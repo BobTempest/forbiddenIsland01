@@ -54,7 +54,7 @@ class Board extends React.Component {
 
     this.state = {
       squares: Array(9),
-      tiles = Array(24),
+      tiles: Array(24),
       xIsNext: true,
       gameIsOver: false
     };
@@ -203,12 +203,15 @@ function riseTheIsland(){
     var tile22 = new Tile("swamp02", 0, false, false, "", "", null, "#FFF", "", "");
     var tile23 = new Tile("swamp03", 0, false, false, "", "", null, "#FFF", "", "");
     var tile24 = new Tile("swamp04", 0, false, false, "", "", null, "#FFF", "", "");
-    // create a 24 array 
+    // create a 24 array
+    var tiles = new Array[tile01,tile02,tile03,tile04,tile05,tile06,tile07,tile08,tile09,tile10,
+      tile11,tile12,tile13,tile14,tile15,tile16,tile17,tile18,tile19,tile20,
+      tile21,tile22,tile23,tile24];
     // shuffleIt
+    tiles = shuffleArray(dice);
+    // foreach tile :make its index position / Is It necessary ?
+    // TODO make Init work
     //AssignEachTile to a Case
-    for (i = 0 , i< 24, i++){
-
-    }
 }
 
 function calculateWinner(squares) {
@@ -229,6 +232,14 @@ function calculateWinner(squares) {
     }
   }
   return null;
+}
+
+function shuffleArray(a) {
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
 }
 
 // ========================================
