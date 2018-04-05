@@ -4,9 +4,12 @@ import './index.css';
 
 function Square(props) {
   return (
-    <button className="square" onClick={props.onClick}>
-      {props.value}
-    </button>
+    <div className="square" style={{background: props.tile.backgroundColor}} onClick={props.onClick}>
+      <span className="inSquarePosition">{props.tile.position}</span><br/>
+      <span className="inSquareText">{props.tile.TextToDisplay}</span><br/>
+      <span className="inSquareLittleText">{props.tile.LittleTextToDisplay}</span>
+      <PlayerPawn pawns={props.tile.playerOn}/>
+    </div>
   );
 }
 
@@ -14,6 +17,15 @@ function EmptySquare() {
   return (
     <button className="emptySquare"></button>
   );
+}
+
+function PlayerPawn(props){
+  if (props.pawns && props.pawns.length > 0){
+    return (
+      <div className="playerPawn">P</div>
+    );
+  }
+  return null
 }
 
 class Board extends React.Component {
@@ -50,17 +62,18 @@ class Board extends React.Component {
     "desert01","desert02","desert03","coast01","coast02",
     "coast03","swamp01","swamp02","swamp03","swamp04"];
 
-    var tiles = [];
+    var tiles = riseTheIsland();
 
     this.state = {
       squares: Array(9),
-      tiles: Array(24),
+      tiles: tiles,
       xIsNext: true,
       gameIsOver: false
     };
   }
 
   handleClick(i) {
+    /*
     const squaresDup = this.state.squares.slice();
     if (squaresDup[i] == null && !this.state.gameIsOver){
       squaresDup[i] = this.state.xIsNext ? 'X' : 'O';
@@ -69,18 +82,25 @@ class Board extends React.Component {
         xIsNext: !this.state.xIsNext
       });
     }
+    */
   }
 
   renderSquare(i) {
-    return <Square value={i}
-    onClick={() => this.handleClick(i)} />;
+    return(
+      <span>
+        <Square tile={this.state.tiles[i]} onClick={() => this.handleClick(i)}/>
+      </span>
+    );
   }
 
   renderEmptySquare() {
-    return <EmptySquare/>;
+    return (
+      <EmptySquare/>
+    );
   }
 
   render() {
+    /*
     const winner = calculateWinner(this.state.squares);
     let status;
     if (winner) {
@@ -88,10 +108,11 @@ class Board extends React.Component {
     } else {
       status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
     }
+    */
 
     return (
       <div>
-        <div className="status">{status}</div>
+        <div className="status">Booyah</div>
         <div className="board-row">
           {this.renderEmptySquare()}
           {this.renderEmptySquare()}
@@ -147,7 +168,7 @@ class Board extends React.Component {
 
 class Game extends React.Component {
   render() {
-    riseTheIsland();
+    //
     return (
       <div className="game">
         <div className="game-board">
@@ -163,14 +184,14 @@ class Game extends React.Component {
 }
 
 class Tile {
-  constructor(name, position, immersed, drawn, startBase, playerOn, templeFor, backgroundColor, TextToDisplay, LittleTextToDisplay) {
+  constructor(name, position, immersed, drawn, startBase, templeFor, playerOn, backgroundColor, TextToDisplay, LittleTextToDisplay) {
     this.name = name; // string
     this.position = position; // int
     this.immersed = immersed; // bool
     this.drawn = drawn; // bool
     this.startBase = startBase; // string
-    this.playerOn = playerOn; // string[]
     this.templeFor = templeFor; // string
+    this.playerOn = playerOn; // string[]
     this.backgroundColor = backgroundColor; // string
     this.TextToDisplay = TextToDisplay; // string
     this.LittleTextToDisplay = LittleTextToDisplay; // string
@@ -179,41 +200,47 @@ class Tile {
 }
 
 function riseTheIsland(){
-    var tile01 = new Tile("helipad", 0, false, false, "Blue", "", null, "#FFF", "HLPRT", "H");
-    var tile02 = new Tile("doorBlack", 0, false, false, "Black", "", null, "#FFF", "DRBlack", "");
-    var tile03 = new Tile("doorRed", 0, false, false, "Red", "", null, "#FFF", "DRRed", "");
-    var tile04 = new Tile("doorGreen", 0, false, false, "Green", "", null, "#FFF", "DRGreen", "");
-    var tile05 = new Tile("doorWhite", 0, false, false, "White", "", null, "#FFF", "DRWhite", "");
-    var tile06 = new Tile("doorYellow", 0, false, false, "Yellow", "", null, "#FFF", "DRYellow", "");
-    var tile07 = new Tile("temple0101", 0, false, false, "", "01", null, "#FFF", "TPL0101", "");
-    var tile08 = new Tile("temple0102", 0, false, false, "", "01", null, "#FFF", "TPL0102", "");
-    var tile09 = new Tile("temple0201", 0, false, false, "", "02", null, "#FFF", "TPL0201", "");
-    var tile10 = new Tile("temple0202", 0, false, false, "", "02", null, "#FFF", "TPL0202", "");
-    var tile11 = new Tile("temple0301", 0, false, false, "", "03", null, "#FFF", "TPL0301", "");
-    var tile12 = new Tile("temple0302", 0, false, false, "", "03", null, "#FFF", "TPL0302", "");
-    var tile13 = new Tile("temple0401", 0, false, false, "", "04", null, "#FFF", "TPL0401", "");
-    var tile14 = new Tile("temple0402", 0, false, false, "", "04", null, "#FFF", "TPL0402", "");
-    var tile15 = new Tile("coast01", 0, false, false, "", "", null, "#FFF", "", "");
-    var tile16 = new Tile("coast02", 0, false, false, "", "", null, "#FFF", "", "");
-    var tile17 = new Tile("coast03", 0, false, false, "", "", null, "#FFF", "", "");
-    var tile18 = new Tile("desert01", 0, false, false, "", "", null, "#FFF", "", "");
-    var tile19 = new Tile("desert02", 0, false, false, "", "", null, "#FFF", "", "");
-    var tile20 = new Tile("desert03", 0, false, false, "", "", null, "#FFF", "", "");
-    var tile21 = new Tile("swamp01", 0, false, false, "", "", null, "#FFF", "", "");
-    var tile22 = new Tile("swamp02", 0, false, false, "", "", null, "#FFF", "", "");
-    var tile23 = new Tile("swamp03", 0, false, false, "", "", null, "#FFF", "", "");
-    var tile24 = new Tile("swamp04", 0, false, false, "", "", null, "#FFF", "", "");
+    var tile01 = new Tile("helipad", 0, false, false, "Blue", "", null, "#FFF", "H", "HLPRT");
+    var tile02 = new Tile("doorBlack", 0, false, false, "Black", "", null, "#FFF", "", "DRBlack");
+    var tile03 = new Tile("doorRed", 0, false, false, "Red", "", ["Red"], "#FFF", "", "DRRed");
+    var tile04 = new Tile("doorGreen", 0, false, false, "Green", "", null, "#FFF", "", "DRGreen");
+    var tile05 = new Tile("doorWhite", 0, false, false, "White", "", null, "#FFF", "", "DRWhite");
+    var tile06 = new Tile("doorYellow", 0, false, false, "Yellow", "", null, "#FFF", "", "DRYellow");
+    var tile07 = new Tile("temple0101", 0, false, false, "", "01", null, "#bdc3c7", "", "TPL0101");
+    var tile08 = new Tile("temple0102", 0, false, false, "", "01", null, "#bdc3c7", "", "TPL0102");
+    var tile09 = new Tile("temple0201", 0, false, false, "", "02", null, "#bdc3c7", "", "TPL0201");
+    var tile10 = new Tile("temple0202", 0, false, false, "", "02", null, "#bdc3c7", "", "TPL0202");
+    var tile11 = new Tile("temple0301", 0, false, false, "", "03", null, "#bdc3c7", "", "TPL0301");
+    var tile12 = new Tile("temple0302", 0, false, false, "", "03", null, "#bdc3c7", "", "TPL0302");
+    var tile13 = new Tile("temple0401", 0, false, false, "", "04", null, "#bdc3c7", "", "TPL0401");
+    var tile14 = new Tile("temple0402", 0, false, false, "", "04", null, "#bdc3c7", "", "TPL0402");
+    var tile15 = new Tile("coast01", 0, false, false, "", "", null, "#825a2c", "", "");
+    var tile16 = new Tile("coast02", 0, false, false, "", "", null, "#825a2c", "", "");
+    var tile17 = new Tile("coast03", 0, false, false, "", "", null, "#825a2c", "", "");
+    var tile18 = new Tile("desert01", 0, false, false, "", "", null, "#ffd480", "", "");
+    var tile19 = new Tile("desert02", 0, false, false, "", "", null, "#ffd480", "", "");
+    var tile20 = new Tile("desert03", 0, false, false, "", "", null, "#ffd480", "", "");
+    var tile21 = new Tile("swamp01", 0, false, false, "", "", null, "#bcf0d2", "", "");
+    var tile22 = new Tile("swamp02", 0, false, false, "", "", null, "#bcf0d2", "", "");
+    var tile23 = new Tile("swamp03", 0, false, false, "", "", null, "#bcf0d2", "", "");
+    var tile24 = new Tile("swamp04", 0, false, false, "", "", null, "#bcf0d2", "", "");
     // create a 24 array
-    var tiles = new Array[tile01,tile02,tile03,tile04,tile05,tile06,tile07,tile08,tile09,tile10,
+    var tiles = new Array(tile01,tile02,tile03,tile04,tile05,tile06,tile07,tile08,tile09,tile10,
       tile11,tile12,tile13,tile14,tile15,tile16,tile17,tile18,tile19,tile20,
-      tile21,tile22,tile23,tile24];
+      tile21,tile22,tile23,tile24);
     // shuffleIt
-    tiles = shuffleArray(dice);
-    // foreach tile :make its index position / Is It necessary ?
-    // TODO make Init work
-    //AssignEachTile to a Case
+    tiles = shuffleArray(tiles);
+    // foreach tile : make its index position
+    for(var i = 0; i<24; i++){
+      var tile = tiles[i];
+      tile.position = i;
+      tiles[i] = tile;
+    }
+
+    return tiles;
 }
 
+/*
 function calculateWinner(squares) {
   const lines = [
     [0, 1, 2],
@@ -232,7 +259,7 @@ function calculateWinner(squares) {
     }
   }
   return null;
-}
+}*/
 
 function shuffleArray(a) {
     for (let i = a.length - 1; i > 0; i--) {

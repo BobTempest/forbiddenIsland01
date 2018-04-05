@@ -21,18 +21,49 @@ ol, ul {
   background: #fff;
   border: 1px solid #999;
   float: left;
-  font-size: 24px;
-  font-weight: bold;
-  line-height: 34px;
   margin-right: 2px;
   margin-top: 2px;
   margin-left: 2px;
   margin-bottom: 2px;
   border-radius: 5px;
   padding: 0;
-  text-align: center;
+
   height: 50px;
   width: 50px;
+}
+
+.inSquarePosition {
+  text-align: center;
+  font-size: 10px;
+  position: relative;
+  top: -3px;
+  left: 3px;
+}
+
+.inSquareText {
+  text-align: center;
+  font-size: 24px;
+  font-weight: bolder;
+  position: relative;
+  top: -8px;
+  left: 16px;
+}
+
+.playerPawn {
+  text-align: center;
+  font-size: 40px;
+  font-weight: bold;
+  position: relative;
+  top: -64px;
+  z-index:5;
+}
+
+.inSquareLittleText {
+  text-align: left;
+  font-size: 10px;
+  position: relative;
+  top: -12px;
+  left: 6px;
 }
 
 .emptySquare {
