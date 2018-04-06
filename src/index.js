@@ -2,7 +2,38 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
-const playerColors = { "Red" : "#CC0000", "Yellow" : "#FFF200", "White" : "#FFFFFF", "Black" : "#000000", "Green" : "#0AB300", "Blue" : "#0064b3"};
+const playerTypes = [
+  {
+    id : 0,
+    role : "Ingeneer", // dry two tiles for one action
+    color : "#CC0000" // red
+  },
+  {
+    id : 1,
+    role : "Navigator", // move another player from one or two tiles for one action
+    color : "#FFF200" //yellow
+  },
+  {
+    id : 2,
+    role : "Messanger",
+    color : "#FFFFFF" //white
+  },
+  {
+    id : 3,
+    role : "Diver",
+    color : "#000000" // black
+  },
+  {
+    id : 4,
+    role : "Explorer",
+    color : "#0AB300" //green
+  },
+  {
+    id : 5,
+    role : "Pilot", // once per turn, fly where you want for 1 action
+    color : "#0064b3" //blue
+  },
+];
 
 const orthogonalPaths =  {0 : [1,3], 1 : [0,4], 2 : [3,7], 3 : [0,2,4,8], 4 : [1,3,5,9], 5 : [4,10],
   6 : [7,12], 7 : [2,6,8,13], 8 : [3,7,9,14], 9 : [4,8,10,15], 10 : [5,9,11,16], 11 : [10,17], 12 : [6,13], 13 : [7,12,14,18],
@@ -54,26 +85,25 @@ function EmptySquare() {
 
 function PlayerPawn(props){
   if (props.pawns && props.pawns.length === 1){
-    // let color01 = playerColors[props.pawns[0]];
     return (
-      <div className="playerPawn singlePP" style={{color: playerColors[props.pawns[0]]}}>P</div>
+      <div className="playerPawn singlePP" style={{color: playerTypes[props.pawns[0]].color}}>P</div>
     );
   }
   else if(props.pawns && props.pawns.length === 2){
     return (
-      <div className="playerPawn twoPP"><span style={{color: playerColors[props.pawns[0]]}}>P</span>&nbsp;<span style={{color: playerColors[props.pawns[1]]}}>P</span></div>
+      <div className="playerPawn twoPP"><span style={{color: playerTypes[props.pawns[0]].color}}>P</span>&nbsp;<span style={{color: playerTypes[props.pawns[1]].color}}>P</span></div>
     );
   }
   else if(props.pawns && props.pawns.length === 3){
     return (
-      <div className="playerPawn multilinePP"><span style={{color: playerColors[props.pawns[0]]}}>P</span>&nbsp;<span style={{color: playerColors[props.pawns[1]]}}>P</span><br/>
-      <span style={{color: playerColors[props.pawns[2]]}}>P</span></div>
+      <div className="playerPawn multilinePP"><span style={{color: playerTypes[props.pawns[0]].color}}>P</span>&nbsp;<span style={{color: playerTypes[props.pawns[1]].color}}>P</span><br/>
+      <span style={{color: playerTypes[props.pawns[2]].color}}>P</span></div>
     );
   }
   else if(props.pawns && props.pawns.length === 4){
     return (
-      <div className="playerPawn multilinePP"><span style={{color: playerColors[props.pawns[0]]}}>P</span>&nbsp;<span style={{color: playerColors[props.pawns[1]]}}>P</span><br/>
-      <span style={{color: playerColors[props.pawns[2]]}}>P</span>&nbsp;<span style={{color: playerColors[props.pawns[3]]}}>P</span></div>
+      <div className="playerPawn multilinePP"><span style={{color: playerTypes[props.pawns[0]].color}}>P</span>&nbsp;<span style={{color: playerTypes[props.pawns[1]].color}}>P</span><br/>
+      <span style={{color: playerTypes[props.pawns[2]].color}}>P</span>&nbsp;<span style={{color: playerTypes[props.pawns[3]].color}}>P</span></div>
     );
   }
   return null
@@ -210,9 +240,9 @@ class Tile {
     this.position = position; // int
     this.immersed = immersed; // bool
     this.drawn = drawn; // bool
-    this.startBase = startBase; // string
+    this.startBase = startBase; // int [1-6]
     this.templeFor = templeFor; // string
-    this.playerOn = playerOn; // string[]
+    this.playerOn = playerOn; // int[]
     this.backgroundColor = backgroundColor; // string
     this.TextToDisplay = TextToDisplay; // string
     this.LittleTextToDisplay = LittleTextToDisplay; // string
@@ -220,13 +250,31 @@ class Tile {
   }
 }
 
+class Player {
+  constructor(id, role, color, playersName, position, cards, isInGame, leftTheIsland, ) {
+    this.id = id; // int
+    this.role = role // string
+    this.color = color; // string in hexa
+    this.playersName = playersName; // string
+    this.position = position; // int
+    this.cards = cards; // string[]
+    this.isInGame = isInGame; // bool
+    this.leftTheIsland = leftTheIsland; // bool
+    this.imgpath = "/images/char" + role + ".png"; // string
+
+    printIntroduction: {
+        console.log(`My name is ${this.playersName}. Im an ${this.role} and my color is ${this.color}`);
+    }
+  }
+}
+
 function riseTheIsland(){
-    var tile01 = new Tile("helipad", 0, false, false, "Blue", "", null, "#FFF", "H", "HLPRT");
-    var tile02 = new Tile("doorBlack", 0, false, false, "Black", "", null, "#FFF", "", "DRBlack");
-    var tile03 = new Tile("doorRed", 0, false, false, "Red", "", ["Red"], "#FFF", "", "DRRed");
-    var tile04 = new Tile("doorGreen", 0, false, false, "Green", "", null, "#FFF", "", "DRGreen");
-    var tile05 = new Tile("doorWhite", 0, false, false, "White", "", null, "#FFF", "", "DRWhite");
-    var tile06 = new Tile("doorYellow", 0, false, false, "Yellow", "", null, "#FFF", "", "DRYellow");
+    var tile01 = new Tile("helipad", 0, false, false, 5, "", null, "#FFF", "H", "HLPRT");
+    var tile02 = new Tile("doorBlack", 0, false, false, 3, "", null, "#FFF", "", "DRBlack");
+    var tile03 = new Tile("doorRed", 0, false, false, 0, "", [0], "#FFF", "", "DRRed");
+    var tile04 = new Tile("doorGreen", 0, false, false, 4, "", null, "#FFF", "", "DRGreen");
+    var tile05 = new Tile("doorWhite", 0, false, false, 2, "", null, "#FFF", "", "DRWhite");
+    var tile06 = new Tile("doorYellow", 0, false, false, 1, "", null, "#FFF", "", "DRYellow");
     var tile07 = new Tile("temple0101", 0, false, false, "", "01", null, "#bdc3c7", "", "TPL0101");
     var tile08 = new Tile("temple0102", 0, false, false, "", "01", null, "#bdc3c7", "", "TPL0102");
     var tile09 = new Tile("temple0201", 0, false, false, "", "02", null, "#bdc3c7", "", "TPL0201");
@@ -236,15 +284,15 @@ function riseTheIsland(){
     var tile13 = new Tile("temple0401", 0, false, false, "", "04", null, "#bdc3c7", "", "TPL0401");
     var tile14 = new Tile("temple0402", 0, false, false, "", "04", null, "#bdc3c7", "", "TPL0402");
     var tile15 = new Tile("coast01", 0, false, false, "", "", null, "#825a2c", "", "");
-    var tile16 = new Tile("coast02", 0, false, false, "", "", ["Red","Yellow"], "#825a2c", "", "");
+    var tile16 = new Tile("coast02", 0, false, false, "", "", [3,4], "#825a2c", "", "");
     var tile17 = new Tile("coast03", 0, false, false, "", "", null, "#825a2c", "", "");
     var tile18 = new Tile("desert01", 0, false, false, "", "", null, "#ffd480", "", "");
     var tile19 = new Tile("desert02", 0, false, false, "", "", null, "#ffd480", "", "");
     var tile20 = new Tile("desert03", 0, false, false, "", "", null, "#ffd480", "", "");
     var tile21 = new Tile("swamp01", 0, false, false, "", "", null, "#bcf0d2", "", "");
-    var tile22 = new Tile("swamp02", 0, false, false, "", "", ["Blue","White", "Black"], "#bcf0d2", "", "");
+    var tile22 = new Tile("swamp02", 0, false, false, "", "", [5,0,2], "#bcf0d2", "", "");
     var tile23 = new Tile("swamp03", 0, false, false, "", "", null, "#bcf0d2", "", "");
-    var tile24 = new Tile("swamp04", 0, false, false, "", "", ["Red","Yellow","Green","Blue"], "#bcf0d2", "", "");
+    var tile24 = new Tile("swamp04", 0, false, false, "", "", [1,3,4,5], "#bcf0d2", "", "");
     // create a 24 array
     var tiles = new Array(tile01,tile02,tile03,tile04,tile05,tile06,tile07,tile08,tile09,tile10,
       tile11,tile12,tile13,tile14,tile15,tile16,tile17,tile18,tile19,tile20,
