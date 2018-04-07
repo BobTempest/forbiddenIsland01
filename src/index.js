@@ -5,33 +5,40 @@ import './index.css';
 const playerTypes = [
   {
     id : 0,
-    role : "Ingeneer", // dry two tiles for one action
-    color : "#CC0000" // red
+    role : "Engineer", // dry two tiles for one action
+    color : "#CC0000", // red
+    name : "Natacha"
+
   },
   {
     id : 1,
     role : "Navigator", // move another player from one or two tiles for one action
-    color : "#FFF200" //yellow
+    color : "#FFF200", //yellow
+    name : "Boris"
   },
   {
     id : 2,
     role : "Messanger",
-    color : "#FFFFFF" //white
+    color : "#FFFFFF", //white
+    name : "Francois"
   },
   {
     id : 3,
-    role : "Diver",
-    color : "#000000" // black
+    role : "Diver", // can move one wet case and one other case
+    color : "#000000", // black
+    name : "Gina"
   },
   {
     id : 4,
-    role : "Explorer",
-    color : "#0AB300" //green
+    role : "Explorer", // can move and dry orth and diagonaly
+    color : "#0AB300", //green
+    name : "Brian"
   },
   {
     id : 5,
     role : "Pilot", // once per turn, fly where you want for 1 action
-    color : "#0064b3" //blue
+    color : "#0064b3", //blue
+    name : "Bob"
   },
 ];
 
@@ -49,7 +56,8 @@ const scubaDiversPaths = {0 : [8], 1 : [9], 2 : [4,13], 3 : [5,14], 4 : [2,15], 
 
  const gameSteps = ["init", "startTurn", "playerActionOne", "playerActionTwo", "playerActionThree", "playerPickACard", "floodRise", "endTurn", "final"];
 
- const playerCardsLeap = [
+/*
+ const playerCards = [
  "crystal","crystal","crystal","crystal","crystal",
  "cup","cup","cup","cup","cup",
  "statue","statue","statue","statue","statue",
@@ -57,6 +65,7 @@ const scubaDiversPaths = {0 : [8], 1 : [9], 2 : [4,13], 3 : [5,14], 4 : [2,15], 
  "helicopter","helicopter","helicopter",
  "sandBag","sandBag",
  "floodRise","floodRise","floodRise"];
+ */
 
  const tilesCards = [
  "helipad",
@@ -66,24 +75,45 @@ const scubaDiversPaths = {0 : [8], 1 : [9], 2 : [4,13], 3 : [5,14], 4 : [2,15], 
  "desert01","desert02","desert03","coast01","coast02",
  "coast03","swamp01","swamp02","swamp03","swamp04"];
 
-function Square(props) {
+function DrawSquare(props) {
   return (
     <div className="square" style={{background: props.tile.backgroundColor}} onClick={props.onClick}>
       <span className="inSquarePosition">{props.tile.position}</span><br/>
       <span className="inSquareText">{props.tile.TextToDisplay}</span><br/>
       <span className="inSquareLittleText">{props.tile.LittleTextToDisplay}</span>
-      <PlayerPawn pawns={props.tile.playerOn}/>
+      <DrawPlayerPawn pawns={props.tile.playerOn}/>
     </div>
   );
 }
 
-function EmptySquare() {
+function DrawPlayerBoard(props) {
+  return (
+
+    <div className="playerBoard" style={{color: props.player.color}}>
+      <span className="inBoardRole" style={{color: props.player.color}}>{props.player.role}</span>&nbsp;&nbsp;
+      <span className="inBoardName">{props.player.playersName}</span>
+      <br/>
+      <div className="inBoardCards">
+          <DrawPlayerCards cards={props.player.cards}/>
+      </div>
+    </div>
+  )
+}
+
+function DrawPlayerCards(props){
+  let output = props.cards.map((card) =>
+    <span className="boardPlayerCards"><img src={card.url} width="40px" height="60px" /></span>
+  );
+  return output;
+}
+
+function DrawEmptySquare() {
   return (
     <button className="emptySquare"></button>
   );
 }
 
-function PlayerPawn(props){
+function DrawPlayerPawn(props){
   if (props.pawns && props.pawns.length === 1){
     return (
       <div className="playerPawn singlePP" style={{color: playerTypes[props.pawns[0]].color}}>P</div>
@@ -109,18 +139,57 @@ function PlayerPawn(props){
   return null
 }
 
+
+
 class Board extends React.Component {
   constructor(props) {
     super(props);
 
     var tiles = riseTheIsland();
+    var playerCardsLeap = generatePlayerCardsLeap();
+    var playerCardsDiscard = new Array();
+    var tilesCardsLeap = generateTilesCardsLeap();
+    var tilesCardsDiscard = new Array();
+
+    var players = generatePlayers();
+    // distribuer les cartes aux joueurs
+    players.forEach(giveTwoInitialCards);
+    // assigner les positions de depart
+    players.forEach(getInitialPlayerPosition);
 
     this.state = {
-      squares: Array(9),
+      // squares: Array(9),
       tiles: tiles,
-      xIsNext: true,
-      gameIsOver: false
+      playerCardsLeap: playerCardsLeap,
+      playerCardsDiscard: playerCardsDiscard,
+      tilesCardsLeap: tilesCardsLeap,
+      tilesCardsDiscard: tilesCardsDiscard,
+      players: players,
+      //xIsNext: true,
+      //gameIsOver: false
     };
+
+    function getInitialPlayerPosition(player, y, z){
+        for (let i = 0; i < tiles.length; i++){
+          if (tiles[i].startBase === player.type){
+            player.position = tiles[i].position;
+            tiles[i].playerOn.push(player.type);
+            break;
+          }
+        }
+    }
+
+    function giveTwoInitialCards(player, y , z){
+      for (let i = 0; i < 2; i++){
+            let card = playerCardsLeap.pop();
+            while (card.name === "floodRise"){
+              playerCardsLeap.push(card);
+              shuffleArray(playerCardsLeap);
+              card = playerCardsLeap.pop();
+            }
+            player.cards.push(card);
+      }
+    }
   }
 
   handleClick(i) {
@@ -139,15 +208,23 @@ class Board extends React.Component {
   renderSquare(i) {
     return(
       <span>
-        <Square tile={this.state.tiles[i]} onClick={() => this.handleClick(i)}/>
+        <DrawSquare tile={this.state.tiles[i]} onClick={() => this.handleClick(i)}/>
       </span>
     );
   }
 
   renderEmptySquare() {
     return (
-      <EmptySquare/>
+      <DrawEmptySquare/>
     );
+  }
+
+  renderPlayerBoard(i) {
+    return (
+      <span>
+        <DrawPlayerBoard player={this.state.players[i]} />
+      </span>
+    )
   }
 
   render() {
@@ -162,6 +239,7 @@ class Board extends React.Component {
     */
 
     return (
+
       <div>
         <div className="status">Booyah</div>
         <div className="board-row">
@@ -212,6 +290,12 @@ class Board extends React.Component {
           {this.renderEmptySquare()}
           {this.renderEmptySquare()}
         </div>
+        <div className="playerBoard-column">
+          {this.renderPlayerBoard(0)}
+          {this.renderPlayerBoard(1)}
+          {this.renderPlayerBoard(2)}
+          {this.renderPlayerBoard(3)}
+        </div>
       </div>
     );
   }
@@ -240,7 +324,7 @@ class Tile {
     this.position = position; // int
     this.immersed = immersed; // bool
     this.drawn = drawn; // bool
-    this.startBase = startBase; // int [1-6]
+    this.startBase = startBase; // int [0-5]
     this.templeFor = templeFor; // string
     this.playerOn = playerOn; // int[]
     this.backgroundColor = backgroundColor; // string
@@ -251,8 +335,9 @@ class Tile {
 }
 
 class Player {
-  constructor(id, role, color, playersName, position, cards, isInGame, leftTheIsland, ) {
+  constructor(id, type, role, color, playersName, position, cards, isInGame, leftTheIsland, ) {
     this.id = id; // int
+    this.type = type; // int
     this.role = role // string
     this.color = color; // string in hexa
     this.playersName = playersName; // string
@@ -269,32 +354,32 @@ class Player {
 }
 
 function riseTheIsland(){
-    var tile01 = new Tile("helipad", 0, false, false, 5, "", null, "#FFF", "H", "HLPRT");
-    var tile02 = new Tile("doorBlack", 0, false, false, 3, "", null, "#FFF", "", "DRBlack");
-    var tile03 = new Tile("doorRed", 0, false, false, 0, "", [0], "#FFF", "", "DRRed");
-    var tile04 = new Tile("doorGreen", 0, false, false, 4, "", null, "#FFF", "", "DRGreen");
-    var tile05 = new Tile("doorWhite", 0, false, false, 2, "", null, "#FFF", "", "DRWhite");
-    var tile06 = new Tile("doorYellow", 0, false, false, 1, "", null, "#FFF", "", "DRYellow");
-    var tile07 = new Tile("temple0101", 0, false, false, "", "01", null, "#bdc3c7", "", "TPL0101");
-    var tile08 = new Tile("temple0102", 0, false, false, "", "01", null, "#bdc3c7", "", "TPL0102");
-    var tile09 = new Tile("temple0201", 0, false, false, "", "02", null, "#bdc3c7", "", "TPL0201");
-    var tile10 = new Tile("temple0202", 0, false, false, "", "02", null, "#bdc3c7", "", "TPL0202");
-    var tile11 = new Tile("temple0301", 0, false, false, "", "03", null, "#bdc3c7", "", "TPL0301");
-    var tile12 = new Tile("temple0302", 0, false, false, "", "03", null, "#bdc3c7", "", "TPL0302");
-    var tile13 = new Tile("temple0401", 0, false, false, "", "04", null, "#bdc3c7", "", "TPL0401");
-    var tile14 = new Tile("temple0402", 0, false, false, "", "04", null, "#bdc3c7", "", "TPL0402");
-    var tile15 = new Tile("coast01", 0, false, false, "", "", null, "#825a2c", "", "");
-    var tile16 = new Tile("coast02", 0, false, false, "", "", [3,4], "#825a2c", "", "");
-    var tile17 = new Tile("coast03", 0, false, false, "", "", null, "#825a2c", "", "");
-    var tile18 = new Tile("desert01", 0, false, false, "", "", null, "#ffd480", "", "");
-    var tile19 = new Tile("desert02", 0, false, false, "", "", null, "#ffd480", "", "");
-    var tile20 = new Tile("desert03", 0, false, false, "", "", null, "#ffd480", "", "");
-    var tile21 = new Tile("swamp01", 0, false, false, "", "", null, "#bcf0d2", "", "");
-    var tile22 = new Tile("swamp02", 0, false, false, "", "", [5,0,2], "#bcf0d2", "", "");
-    var tile23 = new Tile("swamp03", 0, false, false, "", "", null, "#bcf0d2", "", "");
-    var tile24 = new Tile("swamp04", 0, false, false, "", "", [1,3,4,5], "#bcf0d2", "", "");
+    var tile01 = new Tile("helipad", 0, false, false, 5, "", new Array(), "#FFF", "H", "HLPRT");
+    var tile02 = new Tile("doorBlack", 0, false, false, 3, "", new Array(), "#FFF", "", "DRBlack");
+    var tile03 = new Tile("doorRed", 0, false, false, 0, "", new Array(), "#FFF", "", "DRRed");
+    var tile04 = new Tile("doorGreen", 0, false, false, 4, "", new Array(), "#FFF", "", "DRGreen");
+    var tile05 = new Tile("doorWhite", 0, false, false, 2, "", new Array(), "#FFF", "", "DRWhite");
+    var tile06 = new Tile("doorYellow", 0, false, false, 1, "", new Array(), "#FFF", "", "DRYellow");
+    var tile07 = new Tile("temple0101", 0, false, false, "", "01", new Array(), "#bdc3c7", "", "TPL0101");
+    var tile08 = new Tile("temple0102", 0, false, false, "", "01", new Array(), "#bdc3c7", "", "TPL0102");
+    var tile09 = new Tile("temple0201", 0, false, false, "", "02", new Array(), "#bdc3c7", "", "TPL0201");
+    var tile10 = new Tile("temple0202", 0, false, false, "", "02", new Array(), "#bdc3c7", "", "TPL0202");
+    var tile11 = new Tile("temple0301", 0, false, false, "", "03", new Array(), "#bdc3c7", "", "TPL0301");
+    var tile12 = new Tile("temple0302", 0, false, false, "", "03", new Array(), "#bdc3c7", "", "TPL0302");
+    var tile13 = new Tile("temple0401", 0, false, false, "", "04", new Array(), "#bdc3c7", "", "TPL0401");
+    var tile14 = new Tile("temple0402", 0, false, false, "", "04", new Array(), "#bdc3c7", "", "TPL0402");
+    var tile15 = new Tile("coast01", 0, false, false, "", "", new Array(), "#825a2c", "", "");
+    var tile16 = new Tile("coast02", 0, false, false, "", "", new Array(), "#825a2c", "", "");
+    var tile17 = new Tile("coast03", 0, false, false, "", "", new Array(), "#825a2c", "", "");
+    var tile18 = new Tile("desert01", 0, false, false, "", "", new Array(), "#ffd480", "", "");
+    var tile19 = new Tile("desert02", 0, false, false, "", "", new Array(), "#ffd480", "", "");
+    var tile20 = new Tile("desert03", 0, false, false, "", "", new Array(), "#ffd480", "", "");
+    var tile21 = new Tile("swamp01", 0, false, false, "", "", new Array(), "#bcf0d2", "", "");
+    var tile22 = new Tile("swamp02", 0, false, false, "", "", new Array(), "#bcf0d2", "", "");
+    var tile23 = new Tile("swamp03", 0, false, false, "", "", new Array(), "#bcf0d2", "", "");
+    var tile24 = new Tile("swamp04", 0, false, false, "", "", new Array(), "#bcf0d2", "", "");
     // create a 24 array
-    var tiles = new Array(tile01,tile02,tile03,tile04,tile05,tile06,tile07,tile08,tile09,tile10,
+    let tiles = new Array(tile01,tile02,tile03,tile04,tile05,tile06,tile07,tile08,tile09,tile10,
       tile11,tile12,tile13,tile14,tile15,tile16,tile17,tile18,tile19,tile20,
       tile21,tile22,tile23,tile24);
     // shuffleIt
@@ -307,6 +392,60 @@ function riseTheIsland(){
     }
 
     return tiles;
+}
+
+function generatePlayerCardsLeap(){
+    let cards = new Array();
+    for (let i = 0; i < 5; i++){
+        let card = { name : "crystal", type : 0, url : "img/crystalCard.png"};
+        cards.push(card);
+    }
+    for (let i = 0; i < 5; i++){
+        let card = { name : "cup", type : 1, url : "img/cupCard.png"};
+        cards.push(card);
+    }
+    for (let i = 0; i < 5; i++){
+        let card = { name : "sceptre", type : 2, url : "img/sceptreCard.png"};
+        cards.push(card);
+    }
+    for (let i = 0; i < 5; i++){
+        let card = { name : "statue", type : 3, url : "img/statueCard.png"};
+        cards.push(card);
+    }
+    for (let i = 0; i < 3; i++){
+        let card = { name : "helicopter", type : 4, url : "img/helicopterCard.png"};
+        cards.push(card);
+    }
+    for (let i = 0; i < 2; i++){
+        let card = { name : "sandBag", type : 5, url : "img/sandBagCard.png"};
+        cards.push(card);
+    }
+    for (let i = 0; i < 3; i++){
+        let card = { name : "floodRise", type : 5, url : "img/floodRiseCard.png"};
+        cards.push(card);
+    }
+    cards = shuffleArray(cards);
+    return cards;
+}
+
+function generateTilesCardsLeap(){
+    let cards = tilesCards;
+    cards = shuffleArray(cards);
+    return cards;
+}
+
+function generatePlayers(){
+    let roles = new Array(0,1,2,3,4,5);
+    roles = shuffleArray(roles);
+    let players = new Array();
+    for (let i = 1; i < 5; i++){
+      let type = roles[i];
+      let player = new Player(
+          i, type, playerTypes[type].role, playerTypes[type].color, playerTypes[type].name, 0, new Array(), true, false
+      )
+      players.push(player);
+    }
+    return players;
 }
 
 /*
