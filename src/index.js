@@ -24,13 +24,13 @@ const playerTypes = [
   },
   {
     id : 3,
-    role : "Diver",
+    role : "Diver", // can move one wet case and one other case
     color : "#000000", // black
     name : "Gina"
   },
   {
     id : 4,
-    role : "Explorer",
+    role : "Explorer", // can move and dry orth and diagonaly
     color : "#0AB300", //green
     name : "Brian"
   },
@@ -56,6 +56,7 @@ const scubaDiversPaths = {0 : [8], 1 : [9], 2 : [4,13], 3 : [5,14], 4 : [2,15], 
 
  const gameSteps = ["init", "startTurn", "playerActionOne", "playerActionTwo", "playerActionThree", "playerPickACard", "floodRise", "endTurn", "final"];
 
+/*
  const playerCards = [
  "crystal","crystal","crystal","crystal","crystal",
  "cup","cup","cup","cup","cup",
@@ -64,6 +65,7 @@ const scubaDiversPaths = {0 : [8], 1 : [9], 2 : [4,13], 3 : [5,14], 4 : [2,15], 
  "helicopter","helicopter","helicopter",
  "sandBag","sandBag",
  "floodRise","floodRise","floodRise"];
+ */
 
  const tilesCards = [
  "helipad",
@@ -73,24 +75,45 @@ const scubaDiversPaths = {0 : [8], 1 : [9], 2 : [4,13], 3 : [5,14], 4 : [2,15], 
  "desert01","desert02","desert03","coast01","coast02",
  "coast03","swamp01","swamp02","swamp03","swamp04"];
 
-function Square(props) {
+function DrawSquare(props) {
   return (
     <div className="square" style={{background: props.tile.backgroundColor}} onClick={props.onClick}>
       <span className="inSquarePosition">{props.tile.position}</span><br/>
       <span className="inSquareText">{props.tile.TextToDisplay}</span><br/>
       <span className="inSquareLittleText">{props.tile.LittleTextToDisplay}</span>
-      <PlayerPawn pawns={props.tile.playerOn}/>
+      <DrawPlayerPawn pawns={props.tile.playerOn}/>
     </div>
   );
 }
 
-function EmptySquare() {
+function DrawPlayerBoard(props) {
+  return (
+
+    <div className="playerBoard" style={{color: props.player.color}}>
+      <span className="inBoardRole" style={{color: props.player.color}}>{props.player.role}</span>&nbsp;&nbsp;
+      <span className="inBoardName">{props.player.playersName}</span>
+      <br/>
+      <div className="inBoardCards">
+          <DrawPlayerCards cards={props.player.cards}/>
+      </div>
+    </div>
+  )
+}
+
+function DrawPlayerCards(props){
+  let output = props.cards.map((card) =>
+    <span className="boardPlayerCards"><img src={card.url} width="40px" height="60px" /></span>
+  );
+  return output;
+}
+
+function DrawEmptySquare() {
   return (
     <button className="emptySquare"></button>
   );
 }
 
-function PlayerPawn(props){
+function DrawPlayerPawn(props){
   if (props.pawns && props.pawns.length === 1){
     return (
       <div className="playerPawn singlePP" style={{color: playerTypes[props.pawns[0]].color}}>P</div>
@@ -129,9 +152,8 @@ class Board extends React.Component {
     var tilesCardsDiscard = new Array();
 
     var players = generatePlayers();
-
     // distribuer les cartes aux joueurs
-
+    players.forEach(giveTwoInitialCards);
     // assigner les positions de depart
     players.forEach(getInitialPlayerPosition);
 
@@ -156,6 +178,18 @@ class Board extends React.Component {
           }
         }
     }
+
+    function giveTwoInitialCards(player, y , z){
+      for (let i = 0; i < 2; i++){
+            let card = playerCardsLeap.pop();
+            while (card.name === "floodRise"){
+              playerCardsLeap.push(card);
+              shuffleArray(playerCardsLeap);
+              card = playerCardsLeap.pop();
+            }
+            player.cards.push(card);
+      }
+    }
   }
 
   handleClick(i) {
@@ -174,15 +208,23 @@ class Board extends React.Component {
   renderSquare(i) {
     return(
       <span>
-        <Square tile={this.state.tiles[i]} onClick={() => this.handleClick(i)}/>
+        <DrawSquare tile={this.state.tiles[i]} onClick={() => this.handleClick(i)}/>
       </span>
     );
   }
 
   renderEmptySquare() {
     return (
-      <EmptySquare/>
+      <DrawEmptySquare/>
     );
+  }
+
+  renderPlayerBoard(i) {
+    return (
+      <span>
+        <DrawPlayerBoard player={this.state.players[i]} />
+      </span>
+    )
   }
 
   render() {
@@ -197,6 +239,7 @@ class Board extends React.Component {
     */
 
     return (
+
       <div>
         <div className="status">Booyah</div>
         <div className="board-row">
@@ -246,6 +289,12 @@ class Board extends React.Component {
           {this.renderSquare(23)}
           {this.renderEmptySquare()}
           {this.renderEmptySquare()}
+        </div>
+        <div className="playerBoard-column">
+          {this.renderPlayerBoard(0)}
+          {this.renderPlayerBoard(1)}
+          {this.renderPlayerBoard(2)}
+          {this.renderPlayerBoard(3)}
         </div>
       </div>
     );
@@ -346,7 +395,35 @@ function riseTheIsland(){
 }
 
 function generatePlayerCardsLeap(){
-    let cards = playerCards;
+    let cards = new Array();
+    for (let i = 0; i < 5; i++){
+        let card = { name : "crystal", type : 0, url : "img/crystalCard.png"};
+        cards.push(card);
+    }
+    for (let i = 0; i < 5; i++){
+        let card = { name : "cup", type : 1, url : "img/cupCard.png"};
+        cards.push(card);
+    }
+    for (let i = 0; i < 5; i++){
+        let card = { name : "sceptre", type : 2, url : "img/sceptreCard.png"};
+        cards.push(card);
+    }
+    for (let i = 0; i < 5; i++){
+        let card = { name : "statue", type : 3, url : "img/statueCard.png"};
+        cards.push(card);
+    }
+    for (let i = 0; i < 3; i++){
+        let card = { name : "helicopter", type : 4, url : "img/helicopterCard.png"};
+        cards.push(card);
+    }
+    for (let i = 0; i < 2; i++){
+        let card = { name : "sandBag", type : 5, url : "img/sandBagCard.png"};
+        cards.push(card);
+    }
+    for (let i = 0; i < 3; i++){
+        let card = { name : "floodRise", type : 5, url : "img/floodRiseCard.png"};
+        cards.push(card);
+    }
     cards = shuffleArray(cards);
     return cards;
 }
@@ -364,7 +441,7 @@ function generatePlayers(){
     for (let i = 1; i < 5; i++){
       let type = roles[i];
       let player = new Player(
-          i, type, playerTypes[type].role, playerTypes[type].color, playerTypes[type].name, 0, null, true, false
+          i, type, playerTypes[type].role, playerTypes[type].color, playerTypes[type].name, 0, new Array(), true, false
       )
       players.push(player);
     }

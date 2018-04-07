@@ -97,6 +97,49 @@ ol, ul {
   width: 50px;
 }
 
+.playerBoard-column {
+    float: left;
+}
+
+.playerBoard {
+  background: #fff;
+  border: 4px solid;
+  float: left;
+  line-height: 24px;
+  margin-right: 2px;
+  margin-top: 2px;
+  margin-left: 10px;
+  margin-bottom: 2px;
+  border-radius: 5px;
+  padding: 10;
+  height: 100px;
+  width: 300px;
+  box-shadow: 1px 1px 3px #333333;
+}
+
+.inBoardName {
+  color: #000;
+  font-size: 24px;
+}
+
+.inBoardRole {
+  font-size: 24px;
+  font-weight: bold;
+  text-shadow: 1px 1px 3px #333333;
+  margin-left: 10px;
+  margin-top: 10px;
+}
+
+.inBoardCards {
+    color: #000;
+  font-size: 12px;
+  margin-left: 10px;
+}
+
+.boardPlayerCards {
+  margin-left: 5px;
+  box-shadow: 1px 1px 3px #333333;
+}
 
 .square:focus {
   outline: none;
