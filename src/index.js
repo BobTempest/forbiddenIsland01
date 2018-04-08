@@ -67,7 +67,7 @@ const scubaDiversPaths = {0 : [8], 1 : [9], 2 : [4,13], 3 : [5,14], 4 : [2,15], 
  "floodRise","floodRise","floodRise"];
  */
 
- const tilesCards = [
+ const floodCards = [
  "helipad",
  "doorBlack","doorYellow","doorGreen","doorRed","doorWhite",
  "temple0101","temple0102","temple0201","temple0202",
@@ -77,7 +77,7 @@ const scubaDiversPaths = {0 : [8], 1 : [9], 2 : [4,13], 3 : [5,14], 4 : [2,15], 
 
 function DrawSquare(props) {
   return (
-    <div className="square" style={{background: props.tile.backgroundColor}} onClick={props.onClick}>
+    <div className="square {props.tile.immersed && immersed}" style={{background: props.tile.backgroundColor}} id={props.index} onClick={props.onClick}>
       <span className="inSquarePosition">{props.tile.position}</span><br/>
       <span className="inSquareText">{props.tile.TextToDisplay}</span><br/>
       <span className="inSquareLittleText">{props.tile.LittleTextToDisplay}</span>
@@ -87,8 +87,8 @@ function DrawSquare(props) {
 }
 
 function DrawPlayerBoard(props) {
+  props.player.printIntroduction;
   return (
-
     <div className="playerBoard" style={{color: props.player.color}}>
       <span className="inBoardRole" style={{color: props.player.color}}>{props.player.role}</span>&nbsp;&nbsp;
       <span className="inBoardName">{props.player.playersName}</span>
@@ -102,7 +102,7 @@ function DrawPlayerBoard(props) {
 
 function DrawPlayerCards(props){
   let output = props.cards.map((card) =>
-    <span className="boardPlayerCards"><img src={card.url} width="40px" height="60px" /></span>
+    <span key={card.id} className="boardPlayerCards"><img src={card.url} width="40px" height="60px" /></span>
   );
   return output;
 }
@@ -148,22 +148,33 @@ class Board extends React.Component {
     var tiles = riseTheIsland();
     var playerCardsLeap = generatePlayerCardsLeap();
     var playerCardsDiscard = new Array();
-    var tilesCardsLeap = generateTilesCardsLeap();
-    var tilesCardsDiscard = new Array();
+    var floodCardsLeap = generateFloodCardsLeap();
+    var floodCardsDiscard = new Array();
 
     var players = generatePlayers();
     // distribuer les cartes aux joueurs
     players.forEach(giveTwoInitialCards);
     // assigner les positions de depart
     players.forEach(getInitialPlayerPosition);
+    // innonder 6 tilesCards
+    for ( let i = 0; i < 6; i++){ // TODO set a name to floodCards
+        let card = floodCardsLeap.pop();
+        for (let j; j < tiles.length; j++){
+          if (tiles[j].name === card){
+            tiles[j].immersed = true;
+            break;
+          }
+        }
+        floodCardsDiscard.push(card);
+    }
 
     this.state = {
       // squares: Array(9),
       tiles: tiles,
       playerCardsLeap: playerCardsLeap,
       playerCardsDiscard: playerCardsDiscard,
-      tilesCardsLeap: tilesCardsLeap,
-      tilesCardsDiscard: tilesCardsDiscard,
+      floodCardsLeap: floodCardsLeap,
+      floodCardsDiscard: floodCardsDiscard,
       players: players,
       //xIsNext: true,
       //gameIsOver: false
@@ -208,7 +219,7 @@ class Board extends React.Component {
   renderSquare(i) {
     return(
       <span>
-        <DrawSquare tile={this.state.tiles[i]} onClick={() => this.handleClick(i)}/>
+        <DrawSquare tile={this.state.tiles[i]} index={i} onClick={() => this.handleClick(i)}/>
       </span>
     );
   }
@@ -241,60 +252,62 @@ class Board extends React.Component {
     return (
 
       <div>
-        <div className="status">Booyah</div>
-        <div className="board-row">
-          {this.renderEmptySquare()}
-          {this.renderEmptySquare()}
-          {this.renderSquare(0)}
-          {this.renderSquare(1)}
-          {this.renderEmptySquare()}
-          {this.renderEmptySquare()}
-        </div>
-        <div className="board-row">
-          {this.renderEmptySquare()}
-          {this.renderSquare(2)}
-          {this.renderSquare(3)}
-          {this.renderSquare(4)}
-          {this.renderSquare(5)}
-          {this.renderEmptySquare()}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(6)}
-          {this.renderSquare(7)}
-          {this.renderSquare(8)}
-          {this.renderSquare(9)}
-          {this.renderSquare(10)}
-          {this.renderSquare(11)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(12)}
-          {this.renderSquare(13)}
-          {this.renderSquare(14)}
-          {this.renderSquare(15)}
-          {this.renderSquare(16)}
-          {this.renderSquare(17)}
-        </div>
-        <div className="board-row">
-          {this.renderEmptySquare()}
-          {this.renderSquare(18)}
-          {this.renderSquare(19)}
-          {this.renderSquare(20)}
-          {this.renderSquare(21)}
-          {this.renderEmptySquare()}
-        </div>
-        <div className="board-row">
-          {this.renderEmptySquare()}
-          {this.renderEmptySquare()}
-          {this.renderSquare(22)}
-          {this.renderSquare(23)}
-          {this.renderEmptySquare()}
-          {this.renderEmptySquare()}
-        </div>
         <div className="playerBoard-column">
           {this.renderPlayerBoard(0)}
           {this.renderPlayerBoard(1)}
           {this.renderPlayerBoard(2)}
           {this.renderPlayerBoard(3)}
+        </div>
+        <div className="board-column">
+          <div className="status">Booyah</div>
+          <div className="board-row">
+            {this.renderEmptySquare()}
+            {this.renderEmptySquare()}
+            {this.renderSquare(0)}
+            {this.renderSquare(1)}
+            {this.renderEmptySquare()}
+            {this.renderEmptySquare()}
+          </div>
+          <div className="board-row">
+            {this.renderEmptySquare()}
+            {this.renderSquare(2)}
+            {this.renderSquare(3)}
+            {this.renderSquare(4)}
+            {this.renderSquare(5)}
+            {this.renderEmptySquare()}
+          </div>
+          <div className="board-row">
+            {this.renderSquare(6)}
+            {this.renderSquare(7)}
+            {this.renderSquare(8)}
+            {this.renderSquare(9)}
+            {this.renderSquare(10)}
+            {this.renderSquare(11)}
+          </div>
+          <div className="board-row">
+            {this.renderSquare(12)}
+            {this.renderSquare(13)}
+            {this.renderSquare(14)}
+            {this.renderSquare(15)}
+            {this.renderSquare(16)}
+            {this.renderSquare(17)}
+          </div>
+          <div className="board-row">
+            {this.renderEmptySquare()}
+            {this.renderSquare(18)}
+            {this.renderSquare(19)}
+            {this.renderSquare(20)}
+            {this.renderSquare(21)}
+            {this.renderEmptySquare()}
+          </div>
+          <div className="board-row">
+            {this.renderEmptySquare()}
+            {this.renderEmptySquare()}
+            {this.renderSquare(22)}
+            {this.renderSquare(23)}
+            {this.renderEmptySquare()}
+            {this.renderEmptySquare()}
+          </div>
         </div>
       </div>
     );
@@ -397,39 +410,39 @@ function riseTheIsland(){
 function generatePlayerCardsLeap(){
     let cards = new Array();
     for (let i = 0; i < 5; i++){
-        let card = { name : "crystal", type : 0, url : "img/crystalCard.png"};
+        let card = { id : i, name : "crystal", type : 0, url : "img/crystalCard.png"};
         cards.push(card);
     }
     for (let i = 0; i < 5; i++){
-        let card = { name : "cup", type : 1, url : "img/cupCard.png"};
+        let card = { id : i + 5, name : "cup", type : 1, url : "img/cupCard.png"};
         cards.push(card);
     }
     for (let i = 0; i < 5; i++){
-        let card = { name : "sceptre", type : 2, url : "img/sceptreCard.png"};
+        let card = { id : i + 10, name : "sceptre", type : 2, url : "img/sceptreCard.png"};
         cards.push(card);
     }
     for (let i = 0; i < 5; i++){
-        let card = { name : "statue", type : 3, url : "img/statueCard.png"};
+        let card = {id : i + 15, name : "statue", type : 3, url : "img/statueCard.png"};
         cards.push(card);
     }
     for (let i = 0; i < 3; i++){
-        let card = { name : "helicopter", type : 4, url : "img/helicopterCard.png"};
+        let card = { id : i + 20, name : "helicopter", type : 4, url : "img/helicopterCard.png"};
         cards.push(card);
     }
     for (let i = 0; i < 2; i++){
-        let card = { name : "sandBag", type : 5, url : "img/sandBagCard.png"};
+        let card = { id : i + 23, name : "sandBag", type : 5, url : "img/sandBagCard.png"};
         cards.push(card);
     }
     for (let i = 0; i < 3; i++){
-        let card = { name : "floodRise", type : 5, url : "img/floodRiseCard.png"};
+        let card = { id : i + 25, name : "floodRise", type : 5, url : "img/floodRiseCard.png"};
         cards.push(card);
     }
     cards = shuffleArray(cards);
     return cards;
 }
 
-function generateTilesCardsLeap(){
-    let cards = tilesCards;
+function generateFloodCardsLeap(){
+    let cards = floodCards;
     cards = shuffleArray(cards);
     return cards;
 }
@@ -448,6 +461,25 @@ function generatePlayers(){
     return players;
 }
 
+/*
+
+function setInitialFlood(){
+  for ( let i = 0; i < 6; i++){
+      let card = floodCardsLeap.pop();
+      // card.name
+      for (let j; j < this.tiles.length; j++){
+        if (this.tiles[j].name === card.name){
+          this.tiles[j].immersed = true;
+          break;
+        }
+      }
+      floodCardsDiscard.push(card);
+  }
+}
+*/
+
+//    var floodCardsLeap = generateFloodCardsLeap();
+//    var floodCardsDiscard = new Array();
 /*
 function calculateWinner(squares) {
   const lines = [
