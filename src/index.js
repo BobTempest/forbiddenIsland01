@@ -8,17 +8,16 @@ const playerTypes = [
     role : "Engineer", // dry two tiles for one action
     color : "#CC0000", // red
     name : "Natacha"
-
   },
   {
     id : 1,
-    role : "Navigator", // move another player from one or two tiles for one action
+    role : "Navigator", // move another player from one or two tiles (straight ?) for one action
     color : "#FFF200", //yellow
     name : "Boris"
   },
   {
     id : 2,
-    role : "Messanger",
+    role : "Messanger", // can give one card for one action to anyone
     color : "#FFFFFF", //white
     name : "Francois"
   },
@@ -56,6 +55,13 @@ const scubaDiversPaths = {0 : [8], 1 : [9], 2 : [4,13], 3 : [5,14], 4 : [2,15], 
 
  const gameSteps = ["init", "startTurn", "playerActionOne", "playerActionTwo", "playerActionThree", "playerPickACard", "floodRise", "endTurn", "final"];
 
+ const trasures = [
+     { name : "crystal", id : 0 },
+     { name : "cup", id : 1 },
+     { name : "sceptre", id : 2 },
+     { name : "statue", id : 3 }
+ ];
+
 /*
  const playerCards = [
  "crystal","crystal","crystal","crystal","crystal",
@@ -68,16 +74,21 @@ const scubaDiversPaths = {0 : [8], 1 : [9], 2 : [4,13], 3 : [5,14], 4 : [2,15], 
  */
 
  const floodCards = [
- "helipad",
- "doorBlack","doorYellow","doorGreen","doorRed","doorWhite",
- "temple0101","temple0102","temple0201","temple0202",
- "temple0301","templ0302","temple0401","temple0402",
- "desert01","desert02","desert03","coast01","coast02",
- "coast03","swamp01","swamp02","swamp03","swamp04"];
+ { name : "helipad" },
+ { name : "doorBlack" }, { name : "doorYellow" }, { name : "doorGreen" }, { name : "doorRed" }, { name : "doorWhite" },
+ { name : "temple0101" }, { name : "temple0102" }, { name : "temple0201" }, { name : "temple0202" },
+ { name : "temple0301" }, { name : "temple0302" }, { name : "temple0001" }, { name : "temple0002" },
+ { name : "desert01" }, { name : "desert02" }, { name : "desert03" }, { name : "coast01" }, { name : "coast02" },
+ { name : "coast03" }, { name : "swamp01" }, { name : "swamp02" }, { name : "swamp03" }, { name : "swamp04" }];
 
 function DrawSquare(props) {
+  let squareStyle = props.tile.immersed? ({background: '#01A9DB'}) : ({background: props.tile.backgroundColor});
+  squareStyle = props.tile.drawned?({background: '#FFF'}) : (squareStyle);
+
+  let squareClass = props.tile.drawned? ('drawnedSquare') : ('square');
+
   return (
-    <div className="square {props.tile.immersed && immersed}" style={{background: props.tile.backgroundColor}} id={props.index} onClick={props.onClick}>
+    <div className={squareClass} style={squareStyle} id={props.index} onClick={props.onClick}>
       <span className="inSquarePosition">{props.tile.position}</span><br/>
       <span className="inSquareText">{props.tile.TextToDisplay}</span><br/>
       <span className="inSquareLittleText">{props.tile.LittleTextToDisplay}</span>
@@ -151,16 +162,22 @@ class Board extends React.Component {
     var floodCardsLeap = generateFloodCardsLeap();
     var floodCardsDiscard = new Array();
 
+    // generer les joueurs
     var players = generatePlayers();
+
     // distribuer les cartes aux joueurs
     players.forEach(giveTwoInitialCards);
+
     // assigner les positions de depart
     players.forEach(getInitialPlayerPosition);
+
     // innonder 6 tilesCards
-    for ( let i = 0; i < 6; i++){ // TODO set a name to floodCards
+    for ( let i = 0; i < 6; i++){
         let card = floodCardsLeap.pop();
-        for (let j; j < tiles.length; j++){
-          if (tiles[j].name === card){
+        // console.log('*************** CARD IS ' + card.name + ' tiles.length = ' + tiles.length);
+        for (let j = 0; j < tiles.length; j++){
+          // console.log('****** TILE IS ' + tiles[j].name);
+          if (tiles[j].name === card.name){
             tiles[j].immersed = true;
             break;
           }
@@ -177,7 +194,7 @@ class Board extends React.Component {
       floodCardsDiscard: floodCardsDiscard,
       players: players,
       //xIsNext: true,
-      //gameIsOver: false
+      gameIsOver: false
     };
 
     function getInitialPlayerPosition(player, y, z){
@@ -332,11 +349,11 @@ class Game extends React.Component {
 }
 
 class Tile {
-  constructor(name, position, immersed, drawn, startBase, templeFor, playerOn, backgroundColor, TextToDisplay, LittleTextToDisplay) {
+  constructor(name, position, immersed, drawned, startBase, templeFor, playerOn, backgroundColor, TextToDisplay, LittleTextToDisplay) {
     this.name = name; // string
     this.position = position; // int
     this.immersed = immersed; // bool
-    this.drawn = drawn; // bool
+    this.drawned = drawned; // bool
     this.startBase = startBase; // int [0-5]
     this.templeFor = templeFor; // string
     this.playerOn = playerOn; // int[]
@@ -367,20 +384,20 @@ class Player {
 }
 
 function riseTheIsland(){
-    var tile01 = new Tile("helipad", 0, false, false, 5, "", new Array(), "#FFF", "H", "HLPRT");
-    var tile02 = new Tile("doorBlack", 0, false, false, 3, "", new Array(), "#FFF", "", "DRBlack");
-    var tile03 = new Tile("doorRed", 0, false, false, 0, "", new Array(), "#FFF", "", "DRRed");
-    var tile04 = new Tile("doorGreen", 0, false, false, 4, "", new Array(), "#FFF", "", "DRGreen");
-    var tile05 = new Tile("doorWhite", 0, false, false, 2, "", new Array(), "#FFF", "", "DRWhite");
-    var tile06 = new Tile("doorYellow", 0, false, false, 1, "", new Array(), "#FFF", "", "DRYellow");
-    var tile07 = new Tile("temple0101", 0, false, false, "", "01", new Array(), "#bdc3c7", "", "TPL0101");
-    var tile08 = new Tile("temple0102", 0, false, false, "", "01", new Array(), "#bdc3c7", "", "TPL0102");
-    var tile09 = new Tile("temple0201", 0, false, false, "", "02", new Array(), "#bdc3c7", "", "TPL0201");
-    var tile10 = new Tile("temple0202", 0, false, false, "", "02", new Array(), "#bdc3c7", "", "TPL0202");
-    var tile11 = new Tile("temple0301", 0, false, false, "", "03", new Array(), "#bdc3c7", "", "TPL0301");
-    var tile12 = new Tile("temple0302", 0, false, false, "", "03", new Array(), "#bdc3c7", "", "TPL0302");
-    var tile13 = new Tile("temple0401", 0, false, false, "", "04", new Array(), "#bdc3c7", "", "TPL0401");
-    var tile14 = new Tile("temple0402", 0, false, false, "", "04", new Array(), "#bdc3c7", "", "TPL0402");
+    var tile01 = new Tile("helipad", 0, false, false, 5, "", new Array(), "#A9D0F5", "H", "HELIPORT");
+    var tile02 = new Tile("doorBlack", 0, false, false, 3, "", new Array(), "#6E6E6E", "", "");
+    var tile03 = new Tile("doorRed", 0, false, false, 0, "", new Array(), "#F78181", "", "");
+    var tile04 = new Tile("doorGreen", 0, false, false, 4, "", new Array(), "#9FF781", "", "");
+    var tile05 = new Tile("doorWhite", 0, false, false, 2, "", new Array(), "#F2F2F2", "", "");
+    var tile06 = new Tile("doorYellow", 0, false, false, 1, "", new Array(), "#F2F5A9", "", "");
+    var tile07 = new Tile("temple0001", 0, false, false, "", "0", new Array(), "#bdc3c7", "", "CRYSTAL");
+    var tile08 = new Tile("temple0002", 0, false, false, "", "0", new Array(), "#bdc3c7", "", "CRYSTAL");
+    var tile09 = new Tile("temple0201", 0, false, false, "", "2", new Array(), "#bdc3c7", "", "SCEPTRE");
+    var tile10 = new Tile("temple0202", 0, false, false, "", "2", new Array(), "#bdc3c7", "", "SCEPTRE");
+    var tile11 = new Tile("temple0301", 0, false, false, "", "3", new Array(), "#bdc3c7", "", "STATUE");
+    var tile12 = new Tile("temple0302", 0, false, false, "", "3", new Array(), "#bdc3c7", "", "STATUE");
+    var tile13 = new Tile("temple0101", 0, false, false, "", "1", new Array(), "#bdc3c7", "", "CUP");
+    var tile14 = new Tile("temple0102", 0, false, false, "", "1", new Array(), "#bdc3c7", "", "CUP");
     var tile15 = new Tile("coast01", 0, false, false, "", "", new Array(), "#825a2c", "", "");
     var tile16 = new Tile("coast02", 0, false, false, "", "", new Array(), "#825a2c", "", "");
     var tile17 = new Tile("coast03", 0, false, false, "", "", new Array(), "#825a2c", "", "");
