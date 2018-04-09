@@ -27,7 +27,6 @@ ol, ul {
   margin-bottom: 2px;
   border-radius: 5px;
   padding: 0;
-
   height: 50px;
   width: 50px;
 }
@@ -52,6 +51,7 @@ ol, ul {
   text-align: center;
   font-size: 10px;
   position: relative;
+  z-index:1;
   top: -3px;
   left: 3px;
 }
@@ -60,9 +60,20 @@ ol, ul {
   text-align: center;
   font-size: 24px;
   font-weight: bolder;
+  z-index:2;
   position: relative;
   top: -8px;
   left: 16px;
+}
+
+.inSquareLittleText {
+  display: inline-block;
+  text-align: center;
+  font-size: 9px;
+  z-index:3;
+  position: relative;
+  line-height: 9px;
+  top: -16px;
 }
 
 .playerPawn {
@@ -70,7 +81,7 @@ ol, ul {
   font-size: 22px;
   font-weight: bold;
   position: relative;
-  z-index:5;
+  z-index:10;
   text-shadow: 1px 1px 3px #333333;
 }
 
@@ -85,14 +96,6 @@ ol, ul {
 .multilinePP {
   line-height: 19px;
   top: -40px;
-}
-
-.inSquareLittleText {
-  text-align: left;
-  font-size: 10px;
-  position: relative;
-  top: -12px;
-  left: 6px;
 }
 
 .emptySquare {
@@ -149,7 +152,6 @@ ol, ul {
 }
 
 .inBoardCards {
-    color: #000;
   font-size: 12px;
   margin-left: 10px;
 }
