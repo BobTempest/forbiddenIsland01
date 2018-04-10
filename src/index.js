@@ -85,10 +85,12 @@ function DrawSquare(props) {
   let squareStyle = props.tile.isImmersed? ({background: '#01A9DB'}) : ({background: props.tile.backgroundColor});
   squareStyle = props.tile.isDrawned?({background: '#FFF'}) : (squareStyle);
 
+  let squareId =  "square" + props.index;
+
   let squareClass = props.tile.isDrawned? ('isDrawnedSquare') : ('square');
 
   return (
-    <div className={squareClass} style={squareStyle} id={props.index} onClick={props.onClick}>
+    <div className={squareClass} style={squareStyle} id={squareId} onClick={props.onClick}>
       <span className="inSquarePosition">{props.tile.position}</span><br/>
       <span className="inSquareText">{props.tile.TextToDisplay}</span><br/>
       <span className="inSquareLittleText">{props.tile.LittleTextToDisplay}</span>
@@ -113,8 +115,7 @@ function DrawPlayerBoard(props) {
 
 function DrawPlayerCards(props){
   let output = props.cards.map((card) =>
-    <span key={card.id} className="boardPlayerCards"><img src={card.url} width="45
-      px" height="70px" /></span>
+    <span key={card.id} className="boardPlayerCards"><img src={card.url} width="45px" height="70px" /></span>
   );
   return output;
 }
@@ -185,7 +186,7 @@ class Board extends React.Component {
     }
 
     // tests
-    console.log('********WhereCanHeMove : ' + whereCanHeMove(16, "Diver") );
+    // console.log('********WhereCanHeMove : ' + whereCanHeMove(16, "Diver") );
 
     this.state = {
       tiles: tiles,
@@ -219,103 +220,108 @@ class Board extends React.Component {
       }
     }
 
-    // returns an array of positions
-    function whereCanHeMove(position, role){
-      let moves = new Array();
-      if (role === "Pilot"){
-        for (let i = 0; i < 24; i ++){
-          if (i !== position){
-            moves.push(i);
-          }
+  } // end of Board constructor
+
+  // returns an array of positions
+  whereCanHeMove(position, role){
+    let moves = new Array();
+    if (role === "Pilot"){
+      for (let i = 0; i < 24; i ++){
+        if (i !== position){
+          moves.push(i);
         }
       }
-      else if (role === "Explorer"){
-          moves = orthogonalPaths[position];
-          moves = moves.concat(diagonalPaths[position]);
-      }
-      else if (role === "Diver"){
-          let afterSwimPositions = new Array();
-          moves = orthogonalPaths[position];
-          for (let j = 0 ; j < moves.length; j++){
-            console.log('***** Check If tile : ' + moves[j] + ' is Drawned ');
-            if (tiles[moves[j]].isDrawned || tiles[moves[j]].isImmersed)
-            {
-                console.log('***** isDrawned ');
-                afterSwimPositions = afterSwimPositions.concat(orthogonalPaths[moves[j]]);
-            }
-          }
-          moves = moves.concat(afterSwimPositions);
-          console.log('***** moves.length : ' + moves.length + ' and contains : ' + moves + ' afterSwimPositions :' + afterSwimPositions);
-      }
-      else {
-          moves = orthogonalPaths[position];
-      }
-
-      // virer les cases isDrawned et origin
-      let output = moves;
-      if (moves.length > 0) {
-        // console.log('***** moves.length : ' + moves.length + ' and contains : ' + moves);
-        for (let k = 0; k < moves.length; k++)
-        {
-          if ( k >= 0 && k < 24){
-            // TODO HERE :
-            if (/*tiles[moves[k]].isDrawned || */moves[k] === position)
-            {
-              let index = output.indexOf(moves[k]);
-              // console.log('***** je splice pos : ' + moves[k] + ' at index :' + index);
-              output.splice(output.indexOf(moves[k]), 1);
-            }
+    }
+    else if (role === "Explorer"){
+        moves = orthogonalPaths[position];
+        moves = moves.concat(diagonalPaths[position]);
+    }
+    else if (role === "Diver"){
+        let afterSwimPositions = new Array();
+        moves = orthogonalPaths[position];
+        for (let j = 0 ; j < moves.length; j++){
+          console.log('***** Check If tile : ' + moves[j] + ' is Drawned ');
+          if (this.state.tiles[moves[j]].isDrawned || this.state.tiles[moves[j]].isImmersed)
+          {
+              console.log('***** isDrawned ');
+              afterSwimPositions = afterSwimPositions.concat(orthogonalPaths[moves[j]]);
           }
         }
-      }
-
-      return output;
+        moves = moves.concat(afterSwimPositions);
+        console.log('***** moves.length : ' + moves.length + ' and contains : ' + moves + ' afterSwimPositions :' + afterSwimPositions);
+    }
+    else {
+        moves = orthogonalPaths[position];
     }
 
-    // returns an array of positions
-    function whereCanHeDry(position, role){
-      let cases = new Array();
-      if (role === "Bag"){
-        for (let i = 0; i < 24; i ++){
-          if (i !== position && tiles[i].isImmersed){
-            cases.push(i);
+    // virer les cases isDrawned et origin
+    let output = moves;
+    if (moves.length > 0) {
+      // console.log('***** moves.length : ' + moves.length + ' and contains : ' + moves);
+      for (let k = 0; k < moves.length; k++)
+      {
+        if ( k >= 0 && k < 24){
+          // TODO HERE :
+          if (this.state.tiles[moves[k]].isDrawned || moves[k] === position)
+          {
+            let index = output.indexOf(moves[k]);
+            // console.log('***** je splice pos : ' + moves[k] + ' at index :' + index);
+            output.splice(output.indexOf(moves[k]), 1);
           }
         }
       }
-      else if (role === "Explorer"){
-        for (let j = 0 ; j < orthogonalPaths[j]; j++){
-          if (orthogonalPaths[j] !== position && tiles[orthogonalPaths[j]].isImmersed){
-            cases.push(orthogonalPaths[j]);
-          }
-        }
-        for (let k = 0 ; k < diagonalPaths[k]; k++){
-          if (diagonalPaths[k] !== position && tiles[diagonalPaths[k]].isImmersed){
-            cases.push(diagonalPaths[k]);
-          }
-        }
-      }
-      else{
-        for (let j = 0 ; j < orthogonalPaths[j]; j++){
-          if (orthogonalPaths[j] !== position && tiles[orthogonalPaths[j]].isImmersed){
-            cases.push(orthogonalPaths[j]);
-          }
-        }
-      }
-
-      return cases;
     }
+
+    return output;
+  }
+
+  // returns an array of positions
+  whereCanHeDry(position, role){
+    let cases = new Array();
+    if (role === "Bag"){
+      for (let i = 0; i < 24; i ++){
+        if (this.state.tiles[i].isImmersed){
+          cases.push(i);
+        }
+      }
+    }
+    else if (role === "Explorer"){
+      for (let j = 0 ; j < orthogonalPaths[position].length; j++){
+        if (this.state.tiles[orthogonalPaths[position][j]].isImmersed){
+          cases.push(orthogonalPaths[position][j]);
+        }
+      }
+      for (let k = 0 ; k < diagonalPaths[position].length; k++){
+        if (this.state.tiles[diagonalPaths[position][k]].isImmersed){
+          cases.push(diagonalPaths[position][k]);
+        }
+      }
+    }
+    else{
+      for (let j = 0 ; j < orthogonalPaths[position].length; j++){
+        if (this.state.tiles[orthogonalPaths[position][j]].isImmersed){
+          cases.push(orthogonalPaths[position][j]);
+        }
+      }
+    }
+
+    return cases;
   }
 
   handleClick(i) {
     // alert("click");
     if (this.state.tiles[i].playerOn.length > 0){
       let id = this.state.tiles[i].playerOn[0];
-      alert("Clicked on tile " + i + " for player id " + id + ". Dessus, il y a le " + this.state.players[id].role + " et sa couleur est le " + this.state.players[id].color);
-      //let tilesToLight = this.Board.whereCanHeMove(i, this.state.players[id].role);
-      // HERE I AM
+      // alert("Clicked on tile " + i + " for player id " + id + ". Dessus, il y a le " + this.state.players[id].role + " et sa couleur est le " + this.state.players[id].color);
+
+      let tilesToLight = this.whereCanHeDry(i, this.state.players[id].role);
+      for (let i = 0; i < tilesToLight.length; i++){
+        document.getElementById("square" + tilesToLight[i]).style.border = "3px solid " + this.state.players[id].color;
+      }
+
+      console.log("Tiles to Ligth = " + tilesToLight);
+
     }
-
-
     /*
     const squaresDup = this.state.squares.slice();
     if (squaresDup[i] === null && !this.state.gameIsOver){
@@ -475,13 +481,14 @@ class Player {
     printIntroduction: {
         console.log(`My name is ${this.playersName}. Im an ${this.role} and my color is ${this.color}`);
     }
+  }
+
 
     /*
     function whereCanHeGo(i, this.role){
       SET MY FUNCTION HERE ?
     }
     */
-  }
 }
 
 function riseTheIsland(){
@@ -579,25 +586,6 @@ function generatePlayers(){
     return players;
 }
 
-/*
-
-function setInitialFlood(){
-  for ( let i = 0; i < 6; i++){
-      let card = floodCardsLeap.pop();
-      // card.name
-      for (let j; j < this.tiles.length; j++){
-        if (this.tiles[j].name === card.name){
-          this.tiles[j].isImmersed = true;
-          break;
-        }
-      }
-      floodCardsDiscard.push(card);
-  }
-}
-*/
-
-//    var floodCardsLeap = generateFloodCardsLeap();
-//    var floodCardsDiscard = new Array();
 /*
 function calculateWinner(squares) {
   const lines = [
