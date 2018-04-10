@@ -85,9 +85,8 @@ function DrawSquare(props) {
   let squareStyle = props.tile.isImmersed? ({background: '#01A9DB'}) : ({background: props.tile.backgroundColor});
   squareStyle = props.tile.isDrawned?({background: '#FFF'}) : (squareStyle);
 
-  let squareId =  "square" + props.index;
-
   let squareClass = props.tile.isDrawned? ('isDrawnedSquare') : ('square');
+  let squareId =  "square" + props.index;
 
   return (
     <div className={squareClass} style={squareStyle} id={squareId} onClick={props.onClick}>
@@ -134,19 +133,19 @@ function DrawPlayerPawn(props){
   }
   else if(props.pawns && props.pawns.length === 2){
     return (
-      <div className="playerPawn twoPP"><span style={{color: playerTypes[props.pawns[0]].color}}>P</span>&nbsp;<span style={{color: playerTypes[props.pawns[1]].color}}>P</span></div>
+      <div className="playerPawn twoPP"><span style={{color: props.players[props.pawns[0]].color}}>P</span>&nbsp;<span style={{color: props.players[props.pawns[1]].color}}>P</span></div>
     );
   }
   else if(props.pawns && props.pawns.length === 3){
     return (
-      <div className="playerPawn multilinePP"><span style={{color: playerTypes[props.pawns[0]].color}}>P</span>&nbsp;<span style={{color: playerTypes[props.pawns[1]].color}}>P</span><br/>
-      <span style={{color: playerTypes[props.pawns[2]].color}}>P</span></div>
+      <div className="playerPawn multilinePP"><span style={{color: props.players[props.pawns[0]].color}}>P</span>&nbsp;<span style={{color: props.players[props.pawns[1]].color}}>P</span><br/>
+      <span style={{color: props.players[props.pawns[2]].color}}>P</span></div>
     );
   }
   else if(props.pawns && props.pawns.length === 4){
     return (
-      <div className="playerPawn multilinePP"><span style={{color: playerTypes[props.pawns[0]].color}}>P</span>&nbsp;<span style={{color: playerTypes[props.pawns[1]].color}}>P</span><br/>
-      <span style={{color: playerTypes[props.pawns[2]].color}}>P</span>&nbsp;<span style={{color: playerTypes[props.pawns[3]].color}}>P</span></div>
+      <div className="playerPawn multilinePP"><span style={{color: props.players[props.pawns[0]].color}}>P</span>&nbsp;<span style={{color: props.players[props.pawns[1]].color}}>P</span><br/>
+      <span style={{color: props.players[props.pawns[2]].color}}>P</span>&nbsp;<span style={{color: props.players[props.pawns[3]].color}}>P</span></div>
     );
   }
   return null
@@ -314,7 +313,7 @@ class Board extends React.Component {
       let id = this.state.tiles[i].playerOn[0];
       // alert("Clicked on tile " + i + " for player id " + id + ". Dessus, il y a le " + this.state.players[id].role + " et sa couleur est le " + this.state.players[id].color);
 
-      let tilesToLight = this.whereCanHeDry(i, this.state.players[id].role);
+      let tilesToLight = this.whereCanHeMove(i, this.state.players[id].role);
       for (let i = 0; i < tilesToLight.length; i++){
         document.getElementById("square" + tilesToLight[i]).style.border = "3px solid " + this.state.players[id].color;
       }
