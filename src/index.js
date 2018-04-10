@@ -224,7 +224,7 @@ class Board extends React.Component {
       let moves = new Array();
       if (role === "Pilot"){
         for (let i = 0; i < 24; i ++){
-          if (i != position){
+          if (i !== position){
             moves.push(i);
           }
         }
@@ -258,7 +258,8 @@ class Board extends React.Component {
         for (let k = 0; k < moves.length; k++)
         {
           if ( k >= 0 && k < 24){
-            if (/*tiles[moves[k]].isDrawned || */moves[k] == position)
+            // TODO HERE :
+            if (/*tiles[moves[k]].isDrawned || */moves[k] === position)
             {
               let index = output.indexOf(moves[k]);
               // console.log('***** je splice pos : ' + moves[k] + ' at index :' + index);
@@ -276,26 +277,26 @@ class Board extends React.Component {
       let cases = new Array();
       if (role === "Bag"){
         for (let i = 0; i < 24; i ++){
-          if (i != position && tiles[i].isImmersed){
+          if (i !== position && tiles[i].isImmersed){
             cases.push(i);
           }
         }
       }
       else if (role === "Explorer"){
         for (let j = 0 ; j < orthogonalPaths[j]; j++){
-          if (orthogonalPaths[j] != position && tiles[orthogonalPaths[j]].isImmersed){
+          if (orthogonalPaths[j] !== position && tiles[orthogonalPaths[j]].isImmersed){
             cases.push(orthogonalPaths[j]);
           }
         }
         for (let k = 0 ; k < diagonalPaths[k]; k++){
-          if (diagonalPaths[k] != position && tiles[diagonalPaths[k]].isImmersed){
+          if (diagonalPaths[k] !== position && tiles[diagonalPaths[k]].isImmersed){
             cases.push(diagonalPaths[k]);
           }
         }
       }
       else{
         for (let j = 0 ; j < orthogonalPaths[j]; j++){
-          if (orthogonalPaths[j] != position && tiles[orthogonalPaths[j]].isImmersed){
+          if (orthogonalPaths[j] !== position && tiles[orthogonalPaths[j]].isImmersed){
             cases.push(orthogonalPaths[j]);
           }
         }
@@ -309,15 +310,15 @@ class Board extends React.Component {
     // alert("click");
     if (this.state.tiles[i].playerOn.length > 0){
       let id = this.state.tiles[i].playerOn[0];
-      // alert("Clicked on tile " + i + " for player id " + id + ". Dessus, il y a le " + this.state.players[id].role + " et sa couleur est le " + this.state.players[id].color);
+      alert("Clicked on tile " + i + " for player id " + id + ". Dessus, il y a le " + this.state.players[id].role + " et sa couleur est le " + this.state.players[id].color);
       //let tilesToLight = this.Board.whereCanHeMove(i, this.state.players[id].role);
-      alert("tilesTo Light"  + tilesToLight);
+      // HERE I AM
     }
 
 
     /*
     const squaresDup = this.state.squares.slice();
-    if (squaresDup[i] == null && !this.state.gameIsOver){
+    if (squaresDup[i] === null && !this.state.gameIsOver){
       squaresDup[i] = this.state.xIsNext ? 'X' : 'O';
       this.setState({
         squares: squaresDup,
@@ -474,6 +475,12 @@ class Player {
     printIntroduction: {
         console.log(`My name is ${this.playersName}. Im an ${this.role} and my color is ${this.color}`);
     }
+
+    /*
+    function whereCanHeGo(i, this.role){
+      SET MY FUNCTION HERE ?
+    }
+    */
   }
 }
 
