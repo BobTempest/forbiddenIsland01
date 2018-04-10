@@ -56,10 +56,10 @@ const scubaDiversPaths = {0 : [8], 1 : [9], 2 : [4,13], 3 : [5,14], 4 : [2,15], 
  const gameSteps = ["init", "startTurn", "playerActionOne", "playerActionTwo", "playerActionThree", "playerPickACard", "floodRise", "endTurn", "final"];
 
  const trasures = [
-     { name : "crystal", id : 0 },
-     { name : "cup", id : 1 },
-     { name : "sceptre", id : 2 },
-     { name : "statue", id : 3 }
+     { id : 0 , name : "crystal" },
+     { id : 1 , name : "cup" },
+     { id : 2 , name : "sceptre"},
+     { id : 3 , name : "statue"}
  ];
 
 /*
@@ -113,7 +113,8 @@ function DrawPlayerBoard(props) {
 
 function DrawPlayerCards(props){
   let output = props.cards.map((card) =>
-    <span key={card.id} className="boardPlayerCards"><img src={card.url} width="40px" height="60px" /></span>
+    <span key={card.id} className="boardPlayerCards"><img src={card.url} width="45
+      px" height="70px" /></span>
   );
   return output;
 }
@@ -149,8 +150,6 @@ function DrawPlayerPawn(props){
   }
   return null
 }
-
-
 
 class Board extends React.Component {
   constructor(props) {
@@ -217,6 +216,76 @@ class Board extends React.Component {
             }
             player.cards.push(card);
       }
+    }
+
+    // returns an array of positions
+    function whereCanHeGo(position, role){
+      let moves = new Array();
+      if (role === "Pilot"){
+        for (let i = 0; i < 24; i ++){
+          if (i != position){
+            moves.push(i);
+          }
+        }
+      }
+      else if (role === "Explorer"){
+          moves = orthogonalPaths[position];
+          moves.push(diagonalPaths[position]);
+      }
+      else if (role === "Diver"){
+          moves = orthogonalPaths[position];
+          for (let j = 0 ; j < moves.length; j++){
+            if (tiles[moves[j]].isDrawned || tiles[moves[j]].isImmersed)
+            {
+                moves.push(orthogonalPaths[moves[j]]);
+            }
+          }
+      }
+      else {
+            moves = orthogonalPaths[position];
+      }
+      // virer les cases drawned et origin
+      for (let k = 0; k < moves.length; k++)
+      {
+          if (moves[k] == position || tiles[moves[k]].isDrawned)
+          {
+            moves.splice(k, 1);
+          }
+      }
+      return moves;
+    }
+
+    // returns an array of positions
+    function whereCanHeDry(position, role){
+      let cases = new Array();
+      if (role === "Bag"){
+        for (let i = 0; i < 24; i ++){
+          if (i != position && tiles[i].isImmersed){
+            cases.push(i);
+          }
+        }
+      }
+      else if (role === "Explorer"){
+        for (let j = 0 ; j < orthogonalPaths[j]; j++){
+          if (orthogonalPaths[j] != position && tiles[orthogonalPaths[j]].isImmersed){
+            cases.push(orthogonalPaths[j]);
+          }
+        }
+        for (let k = 0 ; k < diagonalPaths[k]; k++){
+          if (diagonalPaths[k] != position && tiles[diagonalPaths[k]].isImmersed){
+            cases.push(diagonalPaths[k]);
+          }
+        }
+      }
+      else{
+        for (let j = 0 ; j < orthogonalPaths[j]; j++){
+          if (orthogonalPaths[j] != position && tiles[orthogonalPaths[j]].isImmersed){
+            cases.push(orthogonalPaths[j]);
+          }
+        }
+      }
+
+      return cases;
     }
   }
 
