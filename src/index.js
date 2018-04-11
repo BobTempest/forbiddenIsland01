@@ -107,9 +107,9 @@ function DrawSquare(props) {
 function DrawPlayerBoard(props) {
   props.player.printIntroduction; // TO REMOVE
   return (
-    <div className="playerBoard" style={{color: props.player.color}}>
-      <span className="inBoardRole" style={{color: props.player.color}}>{props.player.role}</span>&nbsp;&nbsp;
-      <span className="inBoardName">{props.player.playersName}</span>
+    <div className="playerBoard">
+      <span className="inBoardName">{props.player.playersName}</span>&nbsp;the&nbsp;
+      <span className="inBoardRole" style={{color: props.player.color}}>{props.player.role}</span>
       <br/>
       <div className="inBoardCards">
           <DrawPlayerCards cards={props.player.cards}/>
@@ -163,7 +163,7 @@ function DrawMessagePanel(props) {
       <div className="panelTitle"> FORBIDDEN<br/>::ReactJS::<br/>ISLAND</div>
       <div className="panelInfo"> Turn : {props.state.turn} </div>
       <div className="panelInfo"> FloodLevel {props.state.floodMeter.level} <span className="littlePanelInfo"> ({props.state.floodMeter.howManyCards(props.state.floodMeter.level)} cards per flood)</span></div>
-      <div className="panelInfo"> {props.state.players[props.state.currentPlayerPlaying].playersName} is Playing. </div>
+      <div className="panelInfo"> {props.state.players[props.state.currentPlayerPlaying].playersName} the {props.state.players[props.state.currentPlayerPlaying].role} is Playing. </div>
       <div className="panelInfo"> Step : {props.state.currentStep} </div>
     </div>
   )
@@ -178,7 +178,7 @@ class Board extends React.Component {
     var playerCardsDiscard = new Array();
     var floodCardsLeap = generateFloodCardsLeap();
     var floodCardsDiscard = new Array();
-    var floodMeter = new FloodMeter(7);
+    var floodMeter = new FloodMeter(1);
 
     // generer les joueurs
     var players = generatePlayers();
