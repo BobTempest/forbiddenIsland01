@@ -17,7 +17,7 @@ const playerTypes = [
   },
   {
     id : 2,
-    role : "Messanger", // can give one card for one action to anyone
+    role : "Messenger", // can give one card for one action to anyone
     color : "#FFFFFF", //white
     name : "Francois"
   },
@@ -82,14 +82,20 @@ const scubaDiversPaths = {0 : [8], 1 : [9], 2 : [4,13], 3 : [5,14], 4 : [2,15], 
  { name : "coast03" }, { name : "swamp01" }, { name : "swamp02" }, { name : "swamp03" }, { name : "swamp04" }];
 
 function DrawSquare(props) {
-  let squareStyle = props.tile.isImmersed? ({background: '#01A9DB'}) : ({background: props.tile.backgroundColor});
-  squareStyle = props.tile.isDrawned?({background: '#FFF'}) : (squareStyle);
+  let squareStyle;
+  if (props.tile.isImmersed){
+      squareStyle = ({background: '#01A9DB' });
+  }else if (props.tile.imgpath.length > 0 && props.tile.name === "helipad") {
+      squareStyle = ({background: 'url(' + props.tile.imgpath + ')' });
+  } else {
+      squareStyle = ({background: props.tile.backgroundColor});
+  }
 
   let squareClass = props.tile.isDrawned? ('isDrawnedSquare') : ('square');
   let squareId =  "square" + props.index;
 
   return (
-    <div className={squareClass} style={squareStyle} id={squareId} onClick={props.onClick}>
+    <div className={squareClass} style={squareStyle} id={squareId} onClick={props.onClick} >
       <span className="inSquarePosition">{props.tile.position}</span><br/>
       <span className="inSquareText">{props.tile.TextToDisplay}</span><br/>
       <span className="inSquareLittleText">{props.tile.LittleTextToDisplay}</span>
@@ -151,6 +157,18 @@ function DrawPlayerPawn(props){
   return null
 }
 
+function DrawMessagePanel(props) {
+  return (
+    <div className="messagePanel">
+      <div className="panelTitle"> FORBIDDEN<br/>::ReactJS::<br/>ISLAND</div>
+      <div className="panelInfo"> Turn : {props.state.turn} </div>
+      <div className="panelInfo"> FloodLevel {props.state.floodMeter.level} <span className="littlePanelInfo"> ({props.state.floodMeter.howManyCards(props.state.floodMeter.level)} cards per flood)</span></div>
+      <div className="panelInfo"> {props.state.players[props.state.currentPlayerPlaying].playersName} is Playing. </div>
+      <div className="panelInfo"> Step : {props.state.currentStep} </div>
+    </div>
+  )
+}
+
 class Board extends React.Component {
   constructor(props) {
     super(props);
@@ -160,6 +178,7 @@ class Board extends React.Component {
     var playerCardsDiscard = new Array();
     var floodCardsLeap = generateFloodCardsLeap();
     var floodCardsDiscard = new Array();
+    var floodMeter = new FloodMeter(7);
 
     // generer les joueurs
     var players = generatePlayers();
@@ -186,7 +205,6 @@ class Board extends React.Component {
 
     // tests
     // console.log('********WhereCanHeMove : ' + whereCanHeMove(16, "Diver") );
-
     this.state = {
       tiles: tiles,
       playerCardsLeap: playerCardsLeap,
@@ -194,7 +212,14 @@ class Board extends React.Component {
       floodCardsLeap: floodCardsLeap,
       floodCardsDiscard: floodCardsDiscard,
       players: players,
-      gameIsOver: false
+      floodMeter: floodMeter,
+      gameIsOver: false,
+      turn : 1,
+      currentPlayerPlaying : 0,
+      currentStep : 1,
+      nbrOfPlayers : players.length,
+      nbrOfPosessedTreasures : 0,
+
     };
 
     function getInitialPlayerPosition(player, y, z){
@@ -317,9 +342,7 @@ class Board extends React.Component {
       for (let i = 0; i < tilesToLight.length; i++){
         document.getElementById("square" + tilesToLight[i]).style.border = "3px solid " + this.state.players[id].color;
       }
-
       console.log("Tiles to Ligth = " + tilesToLight);
-
     }
     /*
     const squaresDup = this.state.squares.slice();
@@ -355,6 +378,14 @@ class Board extends React.Component {
     )
   }
 
+  renderPlayerMessagePanel() {
+    return (
+      <span>
+        <DrawMessagePanel state={this.state} />
+      </span>
+    )
+  }
+
   render() {
     /*
     const winner = calculateWinner(this.state.squares);
@@ -370,10 +401,7 @@ class Board extends React.Component {
 
       <div>
         <div className="playerBoard-column">
-          {this.renderPlayerBoard(0)}
-          {this.renderPlayerBoard(1)}
-          {this.renderPlayerBoard(2)}
-          {this.renderPlayerBoard(3)}
+          {this.renderPlayerMessagePanel()}
         </div>
         <div className="board-column">
           <div className="status">Booyah</div>
@@ -426,6 +454,12 @@ class Board extends React.Component {
             {this.renderEmptySquare()}
           </div>
         </div>
+        <div className="playerBoard-column">
+          {this.renderPlayerBoard(0)}
+          {this.renderPlayerBoard(1)}
+          {this.renderPlayerBoard(2)}
+          {this.renderPlayerBoard(3)}
+        </div>
       </div>
     );
   }
@@ -460,12 +494,12 @@ class Tile {
     this.backgroundColor = backgroundColor; // string
     this.TextToDisplay = TextToDisplay; // string
     this.LittleTextToDisplay = LittleTextToDisplay; // string
-    this.imgpath = "/images/" + name + ".png"; // string
+    this.imgpath = "/img/" + name + "Tile.png"; // string
   }
 }
 
 class Player {
-  constructor(id, type, role, color, playersName, position, cards, isInGame, leftTheIsland, ) {
+  constructor(id, type, role, color, playersName, position, cards, isInGame, leftTheIsland) {
     this.id = id; // int
     this.type = type; // int
     this.role = role // string
@@ -481,8 +515,6 @@ class Player {
         console.log(`My name is ${this.playersName}. Im an ${this.role} and my color is ${this.color}`);
     }
   }
-
-
     /*
     function whereCanHeGo(i, this.role){
       SET MY FUNCTION HERE ?
@@ -490,8 +522,27 @@ class Player {
     */
 }
 
+class FloodMeter {
+  constructor(startLevel) {
+    this.level = startLevel;
+    this.topLevel = 10;
+  }
+
+  howManyCards(level){
+    if (level < 3){
+        return 2;
+    } else if (level < 6) {
+        return 3;
+    } else if (level < 8) {
+        return 4;
+    } else {
+        return 5;
+    }
+  }
+}
+
 function riseTheIsland(){
-    var tile01 = new Tile("helipad", 0, false, false, 5, "", new Array(), "#A9D0F5", "H", "HELIPORT");
+    var tile01 = new Tile("helipad", 0, false, false, 5, "", new Array(), "#A9D0F5", "", "HELIPORT");
     var tile02 = new Tile("doorBlack", 0, false, false, 3, "", new Array(), "#6E6E6E", "", "");
     var tile03 = new Tile("doorRed", 0, false, false, 0, "", new Array(), "#F78181", "", "");
     var tile04 = new Tile("doorGreen", 0, false, false, 4, "", new Array(), "#9FF781", "", "");

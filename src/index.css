@@ -19,7 +19,14 @@ ol, ul {
 
 .square {
   background: #fff;
-  border: 1px solid #999;
+  /*border: 1px solid #999;*/
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  border: 1px solid #222;
+  background: #fff;
+  margin: 10px;
+
   float: left;
   margin-right: 2px;
   margin-top: 2px;
@@ -73,7 +80,7 @@ ol, ul {
   z-index:3;
   position: relative;
   line-height: 9px;
-  top: -16px;
+  top: -20px;
 }
 
 .playerPawn {
@@ -122,9 +129,45 @@ ol, ul {
     margin-left: 10px;
 }
 
+.messagePanel {
+  background: #fff;
+  border: 2px solid #000;
+  float: left;
+  line-height: 24px;
+  margin-right: 2px;
+  margin-top: 2px;
+  margin-left: 10px;
+  margin-bottom: 2px;
+  border-radius: 5px;
+  padding: 10;
+  height: 423px;
+  width: 300px;
+  box-shadow: 1px 1px 3px #333333;
+}
+
+.panelTitle {
+  float: left;
+  margin-left: 10px;
+  font-size: 44px;
+  font-weight: bold;
+  text-shadow: 1px 1px 3px #333333;
+  line-height: 39px;
+}
+
+.panelInfo {
+  float: left;
+  margin-left: 10px;
+  font-size: 20px;
+  text-shadow: 1px 1px 3px #333333;
+}
+
+.littlePanelInfo {
+  font-size: 12px;
+}
+
 .playerBoard {
   background: #fff;
-  border: 4px solid;
+  border: 2px solid;
   float: left;
   line-height: 24px;
   margin-right: 2px;
@@ -153,7 +196,7 @@ ol, ul {
 
 .inBoardCards {
   font-size: 12px;
-  margin-left: 10px;
+  margin-left: 7px;
 }
 
 .boardPlayerCards {
