@@ -62,6 +62,36 @@ const scubaDiversPaths = {0 : [8], 1 : [9], 2 : [4,13], 3 : [5,14], 4 : [2,15], 
      { id : 3 , name : "statue"}
  ];
 
+ const playerSteps = [
+     {id : 0, name : "action 1/3" },
+     {id : 1, name : "action 2/3" },
+     {id : 2, name : "action 3/3" },
+     {id : 3, name : "draw player cards" },
+     {id : 4, name : "draw flood cards" }
+ ];
+
+ const playerDefaultActions = [
+      {id : 0, name : "Move", text: "Move to an adjacent tile." },
+      {id : 1, name : "Dry", text: "Dry an adjacent tile" },
+      {id : 2, name : "Give", text: "Give a card on a character on the same tile" },
+      {id : 3, name : "Get a Treasure !", text: "Get the treasure in this temple." },
+ ];
+
+ const playerSpecialActions = [
+   // Special actions
+   {id : 0, name : "Send a card", forRole: "Messenger", replacesAction: "2", text: "Send a card to any character." },
+   {id : 1, name : "Move someone", forRole: "Navigator", replacesAction: "-", text: "Move any character from one or two tiles." },
+   {id : 2, name : "Dry two tiles", forRole: "Engineer", replacesAction: "1", text: "Dry two adjacent tiles." },
+   {id : 3, name : "Move around", forRole: "Explorer", replacesAction: "0", text: "Move to any tile around." },
+   {id : 4, name : "Dry around", forRole: "Explorer", replacesAction: "1", text: "Dry any tile around." },
+   {id : 5, name : "Fly", forRole: "Pilot", replacesAction: "0", text: "Fly to any tile." },
+   {id : 6, name : "Dive", forRole: "Diver", replacesAction: "0", text: "Dive through any adjacent tile." },
+ ];
+
+ // QUESTIONS : How many times per round can one use its power ?
+ //              Can pilot move someone else with him ?
+//                Navigator move : can he move himself ? same player for two tiles ?
+
 /*
  const playerCards = [
  "crystal","crystal","crystal","crystal","crystal",
@@ -154,7 +184,7 @@ function DrawPlayerPawn(props){
       <span style={{color: props.players[props.pawns[2]].color}}>P</span>&nbsp;<span style={{color: props.players[props.pawns[3]].color}}>P</span></div>
     );
   }
-  return null
+  return null;
 }
 
 function DrawMessagePanel(props) {
@@ -164,9 +194,21 @@ function DrawMessagePanel(props) {
       <div className="panelInfo"> Turn : {props.state.turn} </div>
       <div className="panelInfo"> FloodLevel {props.state.floodMeter.level} <span className="littlePanelInfo"> ({props.state.floodMeter.howManyCards(props.state.floodMeter.level)} cards per flood)</span></div>
       <div className="panelInfo"> {props.state.players[props.state.currentPlayerPlaying].playersName} the {props.state.players[props.state.currentPlayerPlaying].role} is Playing. </div>
-      <div className="panelInfo"> Step : {props.state.currentStep} </div>
+      <div className="panelInfo"> Step : {playerSteps[props.state.currentStep].name} </div>
+      <div className="panelInfo">
+        <ul>
+          <DrawActions actions={props.state.possibleActions}/>
+        </ul>
+      </div>
     </div>
-  )
+  );
+}
+
+function DrawActions(props) {
+  let output = props.actions.map((action) =>
+    <li key={action.name}>{action.name}</li>
+  );
+  return output;
 }
 
 class Board extends React.Component {
@@ -203,6 +245,8 @@ class Board extends React.Component {
         floodCardsDiscard.push(card);
     }
 
+    var possibleActions = getPossibleActions(players[0].role);
+
     // tests
     // console.log('********WhereCanHeMove : ' + whereCanHeMove(16, "Diver") );
     this.state = {
@@ -214,12 +258,12 @@ class Board extends React.Component {
       players: players,
       floodMeter: floodMeter,
       gameIsOver: false,
-      turn : 1,
-      currentPlayerPlaying : 0,
-      currentStep : 1,
       nbrOfPlayers : players.length,
       nbrOfPosessedTreasures : 0,
-
+      turn : 1,
+      currentPlayerPlaying : 0,
+      possibleActions : possibleActions,
+      currentStep : 0,
     };
 
     function getInitialPlayerPosition(player, y, z){
@@ -244,6 +288,37 @@ class Board extends React.Component {
       }
     }
 
+    function getPossibleActions(role) {
+        let actions = new Array();
+         // console.log('***** Trying to get actions for : ' + role );
+        for (let i = 0; i < playerDefaultActions.length; i++){
+            let action = playerDefaultActions[i];
+            for (let j = 0; j < playerSpecialActions.length; j++ )
+            {
+               // console.log('***** running special action : ' + j );
+              if (playerSpecialActions[j].forRole === role && playerSpecialActions[j].replacesAction === i.toString()){
+                // console.log('***** PUSHING : ' + j );
+                action = playerSpecialActions[j];
+              }
+            }
+            // is action possible ?
+            actions.push(action);
+        }
+
+        if (role === "Navigator"){
+                    console.log('***** action before shift : ' + actions );
+          let nada = actions.shift();
+          console.log('***** action post shift : ' + actions );
+          let navigatorActions = new Array();
+          navigatorActions.push(playerDefaultActions[0]);
+          navigatorActions.push(playerSpecialActions[1]);
+          console.log('***** navigatorActions before concat : ' + navigatorActions );
+          navigatorActions = navigatorActions.concat(actions);
+          console.log('***** navigatorActions post concat : ' + navigatorActions );
+          return navigatorActions;
+        }
+        return actions;
+      }
   } // end of Board constructor
 
   // returns an array of positions
@@ -264,10 +339,10 @@ class Board extends React.Component {
         let afterSwimPositions = new Array();
         moves = orthogonalPaths[position];
         for (let j = 0 ; j < moves.length; j++){
-          console.log('***** Check If tile : ' + moves[j] + ' is Drawned ');
+          // console.log('***** Check If tile : ' + moves[j] + ' is Drawned ');
           if (this.state.tiles[moves[j]].isDrawned || this.state.tiles[moves[j]].isImmersed)
           {
-              console.log('***** isDrawned ');
+              // console.log('***** isDrawned ');
               afterSwimPositions = afterSwimPositions.concat(orthogonalPaths[moves[j]]);
           }
         }
@@ -342,7 +417,7 @@ class Board extends React.Component {
       for (let i = 0; i < tilesToLight.length; i++){
         document.getElementById("square" + tilesToLight[i]).style.border = "3px solid " + this.state.players[id].color;
       }
-      console.log("Tiles to Ligth = " + tilesToLight);
+      // console.log("Tiles to Ligth = " + tilesToLight);
     }
     /*
     const squaresDup = this.state.squares.slice();
