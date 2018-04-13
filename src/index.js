@@ -17,7 +17,7 @@ const playerTypes = [
   },
   {
     id : 2,
-    role : "Messanger", // can give one card for one action to anyone
+    role : "Messenger", // can give one card for one action to anyone
     color : "#FFFFFF", //white
     name : "Francois"
   },
@@ -49,9 +49,6 @@ const diagonalPaths = {0 : [4], 1 : [3], 2 : [6,8], 3 : [1,7,9], 4 : [0,8,10], 5
    8 : [2,4,13,15], 9 : [3,5,14,16], 10 : [4,15,17], 11 : [5,16], 12 : [7,18], 13 : [6,8,19],
    14 : [7,9,18,20], 15 : [8,10,19,21], 16 : [9,11,20], 17 : [10,21], 18 : [14,22], 19 : [13,15,23], 20 : [14,16,22],
    21 : [15,17,23], 22 : [18,20], 23 : [19,21]};
-const scubaDiversPaths = {0 : [8], 1 : [9], 2 : [4,13], 3 : [5,14], 4 : [2,15], 5 : [3,16], 6 : [8], 7 : [9,18], 8 : [0,6,11,19],
-   9 : [1,7,11,20], 10 : [8,21], 11 : [9], 12 : [14], 13 : [2,15], 14 : [3,12,16,22], 15 : [4,13,17,23], 16 : [5,14], 17 : [15],
-   18 : [7,20], 19 : [8,21], 20 : [9,18], 21 : [10,19], 22 : [14], 23 : [15]};
 
  const gameSteps = ["init", "startTurn", "playerActionOne", "playerActionTwo", "playerActionThree", "playerPickACard", "floodRise", "endTurn", "final"];
 
@@ -61,6 +58,36 @@ const scubaDiversPaths = {0 : [8], 1 : [9], 2 : [4,13], 3 : [5,14], 4 : [2,15], 
      { id : 2 , name : "sceptre"},
      { id : 3 , name : "statue"}
  ];
+
+ const playerSteps = [
+     {id : 0, name : "action 1/3" },
+     {id : 1, name : "action 2/3" },
+     {id : 2, name : "action 3/3" },
+     {id : 3, name : "draw player cards" },
+     {id : 4, name : "draw flood cards" }
+ ];
+
+ const playerDefaultActions = [
+      {id : 0, name : "Move", text: "Move to an adjacent tile.", enabled : true, triggers : "ActionMove" },
+      {id : 1, name : "Dry", text: "Dry an adjacent tile", enabled : true, triggers : "ActionMove"  },
+      {id : 2, name : "Give", text: "Give a card on a character on the same tile", enabled : true, triggers : "ActionMove"  },
+      {id : 3, name : "Get a Treasure !", text: "Get the treasure in this temple.", enabled : true, triggers : "ActionMove"  },
+ ];
+
+ const playerSpecialActions = [
+   // Special actions
+   {id : 0, name : "Send a card", forRole: "Messenger", replacesAction: "2", text: "Send a card to any character.", enabled : true, triggers : "ActionMove"  },
+   {id : 1, name : "Move someone", forRole: "Navigator", replacesAction: "-", text: "Move any character from one or two tiles.", enabled : true, triggers : "ActionMove"  },
+   {id : 2, name : "Dry two tiles", forRole: "Engineer", replacesAction: "1", text: "Dry two adjacent tiles.", enabled : true, triggers : "ActionMove"  },
+   {id : 3, name : "Move around", forRole: "Explorer", replacesAction: "0", text: "Move to any tile around.", enabled : true, triggers : "ActionMove"  },
+   {id : 4, name : "Dry around", forRole: "Explorer", replacesAction: "1", text: "Dry any tile around." , enabled : true, triggers : "ActionMove" },
+   {id : 5, name : "Fly", forRole: "Pilot", replacesAction: "0", text: "Fly to any tile.", enabled : true, triggers : "ActionMove"  },
+   {id : 6, name : "Dive", forRole: "Diver", replacesAction: "0", text: "Dive through any adjacent tile.", enabled : true, triggers : "ActionMove"  },
+ ];
+
+ // QUESTIONS : How many times per round can one use its power ?
+ //              Can pilot move someone else with him ?
+//                Navigator move : can he move himself ? same player for two tiles ?
 
 /*
  const playerCards = [
@@ -82,14 +109,20 @@ const scubaDiversPaths = {0 : [8], 1 : [9], 2 : [4,13], 3 : [5,14], 4 : [2,15], 
  { name : "coast03" }, { name : "swamp01" }, { name : "swamp02" }, { name : "swamp03" }, { name : "swamp04" }];
 
 function DrawSquare(props) {
-  let squareStyle = props.tile.isImmersed? ({background: '#01A9DB'}) : ({background: props.tile.backgroundColor});
-  squareStyle = props.tile.isDrawned?({background: '#FFF'}) : (squareStyle);
+  let squareStyle;
+  if (props.tile.isImmersed){
+      squareStyle = ({background: '#01A9DB' });
+  }else if (props.tile.imgpath.length > 0 && props.tile.name === "helipad") {
+      squareStyle = ({background: 'url(' + props.tile.imgpath + ')' });
+  } else {
+      squareStyle = ({background: props.tile.backgroundColor});
+  }
 
   let squareClass = props.tile.isDrawned? ('isDrawnedSquare') : ('square');
   let squareId =  "square" + props.index;
 
   return (
-    <div className={squareClass} style={squareStyle} id={squareId} onClick={props.onClick}>
+    <div className={squareClass} style={squareStyle} id={squareId} onClick={props.onClick} >
       <span className="inSquarePosition">{props.tile.position}</span><br/>
       <span className="inSquareText">{props.tile.TextToDisplay}</span><br/>
       <span className="inSquareLittleText">{props.tile.LittleTextToDisplay}</span>
@@ -101,9 +134,9 @@ function DrawSquare(props) {
 function DrawPlayerBoard(props) {
   props.player.printIntroduction; // TO REMOVE
   return (
-    <div className="playerBoard" style={{color: props.player.color}}>
-      <span className="inBoardRole" style={{color: props.player.color}}>{props.player.role}</span>&nbsp;&nbsp;
-      <span className="inBoardName">{props.player.playersName}</span>
+    <div className="playerBoard">
+      <span className="inBoardName">{props.player.playersName}</span>&nbsp;the&nbsp;
+      <span className="inBoardRole" style={{color: props.player.color}}>{props.player.role}</span>
       <br/>
       <div className="inBoardCards">
           <DrawPlayerCards cards={props.player.cards}/>
@@ -148,7 +181,14 @@ function DrawPlayerPawn(props){
       <span style={{color: props.players[props.pawns[2]].color}}>P</span>&nbsp;<span style={{color: props.players[props.pawns[3]].color}}>P</span></div>
     );
   }
-  return null
+  return null;
+}
+
+function DrawPlayerActions(props) {
+  let output = props.actions.map((action) =>
+    <li key={action.name}><button className="actionButton" onClick={props.onClick}>{action.name}</button></li>
+  );
+  return output;
 }
 
 class Board extends React.Component {
@@ -160,6 +200,7 @@ class Board extends React.Component {
     var playerCardsDiscard = new Array();
     var floodCardsLeap = generateFloodCardsLeap();
     var floodCardsDiscard = new Array();
+    var floodMeter = new FloodMeter(1);
 
     // generer les joueurs
     var players = generatePlayers();
@@ -184,9 +225,12 @@ class Board extends React.Component {
         floodCardsDiscard.push(card);
     }
 
+    var possibleActions = getPossibleActions(players[0].role);
+
+    var whatIsExpectedNext = "CharacterActionButton";
+
     // tests
     // console.log('********WhereCanHeMove : ' + whereCanHeMove(16, "Diver") );
-
     this.state = {
       tiles: tiles,
       playerCardsLeap: playerCardsLeap,
@@ -194,8 +238,32 @@ class Board extends React.Component {
       floodCardsLeap: floodCardsLeap,
       floodCardsDiscard: floodCardsDiscard,
       players: players,
-      gameIsOver: false
+      floodMeter: floodMeter,
+      gameIsOver: false,
+      nbrOfPlayers : players.length,
+      nbrOfPosessedTreasures : 0,
+      turn : 1,
+      currentPlayerPlaying : 0,
+      possibleActions : possibleActions,
+      currentStep : 0,
+      whatIsExpectedNext : whatIsExpectedNext
     };
+
+    // Let's start
+    function waitForPlayerInput(expectFor){
+    }
+      /*
+      ================================================================
+Wait For PlayerInput ( action || ExtraCardAction || Tile || Card in His hand || Card in SomeOneElse's hand )
+type : What's expected
+A user message says What's expected
+
+On TileClick || On Card Click || On Anything click
+check for What's expected
+solve the action
+Go Next Step in the Turn
+    }
+    */
 
     function getInitialPlayerPosition(player, y, z){
         for (let i = 0; i < tiles.length; i++){
@@ -219,7 +287,34 @@ class Board extends React.Component {
       }
     }
 
+    function getPossibleActions(role) {
+        let actions = new Array();
+        for (let i = 0; i < playerDefaultActions.length; i++){
+            let action = playerDefaultActions[i];
+            for (let j = 0; j < playerSpecialActions.length; j++ )
+            {
+              if (playerSpecialActions[j].forRole === role && playerSpecialActions[j].replacesAction === i.toString()){
+                action = playerSpecialActions[j];
+              }
+            }
+            // TODO : is action possible ?
+            actions.push(action);
+        }
+
+        if (role === "Navigator"){
+          let nada = actions.shift();
+          let navigatorActions = new Array();
+          navigatorActions.push(playerDefaultActions[0]); // move
+          navigatorActions.push(playerSpecialActions[1]); // move someone else
+          return navigatorActions.concat(actions);
+        }
+        return actions;
+      }
   } // end of Board constructor
+
+///////////////////////////////////////////////////////////////////////////////////
+//        OUt Of Board constructor
+////////////////////////////////////////////////////////////////////////////////////
 
   // returns an array of positions
   whereCanHeMove(position, role){
@@ -239,10 +334,10 @@ class Board extends React.Component {
         let afterSwimPositions = new Array();
         moves = orthogonalPaths[position];
         for (let j = 0 ; j < moves.length; j++){
-          console.log('***** Check If tile : ' + moves[j] + ' is Drawned ');
+          // console.log('***** Check If tile : ' + moves[j] + ' is Drawned ');
           if (this.state.tiles[moves[j]].isDrawned || this.state.tiles[moves[j]].isImmersed)
           {
-              console.log('***** isDrawned ');
+              //  isDrawned
               afterSwimPositions = afterSwimPositions.concat(orthogonalPaths[moves[j]]);
           }
         }
@@ -307,7 +402,25 @@ class Board extends React.Component {
     return cases;
   }
 
-  handleClick(i) {
+ handleActionClick(action){
+    console.log("clicked on " + action);
+    if (action === "Move" || action === "Dive" || action === "MoveAround"){
+          let id = this.state.players[this.state.currentPlayerPlaying].id;
+          console.log("clicked for player id  " + id);
+          let tilesToLight = this.whereCanHeMove(this.state.players[id].location, this.state.players[id].role);
+
+           // this.lightTheTiles(tilesToLight, this.state.players[id].color);
+
+          for (let i = 0; i < tilesToLight.length; i++){
+            document.getElementById("square" + tilesToLight[i]).style.border = "3px solid " + this.state.players[id].color;
+          }
+
+          // set a new Expected input
+    }
+    return null;
+  }
+
+  handleTileClick(i) {
     // alert("click");
     if (this.state.tiles[i].playerOn.length > 0){
       let id = this.state.tiles[i].playerOn[0];
@@ -317,9 +430,7 @@ class Board extends React.Component {
       for (let i = 0; i < tilesToLight.length; i++){
         document.getElementById("square" + tilesToLight[i]).style.border = "3px solid " + this.state.players[id].color;
       }
-
-      console.log("Tiles to Ligth = " + tilesToLight);
-
+      // console.log("Tiles to Ligth = " + tilesToLight);
     }
     /*
     const squaresDup = this.state.squares.slice();
@@ -331,12 +442,14 @@ class Board extends React.Component {
       });
     }
     */
+
+        return null;
   }
 
   renderSquare(i) {
     return(
       <span>
-        <DrawSquare tile={this.state.tiles[i]} players={this.state.players} index={i} onClick={() => this.handleClick(i)}/>
+        <DrawSquare tile={this.state.tiles[i]} players={this.state.players} index={i} onClick={() => this.handleTileClick(i)}/>
       </span>
     );
   }
@@ -354,6 +467,37 @@ class Board extends React.Component {
       </span>
     )
   }
+// <DrawMessagePanel state={this.state} onClick={(action) => this.handleActionClick(action.name)}/>
+  renderPlayerMessagePanel() {
+    return (
+      <span>
+        <div className="messagePanel">
+          <div className="panelTitle"> FORBIDDEN<br/>::ReactJS::<br/>ISLAND</div>
+          <div className="panelInfo"> Turn : {this.state.turn} </div>
+          <div className="panelInfo"> FloodLevel {this.state.floodMeter.level} <span className="littlePanelInfo"> ({this.state.floodMeter.howManyCards(this.state.floodMeter.level)} cards per flood)</span></div>
+          <div className="panelInfo"> {this.state.players[this.state.currentPlayerPlaying].playersName} the <span style={{color: this.state.players[this.state.currentPlayerPlaying].color}}>{this.state.players[this.state.currentPlayerPlaying].role}</span> is Playing. </div>
+          <div className="panelInfo"> Step : {playerSteps[this.state.currentStep].name} </div>
+          <div className="panelInfo">
+            <ul>
+              <DrawPlayerActions actions={this.state.possibleActions} onClick={() => this.handleActionClick(ICI PASSER l'action)}/>
+            </ul>
+          </div>
+        </div>
+      </span>
+    )
+  }
+
+  lightTheTiles(tilesToLigth, color){
+    for (let i = 0; i < this.tilesToLigth.length; i++){
+      document.getElementById("square" + this.tilesToLight[i]).style.border = "3px solid " + this.color;
+    }
+  }
+
+  unlightTheTiles() {
+    for (let i = 0; i < 24; i++){
+      document.getElementById("square" + i).style.border = "border: 1px solid #222;";
+    }
+  }
 
   render() {
     /*
@@ -370,10 +514,7 @@ class Board extends React.Component {
 
       <div>
         <div className="playerBoard-column">
-          {this.renderPlayerBoard(0)}
-          {this.renderPlayerBoard(1)}
-          {this.renderPlayerBoard(2)}
-          {this.renderPlayerBoard(3)}
+          {this.renderPlayerMessagePanel()}
         </div>
         <div className="board-column">
           <div className="status">Booyah</div>
@@ -426,10 +567,18 @@ class Board extends React.Component {
             {this.renderEmptySquare()}
           </div>
         </div>
+        <div className="playerBoard-column">
+          {this.renderPlayerBoard(0)}
+          {this.renderPlayerBoard(1)}
+          {this.renderPlayerBoard(2)}
+          {this.renderPlayerBoard(3)}
+        </div>
       </div>
     );
   }
 }
+
+////// END OF Board Class
 
 class Game extends React.Component {
   render() {
@@ -460,12 +609,12 @@ class Tile {
     this.backgroundColor = backgroundColor; // string
     this.TextToDisplay = TextToDisplay; // string
     this.LittleTextToDisplay = LittleTextToDisplay; // string
-    this.imgpath = "/images/" + name + ".png"; // string
+    this.imgpath = "/img/" + name + "Tile.png"; // string
   }
 }
 
 class Player {
-  constructor(id, type, role, color, playersName, position, cards, isInGame, leftTheIsland, ) {
+  constructor(id, type, role, color, playersName, position, cards, isInGame, leftTheIsland) {
     this.id = id; // int
     this.type = type; // int
     this.role = role // string
@@ -481,8 +630,6 @@ class Player {
         console.log(`My name is ${this.playersName}. Im an ${this.role} and my color is ${this.color}`);
     }
   }
-
-
     /*
     function whereCanHeGo(i, this.role){
       SET MY FUNCTION HERE ?
@@ -490,8 +637,27 @@ class Player {
     */
 }
 
+class FloodMeter {
+  constructor(startLevel) {
+    this.level = startLevel;
+    this.topLevel = 10;
+  }
+
+  howManyCards(level){
+    if (level < 3){
+        return 2;
+    } else if (level < 6) {
+        return 3;
+    } else if (level < 8) {
+        return 4;
+    } else {
+        return 5;
+    }
+  }
+}
+
 function riseTheIsland(){
-    var tile01 = new Tile("helipad", 0, false, false, 5, "", new Array(), "#A9D0F5", "H", "HELIPORT");
+    var tile01 = new Tile("helipad", 0, false, false, 5, "", new Array(), "#A9D0F5", "", "HELIPORT");
     var tile02 = new Tile("doorBlack", 0, false, false, 3, "", new Array(), "#6E6E6E", "", "");
     var tile03 = new Tile("doorRed", 0, false, false, 0, "", new Array(), "#F78181", "", "");
     var tile04 = new Tile("doorGreen", 0, false, false, 4, "", new Array(), "#9FF781", "", "");
