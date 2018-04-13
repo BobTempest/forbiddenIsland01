@@ -184,26 +184,9 @@ function DrawPlayerPawn(props){
   return null;
 }
 
-function DrawMessagePanel(props) {
-  return (
-    <div className="messagePanel">
-      <div className="panelTitle"> FORBIDDEN<br/>::ReactJS::<br/>ISLAND</div>
-      <div className="panelInfo"> Turn : {props.state.turn} </div>
-      <div className="panelInfo"> FloodLevel {props.state.floodMeter.level} <span className="littlePanelInfo"> ({props.state.floodMeter.howManyCards(props.state.floodMeter.level)} cards per flood)</span></div>
-      <div className="panelInfo"> {props.state.players[props.state.currentPlayerPlaying].playersName} the <span style={{color: props.state.players[props.state.currentPlayerPlaying].color}}>{props.state.players[props.state.currentPlayerPlaying].role}</span> is Playing. </div>
-      <div className="panelInfo"> Step : {playerSteps[props.state.currentStep].name} </div>
-      <div className="panelInfo">
-        <ul>
-          <DrawActions actions={props.state.possibleActions}/>
-        </ul>
-      </div>
-    </div>
-  );
-}
-
-function DrawActions(props) {
+function DrawPlayerActions(props) {
   let output = props.actions.map((action) =>
-    <li key={action.name}><button className="actionButton">{action.name}</button></li>
+    <li key={action.name}><button className="actionButton" onClick={props.onClick}>{action.name}</button></li>
   );
   return output;
 }
@@ -329,6 +312,10 @@ Go Next Step in the Turn
       }
   } // end of Board constructor
 
+///////////////////////////////////////////////////////////////////////////////////
+//        OUt Of Board constructor
+////////////////////////////////////////////////////////////////////////////////////
+
   // returns an array of positions
   whereCanHeMove(position, role){
     let moves = new Array();
@@ -415,6 +402,24 @@ Go Next Step in the Turn
     return cases;
   }
 
+ handleActionClick(action){
+    console.log("clicked on " + action);
+    if (action === "Move" || action === "Dive" || action === "MoveAround"){
+          let id = this.state.players[this.state.currentPlayerPlaying].id;
+          console.log("clicked for player id  " + id);
+          let tilesToLight = this.whereCanHeMove(this.state.players[id].location, this.state.players[id].role);
+
+           // this.lightTheTiles(tilesToLight, this.state.players[id].color);
+
+          for (let i = 0; i < tilesToLight.length; i++){
+            document.getElementById("square" + tilesToLight[i]).style.border = "3px solid " + this.state.players[id].color;
+          }
+
+          // set a new Expected input
+    }
+    return null;
+  }
+
   handleTileClick(i) {
     // alert("click");
     if (this.state.tiles[i].playerOn.length > 0){
@@ -437,6 +442,8 @@ Go Next Step in the Turn
       });
     }
     */
+
+        return null;
   }
 
   renderSquare(i) {
@@ -460,13 +467,36 @@ Go Next Step in the Turn
       </span>
     )
   }
-
+// <DrawMessagePanel state={this.state} onClick={(action) => this.handleActionClick(action.name)}/>
   renderPlayerMessagePanel() {
     return (
       <span>
-        <DrawMessagePanel state={this.state} />
+        <div className="messagePanel">
+          <div className="panelTitle"> FORBIDDEN<br/>::ReactJS::<br/>ISLAND</div>
+          <div className="panelInfo"> Turn : {this.state.turn} </div>
+          <div className="panelInfo"> FloodLevel {this.state.floodMeter.level} <span className="littlePanelInfo"> ({this.state.floodMeter.howManyCards(this.state.floodMeter.level)} cards per flood)</span></div>
+          <div className="panelInfo"> {this.state.players[this.state.currentPlayerPlaying].playersName} the <span style={{color: this.state.players[this.state.currentPlayerPlaying].color}}>{this.state.players[this.state.currentPlayerPlaying].role}</span> is Playing. </div>
+          <div className="panelInfo"> Step : {playerSteps[this.state.currentStep].name} </div>
+          <div className="panelInfo">
+            <ul>
+              <DrawPlayerActions actions={this.state.possibleActions} onClick={() => this.handleActionClick(ICI PASSER l'action)}/>
+            </ul>
+          </div>
+        </div>
       </span>
     )
+  }
+
+  lightTheTiles(tilesToLigth, color){
+    for (let i = 0; i < this.tilesToLigth.length; i++){
+      document.getElementById("square" + this.tilesToLight[i]).style.border = "3px solid " + this.color;
+    }
+  }
+
+  unlightTheTiles() {
+    for (let i = 0; i < 24; i++){
+      document.getElementById("square" + i).style.border = "border: 1px solid #222;";
+    }
   }
 
   render() {
@@ -547,6 +577,8 @@ Go Next Step in the Turn
     );
   }
 }
+
+////// END OF Board Class
 
 class Game extends React.Component {
   render() {
