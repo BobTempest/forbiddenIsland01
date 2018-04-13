@@ -49,9 +49,6 @@ const diagonalPaths = {0 : [4], 1 : [3], 2 : [6,8], 3 : [1,7,9], 4 : [0,8,10], 5
    8 : [2,4,13,15], 9 : [3,5,14,16], 10 : [4,15,17], 11 : [5,16], 12 : [7,18], 13 : [6,8,19],
    14 : [7,9,18,20], 15 : [8,10,19,21], 16 : [9,11,20], 17 : [10,21], 18 : [14,22], 19 : [13,15,23], 20 : [14,16,22],
    21 : [15,17,23], 22 : [18,20], 23 : [19,21]};
-const scubaDiversPaths = {0 : [8], 1 : [9], 2 : [4,13], 3 : [5,14], 4 : [2,15], 5 : [3,16], 6 : [8], 7 : [9,18], 8 : [0,6,11,19],
-   9 : [1,7,11,20], 10 : [8,21], 11 : [9], 12 : [14], 13 : [2,15], 14 : [3,12,16,22], 15 : [4,13,17,23], 16 : [5,14], 17 : [15],
-   18 : [7,20], 19 : [8,21], 20 : [9,18], 21 : [10,19], 22 : [14], 23 : [15]};
 
  const gameSteps = ["init", "startTurn", "playerActionOne", "playerActionTwo", "playerActionThree", "playerPickACard", "floodRise", "endTurn", "final"];
 
@@ -71,21 +68,21 @@ const scubaDiversPaths = {0 : [8], 1 : [9], 2 : [4,13], 3 : [5,14], 4 : [2,15], 
  ];
 
  const playerDefaultActions = [
-      {id : 0, name : "Move", text: "Move to an adjacent tile." },
-      {id : 1, name : "Dry", text: "Dry an adjacent tile" },
-      {id : 2, name : "Give", text: "Give a card on a character on the same tile" },
-      {id : 3, name : "Get a Treasure !", text: "Get the treasure in this temple." },
+      {id : 0, name : "Move", text: "Move to an adjacent tile.", enabled : true, triggers : "ActionMove" },
+      {id : 1, name : "Dry", text: "Dry an adjacent tile", enabled : true, triggers : "ActionMove"  },
+      {id : 2, name : "Give", text: "Give a card on a character on the same tile", enabled : true, triggers : "ActionMove"  },
+      {id : 3, name : "Get a Treasure !", text: "Get the treasure in this temple.", enabled : true, triggers : "ActionMove"  },
  ];
 
  const playerSpecialActions = [
    // Special actions
-   {id : 0, name : "Send a card", forRole: "Messenger", replacesAction: "2", text: "Send a card to any character." },
-   {id : 1, name : "Move someone", forRole: "Navigator", replacesAction: "-", text: "Move any character from one or two tiles." },
-   {id : 2, name : "Dry two tiles", forRole: "Engineer", replacesAction: "1", text: "Dry two adjacent tiles." },
-   {id : 3, name : "Move around", forRole: "Explorer", replacesAction: "0", text: "Move to any tile around." },
-   {id : 4, name : "Dry around", forRole: "Explorer", replacesAction: "1", text: "Dry any tile around." },
-   {id : 5, name : "Fly", forRole: "Pilot", replacesAction: "0", text: "Fly to any tile." },
-   {id : 6, name : "Dive", forRole: "Diver", replacesAction: "0", text: "Dive through any adjacent tile." },
+   {id : 0, name : "Send a card", forRole: "Messenger", replacesAction: "2", text: "Send a card to any character.", enabled : true, triggers : "ActionMove"  },
+   {id : 1, name : "Move someone", forRole: "Navigator", replacesAction: "-", text: "Move any character from one or two tiles.", enabled : true, triggers : "ActionMove"  },
+   {id : 2, name : "Dry two tiles", forRole: "Engineer", replacesAction: "1", text: "Dry two adjacent tiles.", enabled : true, triggers : "ActionMove"  },
+   {id : 3, name : "Move around", forRole: "Explorer", replacesAction: "0", text: "Move to any tile around.", enabled : true, triggers : "ActionMove"  },
+   {id : 4, name : "Dry around", forRole: "Explorer", replacesAction: "1", text: "Dry any tile around." , enabled : true, triggers : "ActionMove" },
+   {id : 5, name : "Fly", forRole: "Pilot", replacesAction: "0", text: "Fly to any tile.", enabled : true, triggers : "ActionMove"  },
+   {id : 6, name : "Dive", forRole: "Diver", replacesAction: "0", text: "Dive through any adjacent tile.", enabled : true, triggers : "ActionMove"  },
  ];
 
  // QUESTIONS : How many times per round can one use its power ?
@@ -193,7 +190,7 @@ function DrawMessagePanel(props) {
       <div className="panelTitle"> FORBIDDEN<br/>::ReactJS::<br/>ISLAND</div>
       <div className="panelInfo"> Turn : {props.state.turn} </div>
       <div className="panelInfo"> FloodLevel {props.state.floodMeter.level} <span className="littlePanelInfo"> ({props.state.floodMeter.howManyCards(props.state.floodMeter.level)} cards per flood)</span></div>
-      <div className="panelInfo"> {props.state.players[props.state.currentPlayerPlaying].playersName} the {props.state.players[props.state.currentPlayerPlaying].role} is Playing. </div>
+      <div className="panelInfo"> {props.state.players[props.state.currentPlayerPlaying].playersName} the <span style={{color: props.state.players[props.state.currentPlayerPlaying].color}}>{props.state.players[props.state.currentPlayerPlaying].role}</span> is Playing. </div>
       <div className="panelInfo"> Step : {playerSteps[props.state.currentStep].name} </div>
       <div className="panelInfo">
         <ul>
@@ -206,7 +203,7 @@ function DrawMessagePanel(props) {
 
 function DrawActions(props) {
   let output = props.actions.map((action) =>
-    <li key={action.name}>{action.name}</li>
+    <li key={action.name}><button className="actionButton">{action.name}</button></li>
   );
   return output;
 }
@@ -247,6 +244,8 @@ class Board extends React.Component {
 
     var possibleActions = getPossibleActions(players[0].role);
 
+    var whatIsExpectedNext = "CharacterActionButton";
+
     // tests
     // console.log('********WhereCanHeMove : ' + whereCanHeMove(16, "Diver") );
     this.state = {
@@ -264,7 +263,24 @@ class Board extends React.Component {
       currentPlayerPlaying : 0,
       possibleActions : possibleActions,
       currentStep : 0,
+      whatIsExpectedNext : whatIsExpectedNext
     };
+
+    // Let's start
+    function waitForPlayerInput(expectFor){
+    }
+      /*
+      ================================================================
+Wait For PlayerInput ( action || ExtraCardAction || Tile || Card in His hand || Card in SomeOneElse's hand )
+type : What's expected
+A user message says What's expected
+
+On TileClick || On Card Click || On Anything click
+check for What's expected
+solve the action
+Go Next Step in the Turn
+    }
+    */
 
     function getInitialPlayerPosition(player, y, z){
         for (let i = 0; i < tiles.length; i++){
@@ -290,32 +306,24 @@ class Board extends React.Component {
 
     function getPossibleActions(role) {
         let actions = new Array();
-         // console.log('***** Trying to get actions for : ' + role );
         for (let i = 0; i < playerDefaultActions.length; i++){
             let action = playerDefaultActions[i];
             for (let j = 0; j < playerSpecialActions.length; j++ )
             {
-               // console.log('***** running special action : ' + j );
               if (playerSpecialActions[j].forRole === role && playerSpecialActions[j].replacesAction === i.toString()){
-                // console.log('***** PUSHING : ' + j );
                 action = playerSpecialActions[j];
               }
             }
-            // is action possible ?
+            // TODO : is action possible ?
             actions.push(action);
         }
 
         if (role === "Navigator"){
-                    console.log('***** action before shift : ' + actions );
           let nada = actions.shift();
-          console.log('***** action post shift : ' + actions );
           let navigatorActions = new Array();
-          navigatorActions.push(playerDefaultActions[0]);
-          navigatorActions.push(playerSpecialActions[1]);
-          console.log('***** navigatorActions before concat : ' + navigatorActions );
-          navigatorActions = navigatorActions.concat(actions);
-          console.log('***** navigatorActions post concat : ' + navigatorActions );
-          return navigatorActions;
+          navigatorActions.push(playerDefaultActions[0]); // move
+          navigatorActions.push(playerSpecialActions[1]); // move someone else
+          return navigatorActions.concat(actions);
         }
         return actions;
       }
@@ -342,7 +350,7 @@ class Board extends React.Component {
           // console.log('***** Check If tile : ' + moves[j] + ' is Drawned ');
           if (this.state.tiles[moves[j]].isDrawned || this.state.tiles[moves[j]].isImmersed)
           {
-              // console.log('***** isDrawned ');
+              //  isDrawned
               afterSwimPositions = afterSwimPositions.concat(orthogonalPaths[moves[j]]);
           }
         }
@@ -407,7 +415,7 @@ class Board extends React.Component {
     return cases;
   }
 
-  handleClick(i) {
+  handleTileClick(i) {
     // alert("click");
     if (this.state.tiles[i].playerOn.length > 0){
       let id = this.state.tiles[i].playerOn[0];
@@ -434,7 +442,7 @@ class Board extends React.Component {
   renderSquare(i) {
     return(
       <span>
-        <DrawSquare tile={this.state.tiles[i]} players={this.state.players} index={i} onClick={() => this.handleClick(i)}/>
+        <DrawSquare tile={this.state.tiles[i]} players={this.state.players} index={i} onClick={() => this.handleTileClick(i)}/>
       </span>
     );
   }
