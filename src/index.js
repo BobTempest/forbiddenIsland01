@@ -68,26 +68,26 @@ const diagonalPaths = {0 : [4], 1 : [3], 2 : [6,8], 3 : [1,7,9], 4 : [0,8,10], 5
  ];
 
  const playerDefaultActions = [
-      {id : 0, name : "Move", text: "Move to an adjacent tile.", enabled : true, triggers : "ActionMove" },
-      {id : 1, name : "Dry", text: "Dry an adjacent tile", enabled : true, triggers : "ActionMove"  },
-      {id : 2, name : "Give", text: "Give a card on a character on the same tile", enabled : true, triggers : "ActionMove"  },
-      {id : 3, name : "Get a Treasure !", text: "Get the treasure in this temple.", enabled : true, triggers : "ActionMove"  },
+      {id : 0, name : "Move", text: "Move to an adjacent tile.", enabled : true, triggers : "Move" },
+      {id : 1, name : "Dry", text: "Dry an adjacent tile", enabled : true, triggers : "Dry"  },
+      {id : 2, name : "Give", text: "Give a card on a character on the same tile", enabled : true, triggers : "Give" },
+      {id : 3, name : "Get a Treasure !", text: "Get the treasure in this temple.", enabled : true, triggers : "GetATreasure"  },
  ];
 
  const playerSpecialActions = [
    // Special actions
-   {id : 0, name : "Send a card", forRole: "Messenger", replacesAction: "2", text: "Send a card to any character.", enabled : true, triggers : "ActionMove"  },
-   {id : 1, name : "Move someone", forRole: "Navigator", replacesAction: "-", text: "Move any character from one or two tiles.", enabled : true, triggers : "ActionMove"  },
-   {id : 2, name : "Dry two tiles", forRole: "Engineer", replacesAction: "1", text: "Dry two adjacent tiles.", enabled : true, triggers : "ActionMove"  },
-   {id : 3, name : "Move around", forRole: "Explorer", replacesAction: "0", text: "Move to any tile around.", enabled : true, triggers : "ActionMove"  },
-   {id : 4, name : "Dry around", forRole: "Explorer", replacesAction: "1", text: "Dry any tile around." , enabled : true, triggers : "ActionMove" },
-   {id : 5, name : "Fly", forRole: "Pilot", replacesAction: "0", text: "Fly to any tile.", enabled : true, triggers : "ActionMove"  },
-   {id : 6, name : "Dive", forRole: "Diver", replacesAction: "0", text: "Dive through any adjacent tile.", enabled : true, triggers : "ActionMove"  },
+   {id : 0, name : "Send a card", forRole: "Messenger", replacesAction: "2", text: "Send a card to any character.", enabled : true, triggers : "SendACard"  },
+   {id : 1, name : "Move someone", forRole: "Navigator", replacesAction: "-", text: "Move any character from one or two tiles.", enabled : true, triggers : "MoveSomeone"  },
+   {id : 2, name : "Dry two tiles", forRole: "Engineer", replacesAction: "1", text: "Dry two adjacent tiles.", enabled : true, triggers : "DryTwoTiles"  },
+   {id : 3, name : "Move around", forRole: "Explorer", replacesAction: "0", text: "Move to any tile around.", enabled : true, triggers : "MoveAround"  },
+   {id : 4, name : "Dry around", forRole: "Explorer", replacesAction: "1", text: "Dry any tile around." , enabled : true, triggers : "DryAround" },
+   {id : 5, name : "Fly", forRole: "Pilot", replacesAction: "0", text: "Fly to any tile.", enabled : true, triggers : "Fly"  },
+   {id : 6, name : "Dive", forRole: "Diver", replacesAction: "0", text: "Dive through any adjacent tile.", enabled : true, triggers : "Dive"  },
  ];
 
- // QUESTIONS : How many times per round can one use its power ?
- //              Can pilot move someone else with him ?
-//                Navigator move : can he move himself ? same player for two tiles ?
+ // QUESTIONS : How many times per round can one use its power ? PIlot ONCE
+ //              Can pilot move someone else with him ?  -> NO
+//               Navigator move : can he move himself ? same player for two tiles ?
 
 /*
  const playerCards = [
@@ -182,13 +182,6 @@ function DrawPlayerPawn(props){
     );
   }
   return null;
-}
-
-function DrawPlayerActions(props) {
-  let output = props.actions.map((action) =>
-    <li key={action.name}><button className="actionButton" onClick={props.onClick}>{action.name}</button></li>
-  );
-  return output;
 }
 
 class Board extends React.Component {
@@ -402,7 +395,7 @@ Go Next Step in the Turn
     return cases;
   }
 
- handleActionClick(action){
+ handleActionClick(action) {
     console.log("clicked on " + action);
     if (action === "Move" || action === "Dive" || action === "MoveAround"){
           let id = this.state.players[this.state.currentPlayerPlaying].id;
@@ -467,7 +460,7 @@ Go Next Step in the Turn
       </span>
     )
   }
-// <DrawMessagePanel state={this.state} onClick={(action) => this.handleActionClick(action.name)}/>
+
   renderPlayerMessagePanel() {
     return (
       <span>
@@ -479,7 +472,9 @@ Go Next Step in the Turn
           <div className="panelInfo"> Step : {playerSteps[this.state.currentStep].name} </div>
           <div className="panelInfo">
             <ul>
-              <DrawPlayerActions actions={this.state.possibleActions} onClick={() => this.handleActionClick(ICI PASSER l'action)}/>
+              {this.state.possibleActions.map((action) =>
+                <li key={action.name}><button className="actionButton" onClick={() => this.handleActionClick(action.triggers)} >{action.name}</button></li>
+              )}
             </ul>
           </div>
         </div>
@@ -655,6 +650,26 @@ class FloodMeter {
     }
   }
 }
+
+/* It Must be in Board
+
+function handleActionClick(action) {
+   console.log("clicked on " + action);
+   if (action === "Move" || action === "Dive" || action === "MoveAround"){
+         let id = Board.state.players[Board.state.currentPlayerPlaying].id;
+         console.log("clicked for player id  " + id);
+         let tilesToLight = this.whereCanHeMove(this.state.players[id].location, this.state.players[id].role);
+
+          // this.lightTheTiles(tilesToLight, this.state.players[id].color);
+
+         for (let i = 0; i < tilesToLight.length; i++){
+           document.getElementById("square" + tilesToLight[i]).style.border = "3px solid " + this.state.players[id].color;
+         }
+
+         // set a new Expected input
+   }
+   return null;
+ }*/
 
 function riseTheIsland(){
     var tile01 = new Tile("helipad", 0, false, false, 5, "", new Array(), "#A9D0F5", "", "HELIPORT");
