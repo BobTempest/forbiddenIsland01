@@ -72,6 +72,7 @@ const diagonalPaths = {0 : [4], 1 : [3], 2 : [6,8], 3 : [1,7,9], 4 : [0,8,10], 5
       {id : 1, name : "Dry", text: "Dry an adjacent tile", enabled : true, triggers : "Dry"  },
       {id : 2, name : "Give", text: "Give a card on a character on the same tile", enabled : true, triggers : "Give" },
       {id : 3, name : "Get a Treasure !", text: "Get the treasure in this temple.", enabled : true, triggers : "GetATreasure"  },
+      {id : 4, name : "Nothing", text: "Simply do nothing.", enabled : true, triggers : "DoNothing"  }
  ];
 
  const playerSpecialActions = [
@@ -87,7 +88,7 @@ const diagonalPaths = {0 : [4], 1 : [3], 2 : [6,8], 3 : [1,7,9], 4 : [0,8,10], 5
 
  // QUESTIONS : How many times per round can one use its power ? PIlot ONCE
  //              Can pilot move someone else with him ?  -> NO
-//               Navigator move : can he move himself ? same player for two tiles ?
+//               Navigator move : can he move himself  -> NO ? same player for two tiles ? YES
 
 /*
  const playerCards = [
@@ -218,9 +219,9 @@ class Board extends React.Component {
         floodCardsDiscard.push(card);
     }
 
-    var possibleActions = getPossibleActions(players[0].role);
+    var possibleActions = this.getPossibleActions(players[0].role);
 
-    var whatIsExpectedNext = "CharacterActionButton";
+    // var whatIsExpectedNext = "CharacterActionButtonClick";
 
     // tests
     // console.log('********WhereCanHeMove : ' + whereCanHeMove(16, "Diver") );
@@ -239,7 +240,7 @@ class Board extends React.Component {
       currentPlayerPlaying : 0,
       possibleActions : possibleActions,
       currentStep : 0,
-      whatIsExpectedNext : whatIsExpectedNext
+      whatIsExpectedNext : "CharacterActionButtonClick"
     };
 
     // Let's start
@@ -280,34 +281,85 @@ Go Next Step in the Turn
       }
     }
 
-    function getPossibleActions(role) {
-        let actions = new Array();
-        for (let i = 0; i < playerDefaultActions.length; i++){
-            let action = playerDefaultActions[i];
-            for (let j = 0; j < playerSpecialActions.length; j++ )
-            {
-              if (playerSpecialActions[j].forRole === role && playerSpecialActions[j].replacesAction === i.toString()){
-                action = playerSpecialActions[j];
-              }
-            }
-            // TODO : is action possible ?
-            actions.push(action);
-        }
 
-        if (role === "Navigator"){
-          let nada = actions.shift();
-          let navigatorActions = new Array();
-          navigatorActions.push(playerDefaultActions[0]); // move
-          navigatorActions.push(playerSpecialActions[1]); // move someone else
-          return navigatorActions.concat(actions);
-        }
-        return actions;
-      }
   } // end of Board constructor
 
 ///////////////////////////////////////////////////////////////////////////////////
 //        OUt Of Board constructor
 ////////////////////////////////////////////////////////////////////////////////////
+  controller(input){
+      if (input === "ActionIsDone"){
+        let nextStep = this.state.currentStep + 1;
+        if (nextStep === 3){
+          // draw player cards
+          alert ("Let's draw some cards");
+          this.setState({ turn : nextStep });
+
+        }
+        else if (nextStep === 4){
+          // flood some tiles.
+          alert ("Let's flood some tiles");
+          this.setState({ turn : nextStep });
+
+        }
+        else if (nextStep === 5){
+          // next Player
+          if (this.state.currentPlayerPlaying === this.state.players[this.state.players.length -1].id){
+            alert ("The last player played : Set up for a next Turn");
+            let nextTurn = this.state.turn + 1;
+            let nextPlayer = this.state.players[0].id;
+            let psblactn = this.getPossibleActions(this.state.players[0].role);
+            this.setState({ currentStep: 0,
+              turn : nextTurn,
+              currentPlayerPlaying : nextPlayer,
+              possibleActions : psblactn,
+              whatIsExpectedNext: "CharacterActionButtonClick" });
+          } else {
+            alert (" next Player Please");
+            let index = this.state.players.indexOf[this.state.currentPlayerPlaying];
+            let nextPlayer = this.state.players[index + 1].id;
+            let psblactn = this.getPossibleActions(this.state.players[nextPlayer].role);
+            this.setState({ currentStep: 0,
+              currentPlayerPlaying : nextPlayer,
+              possibleActions : psblactn,
+              whatIsExpectedNext: "CharacterActionButtonClick" });
+
+          }
+        }
+        else{
+          // next action for thre same player
+          let psblactn = this.getPossibleActions(this.state.players[this.state.currentPlayerPlaying].role);
+          this.setState({ currentStep: nextStep,
+            possibleActions : psblactn,
+            whatIsExpectedNext: "CharacterActionButtonClick" });
+        }
+      }
+  }
+
+  getPossibleActions(role) {
+      let actions = new Array();
+      for (let i = 0; i < playerDefaultActions.length; i++){
+          let action = playerDefaultActions[i];
+          for (let j = 0; j < playerSpecialActions.length; j++ )
+          {
+            if (playerSpecialActions[j].forRole === role && playerSpecialActions[j].replacesAction === i.toString()){
+              action = playerSpecialActions[j];
+            }
+          }
+          // TODO : is action possible ?
+          actions.push(action);
+      }
+
+      if (role === "Navigator"){
+        // remove the first action which is move
+        let nada = actions.shift();
+        let navigatorActions = new Array();
+        navigatorActions.push(playerDefaultActions[0]); // move
+        navigatorActions.push(playerSpecialActions[1]); // move someone else
+        return navigatorActions.concat(actions);
+      }
+      return actions;
+    }
 
   // returns an array of positions
   whereCanHeMove(position, role){
@@ -348,10 +400,10 @@ Go Next Step in the Turn
       for (let k = 0; k < moves.length; k++)
       {
         if ( k >= 0 && k < 24){
-          // TODO HERE :
+          // TODO HERE :????
           if (this.state.tiles[moves[k]].isDrawned || moves[k] === position)
           {
-            let index = output.indexOf(moves[k]);
+            // let index = output.indexOf(moves[k]);
             // console.log('***** je splice pos : ' + moves[k] + ' at index :' + index);
             output.splice(output.indexOf(moves[k]), 1);
           }
@@ -397,33 +449,43 @@ Go Next Step in the Turn
 
  handleActionClick(action) {
     console.log("clicked on " + action);
-    if (action === "Move" || action === "Dive" || action === "MoveAround"){
-          let id = this.state.players[this.state.currentPlayerPlaying].id;
-          console.log("clicked for player id  " + id);
-          let tilesToLight = this.whereCanHeMove(this.state.players[id].location, this.state.players[id].role);
+    if (this.state.whatIsExpectedNext === "CharacterActionButtonClick") {
+      let id = this.state.players[this.state.currentPlayerPlaying].id;
+      if (action === "Move" || action === "Dive" || action === "MoveAround"  || action === "Fly"){
+            let tilesToLight = this.whereCanHeMove(this.state.players[id].position, this.state.players[id].role);
+            this.state.players[id].whereCanHeMove = tilesToLight;
 
-           // this.lightTheTiles(tilesToLight, this.state.players[id].color);
-
-          for (let i = 0; i < tilesToLight.length; i++){
-            document.getElementById("square" + tilesToLight[i]).style.border = "3px solid " + this.state.players[id].color;
-          }
-
-          // set a new Expected input
+            let nada = this.lightTheTiles(tilesToLight, this.state.players[id].color);
+            // set a new Expected input
+            this.setState({ whatIsExpectedNext: "TileButtonClickForMove" });
+      } else
+      return null;
     }
-    return null;
+    else{
+      alert ("UnexpectedClickOnActionButton");
+    }
+
   }
 
   handleTileClick(i) {
     // alert("click");
-    if (this.state.tiles[i].playerOn.length > 0){
-      let id = this.state.tiles[i].playerOn[0];
-      // alert("Clicked on tile " + i + " for player id " + id + ". Dessus, il y a le " + this.state.players[id].role + " et sa couleur est le " + this.state.players[id].color);
-
-      let tilesToLight = this.whereCanHeMove(i, this.state.players[id].role);
-      for (let i = 0; i < tilesToLight.length; i++){
-        document.getElementById("square" + tilesToLight[i]).style.border = "3px solid " + this.state.players[id].color;
+    if (this.state.whatIsExpectedNext === "TileButtonClickForMove") {
+        let player = this.state.players[this.state.currentPlayerPlaying];
+        if (player.whereCanHeMove.indexOf(i) >= 0){
+            // Move
+            this.moveAPlayer(player, i);
+            let nada = this.unlightTheTiles();
+            if (nada){
+              this.setState({ whatIsExpectedNext: "" });
+              this.controller("ActionIsDone");
+            }
+        }
+        else{
+          alert ("He can't move there !");
+        }
+      } else{
+            alert ("Unexpected Clic On a Tile");
       }
-      // console.log("Tiles to Ligth = " + tilesToLight);
     }
     /*
     const squaresDup = this.state.squares.slice();
@@ -436,7 +498,22 @@ Go Next Step in the Turn
     }
     */
 
-        return null;
+      //  return null;
+  //}
+
+  moveAPlayer(player, destination){
+    let NewTiles = this.state.tiles;
+    // remove player from current Tile
+    let index = NewTiles[player.position].playerOn.indexOf(player.id);
+    NewTiles[player.position].playerOn.splice(index, 1);
+    // adding player to new tile
+    NewTiles[destination].playerOn.push(player.id);
+
+    let Newplayers = this.state.players;
+    Newplayers[player.id].position = destination;
+    Newplayers[player.id].whereCanHeMove = null;
+
+    this.setState({ players: Newplayers , tiles: NewTiles});
   }
 
   renderSquare(i) {
@@ -482,16 +559,18 @@ Go Next Step in the Turn
     )
   }
 
-  lightTheTiles(tilesToLigth, color){
-    for (let i = 0; i < this.tilesToLigth.length; i++){
-      document.getElementById("square" + this.tilesToLight[i]).style.border = "3px solid " + this.color;
+  lightTheTiles(t, color){
+    for (let i = 0; i < t.length; i++){
+      document.getElementById("square" + t[i]).style.border = "3px solid " + color;
     }
+    return true;
   }
 
   unlightTheTiles() {
     for (let i = 0; i < 24; i++){
-      document.getElementById("square" + i).style.border = "border: 1px solid #222;";
+      document.getElementById("square" + i).style.border = "1px solid #222";
     }
+    return true;
   }
 
   render() {
@@ -619,6 +698,8 @@ class Player {
     this.cards = cards; // string[]
     this.isInGame = isInGame; // bool
     this.leftTheIsland = leftTheIsland; // bool
+    this.whereCanHeMove = null;
+    this.whereCanHeDry = null;
     this.imgpath = "/images/char" + role + ".png"; // string
 
     printIntroduction: {
@@ -626,7 +707,7 @@ class Player {
     }
   }
     /*
-    function whereCanHeGo(i, this.role){
+    function whereCanHeMove(i, this.role){
       SET MY FUNCTION HERE ?
     }
     */
