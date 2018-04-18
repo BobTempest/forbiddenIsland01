@@ -207,7 +207,9 @@ class Board extends React.Component {
     // assigner les positions de depart
     players.forEach(getInitialPlayerPosition);
 
+    // this.DoFloodSomeTiles(6);
     // innonder 6 tilesCards
+    /*
     for ( let i = 0; i < 6; i++){
         let card = floodCardsLeap.pop();
         // console.log('*************** CARD IS ' + card.name + ' tiles.length = ' + tiles.length);
@@ -220,6 +222,7 @@ class Board extends React.Component {
         }
         floodCardsDiscard.push(card);
     }
+    */
 
     var possibleActions = this.getPossibleActions(players[0].role);
 
@@ -244,6 +247,8 @@ class Board extends React.Component {
       currentStep : 0,
       whatIsExpectedNext : "CharacterActionButtonClick"
     };
+
+    this.doFloodSomeTiles(6);
 
     // Let's start
     function waitForPlayerInput(expectFor){
@@ -304,8 +309,9 @@ Go Next Step in the Turn
           // flood some tiles.
 
           this.setState({ currentStep : nextStep });
-          alert ("Let's flood some tiles");
-
+          let howMuch = this.state.floodMeter.howManyCards(this.state.floodMeter.level);
+          alert ("Let's flood some tiles for " + howMuch);
+          this.doFloodSomeTiles(howMuch);
         }
         else if (nextStep === 5){
           // next Player
@@ -341,6 +347,42 @@ Go Next Step in the Turn
       }
   }
 
+  doFloodSomeTiles(howMany){
+    let newFloodCardLeap = this.state.floodCardsLeap;
+    let newTiles = this.state.tiles;
+    let newFloodCardsDiscard = this.state.floodCardsDiscard;
+
+    for ( let i = 0; i < howMany; i++){
+        let tileHasDrawned = false;
+        let card = newFloodCardLeap.pop();
+        // console.log('*************** CARD IS ' + card.name + ' tiles.length = ' + tiles.length);
+        for (let j = 0; j < newTiles.length; j++){
+          // console.log('****** TILE IS ' + tiles[j].name);
+          if (newTiles[j].name === card.name){
+            if (newTiles[j].isImmersed){
+              // Let's DRAWN this tile
+                newTiles[j].isDrawned = true;
+                // TODO : rescue some players
+                // TODO : Check if all Temples of an undiscovered Treasure are drawned
+            }
+            else{
+                newTiles[j].isImmersed = true;
+            }
+
+            break;
+          }
+        }
+        if (!tileHasDrawned){
+            newFloodCardsDiscard.push(card);
+        }
+    }
+
+    this.setState({
+      floodCardsLeap: newFloodCardLeap,
+      tiles : newTiles,
+      floodCardsDiscard: newFloodCardsDiscard });
+  }
+
   getPossibleActions(role) {
       let actions = new Array();
       for (let i = 0; i < playerDefaultActions.length; i++){
@@ -351,7 +393,8 @@ Go Next Step in the Turn
               action = playerSpecialActions[j];
             }
           }
-          // TODO : is action possible ?
+          // TODO : hasPilotDidHisFlightThisRound ?
+          // TODO : is action possible ? Check the validity of an action and remove it
           actions.push(action);
       }
 
@@ -440,12 +483,22 @@ Go Next Step in the Turn
           cases.push(diagonalPaths[position][k]);
         }
       }
+      // adding the case he's on
+      if (this.state.tiles[position].isImmersed)
+      {
+        cases.push(position);
+      }
     }
     else{
       for (let j = 0 ; j < orthogonalPaths[position].length; j++){
         if (this.state.tiles[orthogonalPaths[position][j]].isImmersed){
           cases.push(orthogonalPaths[position][j]);
         }
+      }
+      // adding the case he's on
+      if (this.state.tiles[position].isImmersed)
+      {
+        cases.push(position);
       }
     }
 
@@ -463,7 +516,15 @@ Go Next Step in the Turn
             let nada = this.lightTheTiles(tilesToLight, this.state.players[id].color);
             // set a new Expected input
             this.setState({ whatIsExpectedNext: "TileButtonClickForMove" });
-      } else
+      } else if (action === "Dry" || action === "DryAround"){
+            let tilesToLight = this.whereCanHeDry(this.state.players[id].position, this.state.players[id].role);
+            this.state.players[id].whereCanHeDry = tilesToLight;
+
+            let nada = this.lightTheTiles(tilesToLight, this.state.players[id].color);
+            this.setState({ whatIsExpectedNext: "TileButtonClickForDry" });
+      } else if (action === "DoNothing"){
+            this.controller("ActionIsDone")
+      }
       return null;
     }
     else{
@@ -488,7 +549,21 @@ Go Next Step in the Turn
         else{
           alert ("He can't move there !");
         }
-      } else{
+      } else if(this.state.whatIsExpectedNext === "TileButtonClickForDry"){
+        let player = this.state.players[this.state.currentPlayerPlaying];
+        if (player.whereCanHeDry.indexOf(i) >= 0){
+            // Move
+            this.dryATile(i);
+            let nada = this.unlightTheTiles();
+            if (nada){
+              this.setState({ whatIsExpectedNext: "" });
+              this.controller("ActionIsDone");
+            }
+        }
+        else{
+          alert ("He can't dry anything there !");
+        }
+      }else{
             alert ("Unexpected Clic On a Tile");
       }
     }
@@ -519,6 +594,12 @@ Go Next Step in the Turn
     Newplayers[player.id].whereCanHeMove = null;
 
     this.setState({ players: Newplayers , tiles: NewTiles});
+  }
+
+  dryATile(tile){
+        let NewTiles = this.state.tiles;
+        NewTiles[tile].isImmersed = false;
+        this.setState({ tiles: NewTiles});
   }
 
   renderSquare(i) {
