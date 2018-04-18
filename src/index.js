@@ -134,8 +134,10 @@ function DrawSquare(props) {
 
 function DrawPlayerBoard(props) {
   props.player.printIntroduction; // TO REMOVE
+  let boardClass = props.isPlaying?  ('playerBoard playerBoardPlaying') : ('playerBoard ');
+
   return (
-    <div className="playerBoard">
+    <div className={boardClass}>
       <span className="inBoardName">{props.player.playersName}</span>&nbsp;the&nbsp;
       <span className="inBoardRole" style={{color: props.player.color}}>{props.player.role}</span>
       <br/>
@@ -288,18 +290,21 @@ Go Next Step in the Turn
 //        OUt Of Board constructor
 ////////////////////////////////////////////////////////////////////////////////////
   controller(input){
+      console.log("InController turn :" + this.state.currentStep);
       if (input === "ActionIsDone"){
         let nextStep = this.state.currentStep + 1;
         if (nextStep === 3){
           // draw player cards
+
+          this.setState({ currentStep : nextStep });
           alert ("Let's draw some cards");
-          this.setState({ turn : nextStep });
 
         }
         else if (nextStep === 4){
           // flood some tiles.
+
+          this.setState({ currentStep : nextStep });
           alert ("Let's flood some tiles");
-          this.setState({ turn : nextStep });
 
         }
         else if (nextStep === 5){
@@ -315,15 +320,15 @@ Go Next Step in the Turn
               possibleActions : psblactn,
               whatIsExpectedNext: "CharacterActionButtonClick" });
           } else {
-            alert (" next Player Please");
-            let index = this.state.players.indexOf[this.state.currentPlayerPlaying];
-            let nextPlayer = this.state.players[index + 1].id;
+            // alert (" next Player Please");
+            // let index = this.state.players.indexOf(this.state.currentPlayerPlaying);
+            let nextPlayer = this.state.players[this.state.currentPlayerPlaying + 1].id;
+                        alert (" next Player Please. . nextPLayer id : " + nextPlayer);
             let psblactn = this.getPossibleActions(this.state.players[nextPlayer].role);
             this.setState({ currentStep: 0,
               currentPlayerPlaying : nextPlayer,
               possibleActions : psblactn,
               whatIsExpectedNext: "CharacterActionButtonClick" });
-
           }
         }
         else{
@@ -531,9 +536,10 @@ Go Next Step in the Turn
   }
 
   renderPlayerBoard(i) {
+    let isPlaying = this.state.currentPlayerPlaying === i;
     return (
       <span>
-        <DrawPlayerBoard player={this.state.players[i]} />
+        <DrawPlayerBoard player={this.state.players[i]} isPlaying={isPlaying}/>
       </span>
     )
   }
@@ -646,6 +652,9 @@ Go Next Step in the Turn
           {this.renderPlayerBoard(1)}
           {this.renderPlayerBoard(2)}
           {this.renderPlayerBoard(3)}
+        </div>
+        <div>
+          <button onClick ={() => this.controller("ActionIsDone")}>Next</button>
         </div>
       </div>
     );
