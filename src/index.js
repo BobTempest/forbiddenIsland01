@@ -86,6 +86,8 @@ const diagonalPaths = {0 : [4], 1 : [3], 2 : [6,8], 3 : [1,7,9], 4 : [0,8,10], 5
    {id : 6, name : "Dive", forRole: "Diver", replacesAction: "0", text: "Dive through any adjacent tile.", enabled : true, triggers : "Dive"  },
  ];
 
+
+
  // QUESTIONS : How many times per round can one use its power ? PIlot ONCE
  //              Can pilot move someone else with him ?  -> NO
 //               Navigator move : can he move himself  -> NO ? same player for two tiles ? YES
@@ -197,6 +199,8 @@ class Board extends React.Component {
     var floodCardsLeap = generateFloodCardsLeap();
     var floodCardsDiscard = new Array();
     var floodMeter = new FloodMeter(1);
+    let mainUserMessage = new UserMessage("Welcome new Player. Choose a first action for the first character.", false, false, false);
+    // mainUserMessage.setMessage("Welcome new Player. Choose a first action for the first character.", false, false, false);
 
     // generer les joueurs
     var players = generatePlayers();
@@ -245,7 +249,8 @@ class Board extends React.Component {
       currentPlayerPlaying : 0,
       possibleActions : possibleActions,
       currentStep : 0,
-      whatIsExpectedNext : "CharacterActionButtonClick"
+      whatIsExpectedNext : "CharacterActionButtonClick",
+      mainUserMessage : mainUserMessage
     };
 
     this.doFloodSomeTiles(6);
@@ -287,13 +292,13 @@ Go Next Step in the Turn
             player.cards.push(card);
       }
     }
-
-
   } // end of Board constructor
 
 ///////////////////////////////////////////////////////////////////////////////////
 //        OUt Of Board constructor
 ////////////////////////////////////////////////////////////////////////////////////
+
+
   controller(input){
       console.log("InController turn :" + this.state.currentStep);
       if (input === "ActionIsDone"){
@@ -302,21 +307,24 @@ Go Next Step in the Turn
           // draw player cards
 
           this.setState({ currentStep : nextStep });
-          alert ("Let's draw some cards");
-
+          // alert ("Let's draw some cards");
+          let newMessage = new UserMessage("Lets' draw some Player Cards", false, true, false);
+          this.setState({ currentStep : nextStep , mainUserMessage : newMessage});
         }
         else if (nextStep === 4){
           // flood some tiles.
 
           this.setState({ currentStep : nextStep });
           let howMuch = this.state.floodMeter.howManyCards(this.state.floodMeter.level);
-          alert ("Let's flood some tiles for " + howMuch);
+          // alert ("Let's flood some tiles for " + howMuch);
+          let newMessage = new UserMessage("Let's flood " + howMuch + " tiles", false, true, false);
+          this.setState({ currentStep : nextStep , mainUserMessage : newMessage});
           this.doFloodSomeTiles(howMuch);
         }
         else if (nextStep === 5){
           // next Player
           if (this.state.currentPlayerPlaying === this.state.players[this.state.players.length -1].id){
-            alert ("The last player played : Set up for a next Turn");
+            let newMessage = new UserMessage("Next Turn ! Please " + this.state.players[0].playersName + ", Choose an action " , false, false, false);
             let nextTurn = this.state.turn + 1;
             let nextPlayer = this.state.players[0].id;
             let psblactn = this.getPossibleActions(this.state.players[0].role);
@@ -324,25 +332,27 @@ Go Next Step in the Turn
               turn : nextTurn,
               currentPlayerPlaying : nextPlayer,
               possibleActions : psblactn,
-              whatIsExpectedNext: "CharacterActionButtonClick" });
+              whatIsExpectedNext: "CharacterActionButtonClick" ,
+              mainUserMessage : newMessage });
           } else {
-            // alert (" next Player Please");
-            // let index = this.state.players.indexOf(this.state.currentPlayerPlaying);
+            let newMessage = new UserMessage("Next player ! Please Choose an action " , false, false, false);
             let nextPlayer = this.state.players[this.state.currentPlayerPlaying + 1].id;
-                        alert (" next Player Please. . nextPLayer id : " + nextPlayer);
             let psblactn = this.getPossibleActions(this.state.players[nextPlayer].role);
             this.setState({ currentStep: 0,
               currentPlayerPlaying : nextPlayer,
               possibleActions : psblactn,
-              whatIsExpectedNext: "CharacterActionButtonClick" });
+              whatIsExpectedNext: "CharacterActionButtonClick",
+              mainUserMessage : newMessage });
           }
         }
         else{
           // next action for thre same player
+          let newMessage = new UserMessage("Choose an action " , false, false, false);
           let psblactn = this.getPossibleActions(this.state.players[this.state.currentPlayerPlaying].role);
           this.setState({ currentStep: nextStep,
             possibleActions : psblactn,
-            whatIsExpectedNext: "CharacterActionButtonClick" });
+            whatIsExpectedNext: "CharacterActionButtonClick" ,
+            mainUserMessage : newMessage});
         }
       }
   }
@@ -362,7 +372,7 @@ Go Next Step in the Turn
             if (newTiles[j].isImmersed){
               // Let's DRAWN this tile
                 newTiles[j].isDrawned = true;
-                // TODO : rescue some players
+                // TODO : rescue some players ?
                 // TODO : Check if all Temples of an undiscovered Treasure are drawned
             }
             else{
@@ -514,16 +524,19 @@ Go Next Step in the Turn
             this.state.players[id].whereCanHeMove = tilesToLight;
 
             let nada = this.lightTheTiles(tilesToLight, this.state.players[id].color);
-            // set a new Expected input
-            this.setState({ whatIsExpectedNext: "TileButtonClickForMove" });
+            // set a new Expected PlayerInput
+            let newMessage = new UserMessage("Now choose a destination", false, false, true);
+            this.setState({ whatIsExpectedNext: "TileButtonClickForMove" , mainUserMessage: newMessage });
       } else if (action === "Dry" || action === "DryAround"){
             let tilesToLight = this.whereCanHeDry(this.state.players[id].position, this.state.players[id].role);
             this.state.players[id].whereCanHeDry = tilesToLight;
 
             let nada = this.lightTheTiles(tilesToLight, this.state.players[id].color);
-            this.setState({ whatIsExpectedNext: "TileButtonClickForDry" });
+            let newMessage = new UserMessage("Now choose a destination", false, false, true);
+            this.setState({ whatIsExpectedNext: "TileButtonClickForDry" , mainUserMessage: newMessage});
       } else if (action === "DoNothing"){
-            this.controller("ActionIsDone")
+              let newMessage = new UserMessage("Doing nothing ZZZZZZZ ", false, true, false);
+              this.setState({ mainUserMessage: newMessage});
       }
       return null;
     }
@@ -542,7 +555,8 @@ Go Next Step in the Turn
             this.moveAPlayer(player, i);
             let nada = this.unlightTheTiles();
             if (nada){
-              this.setState({ whatIsExpectedNext: "" });
+
+              this.setState({ whatIsExpectedNext: ""});
               this.controller("ActionIsDone");
             }
         }
@@ -556,6 +570,7 @@ Go Next Step in the Turn
             this.dryATile(i);
             let nada = this.unlightTheTiles();
             if (nada){
+              // let newMessage = new UserMessage(player.name + "dried a tile", false, true, false);
               this.setState({ whatIsExpectedNext: "" });
               this.controller("ActionIsDone");
             }
@@ -646,6 +661,19 @@ Go Next Step in the Turn
     )
   }
 
+  renderMessageBoard() {
+let showNextBtnStyle = this.state.mainUserMessage.showNextBtn?({display: 'block'}):({display: 'none'});
+let showCancelBtnStyle = this.state.mainUserMessage.showCancelBtn?({display: 'block'}):({display: 'none'});
+
+    return(
+        <div>
+          {this.state.mainUserMessage.message}
+        <button style={showNextBtnStyle} onClick ={() => this.controller("ActionIsDone")}>Next</button>
+        <button style={showCancelBtnStyle} onClick ={() => alert("Not Implemented :(")}>Cancel</button>
+      </div>
+    )
+  }
+
   lightTheTiles(t, color){
     for (let i = 0; i < t.length; i++){
       document.getElementById("square" + t[i]).style.border = "3px solid " + color;
@@ -678,7 +706,6 @@ Go Next Step in the Turn
           {this.renderPlayerMessagePanel()}
         </div>
         <div className="board-column">
-          <div className="status">Booyah</div>
           <div className="board-row">
             {this.renderEmptySquare()}
             {this.renderEmptySquare()}
@@ -734,8 +761,8 @@ Go Next Step in the Turn
           {this.renderPlayerBoard(2)}
           {this.renderPlayerBoard(3)}
         </div>
-        <div>
-          <button onClick ={() => this.controller("ActionIsDone")}>Next</button>
+        <div className="messageBoard">
+          {this.renderMessageBoard()}
         </div>
       </div>
     );
@@ -822,25 +849,16 @@ class FloodMeter {
   }
 }
 
-/* It Must be in Board
+class UserMessage {
+  constructor(message, isImportant, showNextBtn, showCancelBtn) {
+    this.message = message;
+    this.isImportant = isImportant;
+    this.showNextBtn = showNextBtn;
+    this.showCancelBtn = showCancelBtn;
+  }
+}
 
-function handleActionClick(action) {
-   console.log("clicked on " + action);
-   if (action === "Move" || action === "Dive" || action === "MoveAround"){
-         let id = Board.state.players[Board.state.currentPlayerPlaying].id;
-         console.log("clicked for player id  " + id);
-         let tilesToLight = this.whereCanHeMove(this.state.players[id].location, this.state.players[id].role);
 
-          // this.lightTheTiles(tilesToLight, this.state.players[id].color);
-
-         for (let i = 0; i < tilesToLight.length; i++){
-           document.getElementById("square" + tilesToLight[i]).style.border = "3px solid " + this.state.players[id].color;
-         }
-
-         // set a new Expected input
-   }
-   return null;
- }*/
 
 function riseTheIsland(){
     var tile01 = new Tile("helipad", 0, false, false, 5, "", new Array(), "#A9D0F5", "", "HELIPORT");
