@@ -59,6 +59,8 @@ const diagonalPaths = {0 : [4], 1 : [3], 2 : [6,8], 3 : [1,7,9], 4 : [0,8,10], 5
      { id : 3 , name : "statue"}
  ];
 
+ const buttons = ["Next", "Cancel", "PickTwoCards", "Flood"];
+
  const playerSteps = [
      {id : 0, name : "action 1/3" },
      {id : 1, name : "action 2/3" },
@@ -68,22 +70,22 @@ const diagonalPaths = {0 : [4], 1 : [3], 2 : [6,8], 3 : [1,7,9], 4 : [0,8,10], 5
  ];
 
  const playerDefaultActions = [
-      {id : 0, name : "Move", text: "Move to an adjacent tile.", enabled : true, triggers : "Move" },
-      {id : 1, name : "Dry", text: "Dry an adjacent tile", enabled : true, triggers : "Dry"  },
-      {id : 2, name : "Give", text: "Give a card on a character on the same tile", enabled : true, triggers : "Give" },
-      {id : 3, name : "Get a Treasure !", text: "Get the treasure in this temple.", enabled : true, triggers : "GetATreasure"  },
-      {id : 4, name : "Nothing", text: "Simply do nothing.", enabled : true, triggers : "DoNothing"  }
+      {id : 0, name : "Move", text: "Move to an adjacent tile.", enabled : true, triggers : "Move" }, //has an adjacent tile around ?
+      {id : 1, name : "Dry", text: "Dry an adjacent tile", enabled : true, triggers : "Dry"  }, //has an adjacent immersed tile around ?
+      {id : 2, name : "Give", text: "Give a card on a character on the same tile", enabled : true, triggers : "Give" }, //has a player on his tile ?
+      {id : 3, name : "Get a Treasure !", text: "Get the treasure in this temple.", enabled : true, triggers : "GetATreasure"  }, // has 4 cards and is on the right temple
+      {id : 4, name : "Nothing", text: "Simply do nothing.", enabled : true, triggers : "DoNothing"  } // -
  ];
 
  const playerSpecialActions = [
    // Special actions
-   {id : 0, name : "Send a card", forRole: "Messenger", replacesAction: "2", text: "Send a card to any character.", enabled : true, triggers : "SendACard"  },
-   {id : 1, name : "Move someone", forRole: "Navigator", replacesAction: "-", text: "Move any character from one or two tiles.", enabled : true, triggers : "MoveSomeone"  },
-   {id : 2, name : "Dry two tiles", forRole: "Engineer", replacesAction: "1", text: "Dry two adjacent tiles.", enabled : true, triggers : "DryTwoTiles"  },
-   {id : 3, name : "Move around", forRole: "Explorer", replacesAction: "0", text: "Move to any tile around.", enabled : true, triggers : "MoveAround"  },
-   {id : 4, name : "Dry around", forRole: "Explorer", replacesAction: "1", text: "Dry any tile around." , enabled : true, triggers : "DryAround" },
-   {id : 5, name : "Fly", forRole: "Pilot", replacesAction: "0", text: "Fly to any tile.", enabled : true, triggers : "Fly"  },
-   {id : 6, name : "Dive", forRole: "Diver", replacesAction: "0", text: "Dive through any adjacent tile.", enabled : true, triggers : "Dive"  },
+   {id : 0, name : "Send a card", forRole: "Messenger", replacesAction: "2", text: "Send a card to any character.", enabled : true, triggers : "SendACard"  }, // has a treasure card
+   {id : 1, name : "Move someone", forRole: "Navigator", replacesAction: "-", text: "Move any character from one or two tiles.", enabled : true, triggers : "MoveSomeone"  }, // there's another player in game
+   {id : 2, name : "Dry two tiles", forRole: "Engineer", replacesAction: "1", text: "Dry two adjacent tiles.", enabled : true, triggers : "DryTwoTiles"  }, // has two immersed adjacent tiles around
+   {id : 3, name : "Move around", forRole: "Explorer", replacesAction: "0", text: "Move to any tile around.", enabled : true, triggers : "MoveAround"  },//has an tile around ?
+   {id : 4, name : "Dry around", forRole: "Explorer", replacesAction: "1", text: "Dry any tile around." , enabled : true, triggers : "DryAround" },// has an immersed tile around
+   {id : 5, name : "Fly", forRole: "Pilot", replacesAction: "0", text: "Fly to any tile.", enabled : true, triggers : "Fly"  },// any other non dranwned tile
+   {id : 6, name : "Dive", forRole: "Diver", replacesAction: "0", text: "Dive through any adjacent tile.", enabled : true, triggers : "Dive"  }, // a tile to dive to
  ];
 
 
@@ -199,8 +201,7 @@ class Board extends React.Component {
     var floodCardsLeap = generateFloodCardsLeap();
     var floodCardsDiscard = new Array();
     var floodMeter = new FloodMeter(1);
-    let mainUserMessage = new UserMessage("Welcome new Player. Choose a first action for the first character.", false, false, false);
-    // mainUserMessage.setMessage("Welcome new Player. Choose a first action for the first character.", false, false, false);
+    let mainUserMessage = new UserMessage("Welcome new Player. Choose a first action for the first character.", false, new Array());
 
     // generer les joueurs
     var players = generatePlayers();
@@ -306,10 +307,8 @@ Go Next Step in the Turn
         if (nextStep === 3){
           // draw player cards
 
-          this.setState({ currentStep : nextStep });
-          // alert ("Let's draw some cards");
-          let newMessage = new UserMessage("Lets' draw some Player Cards", false, true, false);
-          this.setState({ currentStep : nextStep , mainUserMessage : newMessage});
+          let newMessage = new UserMessage("Lets' draw some Player Cards", false, [2]);
+          this.setState({ currentStep : nextStep, possibleActions : new Array(), mainUserMessage : newMessage});
         }
         else if (nextStep === 4){
           // flood some tiles.
@@ -317,14 +316,14 @@ Go Next Step in the Turn
           this.setState({ currentStep : nextStep });
           let howMuch = this.state.floodMeter.howManyCards(this.state.floodMeter.level);
           // alert ("Let's flood some tiles for " + howMuch);
-          let newMessage = new UserMessage("Let's flood " + howMuch + " tiles", false, true, false);
-          this.setState({ currentStep : nextStep , mainUserMessage : newMessage});
+          let newMessage = new UserMessage("Let's flood " + howMuch + " tiles", false, [3]);
+          this.setState({ currentStep : nextStep, possibleActions : new Array(), mainUserMessage : newMessage});
           this.doFloodSomeTiles(howMuch);
         }
         else if (nextStep === 5){
-          // next Player
+          // next Turn, new Player 0
           if (this.state.currentPlayerPlaying === this.state.players[this.state.players.length -1].id){
-            let newMessage = new UserMessage("Next Turn ! Please " + this.state.players[0].playersName + ", Choose an action " , false, false, false);
+            let newMessage = new UserMessage("Next Turn ! Please " + this.state.players[0].playersName + ", Choose an action " , false, new Array());
             let nextTurn = this.state.turn + 1;
             let nextPlayer = this.state.players[0].id;
             let psblactn = this.getPossibleActions(this.state.players[0].role);
@@ -335,7 +334,8 @@ Go Next Step in the Turn
               whatIsExpectedNext: "CharacterActionButtonClick" ,
               mainUserMessage : newMessage });
           } else {
-            let newMessage = new UserMessage("Next player ! Please Choose an action " , false, false, false);
+            // next Player
+            let newMessage = new UserMessage("Next player ! Please Choose an action " , false, new Array());
             let nextPlayer = this.state.players[this.state.currentPlayerPlaying + 1].id;
             let psblactn = this.getPossibleActions(this.state.players[nextPlayer].role);
             this.setState({ currentStep: 0,
@@ -347,7 +347,7 @@ Go Next Step in the Turn
         }
         else{
           // next action for thre same player
-          let newMessage = new UserMessage("Choose an action " , false, false, false);
+          let newMessage = new UserMessage("Choose an action " , false, new Array());
           let psblactn = this.getPossibleActions(this.state.players[this.state.currentPlayerPlaying].role);
           this.setState({ currentStep: nextStep,
             possibleActions : psblactn,
@@ -355,6 +355,14 @@ Go Next Step in the Turn
             mainUserMessage : newMessage});
         }
       }
+  }
+
+  sideActionsController(input){
+    // user has to pick two cards from the leap
+    if (input === "PickTwoCards"){
+        let cards = this.doPickTwoPlayerCards();
+        // alert ("Rhaaaa");
+    }
   }
 
   doFloodSomeTiles(howMany){
@@ -373,7 +381,7 @@ Go Next Step in the Turn
               // Let's DRAWN this tile
                 newTiles[j].isDrawned = true;
                 // TODO : rescue some players ?
-                // TODO : Check if all Temples of an undiscovered Treasure are drawned
+                // TODO : Check if all Temples of an undiscovered Treasure are drawned. If yes : end game
             }
             else{
                 newTiles[j].isImmersed = true;
@@ -387,10 +395,64 @@ Go Next Step in the Turn
         }
     }
 
+    // TODO : show the two Cards
     this.setState({
       floodCardsLeap: newFloodCardLeap,
       tiles : newTiles,
       floodCardsDiscard: newFloodCardsDiscard });
+  }
+
+  doPickTwoPlayerCards(){
+    // do we have one card left ?
+      let newPlayerCardsDiscard = this.state.playerCardsDiscard;
+      let newPlayerCardsLeap = this.state.playerCardsLeap;
+      let newPlayers = this.state.players;
+
+      let cards = new Array();
+      while (cards.length < 2){
+        if (newPlayerCardsLeap.length < 1){
+          // shuffle
+            newPlayerCardsLeap = shuffleArray(newPlayerCardsDiscard);
+            newPlayerCardsDiscard = new Array();
+        }
+        let card = newPlayerCardsLeap.pop();
+        cards.push(card);
+      }
+      // show the cards
+
+      // if montee des eaux ! x2
+      let floodCard = 0;
+      let cardsToPushToPlayer = new Array();
+      for (let i = 0; i < cards.length; i++ ){
+        console.log("CARD is " + cards[i]); // card is an object !
+        if (cards[i] === "floodRise"){
+          floodCard ++;
+          alert ('Flood Riiiiise !');
+        }
+        else{
+          cardsToPushToPlayer.push(cards[i]);
+        }
+      }
+
+      // has Player too much cards ?
+      let nbrOfCardsInHand = newPlayers[this.state.currentPlayerPlaying].cards.length + cardsToPushToPlayer.length;
+      if (nbrOfCardsInHand > 7){
+        alert ("Over 7 cards in Hand !");
+      }
+
+      newPlayers[this.state.currentPlayerPlaying].cards.push(cardsToPushToPlayer);
+      /*
+        -> any card to play ?
+        -> wanna play it ?
+        -> wanna throw some ?
+        */
+
+        this.setState({
+          playerCardsLeap: newPlayerCardsLeap,
+          players : newPlayers,
+          playerCardsDiscard: newPlayerCardsDiscard });
+      // dois finir en state next
+      this.controller("ActionIsDone");
   }
 
   getPossibleActions(role) {
@@ -468,7 +530,6 @@ Go Next Step in the Turn
         }
       }
     }
-
     return output;
   }
 
@@ -525,17 +586,17 @@ Go Next Step in the Turn
 
             let nada = this.lightTheTiles(tilesToLight, this.state.players[id].color);
             // set a new Expected PlayerInput
-            let newMessage = new UserMessage("Now choose a destination", false, false, true);
+            let newMessage = new UserMessage("Now choose a destination", false, [1]);
             this.setState({ whatIsExpectedNext: "TileButtonClickForMove" , mainUserMessage: newMessage });
       } else if (action === "Dry" || action === "DryAround"){
             let tilesToLight = this.whereCanHeDry(this.state.players[id].position, this.state.players[id].role);
             this.state.players[id].whereCanHeDry = tilesToLight;
 
             let nada = this.lightTheTiles(tilesToLight, this.state.players[id].color);
-            let newMessage = new UserMessage("Now choose a destination", false, false, true);
+            let newMessage = new UserMessage("Now choose a destination", false, [1]);
             this.setState({ whatIsExpectedNext: "TileButtonClickForDry" , mainUserMessage: newMessage});
       } else if (action === "DoNothing"){
-              let newMessage = new UserMessage("Doing nothing ZZZZZZZ ", false, true, false);
+              let newMessage = new UserMessage("Doing nothing ZZZZZZZ ", false, [0]);
               this.setState({ mainUserMessage: newMessage});
       }
       return null;
@@ -649,12 +710,15 @@ Go Next Step in the Turn
           <div className="panelInfo"> FloodLevel {this.state.floodMeter.level} <span className="littlePanelInfo"> ({this.state.floodMeter.howManyCards(this.state.floodMeter.level)} cards per flood)</span></div>
           <div className="panelInfo"> {this.state.players[this.state.currentPlayerPlaying].playersName} the <span style={{color: this.state.players[this.state.currentPlayerPlaying].color}}>{this.state.players[this.state.currentPlayerPlaying].role}</span> is Playing. </div>
           <div className="panelInfo"> Step : {playerSteps[this.state.currentStep].name} </div>
-          <div className="panelInfo">
+          <div className="panelInfo" id="UserActions">
             <ul>
               {this.state.possibleActions.map((action) =>
                 <li key={action.name}><button className="actionButton" onClick={() => this.handleActionClick(action.triggers)} >{action.name}</button></li>
               )}
             </ul>
+          </div>
+          <div className="panelInfo" id="UserDialog">
+              {this.renderMessageBoard()}
           </div>
         </div>
       </span>
@@ -662,12 +726,16 @@ Go Next Step in the Turn
   }
 
   renderMessageBoard() {
-let showNextBtnStyle = this.state.mainUserMessage.showNextBtn?({display: 'block'}):({display: 'none'});
-let showCancelBtnStyle = this.state.mainUserMessage.showCancelBtn?({display: 'block'}):({display: 'none'});
+    let showNextBtnStyle = (this.state.mainUserMessage.buttons.indexOf(0) >= 0)?({display: 'block'}):({display: 'none'});
+    let showCancelBtnStyle = (this.state.mainUserMessage.buttons.indexOf(1) >= 0)?({display: 'block'}):({display: 'none'});
+    let showPick2CardsBtnStyle = (this.state.mainUserMessage.buttons.indexOf(2) >= 0)?({display: 'block'}):({display: 'none'});
+    let showFloodBtnStyle = (this.state.mainUserMessage.buttons.indexOf(3) >= 0)?({display: 'block'}):({display: 'none'});
 
     return(
         <div>
           {this.state.mainUserMessage.message}
+        <button style={showFloodBtnStyle} onClick ={() => this.controller("Flood")}>Flood !</button>
+        <button style={showPick2CardsBtnStyle} onClick ={() => this.sideActionsController("PickTwoCards")}>Pick two cards</button>
         <button style={showNextBtnStyle} onClick ={() => this.controller("ActionIsDone")}>Next</button>
         <button style={showCancelBtnStyle} onClick ={() => alert("Not Implemented :(")}>Cancel</button>
       </div>
@@ -761,9 +829,7 @@ let showCancelBtnStyle = this.state.mainUserMessage.showCancelBtn?({display: 'bl
           {this.renderPlayerBoard(2)}
           {this.renderPlayerBoard(3)}
         </div>
-        <div className="messageBoard">
-          {this.renderMessageBoard()}
-        </div>
+
       </div>
     );
   }
@@ -850,15 +916,12 @@ class FloodMeter {
 }
 
 class UserMessage {
-  constructor(message, isImportant, showNextBtn, showCancelBtn) {
+  constructor(message, isImportant, buttons) {
     this.message = message;
     this.isImportant = isImportant;
-    this.showNextBtn = showNextBtn;
-    this.showCancelBtn = showCancelBtn;
+    this.buttons = buttons;
   }
 }
-
-
 
 function riseTheIsland(){
     var tile01 = new Tile("helipad", 0, false, false, 5, "", new Array(), "#A9D0F5", "", "HELIPORT");
