@@ -678,6 +678,16 @@ Go Next Step in the Turn
         this.setState({ tiles: NewTiles});
   }
 
+  cancelAnAction(){
+    let nada = this.unlightTheTiles();
+    let newMessage = new UserMessage("Choose an action " , false, new Array());
+    // let psblactn = this.getPossibleActions(this.state.players[this.state.currentPlayerPlaying].role);
+    this.setState({
+      // possibleActions : psblactn,
+      whatIsExpectedNext: "CharacterActionButtonClick" ,
+      mainUserMessage : newMessage});
+  }
+
   renderSquare(i) {
     return(
       <span>
@@ -737,7 +747,7 @@ Go Next Step in the Turn
         <button style={showFloodBtnStyle} onClick ={() => this.controller("Flood")}>Flood !</button>
         <button style={showPick2CardsBtnStyle} onClick ={() => this.sideActionsController("PickTwoCards")}>Pick two cards</button>
         <button style={showNextBtnStyle} onClick ={() => this.controller("ActionIsDone")}>Next</button>
-        <button style={showCancelBtnStyle} onClick ={() => alert("Not Implemented :(")}>Cancel</button>
+        <button style={showCancelBtnStyle} onClick ={() => this.cancelAnAction()}>Cancel</button>
       </div>
     )
   }
