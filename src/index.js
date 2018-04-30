@@ -114,16 +114,31 @@ const diagonalPaths = {0 : [4], 1 : [3], 2 : [6,8], 3 : [1,7,9], 4 : [0,8,10], 5
  { name : "coast03" }, { name : "swamp01" }, { name : "swamp02" }, { name : "swamp03" }, { name : "swamp04" }];
 
 function DrawSquare(props) {
-  let squareStyle;
+  let squareStyle; // sets the backGround
+  let squareClass; // sets the Class
+
+  // sets the backGround
   if (props.tile.isImmersed){
       squareStyle = ({background: '#01A9DB' });
+  }else if (props.tile.isDrawned) {
+      squareStyle = ({background: '#FFF' });
   }else if (props.tile.imgpath.length > 0 && props.tile.name === "helipad") {
       squareStyle = ({background: 'url(' + props.tile.imgpath + ')' });
   } else {
       squareStyle = ({background: props.tile.backgroundColor});
   }
 
-  let squareClass = props.tile.isDrawned? ('isDrawnedSquare') : ('square');
+  // sets the Class
+
+  if (props.tile.isImmersed){
+    squareClass = 'immersedSquare';
+  }
+  else if (props.tile.isDrawned){
+    squareClass = 'drawnedSquare';
+  } else {
+    squareClass = 'square';
+  }
+
   let squareId =  "square" + props.index;
 
   return (
@@ -358,18 +373,23 @@ Go Next Step in the Turn
 
         // console.log('*************** CARD IS ' + card.name + ' tiles.length = ' + tiles.length);
         for (let j = 0; j < newTiles.length; j++){
-          // console.log('****** TILE IS ' + tiles[j].name);
+          console.log('****** TILE To flood IS ' + newTiles[j].name);
           if (newTiles[j].name === card.name){
             if (newTiles[j].isImmersed){
               // Let's DRAWN this tile
               alert (newTiles[j] + " is drawning !");
+                newTiles[j].isImmersed = false;
                 newTiles[j].isDrawned = true;
+                tileHasDrawned = true;
                 // rescue some players ?
                 if (newTiles[j].playerOn.length > 0){
-                    alert ("There is " + newTiles[j].playerOn.length + " explorers on the drawning tile. Let's evacuate them.");
+                    alert ("There is " + newTiles[j].playerOn.length + " explorer(s) on the drawning tile. Let's evacuate them.");
                     // TODO evacuate explorers from drawning island
                 }
                 // TODO : Check if all Temples of an undiscovered Treasure are drawned. If yes : end game
+            }
+            else (newTiles[j].isDrawned){
+              alert (newTiles[j].name + " is already drawned. it shouldn't be in the Leap !");
             }
             else{
                 newTiles[j].isImmersed = true;
