@@ -395,6 +395,9 @@ Go Next Step in the Turn
       let newPlayerCardsDiscard = this.state.playerCardsDiscard;
       let newPlayerCardsLeap = this.state.playerCardsLeap;
       let newPlayers = this.state.players;
+      let newFloodCardsLeap = this.state.floodCardsLeap;
+      let newFloodCardsDiscard = this.state.floodCardsDiscard;
+      let newFloodMeter = this.state.floodMeter;
 
       let cards = new Array();
       while (cards.length < 2){
@@ -411,14 +414,23 @@ Go Next Step in the Turn
       let floodHowMuch = 0;
       let cardsToPushToPlayer = new Array();
       for (let i = 0; i < cards.length; i++ ){
-        // console.log("CARD is " + cards[i].name); // card is an object !
         if (cards[i].name === "floodRise"){
-          // floodCards ++;
-          // alert ('Flood Riiiiise ! Montée des Eaux !');
-          let nada = this.doMonteeDesEaux();
-          // TODO : does not work.state is not properly updated
-          floodHowMuch = floodHowMuch + this.state.floodMeter.floodFactor;
-          // let nadaII = this.doFloodSomeTiles(this.state.floodMeter.howManyCards(this.state.floodMeter.level));
+            // bring Discarded flood cards on the top of the flood Leap
+            // TODO : no more cards when flooding : reset the leap
+            if (newFloodCardsDiscard.length > 0){
+                newFloodCardsDiscard = shuffleArray(newFloodCardsDiscard);
+                newFloodCardsLeap = newFloodCardsLeap.concat(newFloodCardsDiscard);
+                newFloodCardsDiscard = new Array();
+            }
+
+            // upgrade the Flood Level
+            newFloodMeter.level = newFloodMeter.level + 1;
+            newFloodMeter.floodFactor = newFloodMeter.howManyCards(newFloodMeter.level);
+            if (newFloodMeter.level >= newFloodMeter.topLevel){
+              alert (" Top level reached. The Island is submerged. Game Over");
+            }
+
+          floodHowMuch = floodHowMuch + newFloodMeter.floodFactor;
         }
         else{
           cardsToPushToPlayer.push(cards[i]);
@@ -444,16 +456,21 @@ Go Next Step in the Turn
         -> wanna throw some ?
         */
       let newMessage = new UserMessage("Oh ! Look at these cards : " + cards[0].name + " and " + cards[1].name + ".", false, [0]);
-        this.setState({
+      this.setState({
           mainUserMessage: newMessage,
           playerCardsLeap: newPlayerCardsLeap,
           players: newPlayers,
-          playerCardsDiscard: newPlayerCardsDiscard });
+          playerCardsDiscard: newPlayerCardsDiscard,
+          floodCardsLeap: newFloodCardsLeap,
+          floodCardsDiscard: newFloodCardsDiscard,
+          floodMeter: newFloodMeter });
       // dois finir en state next  [0]
+
+      alert ("AFTER SET : doPickTwoPlayerCards  Leap is " + this.state.floodCardsLeap.length + " and Discard is " + this.state.floodCardsDiscard.length);
   }
 
+/*
   doMonteeDesEaux() {
-
         let newFloodoCardsLeap = this.state.floodCardsLeap;
         let newFloodoCardsDiscard = this.state.floodCardsDiscard;
         let newFloodMeter = this.state.floodMeter;
@@ -486,7 +503,7 @@ Go Next Step in the Turn
           currentState.floodMeter = newFloodMeter;
           return currentState;
         });
-/*
+
         this.setState({
           floodMeter : newFloodMeter,
           floodCardsLeap : newFloodoCardsLeap,
@@ -494,7 +511,7 @@ Go Next Step in the Turn
           zimLeap : newFloodoCardsLeap,
           zimDiscard : newFloodoCardsDiscard,
          });
-         */
+
           //floodCardsLeap : newFloodCardsLeap,
           //floodCardsDiscard : newFloodCardsDiscard });
          alert ("AFTER SET : THis State:  Leap is " + this.state.floodCardsLeap.length + " and Discard is " + this.state.floodCardsDiscard.length);
@@ -502,6 +519,7 @@ Go Next Step in the Turn
           return true;
         // this.doFloodSomeTiles(newFloodMeter.howManyCards(newFloodMeter.level));
   }
+  */
 
   getPossibleActions(role) {
       let actions = new Array();
