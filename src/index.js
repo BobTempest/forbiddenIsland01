@@ -351,7 +351,9 @@ Go Next Step in the Turn
       }
       // user has to pick two cards from the leap
       else if (input === "PickTwoCards"){
-          let cards = this.doPickTwoPlayerCards();
+          // let cards = this.doPickTwoPlayerCards();
+          let card01 = this.doPickOnePlayerCard(1);
+          let card02 = this.doPickOnePlayerCard(2);
           // alert ("Rhaaaa");
       }
       else if (input === "PlayerFlood"){
@@ -388,7 +390,7 @@ Go Next Step in the Turn
                 }
                 // TODO : Check if all Temples of an undiscovered Treasure are drawned. If yes : end game
             }
-            else (newTiles[j].isDrawned){
+            else if(newTiles[j].isDrawned){
               alert (newTiles[j].name + " is already drawned. it shouldn't be in the Leap !");
             }
             else{
@@ -411,6 +413,90 @@ Go Next Step in the Turn
     return true;
   }
 
+  doPickOnePlayerCard(cardNumber){
+      let newPlayerCardsDiscard = this.state.playerCardsDiscard;
+      let newPlayerCardsLeap = this.state.playerCardsLeap;
+      let newPlayers = this.state.players;
+      let newFloodCardsLeap = this.state.floodCardsLeap;
+      let newFloodCardsDiscard = this.state.floodCardsDiscard;
+      let newFloodMeter = this.state.floodMeter;
+
+      let card = new Array();
+      if (newPlayerCardsLeap.length < 1){
+        // shuffle and rebuild the leap from the Discard
+          newPlayerCardsLeap = shuffleArray(newPlayerCardsDiscard);
+          newPlayerCardsDiscard = new Array();
+      }
+      card = newPlayerCardsLeap.pop();
+
+
+      let cardToPushToPlayer = null;
+
+        if (card.name === "floodRise"){
+            alert("Flood Riiiiise ! ")
+            // bring Discarded flood cards on the top of the flood Leap
+
+            if (newFloodCardsDiscard.length > 0){
+                newFloodCardsDiscard = shuffleArray(newFloodCardsDiscard);
+                newFloodCardsLeap = newFloodCardsLeap.concat(newFloodCardsDiscard);
+                newFloodCardsDiscard = new Array();
+            }
+
+            // upgrade the Flood Level
+            newFloodMeter.level = newFloodMeter.level + 1;
+            newFloodMeter.floodFactor = newFloodMeter.howManyCards(newFloodMeter.level);
+            if (newFloodMeter.level >= newFloodMeter.topLevel){
+              alert (" Top level reached. The Island is submerged. Game Over");
+            }
+
+            // do the floodings
+            console.log("doFloodSomeTiles for " + newFloodMeter.floodFactor);
+            this.doFloodSomeTiles(newFloodMeter.floodFactor);
+        }
+        else{
+          cardToPushToPlayer = card;
+        }
+
+      // do the floodings
+      // console.log("doFloodSomeTiles for " + newFloodMeter.floodFactor);
+      // this.doFloodSomeTiles(newFloodMeter.floodFactor);
+
+      // has Player too much cards ?
+      let nbrOfCardsInHand = newPlayers[this.state.currentPlayerPlaying].cards.length + 1;
+      if (nbrOfCardsInHand > 7){
+        alert ("Oh no ! Over 7 cards in Hand !");
+      }
+
+      if (cardToPushToPlayer != null){
+              newPlayers[this.state.currentPlayerPlaying].cards.push(cardToPushToPlayer);
+      }
+      /*
+        -> any card to play ?
+        -> wanna play it ?
+        -> wanna throw some ?
+      */
+      let newMessage = "";
+      if (cardNumber == 1 ){
+            newMessage = new UserMessage("Oh ! Look at this first card : " + card.name + ".", false, null);
+      }else{
+            newMessage = new UserMessage("Oh ! Look at this second card : " + card.name + ".", false, [0]);
+      }
+
+
+      this.setState({
+          mainUserMessage: newMessage,
+          playerCardsLeap: newPlayerCardsLeap,
+          players: newPlayers,
+          playerCardsDiscard: newPlayerCardsDiscard,
+          floodCardsLeap: newFloodCardsLeap,
+          floodCardsDiscard: newFloodCardsDiscard,
+          floodMeter: newFloodMeter });
+      // dois finir en state next  [0]
+
+      // alert ("AFTER SET : doPickTwoPlayerCards  Leap is " + this.state.floodCardsLeap.length + " and Discard is " + this.state.floodCardsDiscard.length);
+  }
+
+/*
   doPickTwoPlayerCards(){
       let newPlayerCardsDiscard = this.state.playerCardsDiscard;
       let newPlayerCardsLeap = this.state.playerCardsLeap;
@@ -470,11 +556,11 @@ Go Next Step in the Turn
       for (let i = 0; i < cardsToPushToPlayer.length; i++ ){
           newPlayers[this.state.currentPlayerPlaying].cards.push(cardsToPushToPlayer[i]);
       }
-      /*
+
         -> any card to play ?
         -> wanna play it ?
         -> wanna throw some ?
-        */
+
       let newMessage = new UserMessage("Oh ! Look at these cards : " + cards[0].name + " and " + cards[1].name + ".", false, [0]);
       this.setState({
           mainUserMessage: newMessage,
@@ -488,7 +574,7 @@ Go Next Step in the Turn
 
       alert ("AFTER SET : doPickTwoPlayerCards  Leap is " + this.state.floodCardsLeap.length + " and Discard is " + this.state.floodCardsDiscard.length);
   }
-
+*/
 /*
   doMonteeDesEaux() {
         let newFloodoCardsLeap = this.state.floodCardsLeap;

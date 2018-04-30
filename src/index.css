@@ -38,26 +38,6 @@ list-style:none;
   width: 50px;
 }
 
-.drawnedSquare {
-  box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-  background: #fff;
-  border: 1px solid #fff;
-  margin: 10px;
-
-  float: left;
-  margin-right: 2px;
-  margin-top: 2px;
-  margin-left: 2px;
-  margin-bottom: 2px;
-  border-radius: 5px;
-
-  padding: 0;
-  height: 50px;
-  width: 50px;
-}
-
 .immersedSquare {
   box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -72,6 +52,25 @@ list-style:none;
   margin-left: 2px;
   margin-bottom: 2px;
   border-radius: 5px;
+  padding: 0;
+  height: 50px;
+  width: 50px;
+}
+
+.drawnedSquare {
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  background: #fff;
+  margin: 10px;
+
+  float: left;
+  margin-right: 2px;
+  margin-top: 2px;
+  margin-left: 2px;
+  margin-bottom: 2px;
+  border-radius: 5px;
+
   padding: 0;
   height: 50px;
   width: 50px;
