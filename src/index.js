@@ -373,9 +373,11 @@ Go Next Step in the Turn
       // user has to pick two cards from the leap
       else if (input === "PickTwoCards"){
           // let cards = this.doPickTwoPlayerCards();
-          
-          let card01 = this.doPickOnePlayerCard(1);
-          let card02 = this.doPickOnePlayerCard(2);
+          let tempState = this.state;
+          tempState = this.doPickOnePlayerCard(1, tempState);
+          this.setState(tempState);
+          tempState = this.doPickOnePlayerCard(2, tempState);
+          this.setState(tempState);
           // alert ("Rhaaaa");
       }
       else if (input === "PlayerFlood"){
@@ -435,13 +437,76 @@ Go Next Step in the Turn
     return true;
   }
 
-  doPickOnePlayerCard(cardNumber){
-      let newPlayerCardsDiscard = this.state.playerCardsDiscard;
-      let newPlayerCardsLeap = this.state.playerCardsLeap;
-      let newPlayers = this.state.players;
-      let newFloodCardsLeap = this.state.floodCardsLeap;
-      let newFloodCardsDiscard = this.state.floodCardsDiscard;
-      let newFloodMeter = this.state.floodMeter;
+  doFloodSomeTilesWithState(howMany, floodCardsLeapInput, floodCardsDiscardInput, tilesInput){
+    let newFloodCardsLeap = floodCardsLeapInput;
+    let newFloodCardsDiscard = floodCardsDiscardInput;
+    let newTiles = tilesInput;
+
+    let tempState = new Object();
+    tempState.floodCardsLeap = new Array();
+    tempState.tiles = new Array();
+    tempState.floodCardsDiscard = new Array();
+
+    for ( let i = 0; i < howMany; i++){
+        let tileHasDrawned = false;
+        let card = newFloodCardsLeap.pop();
+        // TODO : no more cards when flooding : reset the leap
+
+        // console.log('*************** CARD IS ' + card.name + ' tiles.length = ' + tiles.length);
+        for (let j = 0; j < newTiles.length; j++){
+          console.log('****** TILE To flood IS ' + newTiles[j].name);
+          if (newTiles[j].name === card.name){
+            if (newTiles[j].isImmersed){
+              // Let's DRAWN this tile
+              alert (newTiles[j].name + " at " + j + " is drawning !");
+                newTiles[j].isImmersed = false;
+                newTiles[j].isDrawned = true;
+                tileHasDrawned = true;
+                // rescue some players ?
+                if (newTiles[j].playerOn.length > 0){
+                    alert ("There is " + newTiles[j].playerOn.length + " explorer(s) on the drawning tile. Let's evacuate them.");
+                    // TODO evacuate explorers from drawning island
+                }
+                // TODO : Check if all Temples of an undiscovered Treasure are drawned. If yes : end game
+            }
+            else if(newTiles[j].isDrawned){
+              alert (newTiles[j].name + " is already drawned. it shouldn't be in the Leap !");
+            }
+            else{
+                newTiles[j].isImmersed = true;
+            }
+
+            break;
+          }
+        }
+        if (!tileHasDrawned){
+            newFloodCardsDiscard.push(card);
+        }
+    }
+
+    tempState.floodCardsLeap = newFloodCardsLeap;
+    tempState.tiles = newTiles;
+    tempState.floodCardsDiscard = newFloodCardsDiscard;
+
+    return tempState;
+    /*
+    this.setState({
+      floodCardsLeap: newFloodCardsLeap,
+      tiles: newTiles,
+      floodCardsDiscard: newFloodCardsDiscard });
+
+    return true;
+    */
+  }
+
+  doPickOnePlayerCard(cardNumber, tempState){
+      let newPlayerCardsDiscard = tempState.playerCardsDiscard;
+      let newPlayerCardsLeap = tempState.playerCardsLeap;
+      let newPlayers = tempState.players;
+      let newFloodCardsLeap = tempState.floodCardsLeap;
+      let newFloodCardsDiscard = tempState.floodCardsDiscard;
+      let newFloodMeter = tempState.floodMeter;
+      let newTiles = tempState.tiles;
 
       let card = new Array();
       if (newPlayerCardsLeap.length < 1){
@@ -473,15 +538,14 @@ Go Next Step in the Turn
 
             // do the floodings
             console.log("doFloodSomeTiles for " + newFloodMeter.floodFactor);
-            this.doFloodSomeTiles(newFloodMeter.floodFactor);
+            let ReturnFromFlood = this.doFloodSomeTilesWithState(newFloodMeter.floodFactor, newFloodCardsLeap, newFloodCardsDiscard, newTiles);
+            newFloodCardsLeap = ReturnFromFlood.floodCardsLeap;
+            newFloodCardsDiscard = ReturnFromFlood.floodCardsDiscard;
+            newTiles = ReturnFromFlood.tiles;
         }
         else{
           cardToPushToPlayer = card;
         }
-
-      // do the floodings
-      // console.log("doFloodSomeTiles for " + newFloodMeter.floodFactor);
-      // this.doFloodSomeTiles(newFloodMeter.floodFactor);
 
       // has Player too much cards ?
       let nbrOfCardsInHand = newPlayers[this.state.currentPlayerPlaying].cards.length + 1;
@@ -500,6 +564,17 @@ Go Next Step in the Turn
             newMessage = new UserMessage("Oh ! Look at this second card : " + card.name + ".", false, [0]);
       }
 
+      tempState.mainUserMessage = newMessage;
+      tempState.playerCardsLeap = newPlayerCardsLeap;
+      tempState.players = newPlayers;
+      tempState.playerCardsDiscard = newPlayerCardsDiscard;
+      tempState.floodCardsLeap = newFloodCardsLeap;
+      tempState.floodCardsDiscard = newFloodCardsDiscard;
+      tempState.floodMeter = newFloodMeter;
+      tempState.tiles = newTiles;
+
+      return tempState;
+      /*
       this.setState({
           mainUserMessage: newMessage,
           playerCardsLeap: newPlayerCardsLeap,
@@ -509,6 +584,7 @@ Go Next Step in the Turn
           floodCardsDiscard: newFloodCardsDiscard,
           floodMeter: newFloodMeter });
       // dois finir en state next  [0]
+      */
   }
 
 /*
