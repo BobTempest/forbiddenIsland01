@@ -271,20 +271,6 @@ class Board extends React.Component {
     this.doFloodSomeTiles(6);
 
     // Let's start
-    function waitForPlayerInput(expectFor){
-    }
-      /*
-      ================================================================
-Wait For PlayerInput ( action || ExtraCardAction || Tile || Card in His hand || Card in SomeOneElse's hand )
-type : What's expected
-A user message says What's expected
-
-On TileClick || On Card Click || On Anything click
-check for What's expected
-solve the action
-Go Next Step in the Turn
-    }
-    */
 
     function getInitialPlayerPosition(player, y, z){
         for (let i = 0; i < tiles.length; i++){
@@ -312,7 +298,6 @@ Go Next Step in the Turn
 ///////////////////////////////////////////////////////////////////////////////////
 //        OUt Of Board constructor
 ////////////////////////////////////////////////////////////////////////////////////
-
 
   controller(input){
       console.log("InController turn :" + this.state.currentStep);
@@ -396,11 +381,9 @@ Go Next Step in the Turn
         let tileHasDrawned = false;
         let card = newFloodCardsLeap.pop();
         // TODO : no more cards when flooding : reset the leap
-
-        // console.log('*************** CARD IS ' + card.name + ' tiles.length = ' + tiles.length);
         for (let j = 0; j < newTiles.length; j++){
-          console.log('****** TILE To flood IS ' + newTiles[j].name);
           if (newTiles[j].name === card.name){
+            console.log('****** TILE To flood IS ' + newTiles[j].name);
             if (newTiles[j].isImmersed){
               // Let's DRAWN this tile
               alert (newTiles[j].name + " at " + j + " is drawning !");
@@ -451,10 +434,8 @@ Go Next Step in the Turn
         let tileHasDrawned = false;
         let card = newFloodCardsLeap.pop();
         // TODO : no more cards when flooding : reset the leap
-
-        // console.log('*************** CARD IS ' + card.name + ' tiles.length = ' + tiles.length);
+        console.log('****** TILE To flood IS (with State) ' + card.name);
         for (let j = 0; j < newTiles.length; j++){
-          console.log('****** TILE To flood IS ' + newTiles[j].name);
           if (newTiles[j].name === card.name){
             if (newTiles[j].isImmersed){
               // Let's DRAWN this tile
@@ -876,11 +857,10 @@ Go Next Step in the Turn
           if (player.whereCanHeFly.indexOf(i) >= 0){
               // Move
               this.moveAPlayer(player, i);
-              let nada = this.unlightTheTiles();
-              if (nada){
-                this.setState({ whatIsExpectedNext: "", hasPilotFlownThisTurn: true});
-                this.controller("ActionIsDone");
-              }
+              this.setState({ whatIsExpectedNext: "" , hasPilotFlownThisTurn: true}, () => {
+                  this.controller("ActionIsDone");
+                  this.unlightTheTiles();
+              });
           }
           else{
             alert ("He can't move there !");
@@ -906,19 +886,6 @@ Go Next Step in the Turn
             alert ("Unexpected Clic On a Tile");
       }
     }
-    /*
-    const squaresDup = this.state.squares.slice();
-    if (squaresDup[i] === null && !this.state.gameIsOver){
-      squaresDup[i] = this.state.xIsNext ? 'X' : 'O';
-      this.setState({
-        squares: squaresDup,
-        xIsNext: !this.state.xIsNext
-      });
-    }
-    */
-
-      //  return null;
-  //}
 
   moveAPlayer(player, destination){
     let NewTiles = this.state.tiles;
