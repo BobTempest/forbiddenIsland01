@@ -69,6 +69,25 @@ const diagonalPaths = {0 : [4], 1 : [3], 2 : [6,8], 3 : [1,7,9], 4 : [0,8,10], 5
      {id : 4, name : "draw flood cards" }
  ];
 
+ // And If
+/*
+ 0 action 1/3
+ 100 action 2/3
+ 200 action 3/3
+ 300 pick one player card
+    310 flood?
+      311 case drawned?
+      312 rescue players?
+    320 rescue players?
+    330 too much card in hand ?
+ 350 pick one player cards
+   360 flood?
+     361 case drawned?
+     362 rescue players?
+   380 too much card in hand ?
+ 400 draw flood cards
+  */
+
  const playerDefaultActions = [
       {id : 0, name : "Move", text: "Move to an adjacent tile.", enabled : true, triggers : "Move" }, //has an adjacent tile around ?
       {id : 1, name : "Dry", text: "Dry an adjacent tile", enabled : true, triggers : "Dry"  }, //has an adjacent immersed tile around ?
@@ -84,8 +103,8 @@ const diagonalPaths = {0 : [4], 1 : [3], 2 : [6,8], 3 : [1,7,9], 4 : [0,8,10], 5
    {id : 2, name : "Dry two tiles", forRole: "Engineer", replacesAction: "1", text: "Dry two adjacent tiles.", enabled : true, triggers : "DryTwoTiles"  }, // has two immersed adjacent tiles around
    {id : 3, name : "Move around", forRole: "Explorer", replacesAction: "0", text: "Move to any tile around.", enabled : true, triggers : "MoveAround"  },//has an tile around ?
    {id : 4, name : "Dry around", forRole: "Explorer", replacesAction: "1", text: "Dry any tile around." , enabled : true, triggers : "DryAround" },// has an immersed tile around
-   {id : 5, name : "Fly", forRole: "Pilot", replacesAction: "0", text: "Fly to any tile.", enabled : true, triggers : "Fly"  },// any other non dranwned tile
-   {id : 6, name : "Dive", forRole: "Diver", replacesAction: "0", text: "Dive through any adjacent tile.", enabled : true, triggers : "Dive"  }, // a tile to dive to
+   {id : 5, name : "Fly", forRole: "Pilot", replacesAction: "-", text: "Fly to any tile.", enabled : true, triggers : "Fly"  },// any other non dranwned tile
+   {id : 6, name : "Move/Dive", forRole: "Diver", replacesAction: "0", text: "Dive through any adjacent tile.", enabled : true, triggers : "Dive"  }, // a tile to dive to
  ];
 
 
@@ -114,16 +133,31 @@ const diagonalPaths = {0 : [4], 1 : [3], 2 : [6,8], 3 : [1,7,9], 4 : [0,8,10], 5
  { name : "coast03" }, { name : "swamp01" }, { name : "swamp02" }, { name : "swamp03" }, { name : "swamp04" }];
 
 function DrawSquare(props) {
-  let squareStyle;
+  let squareStyle; // sets the backGround
+  let squareClass; // sets the Class
+
+  // sets the backGround
   if (props.tile.isImmersed){
       squareStyle = ({background: '#01A9DB' });
+  }else if (props.tile.isDrawned) {
+      squareStyle = ({background: '#FFF' });
   }else if (props.tile.imgpath.length > 0 && props.tile.name === "helipad") {
       squareStyle = ({background: 'url(' + props.tile.imgpath + ')' });
   } else {
       squareStyle = ({background: props.tile.backgroundColor});
   }
 
-  let squareClass = props.tile.isDrawned? ('isDrawnedSquare') : ('square');
+  // sets the Class
+
+  if (props.tile.isImmersed){
+    squareClass = 'immersedSquare';
+  }
+  else if (props.tile.isDrawned){
+    squareClass = 'drawnedSquare';
+  } else {
+    squareClass = 'square';
+  }
+
   let squareId =  "square" + props.index;
 
   return (
@@ -200,7 +234,7 @@ class Board extends React.Component {
     var playerCardsDiscard = new Array();
     var floodCardsLeap = generateFloodCardsLeap();
     var floodCardsDiscard = new Array();
-    var floodMeter = new FloodMeter(1);
+    var floodMeter = new FloodMeter(2);
     let mainUserMessage = new UserMessage("Welcome new Player. Choose a first action for the first character.", false, new Array());
 
     // generer les joueurs
@@ -226,6 +260,7 @@ class Board extends React.Component {
       nbrOfPlayers : players.length,
       nbrOfPosessedTreasures : 0,
       turn : 1,
+      hasPilotFlownThisTurn : false,
       currentPlayerPlaying : 0,
       possibleActions : possibleActions,
       currentStep : 0,
@@ -236,20 +271,6 @@ class Board extends React.Component {
     this.doFloodSomeTiles(6);
 
     // Let's start
-    function waitForPlayerInput(expectFor){
-    }
-      /*
-      ================================================================
-Wait For PlayerInput ( action || ExtraCardAction || Tile || Card in His hand || Card in SomeOneElse's hand )
-type : What's expected
-A user message says What's expected
-
-On TileClick || On Card Click || On Anything click
-check for What's expected
-solve the action
-Go Next Step in the Turn
-    }
-    */
 
     function getInitialPlayerPosition(player, y, z){
         for (let i = 0; i < tiles.length; i++){
@@ -278,7 +299,6 @@ Go Next Step in the Turn
 //        OUt Of Board constructor
 ////////////////////////////////////////////////////////////////////////////////////
 
-
   controller(input){
       console.log("InController turn :" + this.state.currentStep);
       if (input === "ActionIsDone"){
@@ -306,37 +326,43 @@ Go Next Step in the Turn
             let nextTurn = this.state.turn + 1;
             let nextPlayer = this.state.players[0].id;
             let psblactn = this.getPossibleActions(this.state.players[0].role);
-            this.setState({ currentStep: 0,
+            this.setState({ currentStep : 0,
               turn : nextTurn,
               currentPlayerPlaying : nextPlayer,
               possibleActions : psblactn,
-              whatIsExpectedNext: "CharacterActionButtonClick" ,
+              hasPilotFlownThisTurn : false,
+              whatIsExpectedNext : "CharacterActionButtonClick" ,
               mainUserMessage : newMessage });
           } else {
             // next Player
             let newMessage = new UserMessage("Next player ! Please Choose an action " , false, new Array());
             let nextPlayer = this.state.players[this.state.currentPlayerPlaying + 1].id;
             let psblactn = this.getPossibleActions(this.state.players[nextPlayer].role);
-            this.setState({ currentStep: 0,
+            this.setState({ currentStep : 0,
               currentPlayerPlaying : nextPlayer,
               possibleActions : psblactn,
-              whatIsExpectedNext: "CharacterActionButtonClick",
+              whatIsExpectedNext : "CharacterActionButtonClick",
               mainUserMessage : newMessage });
           }
         }
         else{
-          // next action for thre same player
+          // next action for the same player
           let newMessage = new UserMessage("Choose an action " , false, new Array());
           let psblactn = this.getPossibleActions(this.state.players[this.state.currentPlayerPlaying].role);
-          this.setState({ currentStep: nextStep,
+          this.setState({ currentStep : nextStep,
             possibleActions : psblactn,
-            whatIsExpectedNext: "CharacterActionButtonClick" ,
+            whatIsExpectedNext : "CharacterActionButtonClick" ,
             mainUserMessage : newMessage});
         }
       }
       // user has to pick two cards from the leap
       else if (input === "PickTwoCards"){
-          let cards = this.doPickTwoPlayerCards();
+          // let cards = this.doPickTwoPlayerCards();
+          let tempState = this.state;
+          tempState = this.doPickOnePlayerCard(1, tempState);
+          this.setState(tempState);
+          tempState = this.doPickOnePlayerCard(2, tempState);
+          this.setState(tempState);
           // alert ("Rhaaaa");
       }
       else if (input === "PlayerFlood"){
@@ -355,21 +381,24 @@ Go Next Step in the Turn
         let tileHasDrawned = false;
         let card = newFloodCardsLeap.pop();
         // TODO : no more cards when flooding : reset the leap
-
-        // console.log('*************** CARD IS ' + card.name + ' tiles.length = ' + tiles.length);
         for (let j = 0; j < newTiles.length; j++){
-          // console.log('****** TILE IS ' + tiles[j].name);
           if (newTiles[j].name === card.name){
+            console.log('****** TILE To flood IS ' + newTiles[j].name);
             if (newTiles[j].isImmersed){
               // Let's DRAWN this tile
-              alert (newTiles[j] + " is drawning !");
+              alert (newTiles[j].name + " at " + j + " is drawning !");
+                newTiles[j].isImmersed = false;
                 newTiles[j].isDrawned = true;
+                tileHasDrawned = true;
                 // rescue some players ?
                 if (newTiles[j].playerOn.length > 0){
-                    alert ("There is " + newTiles[j].playerOn.length + " explorers on the drawning tile. Let's evacuate them.");
+                    alert ("There is " + newTiles[j].playerOn.length + " explorer(s) on the drawning tile. Let's evacuate them.");
                     // TODO evacuate explorers from drawning island
                 }
                 // TODO : Check if all Temples of an undiscovered Treasure are drawned. If yes : end game
+            }
+            else if(newTiles[j].isDrawned){
+              alert (newTiles[j].name + " is already drawned. it shouldn't be in the Leap !");
             }
             else{
                 newTiles[j].isImmersed = true;
@@ -391,10 +420,162 @@ Go Next Step in the Turn
     return true;
   }
 
+  doFloodSomeTilesWithState(howMany, floodCardsLeapInput, floodCardsDiscardInput, tilesInput){
+    let newFloodCardsLeap = floodCardsLeapInput;
+    let newFloodCardsDiscard = floodCardsDiscardInput;
+    let newTiles = tilesInput;
+
+    let tempState = new Object();
+    tempState.floodCardsLeap = new Array();
+    tempState.tiles = new Array();
+    tempState.floodCardsDiscard = new Array();
+
+    for ( let i = 0; i < howMany; i++){
+        let tileHasDrawned = false;
+        let card = newFloodCardsLeap.pop();
+        // TODO : no more cards when flooding : reset the leap
+        console.log('****** TILE To flood IS (with State) ' + card.name);
+        for (let j = 0; j < newTiles.length; j++){
+          if (newTiles[j].name === card.name){
+            if (newTiles[j].isImmersed){
+              // Let's DRAWN this tile
+              alert (newTiles[j].name + " at " + j + " is drawning !");
+                newTiles[j].isImmersed = false;
+                newTiles[j].isDrawned = true;
+                tileHasDrawned = true;
+                // rescue some players ?
+                if (newTiles[j].playerOn.length > 0){
+                    alert ("There is " + newTiles[j].playerOn.length + " explorer(s) on the drawning tile. Let's evacuate them.");
+                    // TODO evacuate explorers from drawning island
+                }
+                // TODO : Check if all Temples of an undiscovered Treasure are drawned. If yes : end game
+            }
+            else if(newTiles[j].isDrawned){
+              alert (newTiles[j].name + " is already drawned. it shouldn't be in the Leap !");
+            }
+            else{
+                newTiles[j].isImmersed = true;
+            }
+
+            break;
+          }
+        }
+        if (!tileHasDrawned){
+            newFloodCardsDiscard.push(card);
+        }
+    }
+
+    tempState.floodCardsLeap = newFloodCardsLeap;
+    tempState.tiles = newTiles;
+    tempState.floodCardsDiscard = newFloodCardsDiscard;
+
+    return tempState;
+    /*
+    this.setState({
+      floodCardsLeap: newFloodCardsLeap,
+      tiles: newTiles,
+      floodCardsDiscard: newFloodCardsDiscard });
+
+    return true;
+    */
+  }
+
+  doPickOnePlayerCard(cardNumber, tempState){
+      let newPlayerCardsDiscard = tempState.playerCardsDiscard;
+      let newPlayerCardsLeap = tempState.playerCardsLeap;
+      let newPlayers = tempState.players;
+      let newFloodCardsLeap = tempState.floodCardsLeap;
+      let newFloodCardsDiscard = tempState.floodCardsDiscard;
+      let newFloodMeter = tempState.floodMeter;
+      let newTiles = tempState.tiles;
+
+      let card = new Array();
+      if (newPlayerCardsLeap.length < 1){
+        // shuffle and rebuild the leap from the Discard
+          newPlayerCardsLeap = shuffleArray(newPlayerCardsDiscard);
+          newPlayerCardsDiscard = new Array();
+      }
+      card = newPlayerCardsLeap.pop();
+
+
+      let cardToPushToPlayer = null;
+
+        if (card.name === "floodRise"){
+            alert("Flood Riiiiise ! ")
+            // bring Discarded flood cards on the top of the flood Leap
+
+            if (newFloodCardsDiscard.length > 0){
+                newFloodCardsDiscard = shuffleArray(newFloodCardsDiscard);
+                newFloodCardsLeap = newFloodCardsLeap.concat(newFloodCardsDiscard);
+                newFloodCardsDiscard = new Array();
+            }
+
+            // upgrade the Flood Level
+            newFloodMeter.level = newFloodMeter.level + 1;
+            newFloodMeter.floodFactor = newFloodMeter.howManyCards(newFloodMeter.level);
+            if (newFloodMeter.level >= newFloodMeter.topLevel){
+              alert (" Top level reached. The Island is submerged. Game Over");
+            }
+
+            // do the floodings
+            console.log("doFloodSomeTiles for " + newFloodMeter.floodFactor);
+            let ReturnFromFlood = this.doFloodSomeTilesWithState(newFloodMeter.floodFactor, newFloodCardsLeap, newFloodCardsDiscard, newTiles);
+            newFloodCardsLeap = ReturnFromFlood.floodCardsLeap;
+            newFloodCardsDiscard = ReturnFromFlood.floodCardsDiscard;
+            newTiles = ReturnFromFlood.tiles;
+        }
+        else{
+          cardToPushToPlayer = card;
+        }
+
+      // has Player too much cards ?
+      let nbrOfCardsInHand = newPlayers[this.state.currentPlayerPlaying].cards.length + 1;
+      if (nbrOfCardsInHand > 7){
+        alert ("Oh no ! Over 7 cards in Hand !");
+      }
+
+      if (cardToPushToPlayer != null){
+              newPlayers[this.state.currentPlayerPlaying].cards.push(cardToPushToPlayer);
+      }
+
+      let newMessage = "";
+      if (cardNumber == 1){
+            newMessage = new UserMessage("Oh ! Look at this first card : " + card.name + ".", false, null);
+      }else{
+            newMessage = new UserMessage("Oh ! Look at this second card : " + card.name + ".", false, [0]);
+      }
+
+      tempState.mainUserMessage = newMessage;
+      tempState.playerCardsLeap = newPlayerCardsLeap;
+      tempState.players = newPlayers;
+      tempState.playerCardsDiscard = newPlayerCardsDiscard;
+      tempState.floodCardsLeap = newFloodCardsLeap;
+      tempState.floodCardsDiscard = newFloodCardsDiscard;
+      tempState.floodMeter = newFloodMeter;
+      tempState.tiles = newTiles;
+
+      return tempState;
+      /*
+      this.setState({
+          mainUserMessage: newMessage,
+          playerCardsLeap: newPlayerCardsLeap,
+          players: newPlayers,
+          playerCardsDiscard: newPlayerCardsDiscard,
+          floodCardsLeap: newFloodCardsLeap,
+          floodCardsDiscard: newFloodCardsDiscard,
+          floodMeter: newFloodMeter });
+      // dois finir en state next  [0]
+      */
+  }
+
+/*
   doPickTwoPlayerCards(){
       let newPlayerCardsDiscard = this.state.playerCardsDiscard;
       let newPlayerCardsLeap = this.state.playerCardsLeap;
       let newPlayers = this.state.players;
+      let newFloodCardsLeap = this.state.floodCardsLeap;
+      let newFloodCardsDiscard = this.state.floodCardsDiscard;
+      let newFloodMeter = this.state.floodMeter;
 
       let cards = new Array();
       while (cards.length < 2){
@@ -411,14 +592,23 @@ Go Next Step in the Turn
       let floodHowMuch = 0;
       let cardsToPushToPlayer = new Array();
       for (let i = 0; i < cards.length; i++ ){
-        // console.log("CARD is " + cards[i].name); // card is an object !
         if (cards[i].name === "floodRise"){
-          // floodCards ++;
-          // alert ('Flood Riiiiise ! Montée des Eaux !');
-          let nada = this.doMonteeDesEaux();
-          // TODO : does not work.state is not properly updated
-          floodHowMuch = floodHowMuch + this.state.floodMeter.floodFactor;
-          // let nadaII = this.doFloodSomeTiles(this.state.floodMeter.howManyCards(this.state.floodMeter.level));
+            // bring Discarded flood cards on the top of the flood Leap
+            // TODO : no more cards when flooding : reset the leap
+            if (newFloodCardsDiscard.length > 0){
+                newFloodCardsDiscard = shuffleArray(newFloodCardsDiscard);
+                newFloodCardsLeap = newFloodCardsLeap.concat(newFloodCardsDiscard);
+                newFloodCardsDiscard = new Array();
+            }
+
+            // upgrade the Flood Level
+            newFloodMeter.level = newFloodMeter.level + 1;
+            newFloodMeter.floodFactor = newFloodMeter.howManyCards(newFloodMeter.level);
+            if (newFloodMeter.level >= newFloodMeter.topLevel){
+              alert (" Top level reached. The Island is submerged. Game Over");
+            }
+
+          floodHowMuch = floodHowMuch + newFloodMeter.floodFactor;
         }
         else{
           cardsToPushToPlayer.push(cards[i]);
@@ -438,70 +628,25 @@ Go Next Step in the Turn
       for (let i = 0; i < cardsToPushToPlayer.length; i++ ){
           newPlayers[this.state.currentPlayerPlaying].cards.push(cardsToPushToPlayer[i]);
       }
-      /*
+
         -> any card to play ?
         -> wanna play it ?
         -> wanna throw some ?
-        */
+
       let newMessage = new UserMessage("Oh ! Look at these cards : " + cards[0].name + " and " + cards[1].name + ".", false, [0]);
-        this.setState({
+      this.setState({
           mainUserMessage: newMessage,
           playerCardsLeap: newPlayerCardsLeap,
           players: newPlayers,
-          playerCardsDiscard: newPlayerCardsDiscard });
+          playerCardsDiscard: newPlayerCardsDiscard,
+          floodCardsLeap: newFloodCardsLeap,
+          floodCardsDiscard: newFloodCardsDiscard,
+          floodMeter: newFloodMeter });
       // dois finir en state next  [0]
+
+      alert ("AFTER SET : doPickTwoPlayerCards  Leap is " + this.state.floodCardsLeap.length + " and Discard is " + this.state.floodCardsDiscard.length);
   }
-
-  doMonteeDesEaux() {
-
-        let newFloodoCardsLeap = this.state.floodCardsLeap;
-        let newFloodoCardsDiscard = this.state.floodCardsDiscard;
-        let newFloodMeter = this.state.floodMeter;
-
-        alert ("BEFORE :  Leap is " + newFloodoCardsLeap.length + " and Discard is " + newFloodoCardsDiscard.length);
-        // bring Discarded flood cards on the top of the flood Leap
-        // TODO : no more cards when flooding : reset the leap
-        if (newFloodoCardsDiscard.length > 0){
-            newFloodoCardsDiscard = shuffleArray(newFloodoCardsDiscard);
-            // for ( let i =0; i < newFloodCardsDiscard.length; i++)
-            // {
-            newFloodoCardsLeap = newFloodoCardsLeap.concat(newFloodoCardsDiscard);
-            //}
-            newFloodoCardsDiscard = new Array();
-        }
-
-         alert ("AFTER :  Leap is " + newFloodoCardsLeap.length + " and Discard is " + newFloodoCardsDiscard.length);
-
-        // upgrade the Flood Level
-        newFloodMeter.level = newFloodMeter.level + 1;
-        newFloodMeter.floodFactor = newFloodMeter.howManyCards(newFloodMeter.level);
-        if (newFloodMeter.level >= newFloodMeter.topLevel){
-          alert (" Top level reached. The Island is submerged. Game Over");
-        }
-
-        // alert ("The new flood level is " + newFloodMeter.level + " out of " +  newFloodMeter.topLevel + ". Let's flood " + newFloodMeter.howManyCards(newFloodMeter.level) + " tiles. Now.");
-        this.setState(currentState => {
-          currentState.floodCardsLeap = newFloodoCardsLeap;
-          currentState.floodCardsDiscard = newFloodoCardsDiscard;
-          currentState.floodMeter = newFloodMeter;
-          return currentState;
-        });
-/*
-        this.setState({
-          floodMeter : newFloodMeter,
-          floodCardsLeap : newFloodoCardsLeap,
-          floodCardsDiscard : newFloodoCardsDiscard,
-          zimLeap : newFloodoCardsLeap,
-          zimDiscard : newFloodoCardsDiscard,
-         });
-         */
-          //floodCardsLeap : newFloodCardsLeap,
-          //floodCardsDiscard : newFloodCardsDiscard });
-         alert ("AFTER SET : THis State:  Leap is " + this.state.floodCardsLeap.length + " and Discard is " + this.state.floodCardsDiscard.length);
-          // alert ("The new flood level is " + newFloodMeter.level + " out of " +  newFloodMeter.topLevel + ". Let's flood " + newFloodMeter.howManyCards(newFloodMeter.level) + " tiles. Now.");
-          return true;
-        // this.doFloodSomeTiles(newFloodMeter.howManyCards(newFloodMeter.level));
-  }
+*/
 
   getPossibleActions(role) {
       let actions = new Array();
@@ -518,6 +663,17 @@ Go Next Step in the Turn
           actions.push(action);
       }
 
+      if (role === "Pilot"){
+        // remove the first action which is fly
+        let nada = actions.shift();
+        let pilotActions = new Array();
+        pilotActions.push(playerDefaultActions[0]); // move
+        if (this.state.hasPilotFlownThisTurn === false){
+            pilotActions.push(playerSpecialActions[5]); // fly
+        }
+        return pilotActions.concat(actions);
+      }
+
       if (role === "Navigator"){
         // remove the first action which is move
         let nada = actions.shift();
@@ -532,14 +688,7 @@ Go Next Step in the Turn
   // returns an array of positions
   whereCanHeMove(position, role){
     let moves = new Array();
-    if (role === "Pilot"){
-      for (let i = 0; i < 24; i ++){
-        if (i !== position){
-          moves.push(i);
-        }
-      }
-    }
-    else if (role === "Explorer"){
+    if (role === "Explorer"){
         moves = orthogonalPaths[position];
         moves = moves.concat(diagonalPaths[position]);
     }
@@ -573,6 +722,31 @@ Go Next Step in the Turn
           {
             // let index = output.indexOf(moves[k]);
             // console.log('***** je splice pos : ' + moves[k] + ' at index :' + index);
+            output.splice(output.indexOf(moves[k]), 1);
+          }
+        }
+      }
+    }
+    return output;
+  }
+
+  // returns an array of positions
+  whereCanHeFly(position){
+    let moves = new Array();
+    for (let i = 0; i < 24; i ++){
+      if (i !== position){
+        moves.push(i);
+      }
+    }
+
+    // virer les cases isDrawned et origin
+    let output = moves;
+    if (moves.length > 0) {
+      for (let k = 0; k < moves.length; k++)
+      {
+        if ( k >= 0 && k < 24){
+          if (this.state.tiles[moves[k]].isDrawned || moves[k] === position)
+          {
             output.splice(output.indexOf(moves[k]), 1);
           }
         }
@@ -628,7 +802,7 @@ Go Next Step in the Turn
     console.log("clicked on " + action);
     if (this.state.whatIsExpectedNext === "CharacterActionButtonClick") {
       let id = this.state.players[this.state.currentPlayerPlaying].id;
-      if (action === "Move" || action === "Dive" || action === "MoveAround"  || action === "Fly"){
+      if (action === "Move" || action === "Dive" || action === "MoveAround"){
             let tilesToLight = this.whereCanHeMove(this.state.players[id].position, this.state.players[id].role);
             this.state.players[id].whereCanHeMove = tilesToLight;
 
@@ -636,6 +810,12 @@ Go Next Step in the Turn
             // set a new Expected PlayerInput
             let newMessage = new UserMessage("Now choose a destination", false, [1]);
             this.setState({ whatIsExpectedNext: "TileButtonClickForMove" , mainUserMessage: newMessage });
+      } if (action === "Fly"){
+          let tilesToLight = this.whereCanHeFly(this.state.players[id].position);
+          this.state.players[id].whereCanHeFly = tilesToLight;
+          let nada = this.lightTheTiles(tilesToLight, this.state.players[id].color);
+          let newMessage = new UserMessage("Now choose a landing destination", false, [1]);
+          this.setState({ whatIsExpectedNext: "TileButtonClickForFly" , mainUserMessage: newMessage });
       } else if (action === "Dry" || action === "DryAround"){
             let tilesToLight = this.whereCanHeDry(this.state.players[id].position, this.state.players[id].role);
             this.state.players[id].whereCanHeDry = tilesToLight;
@@ -648,12 +828,12 @@ Go Next Step in the Turn
               this.setState({ mainUserMessage: newMessage});
       }
       return null;
+
     }
     else{
       alert ("UnexpectedClickOnActionButton");
     }
-
-  }
+}
 
   handleTileClick(i) {
     // alert("click");
@@ -664,7 +844,6 @@ Go Next Step in the Turn
             this.moveAPlayer(player, i);
             let nada = this.unlightTheTiles();
             if (nada){
-
               this.setState({ whatIsExpectedNext: ""});
               this.controller("ActionIsDone");
             }
@@ -672,15 +851,31 @@ Go Next Step in the Turn
         else{
           alert ("He can't move there !");
         }
+      }
+      else if (this.state.whatIsExpectedNext === "TileButtonClickForFly") {
+          let player = this.state.players[this.state.currentPlayerPlaying];
+          if (player.whereCanHeFly.indexOf(i) >= 0){
+              // Move
+              this.moveAPlayer(player, i);
+              this.setState({ whatIsExpectedNext: "" , hasPilotFlownThisTurn: true}, () => {
+                  this.controller("ActionIsDone");
+                  this.unlightTheTiles();
+              });
+          }
+          else{
+            alert ("He can't move there !");
+          }
       } else if(this.state.whatIsExpectedNext === "TileButtonClickForDry"){
-        let player = this.state.players[this.state.currentPlayerPlaying];
-        if (player.whereCanHeDry.indexOf(i) >= 0){
+        let newplayers = this.state.players;
+        let newplayer = this.state.players[this.state.currentPlayerPlaying];
+        if (newplayer.whereCanHeDry.indexOf(i) >= 0){
             // Move
             this.dryATile(i);
             let nada = this.unlightTheTiles();
             if (nada){
               // let newMessage = new UserMessage(player.name + "dried a tile", false, true, false);
-              this.setState({ whatIsExpectedNext: "" });
+              newplayers[this.state.currentPlayerPlaying].whereCanHeDry = null;
+              this.setState({ whatIsExpectedNext: "" , playersnewplayers: newplayers });
               this.controller("ActionIsDone");
             }
         }
@@ -691,19 +886,6 @@ Go Next Step in the Turn
             alert ("Unexpected Clic On a Tile");
       }
     }
-    /*
-    const squaresDup = this.state.squares.slice();
-    if (squaresDup[i] === null && !this.state.gameIsOver){
-      squaresDup[i] = this.state.xIsNext ? 'X' : 'O';
-      this.setState({
-        squares: squaresDup,
-        xIsNext: !this.state.xIsNext
-      });
-    }
-    */
-
-      //  return null;
-  //}
 
   moveAPlayer(player, destination){
     let NewTiles = this.state.tiles;
@@ -716,6 +898,7 @@ Go Next Step in the Turn
     let Newplayers = this.state.players;
     Newplayers[player.id].position = destination;
     Newplayers[player.id].whereCanHeMove = null;
+    Newplayers[player.id].whereCanHeFly = null;
 
     this.setState({ players: Newplayers , tiles: NewTiles});
   }
@@ -809,7 +992,9 @@ Go Next Step in the Turn
 
   unlightTheTiles() {
     for (let i = 0; i < 24; i++){
-      document.getElementById("square" + i).style.border = "1px solid #222";
+      if (!this.state.tiles[i].isDrawned){
+        document.getElementById("square" + i).style.border = "1px solid #222";
+      }
     }
     return true;
   }
@@ -947,11 +1132,6 @@ class Player {
         console.log(`My name is ${this.playersName}. Im an ${this.role} and my color is ${this.color}`);
     }
   }
-    /*
-    function whereCanHeMove(i, this.role){
-      SET MY FUNCTION HERE ?
-    }
-    */
 }
 
 class FloodMeter {

@@ -1,0 +1,16 @@
+// TODO :
+
+**** SHORT TERM *****
+
+ - essayer de passer state en entier puis un set state final.
+
+ - sortir leap des cartes de state ?
+
+ - décoreller les deux tirage de cartes.
+
+ - en dev mode : voir les leaps et discards
+
+***** LONG TERM *****
+
+- canvas and clickable ?
+- losange pic ? clickable losange pic ?
