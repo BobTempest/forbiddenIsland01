@@ -555,17 +555,6 @@ class Board extends React.Component {
       tempState.tiles = newTiles;
 
       return tempState;
-      /*
-      this.setState({
-          mainUserMessage: newMessage,
-          playerCardsLeap: newPlayerCardsLeap,
-          players: newPlayers,
-          playerCardsDiscard: newPlayerCardsDiscard,
-          floodCardsLeap: newFloodCardsLeap,
-          floodCardsDiscard: newFloodCardsDiscard,
-          floodMeter: newFloodMeter });
-      // dois finir en state next  [0]
-      */
   }
 
 /*
@@ -658,7 +647,6 @@ class Board extends React.Component {
               action = playerSpecialActions[j];
             }
           }
-          // TODO : hasPilotDidHisFlightThisRound ?
           // TODO : is action possible ? Check the validity of an action and remove it
           actions.push(action);
       }
@@ -696,7 +684,6 @@ class Board extends React.Component {
         let afterSwimPositions = new Array();
         moves = orthogonalPaths[position];
         for (let j = 0 ; j < moves.length; j++){
-          // console.log('***** Check If tile : ' + moves[j] + ' is Drawned ');
           if (this.state.tiles[moves[j]].isDrawned || this.state.tiles[moves[j]].isImmersed)
           {
               //  isDrawned
@@ -704,7 +691,6 @@ class Board extends React.Component {
           }
         }
         moves = moves.concat(afterSwimPositions);
-        console.log('***** moves.length : ' + moves.length + ' and contains : ' + moves + ' afterSwimPositions :' + afterSwimPositions);
     }
     else {
         moves = orthogonalPaths[position];
@@ -713,15 +699,12 @@ class Board extends React.Component {
     // virer les cases isDrawned et origin
     let output = moves;
     if (moves.length > 0) {
-      // console.log('***** moves.length : ' + moves.length + ' and contains : ' + moves);
       for (let k = 0; k < moves.length; k++)
       {
         if ( k >= 0 && k < 24){
           // TODO HERE :????
           if (this.state.tiles[moves[k]].isDrawned || moves[k] === position)
           {
-            // let index = output.indexOf(moves[k]);
-            // console.log('***** je splice pos : ' + moves[k] + ' at index :' + index);
             output.splice(output.indexOf(moves[k]), 1);
           }
         }
@@ -821,7 +804,7 @@ class Board extends React.Component {
             this.state.players[id].whereCanHeDry = tilesToLight;
 
             let nada = this.lightTheTiles(tilesToLight, this.state.players[id].color);
-            let newMessage = new UserMessage("Now choose a destination", false, [1]);
+            let newMessage = new UserMessage("Now choose a tile to dry", false, [1]);
             this.setState({ whatIsExpectedNext: "TileButtonClickForDry" , mainUserMessage: newMessage});
       } else if (action === "DoNothing"){
               let newMessage = new UserMessage("Doing nothing ZZZZZZZ ", false, [0]);
@@ -856,16 +839,17 @@ class Board extends React.Component {
           let player = this.state.players[this.state.currentPlayerPlaying];
           if (player.whereCanHeFly.indexOf(i) >= 0){
               // Move
-              this.moveAPlayer(player, i);
-              this.setState({ whatIsExpectedNext: "" , hasPilotFlownThisTurn: true}, () => {
-                  this.controller("ActionIsDone");
-                  this.unlightTheTiles();
-              });
+              this.moveAPlayer(player, i), () => {
+                this.setState({ whatIsExpectedNext: "" , hasPilotFlownThisTurn: true}, () => {
+                    this.controller("ActionIsDone");
+                    this.unlightTheTiles();
+                });
+              };
           }
           else{
             alert ("He can't move there !");
           }
-      } else if(this.state.whatIsExpectedNext === "TileButtonClickForDry"){
+      } else if (this.state.whatIsExpectedNext === "TileButtonClickForDry"){
         let newplayers = this.state.players;
         let newplayer = this.state.players[this.state.currentPlayerPlaying];
         if (newplayer.whereCanHeDry.indexOf(i) >= 0){
@@ -992,7 +976,7 @@ class Board extends React.Component {
 
   unlightTheTiles() {
     for (let i = 0; i < 24; i++){
-      if (!this.state.tiles[i].isDrawned){
+      if (this.state.tiles[i].isDrawned === false){
         document.getElementById("square" + i).style.border = "1px solid #222";
       }
     }
@@ -1000,15 +984,6 @@ class Board extends React.Component {
   }
 
   render() {
-    /*
-    const winner = calculateWinner(this.state.squares);
-    let status;
-    if (winner) {
-      status = 'We have a winner: ' + winner;
-    } else {
-      status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
-    }
-    */
 
     return (
 
