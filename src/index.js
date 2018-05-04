@@ -208,7 +208,7 @@ class Board extends React.Component {
     var playerCardsDiscard = [];
     var floodCardsLeap = generateFloodCardsLeap();
     var floodCardsDiscard = [];
-    var floodMeter = new FloodMeter(2);
+    var floodMeter = new FloodMeter(1);
     let mainUserMessage = new UserMessage("Welcome new Player. Choose a first action for the first character.", false, []);
 
     // generer les joueurs
@@ -505,8 +505,8 @@ class Board extends React.Component {
 
       // has Player too much cards ?
       let nbrOfCardsInHand = newPlayers[this.state.currentPlayerPlaying].cards.length + 1;
-      if (nbrOfCardsInHand > 7){
-        alert ("Oh no ! Over 7 cards in Hand !");
+      if (nbrOfCardsInHand > 5){
+        alert ("Oh no ! Over 5 cards in Hand !");
       }
 
       if (cardToPushToPlayer != null){
