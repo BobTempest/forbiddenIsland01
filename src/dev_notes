@@ -2,13 +2,8 @@
 *********************
 **** SHORT TERM *****
 
- - essayer de passer state en entier puis un set state final.
-
- - sortir leap des cartes de state ?
-
- - décoreller les deux tirage de cartes.
-
  - en dev mode : voir les leaps et discards
+ - to do fly with
 
 *********************
 ***** LONG TERM *****
@@ -20,4 +15,4 @@
 *********************
 ******** BUGS *******
 
-- on init : if (this.state.hasPilotFlownThisTurn === false){ line 580 if Pilot is a player I guess
+- on init : if (this.state.hasPilotFlownThisTurn === false){ line 580 if Pilot is a player 0 I guess

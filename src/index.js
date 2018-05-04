@@ -258,7 +258,6 @@ class Board extends React.Component {
 
     function giveTwoInitialCards(player, y , z){
       /* helicopter card hack is off
-
         let card2 = { id : 19, name : "helicopter", type : 4, url : "img/helicopterCard.png"/*, klik : () => alert('Helico') };// works !
         player.cards.push(card);
         player.cards.push(card2);
@@ -295,10 +294,8 @@ class Board extends React.Component {
 
           this.setState({ currentStep : nextStep });
           let howMuch = this.state.floodMeter.floodFactor;
-          // alert ("Let's flood some tiles for " + howMuch);
           let newMessage = new UserMessage("Let's flood " + howMuch + " tiles", false, [3]);
           this.setState({ currentStep : nextStep, possibleActions : [], mainUserMessage : newMessage});
-          // this.doFloodSomeTiles(howMuch);
         }
         else if (nextStep === 5){
           // next Turn, new Player 0
@@ -360,6 +357,11 @@ class Board extends React.Component {
 
     for ( let i = 0; i < howMany; i++){
         let tileHasDrawned = false;
+        if (newFloodCardsLeap.length < 1){
+          newFloodCardsLeap = shuffleArray(newFloodCardsDiscard);
+          newFloodCardsDiscard = [];
+        }
+
         let card = newFloodCardsLeap.pop();
         // TODO : no more cards when flooding : reset the leap
         for (let j = 0; j < newTiles.length; j++){
@@ -413,6 +415,11 @@ class Board extends React.Component {
 
     for ( let i = 0; i < howMany; i++){
         let tileHasDrawned = false;
+        if (newFloodCardsLeap.length < 1){
+          newFloodCardsLeap = shuffleArray(newFloodCardsDiscard);
+          newFloodCardsDiscard = [];
+        }
+
         let card = newFloodCardsLeap.pop();
         // TODO : no more cards when flooding : reset the leap
         console.log('****** TILE To flood IS (with State) ' + card.name);
