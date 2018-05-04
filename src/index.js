@@ -470,7 +470,6 @@ class Board extends React.Component {
       }
       card = newPlayerCardsLeap.pop();
 
-
       let cardToPushToPlayer = null;
 
         if (card.name === "floodRise"){
@@ -496,6 +495,9 @@ class Board extends React.Component {
             newFloodCardsLeap = ReturnFromFlood.floodCardsLeap;
             newFloodCardsDiscard = ReturnFromFlood.floodCardsDiscard;
             newTiles = ReturnFromFlood.tiles;
+
+            // put the flood card in the discards
+            newPlayerCardsDiscard.push(card);
         }
         else{
           cardToPushToPlayer = card;
@@ -540,11 +542,19 @@ class Board extends React.Component {
     let newMessage = new UserMessage("Now choose a landing destination", false, [1]);
     this.setState({ whatIsExpectedNext: "TileButtonClickForFlyWithACard" , mainUserMessage: newMessage, expectedNextButSetAside : expectedNextButSetAside, cardUser : playerId });
     // TODO carry people ? if yes, who ?
-    // light the tiles
 
-    // when done in another fonction
-    // move guys
-    // put card in discard
+    return null;
+  }
+
+  clickedOnSandBagCard(playerId) {
+    // TODO if no tile to dry : alert and exit
+    alert ( " Clicked on SandBag. Which tile do you want to dry ? player number " + playerId + "?")
+    let expectedNextButSetAside = this.state.whatIsExpectedNext;
+    let tilesToLight = this.getImmersedTiles();
+    this.state.players[playerId].whereCanHeDry = tilesToLight;
+    let nada = this.lightTheTiles(tilesToLight, this.state.players[playerId].color);
+    let newMessage = new UserMessage("Now choose a tile to dry", false, [1]);
+    this.setState({ whatIsExpectedNext: "TileButtonClickForDryWithACard" , mainUserMessage: newMessage, expectedNextButSetAside : expectedNextButSetAside, cardUser : playerId });
     return null;
   }
 
@@ -692,6 +702,17 @@ class Board extends React.Component {
     return cases;
   }
 
+  getImmersedTiles(){
+    let cases = [];
+    for (let i = 0; i < 24; i++){
+      if (this.state.tiles[i].isImmersed){
+        cases.push(i);
+      }
+    }
+
+    return cases;
+  }
+
  handleActionClick(action, param1) {
     console.log("clicked on " + action);
     if (this.state.whatIsExpectedNext === "CharacterActionButtonClick") {
@@ -720,8 +741,10 @@ class Board extends React.Component {
               let newMessage = new UserMessage("Doing nothing ZZZZZZZ ", false, [0]);
               this.setState({ mainUserMessage: newMessage});
       } else if (action === "helicopterCard") { // from player !
-            this.clickedOnHelicopterCard(param1) // position / id here is player / who is with him
-
+          // TODO : mettre ca dans un handleCardClick
+            this.clickedOnHelicopterCard(param1) // param1 = id here is player
+      } else if (action === "sandBagCard") { // from player !
+            this.clickedOnSandBagCard(param1) // param1 = id here is player
       }
     }
     else{
@@ -781,12 +804,14 @@ class Board extends React.Component {
       } else if (this.state.whatIsExpectedNext === "TileButtonClickForFlyWithACard") {
         let player = this.state.players[this.state.cardUser];
         let NewPlayers = this.state.players;
+        let NewPlayerCardsDiscard = this.state.playerCardsDiscard;
         let expectedNextButSetAside = this.state.expectedNextButSetAside;
 
         if (player.whereCanHeFly.indexOf(i) >= 0){
             // index of the card to remove
             for (let i = 0; i < player.cards.length; i++){
               if (player.cards[i].name === "helicopter"){
+                NewPlayerCardsDiscard.push(player.cards[i]);
                 player.cards.splice(i, 1);
                 break;
               }
@@ -796,8 +821,46 @@ class Board extends React.Component {
             NewPlayers[player.id] = player;
             // Move
             this.moveAPlayer(player, i);
-            this.setState({ whatIsExpectedNext: expectedNextButSetAside, cardUser: -1, players: NewPlayers, expectedNextButSetAside: null });
+            //
+            this.setState({ whatIsExpectedNext: expectedNextButSetAside,
+                            cardUser: -1,
+                            players: NewPlayers,
+                            playerCardsDiscard: NewPlayerCardsDiscard,
+                            expectedNextButSetAside: null });
             let nada = this.unlightTheTiles();
+        } else {
+          alert("He can't fly there with his card");
+        }
+      }
+      else if (this.state.whatIsExpectedNext === "TileButtonClickForDryWithACard") {
+        let player = this.state.players[this.state.cardUser];
+        let NewPlayers = this.state.players;
+        let NewPlayerCardsDiscard = this.state.playerCardsDiscard;
+        let expectedNextButSetAside = this.state.expectedNextButSetAside;
+
+        if (player.whereCanHeDry.indexOf(i) >= 0){
+          // index of the card to remove from the player's hand
+          for (let i = 0; i < player.cards.length; i++){
+            if (player.cards[i].name === "sandBag"){
+              NewPlayerCardsDiscard.push(player.cards[i]);
+              player.cards.splice(i, 1);
+              break;
+            }
+          }
+
+          player.whereCanHeDry = [];
+          NewPlayers[player.id] = player;
+          // Dry
+          this.dryATile(i);
+          this.setState({ whatIsExpectedNext: expectedNextButSetAside,
+                          cardUser: -1,
+                          players: NewPlayers,
+                          playerCardsDiscard: NewPlayerCardsDiscard,
+                          expectedNextButSetAside: null });
+          let nada = this.unlightTheTiles();
+        }
+        else {
+          alert("He can't DRY there with his card");
         }
       } else {
             alert ("Unexpected Clic On a Tile");
@@ -822,6 +885,9 @@ class Board extends React.Component {
 
   dryATile(tile){
         let NewTiles = this.state.tiles;
+        if (NewTiles[tile].isDrawned){
+          alert("CONCEPTUAL ERROR : can't dry a drawned tile");
+        }
         NewTiles[tile].isImmersed = false;
         this.setState({ tiles: NewTiles});
   }
@@ -829,9 +895,8 @@ class Board extends React.Component {
   cancelAnAction(){
     let nada = this.unlightTheTiles();
     let newMessage = new UserMessage("Choose an action " , false, []);
-    // let psblactn = this.getPossibleActions(this.state.players[this.state.currentPlayerPlaying].role);
+
     this.setState({
-      // possibleActions : psblactn,
       whatIsExpectedNext: "CharacterActionButtonClick" ,
       mainUserMessage : newMessage});
   }
@@ -865,8 +930,10 @@ class Board extends React.Component {
             this.state.players[i].cards.map((card) => {
               return card.name === "helicopter" ?
                 <span key={card.id} className="boardPlayerCards"><img src={card.url} width="45px" height="70px" onClick={() => this.handleActionClick("helicopterCard", this.state.players[i].id)} /></span>
-                :
-                <span key={card.id} className="boardPlayerCards"><img src={card.url} width="45px" height="70px" /></span>
+                : card.name === "sandBag" ?
+                    <span key={card.id} className="boardPlayerCards"><img src={card.url} width="45px" height="70px" onClick={() => this.handleActionClick("sandBagCard", this.state.players[i].id)}/></span>
+                    :
+                    <span key={card.id} className="boardPlayerCards"><img src={card.url} width="45px" height="70px" /></span>
             })
           }
         </div>

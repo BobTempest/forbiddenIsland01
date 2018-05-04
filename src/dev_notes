@@ -1,5 +1,5 @@
 // TODO :
-
+*********************
 **** SHORT TERM *****
 
  - essayer de passer state en entier puis un set state final.
@@ -10,7 +10,14 @@
 
  - en dev mode : voir les leaps et discards
 
+*********************
 ***** LONG TERM *****
 
 - canvas and clickable ?
 - losange pic ? clickable losange pic ?
+
+
+*********************
+******** BUGS *******
+
+- on init : if (this.state.hasPilotFlownThisTurn === false){ line 580 if Pilot is a player I guess
