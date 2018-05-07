@@ -282,6 +282,7 @@ class Board extends React.Component {
 
   controller(input){
       console.log("InController turn :" + this.state.currentStep);
+      document.getElementById("UserActions").style.display = "block";
       if (input === "ActionIsDone"){
         let nextStep = this.state.currentStep + 1;
         if (nextStep === 3){
@@ -722,6 +723,9 @@ class Board extends React.Component {
   }
 
  handleActionClick(action, param1) {
+   // hide actions :
+   document.getElementById("UserActions").style.display = "none";
+
     console.log("clicked on " + action);
     if (this.state.whatIsExpectedNext === "CharacterActionButtonClick") {
       let id = this.state.players[this.state.currentPlayerPlaying].id;
@@ -766,6 +770,8 @@ class Board extends React.Component {
 
   handleTileClick(i) {
     // alert("click");
+    document.getElementById("UserActions").style.display = "block";
+
     if (this.state.whatIsExpectedNext === "TileButtonClickForMove") {
         let player = this.state.players[this.state.currentPlayerPlaying];
         if (player.whereCanHeMove.indexOf(i) >= 0){
@@ -913,7 +919,7 @@ class Board extends React.Component {
   cancelAnAction(){
     let nada = this.unlightTheTiles();
     let newMessage = new UserMessage("Choose an action " , false, []);
-
+    document.getElementById("UserActions").style.display = "block";
     this.setState({
       whatIsExpectedNext: "CharacterActionButtonClick" ,
       mainUserMessage : newMessage});
