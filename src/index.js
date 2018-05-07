@@ -93,7 +93,8 @@ const diagonalPaths = {0 : [4], 1 : [3], 2 : [6,8], 3 : [1,7,9], 4 : [0,8,10], 5
       {id : 1, name : "Dry", text: "Dry an adjacent tile", enabled : true, triggers : "Dry"  }, //has an adjacent immersed tile around ?
       {id : 2, name : "Give", text: "Give a card on a character on the same tile", enabled : true, triggers : "Give" }, //has a player on his tile ?
       {id : 3, name : "Get a Treasure !", text: "Get the treasure in this temple.", enabled : true, triggers : "GetATreasure"  }, // has 4 cards and is on the right temple
-      {id : 4, name : "Nothing", text: "Simply do nothing.", enabled : true, triggers : "DoNothing"  } // -
+      {id : 4, name : "Nothing", text: "Simply do nothing.", enabled : true, triggers : "DoNothing"  }, // -
+      {id : 5, name : "Skip Turn", text: "Skip the player'sTurn.", enabled : true, triggers : "SkipTurn"  } // -
  ];
 
  const playerSpecialActions = [
@@ -747,6 +748,9 @@ class Board extends React.Component {
       } else if (action === "DoNothing"){
               let newMessage = new UserMessage("Doing nothing ZZZZZZZ ", false, [0]);
               this.setState({ mainUserMessage: newMessage});
+      }else if (action === "SkipTurn"){
+             let newMessage = new UserMessage("Skip turn ", false, [0]);
+             this.setState({ mainUserMessage: newMessage, currentStep: 4});
       } else if (action === "helicopterCard") { // from player !
           // TODO : mettre ca dans un handleCardClick
             this.clickedOnHelicopterCard(param1) // param1 = id here is player
@@ -1250,10 +1254,10 @@ function generateFloodCardsLeap(){
 }
 
 function generatePlayers(){
-    // pilot hack on
+    // engineer hack on
     // let roles = new Array(0,1,2,3,4,5);
     // roles = shuffleArray(roles);
-    let roles = new Array(5,1,2,3,4,0);
+    let roles = new Array(0,5,2,3,4,0);
     let players = [];
     for (let i = 0; i < 4; i++){
       let type = roles[i];
