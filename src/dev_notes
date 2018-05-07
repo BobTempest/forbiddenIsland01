@@ -16,3 +16,5 @@
 ******** BUGS *******
 
 - on init : if (this.state.hasPilotFlownThisTurn === false){ line 580 if Pilot is a player 0 I guess
+
+fly is broken

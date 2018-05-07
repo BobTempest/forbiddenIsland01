@@ -218,7 +218,7 @@ class Board extends React.Component {
     // assigner les positions de depart
     players.forEach(getInitialPlayerPosition);
 
-    var possibleActions = this.getPossibleActions(players[0].role);
+    var possibleActions = this.getPossibleActions(players[0].role, false);
 
     this.state = {
       tiles: tiles,
@@ -303,7 +303,7 @@ class Board extends React.Component {
             let newMessage = new UserMessage("Next Turn ! Please " + this.state.players[0].playersName + ", Choose an action " , false, []);
             let nextTurn = this.state.turn + 1;
             let nextPlayer = this.state.players[0].id;
-            let psblactn = this.getPossibleActions(this.state.players[0].role);
+            let psblactn = this.getPossibleActions(this.state.players[0].role, false);
             this.setState({ currentStep : 0,
               turn : nextTurn,
               currentPlayerPlaying : nextPlayer,
@@ -315,7 +315,7 @@ class Board extends React.Component {
             // next Player
             let newMessage = new UserMessage("Next player ! Please Choose an action " , false, []);
             let nextPlayer = this.state.players[this.state.currentPlayerPlaying + 1].id;
-            let psblactn = this.getPossibleActions(this.state.players[nextPlayer].role);
+            let psblactn = this.getPossibleActions(this.state.players[nextPlayer].role, false);
             this.setState({ currentStep : 0,
               currentPlayerPlaying : nextPlayer,
               possibleActions : psblactn,
@@ -326,7 +326,7 @@ class Board extends React.Component {
         else{
           // next action for the same player
           let newMessage = new UserMessage("Choose an action " , false, []);
-          let psblactn = this.getPossibleActions(this.state.players[this.state.currentPlayerPlaying].role);
+          let psblactn = this.getPossibleActions(this.state.players[this.state.currentPlayerPlaying].role, this.state.hasPilotFlownThisTurn);
           this.setState({ currentStep : nextStep,
             possibleActions : psblactn,
             whatIsExpectedNext : "CharacterActionButtonClick" ,
@@ -565,7 +565,7 @@ class Board extends React.Component {
     return null;
   }
 
-  getPossibleActions(role) {
+  getPossibleActions(role, hasPilotFlownThisTurn) {
       let actions = [];
       for (let i = 0; i < playerDefaultActions.length; i++){
           let action = playerDefaultActions[i];
@@ -584,7 +584,7 @@ class Board extends React.Component {
         let nada = actions.shift();
         let pilotActions = [];
         pilotActions.push(playerDefaultActions[0]); // move
-        if (this.state.hasPilotFlownThisTurn === false){
+        if (hasPilotFlownThisTurn === false){
             pilotActions.push(playerSpecialActions[5]); // fly
         }
         return pilotActions.concat(actions);
@@ -766,10 +766,12 @@ class Board extends React.Component {
         let player = this.state.players[this.state.currentPlayerPlaying];
         if (player.whereCanHeMove.indexOf(i) >= 0){
             // Move
-            this.moveAPlayer(player, i);
+            let returnPack = this.moveAPlayer(player, i, this.state.players, this.state.tiles);
             let nada = this.unlightTheTiles();
             if (nada){
-              this.setState({ whatIsExpectedNext: ""});
+              this.setState({ whatIsExpectedNext: "",
+                              tiles: returnPack.tiles,
+                              players: returnPack.players});
               this.controller("ActionIsDone");
             }
         }
@@ -781,12 +783,14 @@ class Board extends React.Component {
           let player = this.state.players[this.state.currentPlayerPlaying];
           if (player.whereCanHeFly.indexOf(i) >= 0){
               // Move
-              this.moveAPlayer(player, i), () => {
-                this.setState({ whatIsExpectedNext: "" , hasPilotFlownThisTurn: true}, () => {
-                    this.controller("ActionIsDone");
-                    this.unlightTheTiles();
+                let returnPack = this.moveAPlayer(player, i, this.state.players, this.state.tiles);
+                this.setState({ whatIsExpectedNext: "" ,
+                                hasPilotFlownThisTurn: true,
+                                tiles: returnPack.tiles,
+                                players: returnPack.players}, () => {
+                                  this.unlightTheTiles();
+                                  this.controller("ActionIsDone");
                 });
-              };
           }
           else{
             alert ("He can't move there !");
@@ -827,11 +831,12 @@ class Board extends React.Component {
             player.whereCanHeFly = [];
             NewPlayers[player.id] = player;
             // Move
-            this.moveAPlayer(player, i);
+            let returnPack = this.moveAPlayer(player, i, NewPlayers, this.state.tiles);
             //
             this.setState({ whatIsExpectedNext: expectedNextButSetAside,
                             cardUser: -1,
-                            players: NewPlayers,
+                            players: returnPack.players,
+                            tiles: returnPack.tiles,
                             playerCardsDiscard: NewPlayerCardsDiscard,
                             expectedNextButSetAside: null });
             let nada = this.unlightTheTiles();
@@ -874,7 +879,8 @@ class Board extends React.Component {
       }
     }
 
-  moveAPlayer(player, destination){
+  moveAPlayer(player, destination, players, tiles){
+    let pack = null;
     let NewTiles = this.state.tiles;
     // remove player from current Tile
     let index = NewTiles[player.position].playerOn.indexOf(player.id);
@@ -887,7 +893,8 @@ class Board extends React.Component {
     Newplayers[player.id].whereCanHeMove = null;
     Newplayers[player.id].whereCanHeFly = null;
 
-    this.setState({ players: Newplayers , tiles: NewTiles});
+    // this.setState({ players: Newplayers , tiles: NewTiles});
+    return pack = { players: Newplayers, tiles: NewTiles};
   }
 
   dryATile(tile){
@@ -999,8 +1006,11 @@ class Board extends React.Component {
   unlightTheTiles() {
     for (let i = 0; i < 24; i++){
       if (this.state.tiles[i].isDrawned === false){
-        document.getElementById("square" + i).style.border = "1px solid #222";
+        document.getElementById("square" + i).style.border = "1px solid #222"; //"1px solid #222"
+      } else {
+        document.getElementById("square" + i).style.border = "1px solid #fff";
       }
+
     }
     return true;
   }
@@ -1240,8 +1250,10 @@ function generateFloodCardsLeap(){
 }
 
 function generatePlayers(){
-    let roles = new Array(0,1,2,3,4,5);
-    roles = shuffleArray(roles);
+    // pilot hack on
+    // let roles = new Array(0,1,2,3,4,5);
+    // roles = shuffleArray(roles);
+    let roles = new Array(5,1,2,3,4,0);
     let players = [];
     for (let i = 0; i < 4; i++){
       let type = roles[i];
