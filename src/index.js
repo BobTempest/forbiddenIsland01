@@ -282,7 +282,7 @@ class Board extends React.Component {
 
   controller(input){
       console.log("InController turn :" + this.state.currentStep);
-      document.getElementById("UserActions").style.display = "block";
+      this.showActionButtons();
       if (input === "ActionIsDone"){
         let nextStep = this.state.currentStep + 1;
         if (nextStep === 3){
@@ -723,8 +723,8 @@ class Board extends React.Component {
   }
 
  handleActionClick(action, param1) {
-   // hide actions :
-   document.getElementById("UserActions").style.display = "none";
+
+   this.hideActionButtons();
 
     console.log("clicked on " + action);
     if (this.state.whatIsExpectedNext === "CharacterActionButtonClick") {
@@ -744,11 +744,31 @@ class Board extends React.Component {
           this.setState({ whatIsExpectedNext: "TileButtonClickForFly" , mainUserMessage: newMessage });
       } else if (action === "Dry" || action === "DryAround"){
             let tilesToLight = this.whereCanHeDry(this.state.players[id].position, this.state.players[id].role);
-            this.state.players[id].whereCanHeDry = tilesToLight;
-
-            let nada = this.lightTheTiles(tilesToLight, this.state.players[id].color);
-            let newMessage = new UserMessage("Now choose a tile to dry", false, [1]);
-            this.setState({ whatIsExpectedNext: "TileButtonClickForDry" , mainUserMessage: newMessage});
+            if (tilesToLight.length === 0 ){
+              alert ("No tiles to dry. Please choose another action");
+              this.showActionButtons();
+            } else {
+              this.state.players[id].whereCanHeDry = tilesToLight;
+              let nada = this.lightTheTiles(tilesToLight, this.state.players[id].color);
+              let newMessage = new UserMessage("Now choose a tile to dry", false, [1]);
+              this.setState({ whatIsExpectedNext: "TileButtonClickForDry" , mainUserMessage: newMessage});
+            }
+      } else if (action === "DryTwoTiles"){
+            let tilesToLight = this.whereCanHeDry(this.state.players[id].position, this.state.players[id].role);
+            if (tilesToLight.length === 0 ){
+              alert ("No tiles to dry. Please choose another action");
+              this.showActionButtons();
+            } else if (tilesToLight.length === 1 ){
+              this.state.players[id].whereCanHeDry = tilesToLight;
+              let nada = this.lightTheTiles(tilesToLight, this.state.players[id].color);
+              let newMessage = new UserMessage("THere's only one tile you can dry. Dry it.", false, [1]);
+              this.setState({ whatIsExpectedNext: "TileButtonClickForDry" , mainUserMessage: newMessage});
+            } else {
+              this.state.players[id].whereCanHeDry = tilesToLight;
+              let nada = this.lightTheTiles(tilesToLight, this.state.players[id].color);
+              let newMessage = new UserMessage("Now choose two tiles to dry", false, [1]);
+              this.setState({ whatIsExpectedNext: "TileButtonClickForDryTwoTimes" , mainUserMessage: newMessage});
+            }
       } else if (action === "DoNothing"){
               let newMessage = new UserMessage("Doing nothing ZZZZZZZ ", false, [0]);
               this.setState({ mainUserMessage: newMessage});
@@ -769,8 +789,8 @@ class Board extends React.Component {
 }
 
   handleTileClick(i) {
-    // alert("click");
-    document.getElementById("UserActions").style.display = "block";
+
+    this.showActionButtons();
 
     if (this.state.whatIsExpectedNext === "TileButtonClickForMove") {
         let player = this.state.players[this.state.currentPlayerPlaying];
@@ -819,7 +839,21 @@ class Board extends React.Component {
               this.controller("ActionIsDone");
             }
         }
-        else{
+        else {
+          alert ("He can't dry anything there !");
+        }
+      } else if (this.state.whatIsExpectedNext === "TileButtonClickForDryTwoTimes") {
+        let newplayers = this.state.players;
+        let newplayer = this.state.players[this.state.currentPlayerPlaying];
+        if (newplayer.whereCanHeDry.indexOf(i) >= 0){
+            // Dry
+            this.dryATile(i);
+            this.unlightATile(i);
+            let newMessage = new UserMessage("Now choose a second one to dry", false, []);
+            this.hideActionButtons();
+            this.setState({ whatIsExpectedNext: "TileButtonClickForDry" , mainUserMessage: newMessage});
+        }
+        else {
           alert ("He can't dry anything there !");
         }
       } else if (this.state.whatIsExpectedNext === "TileButtonClickForFlyWithACard") {
@@ -919,7 +953,7 @@ class Board extends React.Component {
   cancelAnAction(){
     let nada = this.unlightTheTiles();
     let newMessage = new UserMessage("Choose an action " , false, []);
-    document.getElementById("UserActions").style.display = "block";
+    this.showActionButtons();
     this.setState({
       whatIsExpectedNext: "CharacterActionButtonClick" ,
       mainUserMessage : newMessage});
@@ -1023,6 +1057,18 @@ class Board extends React.Component {
 
     }
     return true;
+  }
+
+  unlightATile(i) {
+      document.getElementById("square" + i).style.border = "1px solid #222"; //"1px solid #222"
+  }
+
+  hideActionButtons() {
+      document.getElementById("UserActions").style.display = "none";
+  }
+
+  showActionButtons() {
+      document.getElementById("UserActions").style.display = "block";
   }
 
   render() {
