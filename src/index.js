@@ -52,7 +52,7 @@ const diagonalPaths = {0 : [4], 1 : [3], 2 : [6,8], 3 : [1,7,9], 4 : [0,8,10], 5
 
  const gameSteps = ["init", "startTurn", "playerActionOne", "playerActionTwo", "playerActionThree", "playerPickACard", "floodRise", "endTurn", "final"];
 
- const trasures = [
+ const treasures = [
      { id : 0 , name : "crystal" },
      { id : 1 , name : "cup" },
      { id : 2 , name : "sceptre"},
@@ -108,9 +108,8 @@ const diagonalPaths = {0 : [4], 1 : [3], 2 : [6,8], 3 : [1,7,9], 4 : [0,8,10], 5
    {id : 6, name : "Move/Dive", forRole: "Diver", replacesAction: "0", text: "Dive through any adjacent tile.", enabled : true, triggers : "Dive"  }, // a tile to dive to
  ];
 
- // QUESTIONS : How many times per round can one use its power ? PIlot ONCE
- //              Can pilot move someone else with him ?  -> NO
-//               Navigator move : can he move himself  -> NO ? same player for two tiles ? YES
+ // QUESTIONS :
+ //               Navigator move : can he move himself  -> NO ? same player for two tiles ? YES
 
 /*
  const playerCards = [
@@ -231,7 +230,7 @@ class Board extends React.Component {
       floodMeter: floodMeter,
       gameIsOver: false,
       nbrOfPlayers : players.length,
-      nbrOfPosessedTreasures : 0,
+      posessedTreasures : [],
       turn : 1,
       hasPilotFlownThisTurn : false,
       currentPlayerPlaying : 0,
@@ -381,6 +380,33 @@ class Board extends React.Component {
                     // TODO evacuate explorers from drawning island
                 }
                 // TODO : Check if all Temples of an undiscovered Treasure are drawned. If yes : end game
+                if (newTiles[j].name === "helipad"){
+                  alert("The helipad is drawned. GAMEOVER")
+                }
+
+                if (newTiles[j].templeFor != ""){
+                    // it's a temple drawning
+                    if (this.state.posessedTreasures.indexOf(newTiles[j].templeFor)<0){
+                      // the treasure of this temple isn't discovered yet
+                      for (let k = 0; k < 24; k++){
+                        if (k !=j && newTiles[k].templeFor === newTiles[j].templeFor){
+                          if (newTiles[k].isDrawned){
+                            let treasureName = "Unknown Treasure";
+                            for (let l = 0; l < treasures.length; l++){
+                              if (treasures[l].id == newTiles[j].templeFor)// type mismatch
+                              {
+                                treasureName = treasures[l].name;
+                                break;
+                              }
+                            }
+
+                            alert("Oh my God ! all the temples for " + treasureName + " are drawned. You'll never get it. GAME OVER" );
+                          }
+                          break;
+                        }
+                      }
+                    }
+                }
             }
             else if(newTiles[j].isDrawned){
               alert (newTiles[j].name + " is already drawned. it shouldn't be in the Leap !");
@@ -439,6 +465,33 @@ class Board extends React.Component {
                     // TODO evacuate explorers from drawning island
                 }
                 // TODO : Check if all Temples of an undiscovered Treasure are drawned. If yes : end game
+                if (newTiles[j].name === "helipad"){
+                  alert("The helipad is drawned. GAMEOVER")
+                }
+
+                if (newTiles[j].templeFor != ""){
+                    // it's a temple drawning
+                    if (this.state.posessedTreasures.indexOf(newTiles[j].templeFor)<0){
+                      // the treasure of this temple isn't discovered yet
+                      for (let k = 0; k < 24; k++){
+                        if (k !=j && newTiles[k].templeFor === newTiles[j].templeFor){
+                          if (newTiles[k].isDrawned){
+                            let treasureName = "Unknown Treasure";
+                            for (let l = 0; l < treasures.length; l++){
+                              if (treasures[l].id == newTiles[j].templeFor)// type mismatch
+                              {
+                                treasureName = treasures[l].name;
+                                break;
+                              }
+                            }
+
+                            alert("Oh my God ! all the temples for " + treasureName + " are drawned. You'll never get it. GAME OVER" );
+                          }
+                          break;
+                        }
+                      }
+                    }
+                }
             }
             else if(newTiles[j].isDrawned){
               alert (newTiles[j].name + " is already drawned. it shouldn't be in the Leap !");
