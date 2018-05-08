@@ -52,7 +52,7 @@ const diagonalPaths = {0 : [4], 1 : [3], 2 : [6,8], 3 : [1,7,9], 4 : [0,8,10], 5
 
  const gameSteps = ["init", "startTurn", "playerActionOne", "playerActionTwo", "playerActionThree", "playerPickACard", "floodRise", "endTurn", "final"];
 
- const trasures = [
+ const treasures = [
      { id : 0 , name : "crystal" },
      { id : 1 , name : "cup" },
      { id : 2 , name : "sceptre"},
@@ -93,7 +93,8 @@ const diagonalPaths = {0 : [4], 1 : [3], 2 : [6,8], 3 : [1,7,9], 4 : [0,8,10], 5
       {id : 1, name : "Dry", text: "Dry an adjacent tile", enabled : true, triggers : "Dry"  }, //has an adjacent immersed tile around ?
       {id : 2, name : "Give", text: "Give a card on a character on the same tile", enabled : true, triggers : "Give" }, //has a player on his tile ?
       {id : 3, name : "Get a Treasure !", text: "Get the treasure in this temple.", enabled : true, triggers : "GetATreasure"  }, // has 4 cards and is on the right temple
-      {id : 4, name : "Nothing", text: "Simply do nothing.", enabled : true, triggers : "DoNothing"  } // -
+      {id : 4, name : "Nothing", text: "Simply do nothing.", enabled : true, triggers : "DoNothing"  }, // -
+      {id : 5, name : "Skip Turn", text: "Skip the player'sTurn.", enabled : true, triggers : "SkipTurn"  } // -
  ];
 
  const playerSpecialActions = [
@@ -107,11 +108,8 @@ const diagonalPaths = {0 : [4], 1 : [3], 2 : [6,8], 3 : [1,7,9], 4 : [0,8,10], 5
    {id : 6, name : "Move/Dive", forRole: "Diver", replacesAction: "0", text: "Dive through any adjacent tile.", enabled : true, triggers : "Dive"  }, // a tile to dive to
  ];
 
-
-
- // QUESTIONS : How many times per round can one use its power ? PIlot ONCE
- //              Can pilot move someone else with him ?  -> NO
-//               Navigator move : can he move himself  -> NO ? same player for two tiles ? YES
+ // QUESTIONS :
+ //               Navigator move : can he move himself  -> NO ? same player for two tiles ? YES
 
 /*
  const playerCards = [
@@ -148,7 +146,6 @@ function DrawSquare(props) {
   }
 
   // sets the Class
-
   if (props.tile.isImmersed){
     squareClass = 'immersedSquare';
   }
@@ -168,29 +165,6 @@ function DrawSquare(props) {
       <DrawPlayerPawn pawns={props.tile.playerOn} players={props.players}/>
     </div>
   );
-}
-
-function DrawPlayerBoard(props) {
-  props.player.printIntroduction; // TO REMOVE
-  let boardClass = props.isPlaying?  ('playerBoard playerBoardPlaying') : ('playerBoard ');
-
-  return (
-    <div className={boardClass}>
-      <span className="inBoardName">{props.player.playersName}</span>&nbsp;the&nbsp;
-      <span className="inBoardRole" style={{color: props.player.color}}>{props.player.role}</span>
-      <br/>
-      <div className="inBoardCards">
-          <DrawPlayerCards cards={props.player.cards}/>
-      </div>
-    </div>
-  )
-}
-
-function DrawPlayerCards(props){
-  let output = props.cards.map((card) =>
-    <span key={card.id} className="boardPlayerCards"><img src={card.url} width="45px" height="70px" /></span>
-  );
-  return output;
 }
 
 function DrawEmptySquare() {
@@ -231,22 +205,20 @@ class Board extends React.Component {
 
     var tiles = riseTheIsland();
     var playerCardsLeap = generatePlayerCardsLeap();
-    var playerCardsDiscard = new Array();
+    var playerCardsDiscard = [];
     var floodCardsLeap = generateFloodCardsLeap();
-    var floodCardsDiscard = new Array();
-    var floodMeter = new FloodMeter(2);
-    let mainUserMessage = new UserMessage("Welcome new Player. Choose a first action for the first character.", false, new Array());
+    var floodCardsDiscard = [];
+    var floodMeter = new FloodMeter(1);
+    let mainUserMessage = new UserMessage("Welcome new Player. Choose a first action for the first character.", false, []);
 
     // generer les joueurs
     var players = generatePlayers();
-
     // distribuer les cartes aux joueurs
     players.forEach(giveTwoInitialCards);
-
     // assigner les positions de depart
     players.forEach(getInitialPlayerPosition);
 
-    var possibleActions = this.getPossibleActions(players[0].role);
+    var possibleActions = this.getPossibleActions(players[0].role, false);
 
     this.state = {
       tiles: tiles,
@@ -258,20 +230,22 @@ class Board extends React.Component {
       floodMeter: floodMeter,
       gameIsOver: false,
       nbrOfPlayers : players.length,
-      nbrOfPosessedTreasures : 0,
+      posessedTreasures : [],
       turn : 1,
       hasPilotFlownThisTurn : false,
       currentPlayerPlaying : 0,
       possibleActions : possibleActions,
       currentStep : 0,
       whatIsExpectedNext : "CharacterActionButtonClick",
-      mainUserMessage : mainUserMessage
+      expectedNextButSetAside : null,
+      mainUserMessage : mainUserMessage,
+      cardUser : null,
+      cardFlyWith : []
     };
 
     this.doFloodSomeTiles(6);
 
     // Let's start
-
     function getInitialPlayerPosition(player, y, z){
         for (let i = 0; i < tiles.length; i++){
           if (tiles[i].startBase === player.type){
@@ -283,6 +257,12 @@ class Board extends React.Component {
     }
 
     function giveTwoInitialCards(player, y , z){
+      /* helicopter card hack is off
+        let card2 = { id : 19, name : "helicopter", type : 4, url : "img/helicopterCard.png"/*, klik : () => alert('Helico') };// works !
+        player.cards.push(card);
+        player.cards.push(card2);
+        end of helicopter Hack */
+
       for (let i = 0; i < 2; i++){
             let card = playerCardsLeap.pop();
             while (card.name === "floodRise"){
@@ -301,31 +281,30 @@ class Board extends React.Component {
 
   controller(input){
       console.log("InController turn :" + this.state.currentStep);
+      this.showActionButtons();
       if (input === "ActionIsDone"){
         let nextStep = this.state.currentStep + 1;
         if (nextStep === 3){
           // draw player cards
 
           let newMessage = new UserMessage("Lets' draw some Player Cards", false, [2]);
-          this.setState({ currentStep : nextStep, possibleActions : new Array(), mainUserMessage : newMessage});
+          this.setState({ currentStep : nextStep, possibleActions : [], mainUserMessage : newMessage});
         }
         else if (nextStep === 4){
           // flood some tiles.
 
           this.setState({ currentStep : nextStep });
           let howMuch = this.state.floodMeter.floodFactor;
-          // alert ("Let's flood some tiles for " + howMuch);
           let newMessage = new UserMessage("Let's flood " + howMuch + " tiles", false, [3]);
-          this.setState({ currentStep : nextStep, possibleActions : new Array(), mainUserMessage : newMessage});
-          // this.doFloodSomeTiles(howMuch);
+          this.setState({ currentStep : nextStep, possibleActions : [], mainUserMessage : newMessage});
         }
         else if (nextStep === 5){
           // next Turn, new Player 0
           if (this.state.currentPlayerPlaying === this.state.players[this.state.players.length -1].id){
-            let newMessage = new UserMessage("Next Turn ! Please " + this.state.players[0].playersName + ", Choose an action " , false, new Array());
+            let newMessage = new UserMessage("Next Turn ! Please " + this.state.players[0].playersName + ", Choose an action " , false, []);
             let nextTurn = this.state.turn + 1;
             let nextPlayer = this.state.players[0].id;
-            let psblactn = this.getPossibleActions(this.state.players[0].role);
+            let psblactn = this.getPossibleActions(this.state.players[0].role, false);
             this.setState({ currentStep : 0,
               turn : nextTurn,
               currentPlayerPlaying : nextPlayer,
@@ -335,9 +314,9 @@ class Board extends React.Component {
               mainUserMessage : newMessage });
           } else {
             // next Player
-            let newMessage = new UserMessage("Next player ! Please Choose an action " , false, new Array());
+            let newMessage = new UserMessage("Next player ! Please Choose an action " , false, []);
             let nextPlayer = this.state.players[this.state.currentPlayerPlaying + 1].id;
-            let psblactn = this.getPossibleActions(this.state.players[nextPlayer].role);
+            let psblactn = this.getPossibleActions(this.state.players[nextPlayer].role, false);
             this.setState({ currentStep : 0,
               currentPlayerPlaying : nextPlayer,
               possibleActions : psblactn,
@@ -347,8 +326,8 @@ class Board extends React.Component {
         }
         else{
           // next action for the same player
-          let newMessage = new UserMessage("Choose an action " , false, new Array());
-          let psblactn = this.getPossibleActions(this.state.players[this.state.currentPlayerPlaying].role);
+          let newMessage = new UserMessage("Choose an action " , false, []);
+          let psblactn = this.getPossibleActions(this.state.players[this.state.currentPlayerPlaying].role, this.state.hasPilotFlownThisTurn);
           this.setState({ currentStep : nextStep,
             possibleActions : psblactn,
             whatIsExpectedNext : "CharacterActionButtonClick" ,
@@ -379,6 +358,11 @@ class Board extends React.Component {
 
     for ( let i = 0; i < howMany; i++){
         let tileHasDrawned = false;
+        if (newFloodCardsLeap.length < 1){
+          newFloodCardsLeap = shuffleArray(newFloodCardsDiscard);
+          newFloodCardsDiscard = [];
+        }
+
         let card = newFloodCardsLeap.pop();
         // TODO : no more cards when flooding : reset the leap
         for (let j = 0; j < newTiles.length; j++){
@@ -396,6 +380,33 @@ class Board extends React.Component {
                     // TODO evacuate explorers from drawning island
                 }
                 // TODO : Check if all Temples of an undiscovered Treasure are drawned. If yes : end game
+                if (newTiles[j].name === "helipad"){
+                  alert("The helipad is drawned. GAMEOVER")
+                }
+
+                if (newTiles[j].templeFor != ""){
+                    // it's a temple drawning
+                    if (this.state.posessedTreasures.indexOf(newTiles[j].templeFor)<0){
+                      // the treasure of this temple isn't discovered yet
+                      for (let k = 0; k < 24; k++){
+                        if (k !=j && newTiles[k].templeFor === newTiles[j].templeFor){
+                          if (newTiles[k].isDrawned){
+                            let treasureName = "Unknown Treasure";
+                            for (let l = 0; l < treasures.length; l++){
+                              if (treasures[l].id == newTiles[j].templeFor)// type mismatch
+                              {
+                                treasureName = treasures[l].name;
+                                break;
+                              }
+                            }
+
+                            alert("Oh my God ! all the temples for " + treasureName + " are drawned. You'll never get it. GAME OVER" );
+                          }
+                          break;
+                        }
+                      }
+                    }
+                }
             }
             else if(newTiles[j].isDrawned){
               alert (newTiles[j].name + " is already drawned. it shouldn't be in the Leap !");
@@ -425,13 +436,18 @@ class Board extends React.Component {
     let newFloodCardsDiscard = floodCardsDiscardInput;
     let newTiles = tilesInput;
 
-    let tempState = new Object();
-    tempState.floodCardsLeap = new Array();
-    tempState.tiles = new Array();
-    tempState.floodCardsDiscard = new Array();
+    let tempState = {};
+    tempState.floodCardsLeap = [];
+    tempState.tiles = [];
+    tempState.floodCardsDiscard = [];
 
     for ( let i = 0; i < howMany; i++){
         let tileHasDrawned = false;
+        if (newFloodCardsLeap.length < 1){
+          newFloodCardsLeap = shuffleArray(newFloodCardsDiscard);
+          newFloodCardsDiscard = [];
+        }
+
         let card = newFloodCardsLeap.pop();
         // TODO : no more cards when flooding : reset the leap
         console.log('****** TILE To flood IS (with State) ' + card.name);
@@ -449,6 +465,33 @@ class Board extends React.Component {
                     // TODO evacuate explorers from drawning island
                 }
                 // TODO : Check if all Temples of an undiscovered Treasure are drawned. If yes : end game
+                if (newTiles[j].name === "helipad"){
+                  alert("The helipad is drawned. GAMEOVER")
+                }
+
+                if (newTiles[j].templeFor != ""){
+                    // it's a temple drawning
+                    if (this.state.posessedTreasures.indexOf(newTiles[j].templeFor)<0){
+                      // the treasure of this temple isn't discovered yet
+                      for (let k = 0; k < 24; k++){
+                        if (k !=j && newTiles[k].templeFor === newTiles[j].templeFor){
+                          if (newTiles[k].isDrawned){
+                            let treasureName = "Unknown Treasure";
+                            for (let l = 0; l < treasures.length; l++){
+                              if (treasures[l].id == newTiles[j].templeFor)// type mismatch
+                              {
+                                treasureName = treasures[l].name;
+                                break;
+                              }
+                            }
+
+                            alert("Oh my God ! all the temples for " + treasureName + " are drawned. You'll never get it. GAME OVER" );
+                          }
+                          break;
+                        }
+                      }
+                    }
+                }
             }
             else if(newTiles[j].isDrawned){
               alert (newTiles[j].name + " is already drawned. it shouldn't be in the Leap !");
@@ -470,14 +513,6 @@ class Board extends React.Component {
     tempState.floodCardsDiscard = newFloodCardsDiscard;
 
     return tempState;
-    /*
-    this.setState({
-      floodCardsLeap: newFloodCardsLeap,
-      tiles: newTiles,
-      floodCardsDiscard: newFloodCardsDiscard });
-
-    return true;
-    */
   }
 
   doPickOnePlayerCard(cardNumber, tempState){
@@ -489,14 +524,13 @@ class Board extends React.Component {
       let newFloodMeter = tempState.floodMeter;
       let newTiles = tempState.tiles;
 
-      let card = new Array();
+      let card = [];
       if (newPlayerCardsLeap.length < 1){
         // shuffle and rebuild the leap from the Discard
           newPlayerCardsLeap = shuffleArray(newPlayerCardsDiscard);
-          newPlayerCardsDiscard = new Array();
+          newPlayerCardsDiscard = [];
       }
       card = newPlayerCardsLeap.pop();
-
 
       let cardToPushToPlayer = null;
 
@@ -507,7 +541,7 @@ class Board extends React.Component {
             if (newFloodCardsDiscard.length > 0){
                 newFloodCardsDiscard = shuffleArray(newFloodCardsDiscard);
                 newFloodCardsLeap = newFloodCardsLeap.concat(newFloodCardsDiscard);
-                newFloodCardsDiscard = new Array();
+                newFloodCardsDiscard = [];
             }
 
             // upgrade the Flood Level
@@ -523,6 +557,9 @@ class Board extends React.Component {
             newFloodCardsLeap = ReturnFromFlood.floodCardsLeap;
             newFloodCardsDiscard = ReturnFromFlood.floodCardsDiscard;
             newTiles = ReturnFromFlood.tiles;
+
+            // put the flood card in the discards
+            newPlayerCardsDiscard.push(card);
         }
         else{
           cardToPushToPlayer = card;
@@ -530,8 +567,8 @@ class Board extends React.Component {
 
       // has Player too much cards ?
       let nbrOfCardsInHand = newPlayers[this.state.currentPlayerPlaying].cards.length + 1;
-      if (nbrOfCardsInHand > 7){
-        alert ("Oh no ! Over 7 cards in Hand !");
+      if (nbrOfCardsInHand > 5){
+        alert ("Oh no ! Over 5 cards in Hand !");
       }
 
       if (cardToPushToPlayer != null){
@@ -555,101 +592,36 @@ class Board extends React.Component {
       tempState.tiles = newTiles;
 
       return tempState;
-      /*
-      this.setState({
-          mainUserMessage: newMessage,
-          playerCardsLeap: newPlayerCardsLeap,
-          players: newPlayers,
-          playerCardsDiscard: newPlayerCardsDiscard,
-          floodCardsLeap: newFloodCardsLeap,
-          floodCardsDiscard: newFloodCardsDiscard,
-          floodMeter: newFloodMeter });
-      // dois finir en state next  [0]
-      */
   }
 
-/*
-  doPickTwoPlayerCards(){
-      let newPlayerCardsDiscard = this.state.playerCardsDiscard;
-      let newPlayerCardsLeap = this.state.playerCardsLeap;
-      let newPlayers = this.state.players;
-      let newFloodCardsLeap = this.state.floodCardsLeap;
-      let newFloodCardsDiscard = this.state.floodCardsDiscard;
-      let newFloodMeter = this.state.floodMeter;
+  clickedOnHelicopterCard(playerId) {
+    // alert
+    alert ( " Clicked on Helicopter. Where do you want to go number " + playerId + "?")
+    let expectedNextButSetAside = this.state.whatIsExpectedNext;
+    let tilesToLight = this.whereCanHeFly(this.state.players[playerId].position);
+    this.state.players[playerId].whereCanHeFly = tilesToLight;
+    let nada = this.lightTheTiles(tilesToLight, this.state.players[playerId].color);
+    let newMessage = new UserMessage("Now choose a landing destination", false, [1]);
+    this.setState({ whatIsExpectedNext: "TileButtonClickForFlyWithACard" , mainUserMessage: newMessage, expectedNextButSetAside : expectedNextButSetAside, cardUser : playerId });
+    // TODO carry people ? if yes, who ?
 
-      let cards = new Array();
-      while (cards.length < 2){
-        if (newPlayerCardsLeap.length < 1){
-          // shuffle and rebuild the leap from the Discard
-            newPlayerCardsLeap = shuffleArray(newPlayerCardsDiscard);
-            newPlayerCardsDiscard = new Array();
-        }
-        let card = newPlayerCardsLeap.pop();
-        cards.push(card);
-      }
-
-      // if montee des eaux ! x2
-      let floodHowMuch = 0;
-      let cardsToPushToPlayer = new Array();
-      for (let i = 0; i < cards.length; i++ ){
-        if (cards[i].name === "floodRise"){
-            // bring Discarded flood cards on the top of the flood Leap
-            // TODO : no more cards when flooding : reset the leap
-            if (newFloodCardsDiscard.length > 0){
-                newFloodCardsDiscard = shuffleArray(newFloodCardsDiscard);
-                newFloodCardsLeap = newFloodCardsLeap.concat(newFloodCardsDiscard);
-                newFloodCardsDiscard = new Array();
-            }
-
-            // upgrade the Flood Level
-            newFloodMeter.level = newFloodMeter.level + 1;
-            newFloodMeter.floodFactor = newFloodMeter.howManyCards(newFloodMeter.level);
-            if (newFloodMeter.level >= newFloodMeter.topLevel){
-              alert (" Top level reached. The Island is submerged. Game Over");
-            }
-
-          floodHowMuch = floodHowMuch + newFloodMeter.floodFactor;
-        }
-        else{
-          cardsToPushToPlayer.push(cards[i]);
-        }
-      }
-
-      // do the floodings
-      console.log("doFloodSomeTiles for " + floodHowMuch);
-      this.doFloodSomeTiles(floodHowMuch);
-
-      // has Player too much cards ?
-      let nbrOfCardsInHand = newPlayers[this.state.currentPlayerPlaying].cards.length + cardsToPushToPlayer.length;
-      if (nbrOfCardsInHand > 7){
-        alert ("Oh no ! Over 7 cards in Hand !");
-      }
-
-      for (let i = 0; i < cardsToPushToPlayer.length; i++ ){
-          newPlayers[this.state.currentPlayerPlaying].cards.push(cardsToPushToPlayer[i]);
-      }
-
-        -> any card to play ?
-        -> wanna play it ?
-        -> wanna throw some ?
-
-      let newMessage = new UserMessage("Oh ! Look at these cards : " + cards[0].name + " and " + cards[1].name + ".", false, [0]);
-      this.setState({
-          mainUserMessage: newMessage,
-          playerCardsLeap: newPlayerCardsLeap,
-          players: newPlayers,
-          playerCardsDiscard: newPlayerCardsDiscard,
-          floodCardsLeap: newFloodCardsLeap,
-          floodCardsDiscard: newFloodCardsDiscard,
-          floodMeter: newFloodMeter });
-      // dois finir en state next  [0]
-
-      alert ("AFTER SET : doPickTwoPlayerCards  Leap is " + this.state.floodCardsLeap.length + " and Discard is " + this.state.floodCardsDiscard.length);
+    return null;
   }
-*/
 
-  getPossibleActions(role) {
-      let actions = new Array();
+  clickedOnSandBagCard(playerId) {
+    // TODO if no tile to dry : alert and exit
+    alert ( " Clicked on SandBag. Which tile do you want to dry ? player number " + playerId + "?")
+    let expectedNextButSetAside = this.state.whatIsExpectedNext;
+    let tilesToLight = this.getImmersedTiles();
+    this.state.players[playerId].whereCanHeDry = tilesToLight;
+    let nada = this.lightTheTiles(tilesToLight, this.state.players[playerId].color);
+    let newMessage = new UserMessage("Now choose a tile to dry", false, [1]);
+    this.setState({ whatIsExpectedNext: "TileButtonClickForDryWithACard" , mainUserMessage: newMessage, expectedNextButSetAside : expectedNextButSetAside, cardUser : playerId });
+    return null;
+  }
+
+  getPossibleActions(role, hasPilotFlownThisTurn) {
+      let actions = [];
       for (let i = 0; i < playerDefaultActions.length; i++){
           let action = playerDefaultActions[i];
           for (let j = 0; j < playerSpecialActions.length; j++ )
@@ -658,7 +630,6 @@ class Board extends React.Component {
               action = playerSpecialActions[j];
             }
           }
-          // TODO : hasPilotDidHisFlightThisRound ?
           // TODO : is action possible ? Check the validity of an action and remove it
           actions.push(action);
       }
@@ -666,9 +637,9 @@ class Board extends React.Component {
       if (role === "Pilot"){
         // remove the first action which is fly
         let nada = actions.shift();
-        let pilotActions = new Array();
+        let pilotActions = [];
         pilotActions.push(playerDefaultActions[0]); // move
-        if (this.state.hasPilotFlownThisTurn === false){
+        if (hasPilotFlownThisTurn === false){
             pilotActions.push(playerSpecialActions[5]); // fly
         }
         return pilotActions.concat(actions);
@@ -677,7 +648,7 @@ class Board extends React.Component {
       if (role === "Navigator"){
         // remove the first action which is move
         let nada = actions.shift();
-        let navigatorActions = new Array();
+        let navigatorActions = [];
         navigatorActions.push(playerDefaultActions[0]); // move
         navigatorActions.push(playerSpecialActions[1]); // move someone else
         return navigatorActions.concat(actions);
@@ -687,16 +658,15 @@ class Board extends React.Component {
 
   // returns an array of positions
   whereCanHeMove(position, role){
-    let moves = new Array();
+    let moves = [];
     if (role === "Explorer"){
         moves = orthogonalPaths[position];
         moves = moves.concat(diagonalPaths[position]);
     }
     else if (role === "Diver"){
-        let afterSwimPositions = new Array();
+        let afterSwimPositions = [];
         moves = orthogonalPaths[position];
         for (let j = 0 ; j < moves.length; j++){
-          // console.log('***** Check If tile : ' + moves[j] + ' is Drawned ');
           if (this.state.tiles[moves[j]].isDrawned || this.state.tiles[moves[j]].isImmersed)
           {
               //  isDrawned
@@ -704,7 +674,6 @@ class Board extends React.Component {
           }
         }
         moves = moves.concat(afterSwimPositions);
-        console.log('***** moves.length : ' + moves.length + ' and contains : ' + moves + ' afterSwimPositions :' + afterSwimPositions);
     }
     else {
         moves = orthogonalPaths[position];
@@ -713,15 +682,12 @@ class Board extends React.Component {
     // virer les cases isDrawned et origin
     let output = moves;
     if (moves.length > 0) {
-      // console.log('***** moves.length : ' + moves.length + ' and contains : ' + moves);
       for (let k = 0; k < moves.length; k++)
       {
         if ( k >= 0 && k < 24){
           // TODO HERE :????
           if (this.state.tiles[moves[k]].isDrawned || moves[k] === position)
           {
-            // let index = output.indexOf(moves[k]);
-            // console.log('***** je splice pos : ' + moves[k] + ' at index :' + index);
             output.splice(output.indexOf(moves[k]), 1);
           }
         }
@@ -732,7 +698,7 @@ class Board extends React.Component {
 
   // returns an array of positions
   whereCanHeFly(position){
-    let moves = new Array();
+    let moves = [];
     for (let i = 0; i < 24; i ++){
       if (i !== position){
         moves.push(i);
@@ -757,7 +723,7 @@ class Board extends React.Component {
 
   // returns an array of positions
   whereCanHeDry(position, role){
-    let cases = new Array();
+    let cases = [];
     if (role === "Bag"){
       for (let i = 0; i < 24; i ++){
         if (this.state.tiles[i].isImmersed){
@@ -798,14 +764,27 @@ class Board extends React.Component {
     return cases;
   }
 
- handleActionClick(action) {
+  getImmersedTiles(){
+    let cases = [];
+    for (let i = 0; i < 24; i++){
+      if (this.state.tiles[i].isImmersed){
+        cases.push(i);
+      }
+    }
+
+    return cases;
+  }
+
+ handleActionClick(action, param1) {
+
+   this.hideActionButtons();
+
     console.log("clicked on " + action);
     if (this.state.whatIsExpectedNext === "CharacterActionButtonClick") {
       let id = this.state.players[this.state.currentPlayerPlaying].id;
       if (action === "Move" || action === "Dive" || action === "MoveAround"){
             let tilesToLight = this.whereCanHeMove(this.state.players[id].position, this.state.players[id].role);
             this.state.players[id].whereCanHeMove = tilesToLight;
-
             let nada = this.lightTheTiles(tilesToLight, this.state.players[id].color);
             // set a new Expected PlayerInput
             let newMessage = new UserMessage("Now choose a destination", false, [1]);
@@ -818,33 +797,64 @@ class Board extends React.Component {
           this.setState({ whatIsExpectedNext: "TileButtonClickForFly" , mainUserMessage: newMessage });
       } else if (action === "Dry" || action === "DryAround"){
             let tilesToLight = this.whereCanHeDry(this.state.players[id].position, this.state.players[id].role);
-            this.state.players[id].whereCanHeDry = tilesToLight;
-
-            let nada = this.lightTheTiles(tilesToLight, this.state.players[id].color);
-            let newMessage = new UserMessage("Now choose a destination", false, [1]);
-            this.setState({ whatIsExpectedNext: "TileButtonClickForDry" , mainUserMessage: newMessage});
+            if (tilesToLight.length === 0 ){
+              alert ("No tiles to dry. Please choose another action");
+              this.showActionButtons();
+            } else {
+              this.state.players[id].whereCanHeDry = tilesToLight;
+              let nada = this.lightTheTiles(tilesToLight, this.state.players[id].color);
+              let newMessage = new UserMessage("Now choose a tile to dry", false, [1]);
+              this.setState({ whatIsExpectedNext: "TileButtonClickForDry" , mainUserMessage: newMessage});
+            }
+      } else if (action === "DryTwoTiles"){
+            let tilesToLight = this.whereCanHeDry(this.state.players[id].position, this.state.players[id].role);
+            if (tilesToLight.length === 0 ){
+              alert ("No tiles to dry. Please choose another action");
+              this.showActionButtons();
+            } else if (tilesToLight.length === 1 ){
+              this.state.players[id].whereCanHeDry = tilesToLight;
+              let nada = this.lightTheTiles(tilesToLight, this.state.players[id].color);
+              let newMessage = new UserMessage("THere's only one tile you can dry. Dry it.", false, [1]);
+              this.setState({ whatIsExpectedNext: "TileButtonClickForDry" , mainUserMessage: newMessage});
+            } else {
+              this.state.players[id].whereCanHeDry = tilesToLight;
+              let nada = this.lightTheTiles(tilesToLight, this.state.players[id].color);
+              let newMessage = new UserMessage("Now choose two tiles to dry", false, [1]);
+              this.setState({ whatIsExpectedNext: "TileButtonClickForDryTwoTimes" , mainUserMessage: newMessage});
+            }
       } else if (action === "DoNothing"){
               let newMessage = new UserMessage("Doing nothing ZZZZZZZ ", false, [0]);
               this.setState({ mainUserMessage: newMessage});
+      }else if (action === "SkipTurn"){
+             let newMessage = new UserMessage("Skip turn ", false, [0]);
+             this.setState({ mainUserMessage: newMessage, currentStep: 4});
+      } else if (action === "helicopterCard") { // from player !
+          // TODO : mettre ca dans un handleCardClick
+            this.clickedOnHelicopterCard(param1) // param1 = id here is player
+      } else if (action === "sandBagCard") { // from player !
+            this.clickedOnSandBagCard(param1) // param1 = id here is player
       }
-      return null;
-
     }
     else{
       alert ("UnexpectedClickOnActionButton");
     }
+    return null;
 }
 
   handleTileClick(i) {
-    // alert("click");
+
+    this.showActionButtons();
+
     if (this.state.whatIsExpectedNext === "TileButtonClickForMove") {
         let player = this.state.players[this.state.currentPlayerPlaying];
         if (player.whereCanHeMove.indexOf(i) >= 0){
             // Move
-            this.moveAPlayer(player, i);
+            let returnPack = this.moveAPlayer(player, i, this.state.players, this.state.tiles);
             let nada = this.unlightTheTiles();
             if (nada){
-              this.setState({ whatIsExpectedNext: ""});
+              this.setState({ whatIsExpectedNext: "",
+                              tiles: returnPack.tiles,
+                              players: returnPack.players});
               this.controller("ActionIsDone");
             }
         }
@@ -856,16 +866,19 @@ class Board extends React.Component {
           let player = this.state.players[this.state.currentPlayerPlaying];
           if (player.whereCanHeFly.indexOf(i) >= 0){
               // Move
-              this.moveAPlayer(player, i);
-              this.setState({ whatIsExpectedNext: "" , hasPilotFlownThisTurn: true}, () => {
-                  this.controller("ActionIsDone");
-                  this.unlightTheTiles();
-              });
+                let returnPack = this.moveAPlayer(player, i, this.state.players, this.state.tiles);
+                this.setState({ whatIsExpectedNext: "" ,
+                                hasPilotFlownThisTurn: true,
+                                tiles: returnPack.tiles,
+                                players: returnPack.players}, () => {
+                                  this.unlightTheTiles();
+                                  this.controller("ActionIsDone");
+                });
           }
           else{
             alert ("He can't move there !");
           }
-      } else if(this.state.whatIsExpectedNext === "TileButtonClickForDry"){
+      } else if (this.state.whatIsExpectedNext === "TileButtonClickForDry"){
         let newplayers = this.state.players;
         let newplayer = this.state.players[this.state.currentPlayerPlaying];
         if (newplayer.whereCanHeDry.indexOf(i) >= 0){
@@ -879,15 +892,92 @@ class Board extends React.Component {
               this.controller("ActionIsDone");
             }
         }
-        else{
+        else {
           alert ("He can't dry anything there !");
         }
-      }else{
+      } else if (this.state.whatIsExpectedNext === "TileButtonClickForDryTwoTimes") {
+        let newplayers = this.state.players;
+        let newplayer = this.state.players[this.state.currentPlayerPlaying];
+        if (newplayer.whereCanHeDry.indexOf(i) >= 0){
+            // Dry
+            this.dryATile(i);
+            this.unlightATile(i);
+            let newMessage = new UserMessage("Now choose a second one to dry", false, []);
+            this.hideActionButtons();
+            this.setState({ whatIsExpectedNext: "TileButtonClickForDry" , mainUserMessage: newMessage});
+        }
+        else {
+          alert ("He can't dry anything there !");
+        }
+      } else if (this.state.whatIsExpectedNext === "TileButtonClickForFlyWithACard") {
+        let player = this.state.players[this.state.cardUser];
+        let NewPlayers = this.state.players;
+        let NewPlayerCardsDiscard = this.state.playerCardsDiscard;
+        let expectedNextButSetAside = this.state.expectedNextButSetAside;
+
+        if (player.whereCanHeFly.indexOf(i) >= 0){
+            // index of the card to remove
+            for (let i = 0; i < player.cards.length; i++){
+              if (player.cards[i].name === "helicopter"){
+                NewPlayerCardsDiscard.push(player.cards[i]);
+                player.cards.splice(i, 1);
+                break;
+              }
+            }
+
+            player.whereCanHeFly = [];
+            NewPlayers[player.id] = player;
+            // Move
+            let returnPack = this.moveAPlayer(player, i, NewPlayers, this.state.tiles);
+            //
+            this.setState({ whatIsExpectedNext: expectedNextButSetAside,
+                            cardUser: -1,
+                            players: returnPack.players,
+                            tiles: returnPack.tiles,
+                            playerCardsDiscard: NewPlayerCardsDiscard,
+                            expectedNextButSetAside: null });
+            let nada = this.unlightTheTiles();
+        } else {
+          alert("He can't fly there with his card");
+        }
+      }
+      else if (this.state.whatIsExpectedNext === "TileButtonClickForDryWithACard") {
+        let player = this.state.players[this.state.cardUser];
+        let NewPlayers = this.state.players;
+        let NewPlayerCardsDiscard = this.state.playerCardsDiscard;
+        let expectedNextButSetAside = this.state.expectedNextButSetAside;
+
+        if (player.whereCanHeDry.indexOf(i) >= 0){
+          // index of the card to remove from the player's hand
+          for (let i = 0; i < player.cards.length; i++){
+            if (player.cards[i].name === "sandBag"){
+              NewPlayerCardsDiscard.push(player.cards[i]);
+              player.cards.splice(i, 1);
+              break;
+            }
+          }
+
+          player.whereCanHeDry = [];
+          NewPlayers[player.id] = player;
+          // Dry
+          this.dryATile(i);
+          this.setState({ whatIsExpectedNext: expectedNextButSetAside,
+                          cardUser: -1,
+                          players: NewPlayers,
+                          playerCardsDiscard: NewPlayerCardsDiscard,
+                          expectedNextButSetAside: null });
+          let nada = this.unlightTheTiles();
+        }
+        else {
+          alert("He can't DRY there with his card");
+        }
+      } else {
             alert ("Unexpected Clic On a Tile");
       }
     }
 
-  moveAPlayer(player, destination){
+  moveAPlayer(player, destination, players, tiles){
+    let pack = null;
     let NewTiles = this.state.tiles;
     // remove player from current Tile
     let index = NewTiles[player.position].playerOn.indexOf(player.id);
@@ -900,21 +990,24 @@ class Board extends React.Component {
     Newplayers[player.id].whereCanHeMove = null;
     Newplayers[player.id].whereCanHeFly = null;
 
-    this.setState({ players: Newplayers , tiles: NewTiles});
+    // this.setState({ players: Newplayers , tiles: NewTiles});
+    return pack = { players: Newplayers, tiles: NewTiles};
   }
 
   dryATile(tile){
         let NewTiles = this.state.tiles;
+        if (NewTiles[tile].isDrawned){
+          alert("CONCEPTUAL ERROR : can't dry a drawned tile");
+        }
         NewTiles[tile].isImmersed = false;
         this.setState({ tiles: NewTiles});
   }
 
   cancelAnAction(){
     let nada = this.unlightTheTiles();
-    let newMessage = new UserMessage("Choose an action " , false, new Array());
-    // let psblactn = this.getPossibleActions(this.state.players[this.state.currentPlayerPlaying].role);
+    let newMessage = new UserMessage("Choose an action " , false, []);
+    this.showActionButtons();
     this.setState({
-      // possibleActions : psblactn,
       whatIsExpectedNext: "CharacterActionButtonClick" ,
       mainUserMessage : newMessage});
   }
@@ -933,12 +1026,29 @@ class Board extends React.Component {
     );
   }
 
-  renderPlayerBoard(i) {
+  renderPlayerBoard(i) { // passing a player index
+    this.state.players[i].printIntroduction; // TO REMOVE
     let isPlaying = this.state.currentPlayerPlaying === i;
+    let boardClass = isPlaying?  ('playerBoard playerBoardPlaying') : ('playerBoard ');
+
     return (
-      <span>
-        <DrawPlayerBoard player={this.state.players[i]} isPlaying={isPlaying}/>
-      </span>
+      <div className={boardClass}>
+        <span className="inBoardName">{this.state.players[i].playersName}</span>&nbsp;the&nbsp;
+        <span className="inBoardRole" style={{color: this.state.players[i].color}}>{this.state.players[i].role}</span>
+        <br/>
+        <div className="inBoardCards">
+          {
+            this.state.players[i].cards.map((card) => {
+              return card.name === "helicopter" ?
+                <span key={card.id} className="boardPlayerCards"><img src={card.url} width="45px" height="70px" onClick={() => this.handleActionClick("helicopterCard", this.state.players[i].id)} /></span>
+                : card.name === "sandBag" ?
+                    <span key={card.id} className="boardPlayerCards"><img src={card.url} width="45px" height="70px" onClick={() => this.handleActionClick("sandBagCard", this.state.players[i].id)}/></span>
+                    :
+                    <span key={card.id} className="boardPlayerCards"><img src={card.url} width="45px" height="70px" /></span>
+            })
+          }
+        </div>
+      </div>
     )
   }
 
@@ -992,23 +1102,29 @@ class Board extends React.Component {
 
   unlightTheTiles() {
     for (let i = 0; i < 24; i++){
-      if (!this.state.tiles[i].isDrawned){
-        document.getElementById("square" + i).style.border = "1px solid #222";
+      if (this.state.tiles[i].isDrawned === false){
+        document.getElementById("square" + i).style.border = "1px solid #222"; //"1px solid #222"
+      } else {
+        document.getElementById("square" + i).style.border = "1px solid #fff";
       }
+
     }
     return true;
   }
 
+  unlightATile(i) {
+      document.getElementById("square" + i).style.border = "1px solid #222"; //"1px solid #222"
+  }
+
+  hideActionButtons() {
+      document.getElementById("UserActions").style.display = "none";
+  }
+
+  showActionButtons() {
+      document.getElementById("UserActions").style.display = "block";
+  }
+
   render() {
-    /*
-    const winner = calculateWinner(this.state.squares);
-    let status;
-    if (winner) {
-      status = 'We have a winner: ' + winner;
-    } else {
-      status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
-    }
-    */
 
     return (
 
@@ -1072,7 +1188,6 @@ class Board extends React.Component {
           {this.renderPlayerBoard(2)}
           {this.renderPlayerBoard(3)}
         </div>
-
       </div>
     );
   }
@@ -1163,30 +1278,30 @@ class UserMessage {
 }
 
 function riseTheIsland(){
-    var tile01 = new Tile("helipad", 0, false, false, 5, "", new Array(), "#A9D0F5", "", "HELIPORT");
-    var tile02 = new Tile("doorBlack", 0, false, false, 3, "", new Array(), "#6E6E6E", "", "");
-    var tile03 = new Tile("doorRed", 0, false, false, 0, "", new Array(), "#F78181", "", "");
-    var tile04 = new Tile("doorGreen", 0, false, false, 4, "", new Array(), "#9FF781", "", "");
-    var tile05 = new Tile("doorWhite", 0, false, false, 2, "", new Array(), "#F2F2F2", "", "");
-    var tile06 = new Tile("doorYellow", 0, false, false, 1, "", new Array(), "#F2F5A9", "", "");
-    var tile07 = new Tile("temple0001", 0, false, false, "", "0", new Array(), "#bdc3c7", "", "TEMPLE CRYSTAL");
-    var tile08 = new Tile("temple0002", 0, false, false, "", "0", new Array(), "#bdc3c7", "", "TEMPLE CRYSTAL");
-    var tile09 = new Tile("temple0101", 0, false, false, "", "1", new Array(), "#bdc3c7", "", "TEMPLE CUP");
-    var tile10 = new Tile("temple0102", 0, false, false, "", "1", new Array(), "#bdc3c7", "", "TEMPLE CUP");
-    var tile11 = new Tile("temple0201", 0, false, false, "", "2", new Array(), "#bdc3c7", "", "TEMPLE SCEPTRE");
-    var tile12 = new Tile("temple0202", 0, false, false, "", "2", new Array(), "#bdc3c7", "", "TEMPLE SCEPTRE");
-    var tile13 = new Tile("temple0301", 0, false, false, "", "3", new Array(), "#bdc3c7", "", "TEMPLE STATUE");
-    var tile14 = new Tile("temple0302", 0, false, false, "", "3", new Array(), "#bdc3c7", "", "TEMPLE STATUE");
-    var tile15 = new Tile("coast01", 0, false, false, "", "", new Array(), "#825a2c", "", "");
-    var tile16 = new Tile("coast02", 0, false, false, "", "", new Array(), "#825a2c", "", "");
-    var tile17 = new Tile("coast03", 0, false, false, "", "", new Array(), "#825a2c", "", "");
-    var tile18 = new Tile("desert01", 0, false, false, "", "", new Array(), "#ffd480", "", "");
-    var tile19 = new Tile("desert02", 0, false, false, "", "", new Array(), "#ffd480", "", "");
-    var tile20 = new Tile("desert03", 0, false, false, "", "", new Array(), "#ffd480", "", "");
-    var tile21 = new Tile("swamp01", 0, false, false, "", "", new Array(), "#bcf0d2", "", "");
-    var tile22 = new Tile("swamp02", 0, false, false, "", "", new Array(), "#bcf0d2", "", "");
-    var tile23 = new Tile("swamp03", 0, false, false, "", "", new Array(), "#bcf0d2", "", "");
-    var tile24 = new Tile("swamp04", 0, false, false, "", "", new Array(), "#bcf0d2", "", "");
+    var tile01 = new Tile("helipad", 0, false, false, 5, "", [], "#A9D0F5", "", "HELIPORT");
+    var tile02 = new Tile("doorBlack", 0, false, false, 3, "", [], "#6E6E6E", "", "");
+    var tile03 = new Tile("doorRed", 0, false, false, 0, "", [], "#F78181", "", "");
+    var tile04 = new Tile("doorGreen", 0, false, false, 4, "", [], "#9FF781", "", "");
+    var tile05 = new Tile("doorWhite", 0, false, false, 2, "", [], "#F2F2F2", "", "");
+    var tile06 = new Tile("doorYellow", 0, false, false, 1, "", [], "#F2F5A9", "", "");
+    var tile07 = new Tile("temple0001", 0, false, false, "", "0", [], "#bdc3c7", "", "TEMPLE CRYSTAL");
+    var tile08 = new Tile("temple0002", 0, false, false, "", "0", [], "#bdc3c7", "", "TEMPLE CRYSTAL");
+    var tile09 = new Tile("temple0101", 0, false, false, "", "1", [], "#bdc3c7", "", "TEMPLE CUP");
+    var tile10 = new Tile("temple0102", 0, false, false, "", "1", [], "#bdc3c7", "", "TEMPLE CUP");
+    var tile11 = new Tile("temple0201", 0, false, false, "", "2", [], "#bdc3c7", "", "TEMPLE SCEPTRE");
+    var tile12 = new Tile("temple0202", 0, false, false, "", "2", [], "#bdc3c7", "", "TEMPLE SCEPTRE");
+    var tile13 = new Tile("temple0301", 0, false, false, "", "3", [], "#bdc3c7", "", "TEMPLE STATUE");
+    var tile14 = new Tile("temple0302", 0, false, false, "", "3", [], "#bdc3c7", "", "TEMPLE STATUE");
+    var tile15 = new Tile("coast01", 0, false, false, "", "", [], "#825a2c", "", "");
+    var tile16 = new Tile("coast02", 0, false, false, "", "", [], "#825a2c", "", "");
+    var tile17 = new Tile("coast03", 0, false, false, "", "", [], "#825a2c", "", "");
+    var tile18 = new Tile("desert01", 0, false, false, "", "", [], "#ffd480", "", "");
+    var tile19 = new Tile("desert02", 0, false, false, "", "", [], "#ffd480", "", "");
+    var tile20 = new Tile("desert03", 0, false, false, "", "", [], "#ffd480", "", "");
+    var tile21 = new Tile("swamp01", 0, false, false, "", "", [], "#bcf0d2", "", "");
+    var tile22 = new Tile("swamp02", 0, false, false, "", "", [], "#bcf0d2", "", "");
+    var tile23 = new Tile("swamp03", 0, false, false, "", "", [], "#bcf0d2", "", "");
+    var tile24 = new Tile("swamp04", 0, false, false, "", "", [], "#bcf0d2", "", "");
     // create a 24 array
     let tiles = new Array(tile01,tile02,tile03,tile04,tile05,tile06,tile07,tile08,tile09,tile10,
       tile11,tile12,tile13,tile14,tile15,tile16,tile17,tile18,tile19,tile20,
@@ -1204,7 +1319,7 @@ function riseTheIsland(){
 }
 
 function generatePlayerCardsLeap(){
-    let cards = new Array();
+    let cards = [];
     for (let i = 0; i < 5; i++){
         let card = { id : i, name : "crystal", type : 0, url : "img/crystalCard.png"};
         cards.push(card);
@@ -1244,39 +1359,20 @@ function generateFloodCardsLeap(){
 }
 
 function generatePlayers(){
-    let roles = new Array(0,1,2,3,4,5);
-    roles = shuffleArray(roles);
-    let players = new Array();
+    // engineer hack on
+    // let roles = new Array(0,1,2,3,4,5);
+    // roles = shuffleArray(roles);
+    let roles = new Array(0,5,2,3,4,0);
+    let players = [];
     for (let i = 0; i < 4; i++){
       let type = roles[i];
       let player = new Player(
-          i, type, playerTypes[type].role, playerTypes[type].color, playerTypes[type].name, 0, new Array(), true, false
+          i, type, playerTypes[type].role, playerTypes[type].color, playerTypes[type].name, 0, [], true, false
       )
       players.push(player);
     }
     return players;
 }
-
-/*
-function calculateWinner(squares) {
-  const lines = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6],
-  ];
-  for (let i = 0; i < lines.length; i++) {
-    const [a, b, c] = lines[i];
-    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return squares[a];
-    }
-  }
-  return null;
-}*/
 
 function shuffleArray(a) {
     for (let i = a.length - 1; i > 0; i--) {
