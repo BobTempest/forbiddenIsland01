@@ -600,7 +600,6 @@ class Board extends React.Component {
   }
 
   clickedOnHelicopterCard(playerId) {
-    // alert
     alert ( " Clicked on Helicopter. Where do you want to go number " + playerId + "?")
     let expectedNextButSetAside = this.state.whatIsExpectedNext;
     let tilesToLight = this.whereCanHeFly(this.state.players[playerId].position);
@@ -1053,7 +1052,9 @@ class Board extends React.Component {
       // give to
       n_players[receiver].cards.push(this.givenCard);
 
-      this.setState({whatIsExpectedNext: "" , players : n_players});
+      this.setState({whatIsExpectedNext: "" ,
+                    messageBoardState : "default", 
+                    players : n_players});
       this.controller("ActionIsDone");
     }
   }
@@ -1159,7 +1160,6 @@ class Board extends React.Component {
       return (
           <div>
             Which card do you want to give ?<br/>
-            <form /*onSubmit='return false;'*/>
             {
               this.state.players[giverId].cards.map((card, index) =>
               <span key={index}><input type="radio" name="chosenCard" key={index} value={card.id} onChange={() => chosenCard = card.id} />{card.name}<br/></span>
@@ -1180,7 +1180,6 @@ class Board extends React.Component {
                   }))
             }
             <button className="actionButton" value="Give" onClick={() => this.doGiveACard(giverId, chosenCard, receiver)}>{this.state.players[giverId].role === "Messenger" ? "Send" : "Give" } </button>
-          </form>
           </div>
       )
     } else {
