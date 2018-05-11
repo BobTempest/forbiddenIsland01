@@ -226,6 +226,7 @@ class Board extends React.Component {
       playerCardsDiscard: playerCardsDiscard,
       floodCardsLeap: floodCardsLeap,
       floodCardsDiscard: floodCardsDiscard,
+      floodCardsOutOfGame: [],
       players: players,
       floodMeter: floodMeter,
       gameIsOver: false,
@@ -282,6 +283,7 @@ class Board extends React.Component {
 
   controller(input){
       console.log("InController turn :" + this.state.currentStep);
+      this.checkCardState();
       this.showActionButtons();
       if (input === "ActionIsDone"){
         let nextStep = this.state.currentStep + 1;
@@ -357,6 +359,7 @@ class Board extends React.Component {
     let newFloodCardsLeap = this.state.floodCardsLeap;
     let newTiles = this.state.tiles;
     let newFloodCardsDiscard = this.state.floodCardsDiscard;
+    let newFloodCardsOutOfGame = this.state.floodCardsOutOfGame;
 
     for ( let i = 0; i < howMany; i++){
         let tileHasDrawned = false;
@@ -422,20 +425,24 @@ class Board extends React.Component {
         }
         if (!tileHasDrawned){
             newFloodCardsDiscard.push(card);
+        } else {
+            newFloodCardsOutOfGame.push(card);
         }
     }
 
     this.setState({
       floodCardsLeap: newFloodCardsLeap,
+      floodCardsOutOfGame: newFloodCardsOutOfGame,
       tiles: newTiles,
       floodCardsDiscard: newFloodCardsDiscard });
 
     return true;
   }
 
-  doFloodSomeTilesWithState(howMany, floodCardsLeapInput, floodCardsDiscardInput, tilesInput){
+  doFloodSomeTilesWithState(howMany, floodCardsLeapInput, floodCardsDiscardInput, floodCardsOutOfGameInput, tilesInput){
     let newFloodCardsLeap = floodCardsLeapInput;
     let newFloodCardsDiscard = floodCardsDiscardInput;
+    let newFloodCardsOutOfGame = floodCardsOutOfGameInput;
     let newTiles = tilesInput;
 
     let tempState = {};
@@ -508,10 +515,13 @@ class Board extends React.Component {
         }
         if (!tileHasDrawned){
             newFloodCardsDiscard.push(card);
+        } else {
+            newFloodCardsOutOfGame.push(card);
         }
     }
 
     tempState.floodCardsLeap = newFloodCardsLeap;
+    tempState.floodCardsOutOfGame = newFloodCardsOutOfGame;
     tempState.tiles = newTiles;
     tempState.floodCardsDiscard = newFloodCardsDiscard;
 
@@ -524,6 +534,7 @@ class Board extends React.Component {
       let newPlayers = tempState.players;
       let newFloodCardsLeap = tempState.floodCardsLeap;
       let newFloodCardsDiscard = tempState.floodCardsDiscard;
+      let newFloodCardsOutOfGame = tempState.floodCardsOutOfGame;
       let newFloodMeter = tempState.floodMeter;
       let newTiles = tempState.tiles;
 
@@ -558,7 +569,7 @@ class Board extends React.Component {
 
             // do the floodings
             console.log("doFloodSomeTiles for " + newFloodMeter.floodFactor);
-            let ReturnFromFlood = this.doFloodSomeTilesWithState(newFloodMeter.floodFactor, newFloodCardsLeap, newFloodCardsDiscard, newTiles);
+            let ReturnFromFlood = this.doFloodSomeTilesWithState(newFloodMeter.floodFactor, newFloodCardsLeap, newFloodCardsDiscard, newFloodCardsOutOfGame, newTiles);
             newFloodCardsLeap = ReturnFromFlood.floodCardsLeap;
             newFloodCardsDiscard = ReturnFromFlood.floodCardsDiscard;
             newTiles = ReturnFromFlood.tiles;
@@ -593,6 +604,7 @@ class Board extends React.Component {
       tempState.playerCardsDiscard = newPlayerCardsDiscard;
       tempState.floodCardsLeap = newFloodCardsLeap;
       tempState.floodCardsDiscard = newFloodCardsDiscard;
+      tempState.floodCardsOutOfGame = newFloodCardsOutOfGame;
       tempState.floodMeter = newFloodMeter;
       tempState.tiles = newTiles;
 
@@ -622,6 +634,34 @@ class Board extends React.Component {
     let newMessage = new UserMessage("Now choose a tile to dry", false, [1]);
     this.setState({ whatIsExpectedNext: "TileButtonClickForDryWithACard" , mainUserMessage: newMessage, expectedNextButSetAside : expectedNextButSetAside, cardUser : playerId });
     return null;
+  }
+
+  checkCardState(){
+    // flood Cards
+    let nbrOfFloodCardsInDiscard = this.state.floodCardsDiscard.length;
+    let nbrOfFloodCardsInLeap = this.state.floodCardsLeap.length;
+    let nbrOfFloodCardsOutOfGame = this.state.floodCardsOutOfGame.length;
+    let nbrOfFloodCards = nbrOfFloodCardsInDiscard + nbrOfFloodCardsInLeap + nbrOfFloodCardsOutOfGame;
+
+    console.log("FLOOD CARDS : total = " + nbrOfFloodCards+ " (24 expected), out of game = " + nbrOfFloodCardsOutOfGame + ", in Discard = " + nbrOfFloodCardsInDiscard + ", in Leap = " + nbrOfFloodCardsInLeap);
+
+    if (nbrOfFloodCards != 24){
+      alert("ALERT : We loose some Flood cards in the process.");
+    }
+
+    // playerCards
+    let nbrOfPlayerCardsInPLayersHands = 0;
+    let nbrOfPlayerCardsInDiscard = this.state.playerCardsDiscard.length;
+    let nbrOfPlayerCardsInLeap = this.state.playerCardsLeap.length;
+    for(let i = 0 ; i < this.state.players.length; i++){
+      nbrOfPlayerCardsInPLayersHands = nbrOfPlayerCardsInPLayersHands + this.state.players[i].cards.length;
+    }
+    let nbrOfPlayerCards = nbrOfPlayerCardsInPLayersHands + nbrOfPlayerCardsInDiscard + nbrOfPlayerCardsInLeap;
+    console.log("PLAYER CARDS : total = " + nbrOfPlayerCards+ " (28 expected), in players hands = " + nbrOfPlayerCardsInPLayersHands + ", in Discard = " + nbrOfPlayerCardsInDiscard + ", in Leap = " + nbrOfPlayerCardsInLeap);
+
+    if (nbrOfPlayerCards != 28){
+      alert("ALERT : We loose some Player cards in the process.");
+    }
   }
 
   getPossibleActions(role, hasPilotFlownThisTurn) {
@@ -1053,7 +1093,7 @@ class Board extends React.Component {
       n_players[receiver].cards.push(this.givenCard);
 
       this.setState({whatIsExpectedNext: "" ,
-                    messageBoardState : "default", 
+                    messageBoardState : "default",
                     players : n_players});
       this.controller("ActionIsDone");
     }
