@@ -1,5 +1,9 @@
 // TODO :
 *********************
+**** NOW *****
+
+
+*********************
 **** SHORT TERM *****
 
  - en dev mode : voir les leaps et discards
@@ -14,7 +18,7 @@
 *********************
 ******** BUGS *******
 
-
+Diver can finish on a drawned tile !
 
 *********************
 evacuate :

@@ -764,6 +764,31 @@ class Board extends React.Component {
     return output;
   }
 
+  whereNavigatorCanMoveHim(position){
+      let moves = [];
+      let secondMoves = [];
+      moves = orthogonalPaths[position];
+      for (let i = 0 ; i < moves.length; i++){
+            secondMoves = secondMoves.concat(orthogonalPaths[moves[i]]);
+      }
+      moves = moves.concat(secondMoves);
+
+      // virer les cases isDrawned et origin
+      let output = moves;
+      if (moves.length > 0) {
+        for (let k = 0; k < moves.length; k++)
+        {
+          if ( k >= 0 && k < 24){
+            if (this.state.tiles[moves[k]].isDrawned || moves[k] === position)
+            {
+              output.splice(output.indexOf(moves[k]), 1);
+            }
+          }
+        }
+      }
+      return output;
+  }
+
   // returns an array of positions
   whereCanHeDry(position, role){
     let cases = [];
@@ -879,6 +904,8 @@ class Board extends React.Component {
               } else {
                 this.setState({ whatIsExpectedNext: "ResolveUserDialogSequence" , messageBoardState: "giveACardSequence"});
               }
+      } else if (action === "MoveSomeone") {
+              this.setState({ whatIsExpectedNext: "ResolveUserDialogSequence" , messageBoardState: "moveSomeOneSequence"});
       } else if (action === "DoNothing"){
               let newMessage = new UserMessage("Doing nothing ZZZZZZZ ", false, [0]);
               this.setState({ mainUserMessage: newMessage});
@@ -898,7 +925,7 @@ class Board extends React.Component {
     return null;
 }
 
-  handleTileClick(i) {
+handleTileClick(i) {
 
     this.showActionButtons();
 
@@ -935,6 +962,37 @@ class Board extends React.Component {
           else{
             alert ("He can't move there !");
           }
+      } else if (this.state.whatIsExpectedNext === "TileButtonClickForMoveSomeone") {
+
+        let puppet = null;
+        for (let i = 0; i < this.state.players.length; i++){
+          if (this.state.players[i].isPuppet === true){
+            this.puppet = this.state.players[i];
+            break;
+          }
+        }
+
+        if (this.puppet === null) {
+          alert("CAN't FIND PUPPET !");
+        }
+
+        if (this.puppet.whereCanHeMove.indexOf(i) >= 0){
+            // Move
+              let returnPack = this.moveAPlayer(this.puppet, i, this.state.players, this.state.tiles);
+              // virer le puppet flag
+              for (let j = 0; j < returnPack.players.length; j++){
+                returnPack.players[j].isPuppet = false;
+              }
+              this.setState({ whatIsExpectedNext: "" ,
+                              tiles: returnPack.tiles,
+                              players: returnPack.players}, () => {
+                                this.unlightTheTiles();
+                                this.controller("ActionIsDone");
+              });
+        }
+        else{
+          alert ("He can't move there !");
+        }
       } else if (this.state.whatIsExpectedNext === "TileButtonClickForDry"){
         let newplayers = this.state.players;
         let newplayer = this.state.players[this.state.currentPlayerPlaying];
@@ -1067,6 +1125,16 @@ class Board extends React.Component {
     this.setState({
       whatIsExpectedNext: "CharacterActionButtonClick" ,
       mainUserMessage : newMessage});
+  }
+
+  doMoveSomeOne(puppet) {
+    let whereCanHeMove = this.whereNavigatorCanMoveHim(this.state.players[puppet].position);
+    this.state.players[puppet].whereCanHeMove = whereCanHeMove;
+    let n_players = this.state.players;
+    n_players[puppet].isPuppet = true;
+    let nada = this.lightTheTiles(whereCanHeMove, this.state.players[puppet].color);
+    let newMessage = new UserMessage("Now choose a destination", false, []); // TODO : SET a cancel
+    this.setState({ whatIsExpectedNext: "TileButtonClickForMoveSomeone" , mainUserMessage: newMessage, messageBoardState : "default", players : n_players });
   }
 
   doGiveACard(giver, card, receiver){
@@ -1222,8 +1290,24 @@ class Board extends React.Component {
             <button className="actionButton" value="Give" onClick={() => this.doGiveACard(giverId, chosenCard, receiver)}>{this.state.players[giverId].role === "Messenger" ? "Send" : "Give" } </button>
           </div>
       )
+    } else if (this.state.messageBoardState === "moveSomeOneSequence") {
+      let puppet = null;
+          return (
+            <div>
+              Who do you want to move ? <br/>
+              {
+              (this.state.players.map((player, index) => {
+                return (player.role != "Navigator") ?
+                  (<span key={index}><input type="radio" name="puppet" key={index} value={player.id} onChange={() => puppet = player.id}/>{player.playersName}<br/></span>)
+                  :
+                  (<span key={index}></span>)
+                }))
+              }
+              <button className="actionButton" value="Give" onClick={() => this.doMoveSomeOne(puppet)}>{"Move this character"} </button>
+            </div>
+          )
     } else {
-      // cklassic message  with one button
+      // classic message  with one button
 
       let showNextBtnStyle = (this.state.mainUserMessage.buttons.indexOf(0) >= 0)?({display: 'block'}):({display: 'none'});
       let showCancelBtnStyle = (this.state.mainUserMessage.buttons.indexOf(1) >= 0)?({display: 'block'}):({display: 'none'});
@@ -1511,10 +1595,10 @@ function generateFloodCardsLeap(){
 }
 
 function generatePlayers(){
-    // engineer hack on
+    // navigator hack on
     // let roles = [0,1,2,3,4,5];
     // roles = shuffleArray(roles);
-    let roles = [2,5,1,3,4,0];
+    let roles = [1,5,2,3,4,0];
     let players = [];
     for (let i = 0; i < 4; i++){
       let type = roles[i];
