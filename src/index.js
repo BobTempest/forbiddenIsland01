@@ -59,13 +59,13 @@ const diagonalPaths = {0 : [4], 1 : [3], 2 : [6,8], 3 : [1,7,9], 4 : [0,8,10], 5
      { id : 3 , name : "statue"}
  ];
 
- const buttons = ["Next", "Cancel", "PickTwoCards", "Flood"];
+ const buttons = ["Next", "Cancel", "PickTwoCards 1st", "PickTwoCards 2nd", "Flood"];
 
  const playerSteps = [
      {id : 0, name : "action 1/3" },
      {id : 1, name : "action 2/3" },
      {id : 2, name : "action 3/3" },
-     {id : 3, name : "draw player cards" },
+     {id : 3, name : "draw player cards 1st" },
      {id : 4, name : "draw flood cards" }
  ];
 
@@ -239,6 +239,7 @@ class Board extends React.Component {
       whatIsExpectedNext : "CharacterActionButtonClick",
       expectedNextButSetAside : null,
       mainUserMessage : mainUserMessage,
+      messageBoardState : "default",
       cardUser : null,
       cardFlyWith : []
     };
@@ -285,17 +286,14 @@ class Board extends React.Component {
       if (input === "ActionIsDone"){
         let nextStep = this.state.currentStep + 1;
         if (nextStep === 3){
-          // draw player cards
-
-          let newMessage = new UserMessage("Lets' draw some Player Cards", false, [2]);
+          // draw player cards 01
+          let newMessage = new UserMessage("Let's' draw some Player Cards", false, [2]);
           this.setState({ currentStep : nextStep, possibleActions : [], mainUserMessage : newMessage});
-        }
-        else if (nextStep === 4){
+        } else if (nextStep === 4){
           // flood some tiles.
-
           this.setState({ currentStep : nextStep });
           let howMuch = this.state.floodMeter.floodFactor;
-          let newMessage = new UserMessage("Let's flood " + howMuch + " tiles", false, [3]);
+          let newMessage = new UserMessage("Let's flood " + howMuch + " tiles", false, [4]);
           this.setState({ currentStep : nextStep, possibleActions : [], mainUserMessage : newMessage});
         }
         else if (nextStep === 5){
@@ -335,11 +333,15 @@ class Board extends React.Component {
         }
       }
       // user has to pick two cards from the leap
-      else if (input === "PickTwoCards"){
+      else if (input === "PickTwoCardsONE"){
           // let cards = this.doPickTwoPlayerCards();
           let tempState = this.state;
           tempState = this.doPickOnePlayerCard(1, tempState);
           this.setState(tempState);
+          // alert ("Rhaaaa");
+      } else if (input === "PickTwoCardsTWO"){
+          // let cards = this.doPickTwoPlayerCards();
+          let tempState = this.state;
           tempState = this.doPickOnePlayerCard(2, tempState);
           this.setState(tempState);
           // alert ("Rhaaaa");
@@ -364,7 +366,7 @@ class Board extends React.Component {
         }
 
         let card = newFloodCardsLeap.pop();
-        // TODO : no more cards when flooding : reset the leap
+
         for (let j = 0; j < newTiles.length; j++){
           if (newTiles[j].name === card.name){
             console.log('****** TILE To flood IS ' + newTiles[j].name);
@@ -379,7 +381,7 @@ class Board extends React.Component {
                     alert ("There is " + newTiles[j].playerOn.length + " explorer(s) on the drawning tile. Let's evacuate them.");
                     // TODO evacuate explorers from drawning island
                 }
-                // TODO : Check if all Temples of an undiscovered Treasure are drawned. If yes : end game
+                // Check if all Temples of an undiscovered Treasure are drawned. If yes : end game
                 if (newTiles[j].name === "helipad"){
                   alert("The helipad is drawned. GAMEOVER")
                 }
@@ -443,13 +445,14 @@ class Board extends React.Component {
 
     for ( let i = 0; i < howMany; i++){
         let tileHasDrawned = false;
+        // no more cards when flooding : reset the leap
         if (newFloodCardsLeap.length < 1){
           newFloodCardsLeap = shuffleArray(newFloodCardsDiscard);
           newFloodCardsDiscard = [];
         }
 
         let card = newFloodCardsLeap.pop();
-        // TODO : no more cards when flooding : reset the leap
+
         console.log('****** TILE To flood IS (with State) ' + card.name);
         for (let j = 0; j < newTiles.length; j++){
           if (newTiles[j].name === card.name){
@@ -464,7 +467,7 @@ class Board extends React.Component {
                     alert ("There is " + newTiles[j].playerOn.length + " explorer(s) on the drawning tile. Let's evacuate them.");
                     // TODO evacuate explorers from drawning island
                 }
-                // TODO : Check if all Temples of an undiscovered Treasure are drawned. If yes : end game
+                // Check if all Temples of an undiscovered Treasure are drawned. If yes : end game
                 if (newTiles[j].name === "helipad"){
                   alert("The helipad is drawned. GAMEOVER")
                 }
@@ -535,7 +538,7 @@ class Board extends React.Component {
       let cardToPushToPlayer = null;
 
         if (card.name === "floodRise"){
-            alert("Flood Riiiiise ! ")
+
             // bring Discarded flood cards on the top of the flood Leap
 
             if (newFloodCardsDiscard.length > 0){
@@ -547,6 +550,8 @@ class Board extends React.Component {
             // upgrade the Flood Level
             newFloodMeter.level = newFloodMeter.level + 1;
             newFloodMeter.floodFactor = newFloodMeter.howManyCards(newFloodMeter.level);
+
+            alert("Flood Riiiiise ! New Flood level is " + newFloodMeter.level + "(pick " +  newFloodMeter.floodFactor + " at each flood)");
             if (newFloodMeter.level >= newFloodMeter.topLevel){
               alert (" Top level reached. The Island is submerged. Game Over");
             }
@@ -577,7 +582,7 @@ class Board extends React.Component {
 
       let newMessage = "";
       if (cardNumber == 1){
-            newMessage = new UserMessage("Oh ! Look at this first card : " + card.name + ".", false, null);
+            newMessage = new UserMessage("Oh ! Look at this first card : " + card.name + ".", false, [3]);
       }else{
             newMessage = new UserMessage("Oh ! Look at this second card : " + card.name + ".", false, [0]);
       }
@@ -685,7 +690,6 @@ class Board extends React.Component {
       for (let k = 0; k < moves.length; k++)
       {
         if ( k >= 0 && k < 24){
-          // TODO HERE :????
           if (this.state.tiles[moves[k]].isDrawned || moves[k] === position)
           {
             output.splice(output.indexOf(moves[k]), 1);
@@ -776,19 +780,22 @@ class Board extends React.Component {
   }
 
  handleActionClick(action, param1) {
-
-   this.hideActionButtons();
-
+    this.hideActionButtons();
     console.log("clicked on " + action);
     if (this.state.whatIsExpectedNext === "CharacterActionButtonClick") {
       let id = this.state.players[this.state.currentPlayerPlaying].id;
       if (action === "Move" || action === "Dive" || action === "MoveAround"){
             let tilesToLight = this.whereCanHeMove(this.state.players[id].position, this.state.players[id].role);
-            this.state.players[id].whereCanHeMove = tilesToLight;
-            let nada = this.lightTheTiles(tilesToLight, this.state.players[id].color);
-            // set a new Expected PlayerInput
-            let newMessage = new UserMessage("Now choose a destination", false, [1]);
-            this.setState({ whatIsExpectedNext: "TileButtonClickForMove" , mainUserMessage: newMessage });
+            if (tilesToLight.length === 0 ){
+              alert ("Nowhere to go. Please choose another action");
+              this.showActionButtons();
+            } else  {
+              this.state.players[id].whereCanHeMove = tilesToLight;
+              let nada = this.lightTheTiles(tilesToLight, this.state.players[id].color);
+              // set a new Expected PlayerInput
+              let newMessage = new UserMessage("Now choose a destination", false, [1]);
+              this.setState({ whatIsExpectedNext: "TileButtonClickForMove" , mainUserMessage: newMessage });
+            }
       } if (action === "Fly"){
           let tilesToLight = this.whereCanHeFly(this.state.players[id].position);
           this.state.players[id].whereCanHeFly = tilesToLight;
@@ -822,6 +829,17 @@ class Board extends React.Component {
               let newMessage = new UserMessage("Now choose two tiles to dry", false, [1]);
               this.setState({ whatIsExpectedNext: "TileButtonClickForDryTwoTimes" , mainUserMessage: newMessage});
             }
+      } else if (action === "SendACard" || action === "Give") {
+              let playersAround = this.getPlayersOnTheSameTileExceptMe();
+              if (this.state.players[id].cards.length < 1 ){
+                alert("The messenger has no cards to send. Try something else.");
+                this.showActionButtons();
+              } else if ( action === "Give" && playersAround.length < 1) {
+                  alert("No other player on your tile. Try something else.");
+                  this.showActionButtons();
+              } else {
+                this.setState({ whatIsExpectedNext: "ResolveUserDialogSequence" , messageBoardState: "giveACardSequence"});
+              }
       } else if (action === "DoNothing"){
               let newMessage = new UserMessage("Doing nothing ZZZZZZZ ", false, [0]);
               this.setState({ mainUserMessage: newMessage});
@@ -1012,6 +1030,58 @@ class Board extends React.Component {
       mainUserMessage : newMessage});
   }
 
+  doGiveACard(giver, card, receiver){
+    // alert("GIVE A CARD : " + giver + " will give the " + card + " to " + receiver);
+    if (card == null){
+      alert("Please select a card to give.");
+    } else if (receiver == null){
+      alert("Please select a recipient for the card.");
+    } else {
+      // remove from player
+      let n_players = this.state.players;
+      let givenCard = null;
+      let index = null;
+      for (let i = 0; i < n_players[giver].cards.length; i++){
+        if (n_players[giver].cards[i].id === card){
+          this.givenCard = n_players[giver].cards[i];
+          index = i;
+        }
+        break;
+      }
+      n_players[giver].cards.splice(index, 1);
+
+      // give to
+      n_players[receiver].cards.push(this.givenCard);
+
+      this.setState({whatIsExpectedNext: "" , players : n_players});
+      this.controller("ActionIsDone");
+    }
+  }
+
+  getPlayersOnTheSameTileExceptMe(){
+    let playersOnTheSameTileExceptMe = [];
+    let currentlyPlaying = this.state.currentPlayerPlaying;
+    let currentpostion = this.state.players[currentlyPlaying].position;
+
+    for (let i = 0 ; i < this.state.players.length; i++){
+      if (this.state.players[i].position === currentpostion && this.state.players[i].id !== currentlyPlaying){
+        playersOnTheSameTileExceptMe.push(this.state.players[i].id);
+      }
+    }
+    return playersOnTheSameTileExceptMe;
+  }
+
+  getPlayersOnATile(position){
+    let playersOnTheTile = [];
+
+    for (let i = 0 ; i < this.state.players.length; i++){
+      if (this.state.players[i].position === position ){
+        playersOnTheTile.push(this.state.players[i].id);
+      }
+    }
+    return playersOnTheTile;
+  }
+
   renderSquare(i) {
     return(
       <span>
@@ -1039,12 +1109,14 @@ class Board extends React.Component {
         <div className="inBoardCards">
           {
             this.state.players[i].cards.map((card) => {
-              return card.name === "helicopter" ?
-                <span key={card.id} className="boardPlayerCards"><img src={card.url} width="45px" height="70px" onClick={() => this.handleActionClick("helicopterCard", this.state.players[i].id)} /></span>
-                : card.name === "sandBag" ?
-                    <span key={card.id} className="boardPlayerCards"><img src={card.url} width="45px" height="70px" onClick={() => this.handleActionClick("sandBagCard", this.state.players[i].id)}/></span>
-                    :
-                    <span key={card.id} className="boardPlayerCards"><img src={card.url} width="45px" height="70px" /></span>
+              if (card){
+                return card.name === "helicopter" ?
+                  <span key={card.id} className="boardPlayerCards"><img src={card.url} width="45px" height="70px" onClick={() => this.handleActionClick("helicopterCard", this.state.players[i].id)} /></span>
+                  : card.name === "sandBag" ?
+                      <span key={card.id} className="boardPlayerCards"><img src={card.url} width="45px" height="70px" onClick={() => this.handleActionClick("sandBagCard", this.state.players[i].id)}/></span>
+                      :
+                      <span key={card.id} className="boardPlayerCards"><img src={card.url} width="45px" height="70px" /></span>
+              }
             })
           }
         </div>
@@ -1077,20 +1149,61 @@ class Board extends React.Component {
   }
 
   renderMessageBoard() {
-    let showNextBtnStyle = (this.state.mainUserMessage.buttons.indexOf(0) >= 0)?({display: 'block'}):({display: 'none'});
-    let showCancelBtnStyle = (this.state.mainUserMessage.buttons.indexOf(1) >= 0)?({display: 'block'}):({display: 'none'});
-    let showPick2CardsBtnStyle = (this.state.mainUserMessage.buttons.indexOf(2) >= 0)?({display: 'block'}):({display: 'none'});
-    let showFloodBtnStyle = (this.state.mainUserMessage.buttons.indexOf(3) >= 0)?({display: 'block'}):({display: 'none'});
+    if (this.state.messageBoardState === "giveACardSequence"){
+      let giverId = this.state.players[this.state.currentPlayerPlaying].id;
+      let playersOnTheSameTileExceptMe = this.getPlayersOnTheSameTileExceptMe();
+      console.log('playersOnTheSameTileExceptMe = ' + playersOnTheSameTileExceptMe);// seems Ok
+      let chosenCard = null;
+      let receiver = null;
 
-    return(
-        <div>
+      return (
+          <div>
+            Which card do you want to give ?<br/>
+            <form /*onSubmit='return false;'*/>
+            {
+              this.state.players[giverId].cards.map((card, index) =>
+              <span key={index}><input type="radio" name="chosenCard" key={index} value={card.id} onChange={() => chosenCard = card.id} />{card.name}<br/></span>
+            )
+            }
+            To whom do you want to give it ?<br/>
+            {
+              this.state.players[giverId].role === "Messenger" ?
+                (this.state.players.map((player, index) => {
+                  return (player.id != giverId) ?
+                    (<span key={index}><input type="radio" name="receiver" key={index} value={player.id} onChange={() => receiver = player.id}/>{player.playersName}<br/></span>)
+                    :
+                    (<span key={index}></span>)
+                  }))
+              :
+              (playersOnTheSameTileExceptMe.map((player, index) => {
+                    return <span key={index}><input type="radio" name="receiver" key={index} value={this.state.players[player].id} onChange={() => receiver = this.state.players[player].id}/>{this.state.players[player].playersName}<br/></span>
+                  }))
+            }
+            <button className="actionButton" value="Give" onClick={() => this.doGiveACard(giverId, chosenCard, receiver)}>{this.state.players[giverId].role === "Messenger" ? "Send" : "Give" } </button>
+          </form>
+          </div>
+      )
+    } else {
+      // cklassic message  with one button
+
+      let showNextBtnStyle = (this.state.mainUserMessage.buttons.indexOf(0) >= 0)?({display: 'block'}):({display: 'none'});
+      let showCancelBtnStyle = (this.state.mainUserMessage.buttons.indexOf(1) >= 0)?({display: 'block'}):({display: 'none'});
+      let showPick2CardsBtnStyle01 = (this.state.mainUserMessage.buttons.indexOf(2) >= 0)?({display: 'block'}):({display: 'none'});
+      let showPick2CardsBtnStyle02 = (this.state.mainUserMessage.buttons.indexOf(3) >= 0)?({display: 'block'}):({display: 'none'});
+      let showFloodBtnStyle = (this.state.mainUserMessage.buttons.indexOf(4) >= 0)?({display: 'block'}):({display: 'none'});
+
+      return(
+          <div>
           {this.state.mainUserMessage.message}
-        <button style={showFloodBtnStyle} onClick ={() => this.controller("PlayerFlood")}>Flood !</button>
-        <button style={showPick2CardsBtnStyle} onClick ={() => this.controller("PickTwoCards")}>Pick two cards</button>
-        <button style={showNextBtnStyle} onClick ={() => this.controller("ActionIsDone")}>Next</button>
-        <button style={showCancelBtnStyle} onClick ={() => this.cancelAnAction()}>Cancel</button>
-      </div>
-    )
+          <button style={showNextBtnStyle} onClick ={() => this.controller("ActionIsDone")}>Next</button>
+          <button style={showCancelBtnStyle} onClick ={() => this.cancelAnAction()}>Cancel</button>
+          <button style={showPick2CardsBtnStyle01} onClick ={() => this.controller("PickTwoCardsONE")}>Pick two cards 1st</button>
+          <button style={showPick2CardsBtnStyle02} onClick ={() => this.controller("PickTwoCardsTWO")}>Pick two cards 2nd</button>
+          <button style={showFloodBtnStyle} onClick ={() => this.controller("PlayerFlood")}>Flood !</button>
+        </div>
+      )
+    }
+
   }
 
   lightTheTiles(t, color){
@@ -1303,9 +1416,9 @@ function riseTheIsland(){
     var tile23 = new Tile("swamp03", 0, false, false, "", "", [], "#bcf0d2", "", "");
     var tile24 = new Tile("swamp04", 0, false, false, "", "", [], "#bcf0d2", "", "");
     // create a 24 array
-    let tiles = new Array(tile01,tile02,tile03,tile04,tile05,tile06,tile07,tile08,tile09,tile10,
+    let tiles = [tile01,tile02,tile03,tile04,tile05,tile06,tile07,tile08,tile09,tile10,
       tile11,tile12,tile13,tile14,tile15,tile16,tile17,tile18,tile19,tile20,
-      tile21,tile22,tile23,tile24);
+      tile21,tile22,tile23,tile24];
     // shuffleIt
     tiles = shuffleArray(tiles);
     // foreach tile : make its index position
@@ -1360,9 +1473,9 @@ function generateFloodCardsLeap(){
 
 function generatePlayers(){
     // engineer hack on
-    // let roles = new Array(0,1,2,3,4,5);
+    // let roles = [0,1,2,3,4,5];
     // roles = shuffleArray(roles);
-    let roles = new Array(0,5,2,3,4,0);
+    let roles = [2,5,1,3,4,0];
     let players = [];
     for (let i = 0; i < 4; i++){
       let type = roles[i];

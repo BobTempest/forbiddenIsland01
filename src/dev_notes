@@ -3,7 +3,7 @@
 **** SHORT TERM *****
 
  - en dev mode : voir les leaps et discards
- - to do fly with
+ - control cards number players / flood
 
 *********************
 ***** LONG TERM *****
@@ -11,10 +11,28 @@
 - canvas and clickable ?
 - losange pic ? clickable losange pic ?
 
-
 *********************
 ******** BUGS *******
 
-- on init : if (this.state.hasPilotFlownThisTurn === false){ line 580 if Pilot is a player 0 I guess
 
-fly is broken
+
+*********************
+evacuate :
+list of char on the tile.
+Has anyone an H card ?
+  wanna play it ?
+
+Are there still people on the tile ?
+For each people :
+  where can he go ?
+    if where can he go is empty : DEATH. Game Over !
+  move.
+
+*********************
+  ***** A la fin des actions :
+  Solve 'Too Many Cards in Hand !'
+  -> Does he has an Action card ?
+    -> use it ?
+
+ throw a card
+    -> again ?
