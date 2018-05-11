@@ -973,7 +973,7 @@ handleTileClick(i) {
         }
 
         if (this.puppet === null) {
-          alert("CAN't FIND PUPPET !");
+          alert("CONCEPTUAL ERROR : CAN't FIND PUPPET !");
         }
 
         if (this.puppet.whereCanHeMove.indexOf(i) >= 0){
@@ -1234,14 +1234,23 @@ handleTileClick(i) {
   }
 
   renderPlayerMessagePanel() {
+    let foundTreasures = this.state.posessedTreasures.length;
+    let foundTreasuresNames = "";
+    if (foundTreasures > 0){
+      for (let i = 0; i < this.state.posessedTreasures; i++){
+        foundTreasuresNames = foundTreasuresNames + this.state.posessedTreasures[i].name;
+      }
+      foundTreasuresNames = "( " + foundTreasuresNames + ")";
+    }
+
     return (
       <span>
         <div className="messagePanel">
           <div className="panelTitle"> FORBIDDEN<br/>::ReactJS::<br/>ISLAND</div>
-          <div className="panelInfo"> Turn : {this.state.turn} </div>
+          <div className="panelInfo"> Turn : {this.state.turn} <span className="littlePanelInfo">TreasureFound : {foundTreasures}/4 {foundTreasuresNames}</span></div>
           <div className="panelInfo"> FloodLevel {this.state.floodMeter.level} <span className="littlePanelInfo"> ({this.state.floodMeter.floodFactor} cards per flood)</span></div>
           <div className="panelInfo"> {this.state.players[this.state.currentPlayerPlaying].playersName} the <span style={{color: this.state.players[this.state.currentPlayerPlaying].color}}>{this.state.players[this.state.currentPlayerPlaying].role}</span> is Playing. </div>
-          <div className="panelInfo"> Step : {playerSteps[this.state.currentStep].name} </div>
+          <div className="littlePanelInfo"> Step : {playerSteps[this.state.currentStep].name} </div>
           <div className="panelInfo" id="UserActions">
             <ul>
               {this.state.possibleActions.map((action) =>
