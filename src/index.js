@@ -396,16 +396,7 @@ class Board extends React.Component {
                       for (let k = 0; k < 24; k++){
                         if (k !=j && newTiles[k].templeFor === newTiles[j].templeFor){
                           if (newTiles[k].isDrawned){
-                            let treasureName = "Unknown Treasure";
-                            for (let l = 0; l < treasures.length; l++){
-                              if (treasures[l].id == newTiles[j].templeFor)// type mismatch
-                              {
-                                treasureName = treasures[l].name;
-                                break;
-                              }
-                            }
-
-                            alert("Oh my God ! all the temples for " + treasureName + " are drawned. You'll never get it. GAME OVER" );
+                            alert("Oh my God ! all the temples for " + this.getTreasureNameById(newTiles[j].templeFor) + " are drawned. You'll never get it. GAME OVER" );
                           }
                           break;
                         }
@@ -486,16 +477,7 @@ class Board extends React.Component {
                       for (let k = 0; k < 24; k++){
                         if (k !=j && newTiles[k].templeFor === newTiles[j].templeFor){
                           if (newTiles[k].isDrawned){
-                            let treasureName = "Unknown Treasure";
-                            for (let l = 0; l < treasures.length; l++){
-                              if (treasures[l].id == newTiles[j].templeFor)// type mismatch
-                              {
-                                treasureName = treasures[l].name;
-                                break;
-                              }
-                            }
-
-                            alert("Oh my God ! all the temples for " + treasureName + " are drawned. You'll never get it. GAME OVER" );
+                            alert("Oh my God ! all the temples for " + this.getTreasureNameById(newTiles[j].templeFor) + " are drawned. You'll never get it. GAME OVER" );
                           }
                           break;
                         }
@@ -1199,7 +1181,7 @@ handleTileClick(i) {
   }
 
   doGiveACard(giver, card, receiver){
-    // alert("GIVE A CARD : " + giver + " will give the " + card + " to " + receiver);
+    alert("GIVE A CARD : " + giver + " will give the " + card + " to " + receiver);
     if (card == null){
       alert("Please select a card to give.");
     } else if (receiver == null){
@@ -1222,8 +1204,8 @@ handleTileClick(i) {
       n_players[receiver].cards.push(this.givenCard);
 
       this.setState({whatIsExpectedNext: "" ,
-                    messageBoardState : "default",
-                    players : n_players});
+                    messageBoardState: "default",
+                    players: n_players});
       this.controller("ActionIsDone");
     }
   }
@@ -1278,14 +1260,14 @@ handleTileClick(i) {
         <br/>
         <div className="inBoardCards">
           {
-            this.state.players[i].cards.map((card) => {
+            this.state.players[i].cards.map((card, index) => {
               if (card){
                 return card.name === "helicopter" ?
-                  <span key={card.id} className="boardPlayerCards"><img src={card.url} width="45px" height="70px" onClick={() => this.handleActionClick("helicopterCard", this.state.players[i].id)} /></span>
+                  <span key={index} className="boardPlayerCards"><img src={card.url} width="45px" height="70px" onClick={() => this.handleActionClick("helicopterCard", this.state.players[i].id)} /></span>
                   : card.name === "sandBag" ?
-                      <span key={card.id} className="boardPlayerCards"><img src={card.url} width="45px" height="70px" onClick={() => this.handleActionClick("sandBagCard", this.state.players[i].id)}/></span>
+                      <span key={index} className="boardPlayerCards"><img src={card.url} width="45px" height="70px" onClick={() => this.handleActionClick("sandBagCard", this.state.players[i].id)}/></span>
                       :
-                      <span key={card.id} className="boardPlayerCards"><img src={card.url} width="45px" height="70px" /></span>
+                      <span key={index} className="boardPlayerCards"><img src={card.url} width="45px" height="70px" /></span>
               }
             })
           }
@@ -1299,7 +1281,7 @@ handleTileClick(i) {
     let foundTreasuresNames = "";
     if (foundTreasures > 0){
       for (let i = 0; i < this.state.posessedTreasures; i++){
-        foundTreasuresNames = foundTreasuresNames + this.state.posessedTreasures[i].name;
+        foundTreasuresNames = this.getTreasureNameById(this.state.posessedTreasures[i]);
       }
       foundTreasuresNames = "( " + foundTreasuresNames + ")";
     }
