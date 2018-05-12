@@ -53,10 +53,10 @@ const diagonalPaths = {0 : [4], 1 : [3], 2 : [6,8], 3 : [1,7,9], 4 : [0,8,10], 5
  const gameSteps = ["init", "startTurn", "playerActionOne", "playerActionTwo", "playerActionThree", "playerPickACard", "floodRise", "endTurn", "final"];
 
  const treasures = [
-     { id : 0 , name : "crystal" },
-     { id : 1 , name : "cup" },
-     { id : 2 , name : "sceptre"},
-     { id : 3 , name : "statue"}
+     { id : "CR" , name : "crystal" },
+     { id : "CU" , name : "cup" },
+     { id : "SC" , name : "sceptre"},
+     { id : "ST" , name : "statue"}
  ];
 
  const buttons = ["Next", "Cancel", "PickTwoCards 1st", "PickTwoCards 2nd", "Flood"];
@@ -389,12 +389,12 @@ class Board extends React.Component {
                   alert("The helipad is drawned. GAMEOVER")
                 }
 
-                if (newTiles[j].templeFor != ""){
+                if (newTiles[j].templeFor !== ""){
                     // it's a temple drawning
-                    if (this.state.posessedTreasures.indexOf(newTiles[j].templeFor)<0){
+                    if (this.state.posessedTreasures.indexOf(newTiles[j].templeFor) < 0){
                       // the treasure of this temple isn't discovered yet
                       for (let k = 0; k < 24; k++){
-                        if (k !=j && newTiles[k].templeFor === newTiles[j].templeFor){
+                        if (k != j && newTiles[k].templeFor === newTiles[j].templeFor){
                           if (newTiles[k].isDrawned){
                             alert("Oh my God ! all the temples for " + this.getTreasureNameById(newTiles[j].templeFor) + " are drawned. You'll never get it. GAME OVER" );
                           }
@@ -470,7 +470,7 @@ class Board extends React.Component {
                   alert("The helipad is drawned. GAMEOVER")
                 }
 
-                if (newTiles[j].templeFor != ""){
+                if (newTiles[j].templeFor !== ""){
                     // it's a temple drawning
                     if (this.state.posessedTreasures.indexOf(newTiles[j].templeFor)<0){
                       // the treasure of this temple isn't discovered yet
@@ -706,6 +706,9 @@ class Board extends React.Component {
     }
 
     // virer les cases isDrawned et origin
+    return this.removeDrawnedAndOriginTiles(moves, position);
+    /*
+
     let output = moves;
     if (moves.length > 0) {
       for (let k = 0; k < moves.length; k++)
@@ -718,6 +721,31 @@ class Board extends React.Component {
         }
       }
     }
+    return output;
+    */
+  }
+
+  removeDrawnedAndOriginTiles(moves, position){
+    // alert ("entering RD&O with " + moves + " from " + position);
+    let output = [];
+    if (moves.length > 0) {
+      for (let k = 0; k < moves.length; k++)
+      {
+          if (this.state.tiles[moves[k]].isDrawned || moves[k] === position)
+          {
+            moves[k] = -1;
+          }
+      }
+
+      for (let l = 0; l < moves.length; l++)
+      {
+          if (moves[l] != -1)
+          {
+            output.push(moves[l]);
+          }
+      }
+    }
+    // alert("leaving RD&O with + " + output);
     return output;
   }
 
@@ -731,6 +759,8 @@ class Board extends React.Component {
     }
 
     // virer les cases isDrawned et origin
+    return this.removeDrawnedAndOriginTiles(moves, position);
+        /*
     let output = moves;
     if (moves.length > 0) {
       for (let k = 0; k < moves.length; k++)
@@ -744,18 +774,24 @@ class Board extends React.Component {
       }
     }
     return output;
+    */
   }
 
   whereNavigatorCanMoveHim(position){
       let moves = [];
       let secondMoves = [];
       moves = orthogonalPaths[position];
+
       for (let i = 0 ; i < moves.length; i++){
-            secondMoves = secondMoves.concat(orthogonalPaths[moves[i]]);
+        if (!this.state.tiles[moves[i]].isDrawned){
+          secondMoves = secondMoves.concat(orthogonalPaths[moves[i]]);
+        }
       }
       moves = moves.concat(secondMoves);
 
       // virer les cases isDrawned et origin
+      return this.removeDrawnedAndOriginTiles(moves, position);
+      /*
       let output = moves;
       if (moves.length > 0) {
         for (let k = 0; k < moves.length; k++)
@@ -769,6 +805,7 @@ class Board extends React.Component {
         }
       }
       return output;
+      */
   }
 
   // returns an array of positions
@@ -888,7 +925,7 @@ class Board extends React.Component {
               }
       } else if (action === "GetATreasure") {
               let treasureId = this.state.tiles[this.state.players[id].position].templeFor;
-              if (treasureId < 0){
+              if (treasureId === ""){
                 alert("This tile is not a temple.");
                 this.showActionButtons();
               }
@@ -1181,7 +1218,8 @@ handleTileClick(i) {
   }
 
   doGiveACard(giver, card, receiver){
-    alert("GIVE A CARD : " + giver + " will give the " + card + " to " + receiver);
+    // alert("GIVE A CARD : " + giver + " will give the " + card + " to " + receiver);
+    console.log("PRE  Given : " + card + " to " + receiver);
     if (card == null){
       alert("Please select a card to give.");
     } else if (receiver == null){
@@ -1195,14 +1233,19 @@ handleTileClick(i) {
         if (n_players[giver].cards[i].id === card){
           this.givenCard = n_players[giver].cards[i];
           index = i;
+          break;
         }
-        break;
+      }
+
+      if (index == null){
+        alert("CONCEPTUAL ERROR: Couldn't found the card");
       }
       n_players[giver].cards.splice(index, 1);
 
       // give to
       n_players[receiver].cards.push(this.givenCard);
-
+      console.log("POST Given : " + this.givenCard.id + " to " + receiver);
+      // alert("GIVE A CARD : " + giver + " will give the " + card + " to " + receiver);
       this.setState({whatIsExpectedNext: "" ,
                     messageBoardState: "default",
                     players: n_players});
@@ -1280,7 +1323,7 @@ handleTileClick(i) {
     let foundTreasures = this.state.posessedTreasures.length;
     let foundTreasuresNames = "";
     if (foundTreasures > 0){
-      for (let i = 0; i < this.state.posessedTreasures; i++){
+      for (let i = 0; i < foundTreasures; i++){
         foundTreasuresNames = this.getTreasureNameById(this.state.posessedTreasures[i]);
       }
       foundTreasuresNames = "( " + foundTreasuresNames + ")";
@@ -1401,12 +1444,13 @@ handleTileClick(i) {
   }
 
   getTreasureNameById(id){
+    console.log("In getTreasureById with : " + id);
     for (let i = 0; i < treasures.length; i ++){
       if (treasures[i].id === id){
         return treasures[i].name;
       }
     }
-    return "Unknown Treasure";
+    return "** Unknown Treasure was " + id + "**";
   }
 
   unlightATile(i) {
@@ -1574,31 +1618,38 @@ class UserMessage {
   }
 }
 
+
+/*
+{ id : "CR" , name : "crystal" },
+{ id : "CU" , name : "cup" },
+{ id : "SC" , name : "sceptre"},
+{ id : "ST" , name : "statue"}
+*/
 function riseTheIsland(){
-    var tile01 = new Tile("helipad", 0, false, false, 5, -1, [], "#A9D0F5", "", "HELIPORT");
-    var tile02 = new Tile("doorBlack", 0, false, false, 3, -1, [], "#6E6E6E", "", "");
-    var tile03 = new Tile("doorRed", 0, false, false, 0, -1, [], "#F78181", "", "");
-    var tile04 = new Tile("doorGreen", 0, false, false, 4, -1, [], "#9FF781", "", "");
-    var tile05 = new Tile("doorWhite", 0, false, false, 2, -1, [], "#F2F2F2", "", "");
-    var tile06 = new Tile("doorYellow", 0, false, false, 1, -1, [], "#F2F5A9", "", "");
-    var tile07 = new Tile("temple0001", 0, false, false, "", 0, [], "#bdc3c7", "", "TEMPLE CRYSTAL");
-    var tile08 = new Tile("temple0002", 0, false, false, "", 0, [], "#bdc3c7", "", "TEMPLE CRYSTAL");
-    var tile09 = new Tile("temple0101", 0, false, false, "", 1, [], "#bdc3c7", "", "TEMPLE CUP");
-    var tile10 = new Tile("temple0102", 0, false, false, "", 1, [], "#bdc3c7", "", "TEMPLE CUP");
-    var tile11 = new Tile("temple0201", 0, false, false, "", 2, [], "#bdc3c7", "", "TEMPLE SCEPTRE");
-    var tile12 = new Tile("temple0202", 0, false, false, "", 2, [], "#bdc3c7", "", "TEMPLE SCEPTRE");
-    var tile13 = new Tile("temple0301", 0, false, false, "", 3, [], "#bdc3c7", "", "TEMPLE STATUE");
-    var tile14 = new Tile("temple0302", 0, false, false, "", 3, [], "#bdc3c7", "", "TEMPLE STATUE");
-    var tile15 = new Tile("coast01", 0, false, false, "", -1, [], "#825a2c", "", "");
-    var tile16 = new Tile("coast02", 0, false, false, "", -1, [], "#825a2c", "", "");
-    var tile17 = new Tile("coast03", 0, false, false, "", -1, [], "#825a2c", "", "");
-    var tile18 = new Tile("desert01", 0, false, false, "", -1, [], "#ffd480", "", "");
-    var tile19 = new Tile("desert02", 0, false, false, "", -1, [], "#ffd480", "", "");
-    var tile20 = new Tile("desert03", 0, false, false, "", -1, [], "#ffd480", "", "");
-    var tile21 = new Tile("swamp01", 0, false, false, "", -1, [], "#bcf0d2", "", "");
-    var tile22 = new Tile("swamp02", 0, false, false, "", -1, [], "#bcf0d2", "", "");
-    var tile23 = new Tile("swamp03", 0, false, false, "", -1, [], "#bcf0d2", "", "");
-    var tile24 = new Tile("swamp04", 0, false, false, "", -1, [], "#bcf0d2", "", "");
+    var tile01 = new Tile("helipad", 0, false, false, 5, "", [], "#A9D0F5", "", "HELIPORT");
+    var tile02 = new Tile("doorBlack", 0, false, false, 3, "", [], "#6E6E6E", "", "");
+    var tile03 = new Tile("doorRed", 0, false, false, 0, "", [], "#F78181", "", "");
+    var tile04 = new Tile("doorGreen", 0, false, false, 4, "", [], "#9FF781", "", "");
+    var tile05 = new Tile("doorWhite", 0, false, false, 2, "", [], "#F2F2F2", "", "");
+    var tile06 = new Tile("doorYellow", 0, false, false, 1, "", [], "#F2F5A9", "", "");
+    var tile07 = new Tile("temple0001", 0, false, false, "", "CR", [], "#bdc3c7", "", "TEMPLE CRYSTAL");
+    var tile08 = new Tile("temple0002", 0, false, false, "", "CR", [], "#bdc3c7", "", "TEMPLE CRYSTAL");
+    var tile09 = new Tile("temple0101", 0, false, false, "", "CU", [], "#bdc3c7", "", "TEMPLE CUP");
+    var tile10 = new Tile("temple0102", 0, false, false, "", "CU", [], "#bdc3c7", "", "TEMPLE CUP");
+    var tile11 = new Tile("temple0201", 0, false, false, "", "SC", [], "#bdc3c7", "", "TEMPLE SCEPTRE");
+    var tile12 = new Tile("temple0202", 0, false, false, "", "SC", [], "#bdc3c7", "", "TEMPLE SCEPTRE");
+    var tile13 = new Tile("temple0301", 0, false, false, "", "ST", [], "#bdc3c7", "", "TEMPLE STATUE");
+    var tile14 = new Tile("temple0302", 0, false, false, "", "ST", [], "#bdc3c7", "", "TEMPLE STATUE");
+    var tile15 = new Tile("coast01", 0, false, false, "", "", [], "#825a2c", "", "");
+    var tile16 = new Tile("coast02", 0, false, false, "", "", [], "#825a2c", "", "");
+    var tile17 = new Tile("coast03", 0, false, false, "", "", [], "#825a2c", "", "");
+    var tile18 = new Tile("desert01", 0, false, false, "", "", [], "#ffd480", "", "");
+    var tile19 = new Tile("desert02", 0, false, false, "", "", [], "#ffd480", "", "");
+    var tile20 = new Tile("desert03", 0, false, false, "", "", [], "#ffd480", "", "");
+    var tile21 = new Tile("swamp01", 0, false, false, "", "", [], "#bcf0d2", "", "");
+    var tile22 = new Tile("swamp02", 0, false, false, "", "", [], "#bcf0d2", "", "");
+    var tile23 = new Tile("swamp03", 0, false, false, "", "", [], "#bcf0d2", "", "");
+    var tile24 = new Tile("swamp04", 0, false, false, "", "", [], "#bcf0d2", "", "");
     // create a 24 array
     let tiles = [tile01,tile02,tile03,tile04,tile05,tile06,tile07,tile08,tile09,tile10,
       tile11,tile12,tile13,tile14,tile15,tile16,tile17,tile18,tile19,tile20,
@@ -1618,27 +1669,27 @@ function riseTheIsland(){
 function generatePlayerCardsLeap(){
     let cards = [];
     for (let i = 0; i < 5; i++){
-        let card = { id : i, name : "crystal", type : 0, url : "img/crystalCard.png"};
+        let card = { id : i, name : "crystal", type : "CR", url : "img/crystalCard.png"};
         cards.push(card);
     }
     for (let i = 0; i < 5; i++){
-        let card = { id : i + 5, name : "cup", type : 1, url : "img/cupCard.png"};
+        let card = { id : i + 5, name : "cup", type : "CU", url : "img/cupCard.png"};
         cards.push(card);
     }
     for (let i = 0; i < 5; i++){
-        let card = { id : i + 10, name : "sceptre", type : 2, url : "img/sceptreCard.png"};
+        let card = { id : i + 10, name : "sceptre", type : "SC", url : "img/sceptreCard.png"};
         cards.push(card);
     }
     for (let i = 0; i < 5; i++){
-        let card = {id : i + 15, name : "statue", type : 3, url : "img/statueCard.png"};
+        let card = {id : i + 15, name : "statue", type : "ST", url : "img/statueCard.png"};
         cards.push(card);
     }
     for (let i = 0; i < 3; i++){
-        let card = { id : i + 20, name : "helicopter", type : 4, url : "img/helicopterCard.png"};
+        let card = { id : i + 20, name : "helicopter", type : "H", url : "img/helicopterCard.png"};
         cards.push(card);
     }
     for (let i = 0; i < 2; i++){
-        let card = { id : i + 23, name : "sandBag", type : 5, url : "img/sandBagCard.png"};
+        let card = { id : i + 23, name : "sandBag", type : "SB", url : "img/sandBagCard.png"};
         cards.push(card);
     }
     for (let i = 0; i < 3; i++){
