@@ -469,86 +469,6 @@ class Board extends React.Component {
     return true;
   }
 
-  doFloodSomeTilesWithState(howMany, floodCardsLeapInput, floodCardsDiscardInput, floodCardsOutOfGameInput, tilesInput){
-    let newFloodCardsLeap = floodCardsLeapInput;
-    let newFloodCardsDiscard = floodCardsDiscardInput;
-    let newFloodCardsOutOfGame = floodCardsOutOfGameInput;
-    let newTiles = tilesInput;
-
-    let tempState = {};
-    tempState.floodCardsLeap = [];
-    tempState.tiles = [];
-    tempState.floodCardsDiscard = [];
-
-    for ( let i = 0; i < howMany; i++){
-        let tileHasDrawned = false;
-        // no more cards when flooding : reset the leap
-        if (newFloodCardsLeap.length < 1){
-          newFloodCardsLeap = shuffleArray(newFloodCardsDiscard);
-          newFloodCardsDiscard = [];
-        }
-
-        let card = newFloodCardsLeap.pop();
-
-        console.log('****** TILE To flood IS (with State) ' + card.name);
-        for (let j = 0; j < newTiles.length; j++){
-          if (newTiles[j].name === card.name){
-            if (newTiles[j].isImmersed){
-              // Let's DRAWN this tile
-              alert (newTiles[j].name + " at " + j + " is drawning !");
-                newTiles[j].isImmersed = false;
-                newTiles[j].isDrawned = true;
-                tileHasDrawned = true;
-                // rescue some players ?
-                if (newTiles[j].playerOn.length > 0){
-                    alert ("There is " + newTiles[j].playerOn.length + " explorer(s) on the drawning tile. Let's evacuate them.");
-                    // TODO evacuate explorers from drawning island
-                }
-                // Check if all Temples of an undiscovered Treasure are drawned. If yes : end game
-                if (newTiles[j].name === "helipad"){
-                  alert("The helipad is drawned. GAMEOVER")
-                }
-
-                if (newTiles[j].templeFor !== ""){
-                    // it's a temple drawning
-                    if (this.state.posessedTreasures.indexOf(newTiles[j].templeFor)<0){
-                      // the treasure of this temple isn't discovered yet
-                      for (let k = 0; k < 24; k++){
-                        if (k !=j && newTiles[k].templeFor === newTiles[j].templeFor){
-                          if (newTiles[k].isDrawned){
-                            alert("Oh my God ! all the temples for " + this.getTreasureNameById(newTiles[j].templeFor) + " are drawned. You'll never get it. GAME OVER" );
-                          }
-                          break;
-                        }
-                      }
-                    }
-                }
-            }
-            else if(newTiles[j].isDrawned){
-              alert (newTiles[j].name + " is already drawned. it shouldn't be in the Leap !");
-            }
-            else{
-                newTiles[j].isImmersed = true;
-            }
-
-            break;
-          }
-        }
-        if (!tileHasDrawned){
-            newFloodCardsDiscard.push(card);
-        } else {
-            newFloodCardsOutOfGame.push(card);
-        }
-    }
-
-    tempState.floodCardsLeap = newFloodCardsLeap;
-    tempState.floodCardsOutOfGame = newFloodCardsOutOfGame;
-    tempState.tiles = newTiles;
-    tempState.floodCardsDiscard = newFloodCardsDiscard;
-
-    return tempState;
-  }
-
   doPickOnePlayerCard(cardNumber, tempState){
       let newPlayerCardsDiscard = tempState.playerCardsDiscard;
       let newPlayerCardsLeap = tempState.playerCardsLeap;
@@ -557,7 +477,7 @@ class Board extends React.Component {
       let newFloodCardsDiscard = tempState.floodCardsDiscard;
       let newFloodCardsOutOfGame = tempState.floodCardsOutOfGame;
       let newFloodMeter = tempState.floodMeter;
-      let newTiles = tempState.tiles;
+      // let newTiles = tempState.tiles;
 
       let card = [];
       if (newPlayerCardsLeap.length < 1){
@@ -572,7 +492,6 @@ class Board extends React.Component {
         if (card.name === "floodRise"){
 
             // bring Discarded flood cards on the top of the flood Leap
-
             if (newFloodCardsDiscard.length > 0){
                 newFloodCardsDiscard = shuffleArray(newFloodCardsDiscard);
                 newFloodCardsLeap = newFloodCardsLeap.concat(newFloodCardsDiscard);
@@ -587,13 +506,6 @@ class Board extends React.Component {
             if (newFloodMeter.level >= newFloodMeter.topLevel){
               alert (" Top level reached. The Island is submerged. Game Over");
             }
-
-            // do the floodings
-            console.log("doFloodSomeTiles for " + newFloodMeter.floodFactor);
-            let ReturnFromFlood = this.doFloodSomeTilesWithState(newFloodMeter.floodFactor, newFloodCardsLeap, newFloodCardsDiscard, newFloodCardsOutOfGame, newTiles);
-            newFloodCardsLeap = ReturnFromFlood.floodCardsLeap;
-            newFloodCardsDiscard = ReturnFromFlood.floodCardsDiscard;
-            newTiles = ReturnFromFlood.tiles;
 
             // put the flood card in the discards
             newPlayerCardsDiscard.push(card);
@@ -627,7 +539,7 @@ class Board extends React.Component {
       tempState.floodCardsDiscard = newFloodCardsDiscard;
       tempState.floodCardsOutOfGame = newFloodCardsOutOfGame;
       tempState.floodMeter = newFloodMeter;
-      tempState.tiles = newTiles;
+      // tempState.tiles = newTiles;
 
       return tempState;
   }
