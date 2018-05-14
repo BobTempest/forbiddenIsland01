@@ -65,7 +65,7 @@ const diagonalPaths = {0 : [4], 1 : [3], 2 : [6,8], 3 : [1,7,9], 4 : [0,8,10], 5
      {id : 0, name : "action 1/3" },
      {id : 1, name : "action 2/3" },
      {id : 2, name : "action 3/3" },
-     {id : 3, name : "draw player cards 1st" },
+     {id : 3, name : "draw player cards" },
      {id : 4, name : "draw flood cards" }
  ];
 
@@ -247,11 +247,12 @@ class Board extends React.Component {
       cardFlyWith : []
     };
 
-    this.doFloodSomeTiles(6);
+    this.doFloodInitialTiles(6);
 
-    // Let's start
+    // Let's start ... waiting for the first action click
+
+
     function getInitialPlayerPosition(player, y, z){
-
       //start hack
       // tiles[14].playerOn.push(player.id);
 
@@ -364,6 +365,34 @@ class Board extends React.Component {
         this.setState({ mainUserMessage : newMessage});
       }
   }
+
+  doFloodInitialTiles(howMany){
+    let n_FloodCardsLeap = this.state.floodCardsLeap;
+    let n_Tiles = this.state.tiles;
+    let n_FloodCardsDiscard = this.state.floodCardsDiscard;
+
+    for ( let i = 0; i < howMany; i++){
+
+        let card = n_FloodCardsLeap.pop();
+
+        for (let j = 0; j < n_Tiles.length; j++){
+          if (n_Tiles[j].name === card.name){
+                n_Tiles[j].isImmersed = true;
+                break;
+            }
+        }
+
+        n_FloodCardsDiscard.push(card);
+    }
+
+    this.setState({
+      floodCardsLeap: n_FloodCardsLeap,
+      tiles: n_Tiles,
+      floodCardsDiscard: n_FloodCardsDiscard });
+
+    return true;
+  }
+
 
   doFloodSomeTiles(howMany){
     let newFloodCardsLeap = this.state.floodCardsLeap;
