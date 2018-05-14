@@ -417,6 +417,7 @@ class Board extends React.Component {
               alert (newTiles[j].name + " at " + j + " is drawning !");
                 newTiles[j].isImmersed = false;
                 newTiles[j].isDrawned = true;
+                this.graphicallyDrawnATile(j);
                 tileHasDrawned = true;
                 // rescue some players ?
                 if (newTiles[j].playerOn.length > 0){
@@ -1418,9 +1419,12 @@ handleTileClick(i) {
       } else {
         document.getElementById("square" + i).style.border = "1px solid #fff";
       }
-
     }
     return true;
+  }
+
+  graphicallyDrawnATile(i){
+    document.getElementById("square" + i).style.border = "1px solid #fff";
   }
 
   getTreasureNameById(id){
@@ -1598,13 +1602,6 @@ class UserMessage {
   }
 }
 
-
-/*
-{ id : "CR" , name : "crystal" },
-{ id : "CU" , name : "cup" },
-{ id : "SC" , name : "sceptre"},
-{ id : "ST" , name : "statue"}
-*/
 function riseTheIsland(){
     var tile01 = new Tile("helipad", 0, false, false, 5, "", [], "#A9D0F5", "", "HELIPORT");
     var tile02 = new Tile("doorBlack", 0, false, false, 3, "", [], "#6E6E6E", "", "");
