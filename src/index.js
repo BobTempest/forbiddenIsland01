@@ -241,6 +241,7 @@ class Board extends React.Component {
       expectedNextButSetAside : null,
       mainUserMessage : mainUserMessage,
       messageBoardState : "default",
+      messageBoardStateToRestoreOnceFinished : null,
       cardUser : null,
       cardFlyWith : []
     };
@@ -249,6 +250,10 @@ class Board extends React.Component {
 
     // Let's start
     function getInitialPlayerPosition(player, y, z){
+
+      //start hack
+      tiles[14].playerOn.push(player.id);
+      /*
         for (let i = 0; i < tiles.length; i++){
           if (tiles[i].startBase === player.type){
             player.position = tiles[i].position;
@@ -256,15 +261,17 @@ class Board extends React.Component {
             break;
           }
         }
+        */
     }
 
     function giveTwoInitialCards(player, y , z){
-      /* helicopter card hack is off
-        let card2 = { id : 19, name : "helicopter", type : 4, url : "img/helicopterCard.png"/*, klik : () => alert('Helico') };// works !
+       // helicopter card hack is on
+        let card = { id : 20, name : "helicopter", type : "H", url : "img/helicopterCard.png"};
+        let card2 = { id : 19, name : "helicopter", type : 4, url : "img/helicopterCard.png"};
         player.cards.push(card);
         player.cards.push(card2);
-        end of helicopter Hack */
-
+        //end of helicopter Hack
+/*
       for (let i = 0; i < 2; i++){
             let card = playerCardsLeap.pop();
             while (card.name === "floodRise"){
@@ -274,6 +281,7 @@ class Board extends React.Component {
             }
             player.cards.push(card);
       }
+      */
     }
   } // end of Board constructor
 
@@ -594,17 +602,33 @@ class Board extends React.Component {
   }
 
   clickedOnHelicopterCard(playerId) {
-    alert ( " Clicked on Helicopter. Where do you want to go number " + playerId + "?")
+    // alert ( " Clicked on Helicopter. Where do you want to go number " + playerId + "?")
     let expectedNextButSetAside = this.state.whatIsExpectedNext;
-    let tilesToLight = this.whereCanHeFly(this.state.players[playerId].position);
-    this.state.players[playerId].whereCanHeFly = tilesToLight;
-    let nada = this.lightTheTiles(tilesToLight, this.state.players[playerId].color);
-    let newMessage = new UserMessage("Now choose a landing destination", false, [1]);
-    this.setState({ whatIsExpectedNext: "TileButtonClickForFlyWithACard" , mainUserMessage: newMessage, expectedNextButSetAside : expectedNextButSetAside, cardUser : playerId });
+    let n_Message = new UserMessage("Now choose a landing destination", false, []);
+    let n_MessageBoardStateToRestoreOnceFinished = this.state.messageBoardState;
+    let n_messageBoardState = "FlyingWithAnHelicopterCard";
+    /*
+    expectedNextButSetAside : null,
+    mainUserMessage : mainUserMessage,
+    messageBoardState : "default",
+    */
+    this.setState({ whatIsExpectedNext: "TileButtonClickForFlyWithACard" ,
+                    mainUserMessage: n_Message,
+                    expectedNextButSetAside : expectedNextButSetAside,
+                    messageBoardState: n_messageBoardState,
+                    messageBoardStateToRestoreOnceFinished: n_MessageBoardStateToRestoreOnceFinished,
+                    cardUser : playerId });
     // TODO carry people ? if yes, who ?
 
     return null;
   }
+
+  helicopterCardEnRoute(playerId, travellers){
+    let tilesToLight = this.whereCanHeFly(this.state.players[playerId].position);
+    this.state.players[playerId].whereCanHeFly = tilesToLight;
+    let nada = this.lightTheTiles(tilesToLight, this.state.players[playerId].color);
+    // set state ????
+  };
 
   clickedOnSandBagCard(playerId) {
     // TODO if no tile to dry : alert and exit
@@ -727,27 +751,19 @@ class Board extends React.Component {
 
   removeDrawnedAndOriginTiles(moves, position){
     // alert ("entering RD&O with " + moves + " from " + position);
+    // console.log("entering RD&O with " + moves + " from " + position);
     let output = [];
     if (moves.length > 0) {
       for (let k = 0; k < moves.length; k++)
       {
-          if (this.state.tiles[moves[k]].isDrawned || moves[k] === position)
+          if (!this.state.tiles[moves[k]].isDrawned && moves[k] !== position)
           {
-            moves[k] = -1;
+            output.push(moves[k]);
           }
       }
-
-      for (let l = 0; l < moves.length; l++)
-      {
-          if (moves[l] != -1)
-          {
-            output.push(moves[l]);
-          }
-      }
-    }
-    // alert("leaving RD&O with + " + output);
-    return output;
   }
+  return output;
+}
 
   // returns an array of positions
   whereCanHeFly(position){
@@ -1266,6 +1282,18 @@ handleTileClick(i) {
     return playersOnTheSameTileExceptMe;
   }
 
+  getPlayersOnTheSameTileExceptMeById(id){
+    let playersOnTheSameTileExceptMe = [];
+    let currentpostion = this.state.players[id].position;
+
+    for (let i = 0 ; i < this.state.players.length; i++){
+      if (this.state.players[i].position === currentpostion && this.state.players[i].id !== id){
+        playersOnTheSameTileExceptMe.push(this.state.players[i].id);
+      }
+    }
+    return playersOnTheSameTileExceptMe;
+  }
+
   getPlayersOnATile(position){
     let playersOnTheTile = [];
 
@@ -1324,9 +1352,9 @@ handleTileClick(i) {
     let foundTreasuresNames = "";
     if (foundTreasures > 0){
       for (let i = 0; i < foundTreasures; i++){
-        foundTreasuresNames = this.getTreasureNameById(this.state.posessedTreasures[i]);
+        foundTreasuresNames = foundTreasuresNames + " " + this.getTreasureNameById(this.state.posessedTreasures[i]);
       }
-      foundTreasuresNames = "( " + foundTreasuresNames + ")";
+      foundTreasuresNames = "(" + foundTreasuresNames + ")";
     }
 
     return (
@@ -1336,7 +1364,7 @@ handleTileClick(i) {
           <div className="panelInfo"> Turn : {this.state.turn} <span className="littlePanelInfo">TreasureFound : {foundTreasures}/4 {foundTreasuresNames}</span></div>
           <div className="panelInfo"> FloodLevel {this.state.floodMeter.level} <span className="littlePanelInfo"> ({this.state.floodMeter.floodFactor} cards per flood)</span></div>
           <div className="panelInfo"> {this.state.players[this.state.currentPlayerPlaying].playersName} the <span style={{color: this.state.players[this.state.currentPlayerPlaying].color}}>{this.state.players[this.state.currentPlayerPlaying].role}</span> is Playing. </div>
-          <div className="littlePanelInfo"> Step : {playerSteps[this.state.currentStep].name} </div>
+          <br/><span className="littlePanelInfo"> Step : {playerSteps[this.state.currentStep].name} </span>
           <div className="panelInfo" id="UserActions">
             <ul>
               {this.state.possibleActions.map((action) =>
@@ -1366,7 +1394,7 @@ handleTileClick(i) {
             {
               this.state.players[giverId].cards.map((card, index) =>
               <span key={index}><input type="radio" name="chosenCard" key={index} value={card.id} onChange={() => chosenCard = card.id} />{card.name}<br/></span>
-            )
+              )
             }
             To whom do you want to give it ?<br/>
             {
@@ -1385,6 +1413,31 @@ handleTileClick(i) {
             <button className="actionButton" value="Give" onClick={() => this.doGiveACard(giverId, chosenCard, receiver)}>{this.state.players[giverId].role === "Messenger" ? "Send" : "Give" } </button>
           </div>
       )
+    } else if (this.state.messageBoardState === "FlyingWithAnHelicopterCard") {
+        let flyerId = this.state.cardUser;
+        let playersOnTheSameTileExceptMe = this.getPlayersOnTheSameTileExceptMeById(flyerId);
+        let travellers = [flyerId];
+          // if no one -> go to Choose a destination
+        return (
+          <div>
+            {
+                  playersOnTheSameTileExceptMe.length === 0 ?
+                     (<div> You're alone to fly. Choose a landing destination // helicopterCardEnRoute(flyerId, null)</div>)
+                    : playersOnTheSameTileExceptMe.length === 1 ?
+                       (<div> Do you want to take {this.state.players[playersOnTheSameTileExceptMe[0]].playersName} with you ? <br/> <button>yes</button><button>no</button></div>)
+                      :
+                        (<div> Select the guys you want to take with you ? <br/>
+                        {
+                          playersOnTheSameTileExceptMe.map((playerId, index) => {
+                             <span key={index}><input type="checkBox" name="traveller" key={index} value={playerId} onCheck={() => travellers.push(playerId)} onUnCheck={() => travellers.push(playerId)}/>{this.state.players[playerId].playersName}<br/></span>
+                          })
+                        }
+
+                        <button>Hop in ! [rotor noise]</button>
+                      </div>)
+            }
+          </div>
+        )
     } else if (this.state.messageBoardState === "moveSomeOneSequence") {
       let puppet = null;
           return (
@@ -1707,10 +1760,10 @@ function generateFloodCardsLeap(){
 }
 
 function generatePlayers(){
-    // navigator hack on
-    // let roles = [0,1,2,3,4,5];
-    // roles = shuffleArray(roles);
-    let roles = [1,5,2,3,4,0];
+    // navigator hack off
+    let roles = [0,1,2,3,4,5];
+    roles = shuffleArray(roles);
+    //let roles = [1,5,2,3,4,0];
     let players = [];
     for (let i = 0; i < 4; i++){
       let type = roles[i];
