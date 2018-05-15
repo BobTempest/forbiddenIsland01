@@ -2,6 +2,16 @@
 *********************
 **** NOW *****
 
+save Message as an object and restore it after ClickOnCard stuff
+discociate the floodings with a nicest messageBoard (flood x of Y)
+test the playing card ability
+
+-> do the Too many cards in Hand !
+-> do the People on drawning tile -> Rescue !
+-> do a graphic Flood-O-meter
+-> do a graphic treasures found so far
+
+
 Give fails sometimes -> Not Any more ????
 -> Check+Fix select/unselect on radioBoxes
 
@@ -9,7 +19,6 @@ Give fails sometimes -> Not Any more ????
 **** SHORT TERM *****
 
  - en dev mode : voir les leaps et discards
-
 
 *********************
 ***** LONG TERM *****

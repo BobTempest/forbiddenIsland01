@@ -289,7 +289,7 @@ class Board extends React.Component {
   } // end of Board constructor
 
 ///////////////////////////////////////////////////////////////////////////////////
-//        OUt Of Board constructor
+//        Out Of Board constructor
 ////////////////////////////////////////////////////////////////////////////////////
 
   controller(input){
@@ -550,19 +550,19 @@ class Board extends React.Component {
     let expectedNextButSetAside = this.state.whatIsExpectedNext;
     let n_Message = new UserMessage("Now choose a landing destination", false, []);
     let n_MessageBoardStateToRestoreOnceFinished = this.state.messageBoardState;
-    let n_messageBoardState = "ChooseCoTravellers";
 
+    // displays the board of co travellers choice
     this.setState({ whatIsExpectedNext: "ResolveLeftPaneThing" ,
                     mainUserMessage: n_Message,
                     expectedNextButSetAside : expectedNextButSetAside,
-                    messageBoardState: n_messageBoardState,
+                    messageBoardState: "ChooseCoTravellers",
                     messageBoardStateToRestoreOnceFinished: n_MessageBoardStateToRestoreOnceFinished,
                     cardUser : playerId });
-
     return null;
   }
 
   helicopterCardEnRoute(playerId, travellers){
+    // displays the possible destinations
     let tilesToLight = this.whereCanHeFly(this.state.players[playerId].position);
     this.state.players[playerId].whereCanHeFly = tilesToLight;
     let nada = this.lightTheTiles(tilesToLight, this.state.players[playerId].color);
@@ -575,12 +575,12 @@ class Board extends React.Component {
 
   clickedOnSandBagCard(playerId) {
     // TODO if no tile to dry : alert and exit
-    alert ( " Clicked on SandBag. Which tile do you want to dry ? player number " + playerId + "?")
+    // alert ( " Clicked on SandBag. Which tile do you want to dry ? player number " + playerId + "?")
     let expectedNextButSetAside = this.state.whatIsExpectedNext;
     let tilesToLight = this.getImmersedTiles();
     this.state.players[playerId].whereCanHeDry = tilesToLight;
     let nada = this.lightTheTiles(tilesToLight, this.state.players[playerId].color);
-    let newMessage = new UserMessage("Now choose a tile to dry", false, [1]);
+    let newMessage = new UserMessage("Now choose any tile to dry", false, []);
     this.setState({ whatIsExpectedNext: "TileButtonClickForDryWithACard" , mainUserMessage: newMessage, expectedNextButSetAside : expectedNextButSetAside, cardUser : playerId });
     return null;
   }
@@ -773,7 +773,7 @@ class Board extends React.Component {
     return cases;
   }
 
- handleActionClick(action, param1) {
+ handleActionClick(action) {
     this.hideActionButtons();
     console.log("clicked on " + action);
     if (this.state.whatIsExpectedNext === "CharacterActionButtonClick") {
@@ -899,15 +899,10 @@ class Board extends React.Component {
       } else if (action === "DoNothing"){
               let newMessage = new UserMessage("Doing nothing ZZZZZZZ ", false, [0]);
               this.setState({ mainUserMessage: newMessage});
-      }else if (action === "SkipTurn"){
+      } else if (action === "SkipTurn"){
              let newMessage = new UserMessage("Skip turn ", false, [0]);
              this.setState({ mainUserMessage: newMessage,
                               currentStep: 4});
-      } else if (action === "helicopterCard") { // from player !
-          // TODO : mettre ca dans un handleCardClick
-            this.clickedOnHelicopterCard(param1) // param1 = id here is player
-      } else if (action === "sandBagCard") { // from player !
-            this.clickedOnSandBagCard(param1) // param1 = id here is player
       }
     }
     else{
@@ -916,10 +911,25 @@ class Board extends React.Component {
     return null;
 }
 
+handleCardClick(card, playerId, toThrowIt){
+  if (this.state.whatIsExpectedNext !== "TileButtonClickForMove")
+  {
+    this.hideActionButtons();
+    if (card === "helicopterCard" && toThrowIt === false) {
+          this.clickedOnHelicopterCard(playerId)
+    } else if (card === "sandBagCard" && toThrowIt === false) {
+          this.clickedOnSandBagCard(playerId)
+    }
+  } else {
+    alert("Please finish your action first.");
+  }
+
+
+}
+
 handleTileClick(i) {
 
     this.showActionButtons();
-
     if (this.state.whatIsExpectedNext === "TileButtonClickForMove") {
         let player = this.state.players[this.state.currentPlayerPlaying];
         if (player.whereCanHeMove.indexOf(i) >= 0){
@@ -1037,11 +1047,13 @@ handleTileClick(i) {
             let returnPack = this.moveAGroupOfPlayers(player.id, this.state.coTravellers, i, n_Players, this.state.tiles);
             //
             this.setState({ whatIsExpectedNext: expectedNextButSetAside,
+                            messageBoardState: this.state.messageBoardStateToRestoreOnceFinished,
                             cardUser: -1,
                             coTravellers: [],
                             players: returnPack.players,
                             tiles: returnPack.tiles,
                             playerCardsDiscard: n_PlayerCardsDiscard,
+                            messageBoardStateToRestoreOnceFinished: null,
                             expectedNextButSetAside: null });
             let nada = this.unlightTheTiles();
         } else {
@@ -1069,9 +1081,11 @@ handleTileClick(i) {
           // Dry
           this.dryATile(i);
           this.setState({ whatIsExpectedNext: expectedNextButSetAside,
+                          messageBoardState: this.state.messageBoardStateToRestoreOnceFinished,
                           cardUser: -1,
                           players: NewPlayers,
                           playerCardsDiscard: NewPlayerCardsDiscard,
+                          messageBoardStateToRestoreOnceFinished: null,
                           expectedNextButSetAside: null });
           let nada = this.unlightTheTiles();
         }
@@ -1254,9 +1268,9 @@ handleTileClick(i) {
             this.state.players[i].cards.map((card, index) => {
               if (card){
                 return card.name === "helicopter" ?
-                  <span key={index} className="boardPlayerCards"><img src={card.url} width="45px" height="70px" onClick={() => this.handleActionClick("helicopterCard", this.state.players[i].id)} /></span>
+                  <span key={index} className="boardPlayerCards"><img src={card.url} width="45px" height="70px" onClick={() => this.handleCardClick("helicopterCard", this.state.players[i].id, false)} /></span>
                   : card.name === "sandBag" ?
-                      <span key={index} className="boardPlayerCards"><img src={card.url} width="45px" height="70px" onClick={() => this.handleActionClick("sandBagCard", this.state.players[i].id)}/></span>
+                      <span key={index} className="boardPlayerCards"><img src={card.url} width="45px" height="70px" onClick={() => this.handleCardClick("sandBagCard", this.state.players[i].id, false)}/></span>
                       :
                       <span key={index} className="boardPlayerCards"><img src={card.url} width="45px" height="70px" /></span>
               }
