@@ -1170,7 +1170,7 @@ handleTileClick(i) {
       }
 
       if (index == null){
-        alert("CONCEPTUAL ERROR: Couldn't found the card");
+        alert("CONCEPTUAL ERROR: Couldn't find the card");
       }
       n_players[giver].cards.splice(index, 1);
 
@@ -1185,19 +1185,23 @@ handleTileClick(i) {
     }
   }
 
-  getPlayersOnTheSameTileExceptMe(){
+  getPlayersOnTheSameTileExceptMe(id){
     let playersOnTheSameTileExceptMe = [];
-    let currentlyPlaying = this.state.currentPlayerPlaying;
-    let currentpostion = this.state.players[currentlyPlaying].position;
+    if (id === null || id === undefined){
+      id = this.state.currentPlayerPlaying;
+    }
+    // let id = this.state.currentPlayerPlaying;
+    let currentpostion = this.state.players[id].position;
 
     for (let i = 0 ; i < this.state.players.length; i++){
-      if (this.state.players[i].position === currentpostion && this.state.players[i].id !== currentlyPlaying){
+      if (this.state.players[i].position === currentpostion && this.state.players[i].id !== id){
         playersOnTheSameTileExceptMe.push(this.state.players[i].id);
       }
     }
     return playersOnTheSameTileExceptMe;
   }
 
+/*
   getPlayersOnTheSameTileExceptMeById(id){
     let playersOnTheSameTileExceptMe = [];
     let currentpostion = this.state.players[id].position;
@@ -1209,7 +1213,7 @@ handleTileClick(i) {
     }
     return playersOnTheSameTileExceptMe;
   }
-
+*/
   getPlayersOnATile(position){
     let playersOnTheTile = [];
 
@@ -1345,7 +1349,7 @@ handleTileClick(i) {
       )
     } else if (this.state.messageBoardState === "ChooseCoTravellers") {
         let flyerId = this.state.cardUser;
-        let playersOnTheSameTileExceptMe = this.getPlayersOnTheSameTileExceptMeById(flyerId);
+        let playersOnTheSameTileExceptMe = this.getPlayersOnTheSameTileExceptMe(flyerId);
         let travellers = [flyerId];
 
         function Amadeus(id, element){
