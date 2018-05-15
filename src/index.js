@@ -1135,6 +1135,7 @@ handleTileClick(i) {
     this.showActionButtons();
     this.setState({
       whatIsExpectedNext: "CharacterActionButtonClick" ,
+      messageBoardState: "default",
       mainUserMessage : newMessage});
   }
 
@@ -1278,8 +1279,8 @@ handleTileClick(i) {
           <div className="panelTitle"> FORBIDDEN<br/>::ReactJS::<br/>ISLAND</div>
           <div className="panelInfo"> Turn : {this.state.turn} <span className="littlePanelInfo">TreasureFound : {foundTreasures}/4 {foundTreasuresNames}</span></div>
           <div className="panelInfo"> FloodLevel {this.state.floodMeter.level} <span className="littlePanelInfo"> ({this.state.floodMeter.floodFactor} cards per flood)</span></div>
-          <div className="panelInfo"> {this.state.players[this.state.currentPlayerPlaying].playersName} the <span style={{color: this.state.players[this.state.currentPlayerPlaying].color}}>{this.state.players[this.state.currentPlayerPlaying].role}</span> is Playing. </div>
-          <br/><span className="littlePanelInfo"> Step : {playerSteps[this.state.currentStep].name} </span>
+          <div className="panelInfo"> {this.state.players[this.state.currentPlayerPlaying].playersName} the <span style={{color: this.state.players[this.state.currentPlayerPlaying].color}}>{this.state.players[this.state.currentPlayerPlaying].role}</span> is Playing.
+          <span className="littlePanelInfo"> {playerSteps[this.state.currentStep].name} </span></div>
           <div className="panelInfo" id="UserActions">
             <ul>
               {this.state.possibleActions.map((action) =>
@@ -1301,31 +1302,45 @@ handleTileClick(i) {
       let playersOnTheSameTileExceptMe = this.getPlayersOnTheSameTileExceptMe();
       console.log('playersOnTheSameTileExceptMe = ' + playersOnTheSameTileExceptMe);// seems Ok
       let chosenCard = null;
-      let receiver = null;
+      let receiver = playersOnTheSameTileExceptMe.length === 1 ? playersOnTheSameTileExceptMe[0] : null;
 
       return (
           <div>
-            Which card do you want to give ?<br/>
+            Which card do you want to give { playersOnTheSameTileExceptMe.length === 1 ?
+                (<span>to { this.state.players[playersOnTheSameTileExceptMe[0]].playersName} </span> )
+                : <span></span> }
+            ? <br/>
             {
               this.state.players[giverId].cards.map((card, index) =>
               <span key={index}><input type="radio" name="chosenCard" key={index} value={card.id} onChange={() => chosenCard = card.id} />{card.name}<br/></span>
               )
             }
-            To whom do you want to give it ?<br/>
+            {
+              playersOnTheSameTileExceptMe.length > 1 || this.state.players[giverId].role === "Messenger" ?
+              <span>To whom do you want to give it ?<br/></span>
+              :
+              <span></span>
+            }
             {
               this.state.players[giverId].role === "Messenger" ?
-                (this.state.players.map((player, index) => {
+
+                 this.state.players.map((player, index) => {
                   return (player.id != giverId) ?
                     (<span key={index}><input type="radio" name="receiver" key={index} value={player.id} onChange={() => receiver = player.id}/>{player.playersName}<br/></span>)
                     :
                     (<span key={index}></span>)
-                  }))
+                  })
               :
-              (playersOnTheSameTileExceptMe.map((player, index) => {
+              (playersOnTheSameTileExceptMe.length > 1 ?
+                playersOnTheSameTileExceptMe.map((player, index) => {
                     return <span key={index}><input type="radio" name="receiver" key={index} value={this.state.players[player].id} onChange={() => receiver = this.state.players[player].id}/>{this.state.players[player].playersName}<br/></span>
-                  }))
+                  })
+                :
+                <span></span>
+              )
             }
-            <button className="actionButton" value="Give" onClick={() => this.doGiveACard(giverId, chosenCard, receiver)}>{this.state.players[giverId].role === "Messenger" ? "Send" : "Give" } </button>
+            <button className="actionButton" value="Give" onClick={() => this.doGiveACard(giverId, chosenCard, receiver)}>{this.state.players[giverId].role === "Messenger" ? "Send" : "Give" } </button><br/>
+            <button className="actionButton" value="Cancel" onClick={() => this.cancelAnAction()}>Cancel</button>
           </div>
       )
     } else if (this.state.messageBoardState === "ChooseCoTravellers") {
