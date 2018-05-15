@@ -238,10 +238,11 @@ class Board extends React.Component {
       possibleActions : possibleActions,
       currentStep : 0,
       whatIsExpectedNext : "CharacterActionButtonClick",
-      expectedNextButSetAside : null,
+      whatIsExpectedNext_toRestore : null,
       mainUserMessage : mainUserMessage,
+      mainUserMessage_toRestore: null,
       messageBoardState : "default",
-      messageBoardStateToRestoreOnceFinished : null,
+      messageBoardState_toRestore : null,
       cardUser : null,
       coTravellers : null,
       cardFlyWith : []
@@ -389,7 +390,6 @@ class Board extends React.Component {
       floodCardsLeap: n_FloodCardsLeap,
       tiles: n_Tiles,
       floodCardsDiscard: n_FloodCardsDiscard });
-
     return true;
   }
 
@@ -547,16 +547,17 @@ class Board extends React.Component {
 
   clickedOnHelicopterCard(playerId) {
     // alert ( " Clicked on Helicopter. Where do you want to go number " + playerId + "?")
-    let expectedNextButSetAside = this.state.whatIsExpectedNext;
+    let whatIsExpectedNext_toRestore = this.state.whatIsExpectedNext;
     let n_Message = new UserMessage("Now choose a landing destination", false, []);
-    let n_MessageBoardStateToRestoreOnceFinished = this.state.messageBoardState;
+    let n_messageBoardState_toRestore = this.state.messageBoardState;
 
     // displays the board of co travellers choice
     this.setState({ whatIsExpectedNext: "ResolveLeftPaneThing" ,
                     mainUserMessage: n_Message,
-                    expectedNextButSetAside : expectedNextButSetAside,
+                    mainUserMessage_toRestore: this.state.mainUserMessage,
+                    whatIsExpectedNext_toRestore : whatIsExpectedNext_toRestore,
                     messageBoardState: "ChooseCoTravellers",
-                    messageBoardStateToRestoreOnceFinished: n_MessageBoardStateToRestoreOnceFinished,
+                    messageBoardState_toRestore: n_messageBoardState_toRestore,
                     cardUser : playerId });
     return null;
   }
@@ -576,12 +577,18 @@ class Board extends React.Component {
   clickedOnSandBagCard(playerId) {
     // TODO if no tile to dry : alert and exit
     // alert ( " Clicked on SandBag. Which tile do you want to dry ? player number " + playerId + "?")
-    let expectedNextButSetAside = this.state.whatIsExpectedNext;
+    ;
     let tilesToLight = this.getImmersedTiles();
     this.state.players[playerId].whereCanHeDry = tilesToLight;
     let nada = this.lightTheTiles(tilesToLight, this.state.players[playerId].color);
     let newMessage = new UserMessage("Now choose any tile to dry", false, []);
-    this.setState({ whatIsExpectedNext: "TileButtonClickForDryWithACard" , mainUserMessage: newMessage, expectedNextButSetAside : expectedNextButSetAside, cardUser : playerId });
+    this.setState({ whatIsExpectedNext_toRestore : this.state.whatIsExpectedNext,
+                    whatIsExpectedNext: "TileButtonClickForDryWithACard" ,
+                    mainUserMessage_toRestore: this.state.mainUserMessage,
+                    mainUserMessage: newMessage,
+                    messageBoardState_toRestore: this.state.messageBoardState,
+                    messageBoardState: "empty",
+                    cardUser : playerId });
     return null;
   }
 
@@ -867,21 +874,19 @@ class Board extends React.Component {
                       let n_players = this.state.players;
                       let n_posessedTreasures = this.state.posessedTreasures;
                       // drop 4 cards
-                      let newCards = [];
-                      let ejected4Cards = [];
+                      let cardsLeftInHand = [];
                       let count = 0;
                       for (let j = 0; j < this.state.players[id].cards.length; j++){
                         if (this.state.players[id].cards[j].type === treasureId && count < 4){
                             n_playerCardsDiscard.push(this.state.players[id].cards[j]);
                             count = count + 1;
                         } else {
-                            newCards.push(this.state.players[id].cards[j]);
+                            cardsLeftInHand.push(this.state.players[id].cards[j]);
                         }
                       }
 
-                      if (newCards.length > 0){
-                          n_players[id].cards = newCards;
-                      }
+                      n_players[id].cards = cardsLeftInHand;
+
                       //update posessedTreasures
                       n_posessedTreasures.push(treasureId);
 
@@ -1029,7 +1034,7 @@ handleTileClick(i) {
         let player = this.state.players[this.state.cardUser];
         let n_Players = this.state.players;
         let n_PlayerCardsDiscard = this.state.playerCardsDiscard;
-        let expectedNextButSetAside = this.state.expectedNextButSetAside;
+        let whatIsExpectedNext_toRestore = this.state.whatIsExpectedNext_toRestore;
 
         if (player.whereCanHeFly.indexOf(i) >= 0){
             // index of the card to remove
@@ -1046,15 +1051,16 @@ handleTileClick(i) {
             // Move
             let returnPack = this.moveAGroupOfPlayers(player.id, this.state.coTravellers, i, n_Players, this.state.tiles);
             //
-            this.setState({ whatIsExpectedNext: expectedNextButSetAside,
-                            messageBoardState: this.state.messageBoardStateToRestoreOnceFinished,
+            this.setState({ whatIsExpectedNext: this.state.whatIsExpectedNext_toRestore,
+                            messageBoardState: this.state.messageBoardState_toRestore,
+                            mainUserMessage: this.state.mainUserMessage_toRestore,
                             cardUser: -1,
                             coTravellers: [],
                             players: returnPack.players,
                             tiles: returnPack.tiles,
                             playerCardsDiscard: n_PlayerCardsDiscard,
-                            messageBoardStateToRestoreOnceFinished: null,
-                            expectedNextButSetAside: null });
+                            messageBoardState_toRestore: null,
+                            whatIsExpectedNext_toRestore: null });
             let nada = this.unlightTheTiles();
         } else {
           alert("He can't fly there with his card");
@@ -1064,7 +1070,7 @@ handleTileClick(i) {
         let player = this.state.players[this.state.cardUser];
         let NewPlayers = this.state.players;
         let NewPlayerCardsDiscard = this.state.playerCardsDiscard;
-        let expectedNextButSetAside = this.state.expectedNextButSetAside;
+        let whatIsExpectedNext_toRestore = this.state.whatIsExpectedNext_toRestore;
 
         if (player.whereCanHeDry.indexOf(i) >= 0){
           // index of the card to remove from the player's hand
@@ -1080,13 +1086,15 @@ handleTileClick(i) {
           NewPlayers[player.id] = player;
           // Dry
           this.dryATile(i);
-          this.setState({ whatIsExpectedNext: expectedNextButSetAside,
-                          messageBoardState: this.state.messageBoardStateToRestoreOnceFinished,
+          this.setState({ whatIsExpectedNext: this.state.whatIsExpectedNext_toRestore,
+                          messageBoardState: this.state.messageBoardState_toRestore,
+                          mainUserMessage: this.state.mainUserMessage_toRestore,
                           cardUser: -1,
                           players: NewPlayers,
                           playerCardsDiscard: NewPlayerCardsDiscard,
-                          messageBoardStateToRestoreOnceFinished: null,
-                          expectedNextButSetAside: null });
+                          messageBoardState_toRestore: null,
+                          whatIsExpectedNext_toRestore: null,
+                          mainUserMessage_toRestore: null });
           let nada = this.unlightTheTiles();
         }
         else {
