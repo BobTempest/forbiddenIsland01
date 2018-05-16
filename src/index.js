@@ -130,6 +130,15 @@ const diagonalPaths = {0 : [4], 1 : [3], 2 : [6,8], 3 : [1,7,9], 4 : [0,8,10], 5
  { name : "desert01" }, { name : "desert02" }, { name : "desert03" }, { name : "coast01" }, { name : "coast02" },
  { name : "coast03" }, { name : "swamp01" }, { name : "swamp02" }, { name : "swamp03" }, { name : "swamp04" }];
 
+ class UserMessage {
+   constructor(message, isImportant, buttons, databag) {
+     this.message = message;
+     this.isImportant = isImportant;
+     this.buttons = buttons;
+     this.databag = databag;
+   }
+ }
+
 function DrawSquare(props) {
   let squareStyle; // sets the backGround
   let squareClass; // sets the Class
@@ -293,7 +302,7 @@ class Board extends React.Component {
 //        Out Of Board constructor
 ////////////////////////////////////////////////////////////////////////////////////
 
-  controller(input){
+  controller(input, data){
       console.log("InController turn :" + this.state.currentStep);
       this.checkCardState();
       this.showActionButtons();
@@ -304,6 +313,7 @@ class Board extends React.Component {
           let newMessage = new UserMessage("Let's' draw some Player Cards", false, [2]);
           this.setState({ currentStep : nextStep, possibleActions : [], mainUserMessage : newMessage});
         } else if (nextStep === 4){
+          // TODO Check if too muchCardsInHand
           // flood some tiles.
           this.setState({ currentStep : nextStep });
           let howMuch = this.state.floodMeter.floodFactor;
@@ -344,26 +354,25 @@ class Board extends React.Component {
             possibleActions : psblactn,
             whatIsExpectedNext : "CharacterActionButtonClick" ,
             mainUserMessage : newMessage});
+          // TODO Check if too muchCardsInHand for any one
         }
       }
       // user has to pick two cards from the leap
       else if (input === "PickTwoCardsONE"){
-          // let cards = this.doPickTwoPlayerCards();
           let tempState = this.state;
           tempState = this.doPickOnePlayerCard(1, tempState);
           this.setState(tempState);
-          // alert ("Rhaaaa");
+          // TODO : Check if not Too many Cards in Hand
       } else if (input === "PickTwoCardsTWO"){
-          // let cards = this.doPickTwoPlayerCards();
           let tempState = this.state;
           tempState = this.doPickOnePlayerCard(2, tempState);
           this.setState(tempState);
-          // alert ("Rhaaaa");
+          // TODO : Check if not Too many Cards in Hand
       }
       else if (input === "PlayerFlood"){
-        this.doFloodSomeTiles(this.state.floodMeter.howManyCards(this.state.floodMeter.level));
-        let newMessage = new UserMessage("Brrrrr Sprouitch " , false, [0]);
-        this.setState({ mainUserMessage : newMessage});
+        this.doFloodATile(1, this.state.floodMeter.howManyCards(this.state.floodMeter.level));
+        // let newMessage = new UserMessage("Brrrrr Sprouitch " , false, [0]);
+        // this.setState({ mainUserMessage : newMessage});
       }
   }
 
@@ -393,10 +402,104 @@ class Board extends React.Component {
     return true;
   }
 
+  doFloodATile(number, outOf){
+    let n_Tiles = this.state.tiles;
+    let n_FloodCardsLeap = this.state.floodCardsLeap;
+    let n_FloodCardsDiscard = this.state.floodCardsDiscard;
+    let n_FloodCardsOutOfGame = this.state.floodCardsOutOfGame;
 
+    let message = "<div>immersion " + number + " out of " + outOf + ".<br/>";
+
+    let tileHasDrawned = false;
+    if (n_FloodCardsLeap.length < 1){
+      n_FloodCardsLeap = shuffleArray(n_FloodCardsDiscard);
+      n_FloodCardsDiscard = [];
+    }
+
+    let card = n_FloodCardsLeap.pop();
+
+    for (let j = 0; j < n_Tiles.length; j++){
+      if (n_Tiles[j].name === card.name){
+        console.log('****** TILE To flood IS ' + n_Tiles[j].name);
+        if (n_Tiles[j].isImmersed){
+          // Let's DRAWN this tile
+          alert (n_Tiles[j].name + " at " + j + " is drawning !");
+            message = message + n_Tiles[j].name + " at " + j + " is drawning ! ";
+            n_Tiles[j].isImmersed = false;
+            n_Tiles[j].isDrawned = true;
+            this.graphicallyDrawnATile(j);
+            tileHasDrawned = true;
+            // rescue some players ?
+            if (n_Tiles[j].playerOn.length > 0){
+                message = message + "<br/> There are " + n_Tiles[j].playerOn.length + " explorer(s) on it. Let's evacuate them.";
+                alert ("There is " + n_Tiles[j].playerOn.length + " explorer(s) on the drawning tile. Let's evacuate them.");
+                // TODO evacuate explorers from drawning island
+            }
+            // Check if all Temples of an undiscovered Treasure are drawned. If yes : end game
+            if (n_Tiles[j].name === "helipad"){
+              message = message + "<br/> Explorers can't leave the Island any more ! Game Over !";
+              alert("The helipad is drawned. GAMEOVER")
+            }
+
+            if (n_Tiles[j].templeFor !== ""){
+                // it's a temple drawning
+                if (this.state.posessedTreasures.indexOf(n_Tiles[j].templeFor) < 0){
+                  // the treasure of this temple isn't discovered yet
+                  for (let k = 0; k < 24; k++){
+                    if (k != j && n_Tiles[k].templeFor === n_Tiles[j].templeFor){
+                      if (n_Tiles[k].isDrawned){
+                        message = message + "<br/>Oh my God ! all the temples for " + this.getTreasureNameById(n_Tiles[j].templeFor) + " are drawned. You'll never get it. GAME OVER";
+                        alert("Oh my God ! all the temples for " + this.getTreasureNameById(n_Tiles[j].templeFor) + " are drawned. You'll never get it. GAME OVER" );
+                      }
+                      break;
+                    }
+                  }
+                }
+            }
+        }
+        else if(n_Tiles[j].isDrawned){
+          alert ("CONCEPTUAL ERROR : " + n_Tiles[j].name + " is already drawned. it shouldn't be in the Leap !");
+        }
+        else{
+            message = message + n_Tiles[j].name + " at " + j + " is flooded ! ";
+            n_Tiles[j].isImmersed = true;
+        }
+
+        break;
+      }
+    }
+    if (!tileHasDrawned){
+        n_FloodCardsDiscard.push(card);
+    } else {
+        n_FloodCardsOutOfGame.push(card);
+    }
+
+    let n_userMessage = null;
+    if (number === outOf){
+      // floodings are finished
+      message = message + "<br/> Floodings are over.... for now.</div>";
+      n_userMessage = new UserMessage(message , false, [0]);
+    }
+    else{
+      // next flooding
+      let databag = {nextFloodingNumber: number + 1, outOf: outOf};
+      message = message + "</div>";
+      n_userMessage = new UserMessage(message , false, [5], databag);
+    }
+
+    this.setState({
+      mainUserMessage: n_userMessage,
+      floodCardsLeap: n_FloodCardsLeap,
+      floodCardsOutOfGame: n_FloodCardsOutOfGame,
+      floodCardsDiscard: n_FloodCardsDiscard,
+      tiles: n_Tiles });
+  }
+
+/*
   doFloodSomeTiles(howMany){
-    let newFloodCardsLeap = this.state.floodCardsLeap;
+
     let newTiles = this.state.tiles;
+    let newFloodCardsLeap = this.state.floodCardsLeap;
     let newFloodCardsDiscard = this.state.floodCardsDiscard;
     let newFloodCardsOutOfGame = this.state.floodCardsOutOfGame;
 
@@ -469,6 +572,7 @@ class Board extends React.Component {
 
     return true;
   }
+*/
 
   doPickOnePlayerCard(cardNumber, tempState){
       let newPlayerCardsDiscard = tempState.playerCardsDiscard;
@@ -527,9 +631,9 @@ class Board extends React.Component {
 
       let newMessage = "";
       if (cardNumber == 1){
-            newMessage = new UserMessage("Oh ! Look at this first card : " + card.name + ".", false, [3]);
+            newMessage = new UserMessage('First card : ' + card.name + '. <br/><img src='  + card.url + ' width="30px" height="46px"/>', false, [3]);
       }else{
-            newMessage = new UserMessage("Oh ! Look at this second card : " + card.name + ".", false, [0]);
+            newMessage = new UserMessage('Second card : ' + card.name + '. <br/><img src=' + card.url  + ' width="30px" height="46px"/>', false, [0]);
       }
 
       tempState.mainUserMessage = newMessage;
@@ -933,7 +1037,6 @@ handleCardClick(card, playerId, toThrowIt){
 }
 
 handleTileClick(i) {
-
     this.showActionButtons();
     if (this.state.whatIsExpectedNext === "TileButtonClickForMove") {
         let player = this.state.players[this.state.currentPlayerPlaying];
@@ -1166,7 +1269,7 @@ handleTileClick(i) {
     this.state.players[puppet].whereCanHeMove = whereCanHeMove;
     let n_players = this.state.players;
     n_players[puppet].isPuppet = true;
-    let nada = this.lightTheTiles(whereCanHeMove, this.state.players[puppet].color);
+    this.lightTheTiles(whereCanHeMove, this.state.players[puppet].color);
     let newMessage = new UserMessage("Now choose a destination", false, []); // TODO : SET a cancel
     this.setState({ whatIsExpectedNext: "TileButtonClickForMoveSomeone" , mainUserMessage: newMessage, messageBoardState : "default", players : n_players });
   }
@@ -1425,25 +1528,29 @@ handleTileClick(i) {
           <div>empty</div>
     } else {
       // classic message  with one button
+      let buttons = this.state.mainUserMessage.buttons;
+      let databag = this.state.mainUserMessage.databag;
 
-      let showNextBtnStyle = (this.state.mainUserMessage.buttons.indexOf(0) >= 0)?({display: 'block'}):({display: 'none'});
-      let showCancelBtnStyle = (this.state.mainUserMessage.buttons.indexOf(1) >= 0)?({display: 'block'}):({display: 'none'});
-      let showPick2CardsBtnStyle01 = (this.state.mainUserMessage.buttons.indexOf(2) >= 0)?({display: 'block'}):({display: 'none'});
-      let showPick2CardsBtnStyle02 = (this.state.mainUserMessage.buttons.indexOf(3) >= 0)?({display: 'block'}):({display: 'none'});
-      let showFloodBtnStyle = (this.state.mainUserMessage.buttons.indexOf(4) >= 0)?({display: 'block'}):({display: 'none'});
+      let showNextBtnStyle = (buttons.indexOf(0) >= 0)?({display: 'block'}):({display: 'none'});
+      let showCancelBtnStyle = (buttons.indexOf(1) >= 0)?({display: 'block'}):({display: 'none'});
+      let showPick2CardsBtnStyle01 = (buttons.indexOf(2) >= 0)?({display: 'block'}):({display: 'none'});
+      let showPick2CardsBtnStyle02 = (buttons.indexOf(3) >= 0)?({display: 'block'}):({display: 'none'});
+      let showFloodBtnStyle = (buttons.indexOf(4) >= 0)?({display: 'block'}):({display: 'none'});
+      let showNextFloodingBtnStyle = (buttons.indexOf(5) >= 0)?({display: 'block'}):({display: 'none'});
 
       return(
           <div>
-          {this.state.mainUserMessage.message}
+          <span dangerouslySetInnerHTML={{__html: this.state.mainUserMessage.message}} />
+
           <button style={showNextBtnStyle} onClick ={() => this.controller("ActionIsDone")}>Next</button>
           <button style={showCancelBtnStyle} onClick ={() => this.cancelAnAction()}>Cancel</button>
           <button style={showPick2CardsBtnStyle01} onClick ={() => this.controller("PickTwoCardsONE")}>Pick two cards 1st</button>
           <button style={showPick2CardsBtnStyle02} onClick ={() => this.controller("PickTwoCardsTWO")}>Pick two cards 2nd</button>
           <button style={showFloodBtnStyle} onClick ={() => this.controller("PlayerFlood")}>Flood !</button>
+          <button style={showNextFloodingBtnStyle} onClick ={() => this.doFloodATile(databag.nextFloodingNumber, databag.outOf)}>Next Flooding.. Hold your breath</button>
         </div>
       )
     }
-
   }
 
   lightTheTiles(t, color){
@@ -1456,7 +1563,7 @@ handleTileClick(i) {
   unlightTheTiles() {
     for (let i = 0; i < 24; i++){
       if (this.state.tiles[i].isDrawned === false){
-        document.getElementById("square" + i).style.border = "1px solid #222"; //"1px solid #222"
+        document.getElementById("square" + i).style.border = "1px solid #222";
       } else {
         document.getElementById("square" + i).style.border = "1px solid #fff";
       }
@@ -1479,7 +1586,7 @@ handleTileClick(i) {
   }
 
   unlightATile(i) {
-      document.getElementById("square" + i).style.border = "1px solid #222"; //"1px solid #222"
+      document.getElementById("square" + i).style.border = "1px solid #222";
   }
 
   hideActionButtons() {
@@ -1635,14 +1742,6 @@ class FloodMeter {
   }
 }
 
-class UserMessage {
-  constructor(message, isImportant, buttons) {
-    this.message = message;
-    this.isImportant = isImportant;
-    this.buttons = buttons;
-  }
-}
-
 function riseTheIsland(){
     var tile01 = new Tile("helipad", 0, false, false, 5, "", [], "#A9D0F5", "", "HELIPORT");
     var tile02 = new Tile("doorBlack", 0, false, false, 3, "", [], "#6E6E6E", "", "");
@@ -1711,7 +1810,7 @@ function generatePlayerCardsLeap(){
         cards.push(card);
     }
     for (let i = 0; i < 3; i++){
-        let card = { id : i + 25, name : "floodRise", type : 5, url : "img/floodRiseCard.png"};
+        let card = { id : i + 25, name : "floodRise", type : 5, url : "img/floodRise.png"};
         cards.push(card);
     }
     cards = shuffleArray(cards);
