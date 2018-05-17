@@ -176,9 +176,9 @@ function DrawSquare(props) {
   );
 }
 
-function DrawEmptySquare() {
+function DrawEmptySquare(props) {
   return (
-    <button className="emptySquare"></button>
+    <button className="emptySquare" onClick={props.onClick}></button>
   );
 }
 
@@ -495,84 +495,11 @@ class Board extends React.Component {
       tiles: n_Tiles });
   }
 
-/*
-  doFloodSomeTiles(howMany){
-
-    let newTiles = this.state.tiles;
-    let newFloodCardsLeap = this.state.floodCardsLeap;
-    let newFloodCardsDiscard = this.state.floodCardsDiscard;
-    let newFloodCardsOutOfGame = this.state.floodCardsOutOfGame;
-
-    for ( let i = 0; i < howMany; i++){
-        let tileHasDrawned = false;
-        if (newFloodCardsLeap.length < 1){
-          newFloodCardsLeap = shuffleArray(newFloodCardsDiscard);
-          newFloodCardsDiscard = [];
-        }
-
-        let card = newFloodCardsLeap.pop();
-
-        for (let j = 0; j < newTiles.length; j++){
-          if (newTiles[j].name === card.name){
-            console.log('****** TILE To flood IS ' + newTiles[j].name);
-            if (newTiles[j].isImmersed){
-              // Let's DRAWN this tile
-              alert (newTiles[j].name + " at " + j + " is drawning !");
-                newTiles[j].isImmersed = false;
-                newTiles[j].isDrawned = true;
-                this.graphicallyDrawnATile(j);
-                tileHasDrawned = true;
-                // rescue some players ?
-                if (newTiles[j].playerOn.length > 0){
-                    alert ("There is " + newTiles[j].playerOn.length + " explorer(s) on the drawning tile. Let's evacuate them.");
-                    // TODO evacuate explorers from drawning island
-                }
-                // Check if all Temples of an undiscovered Treasure are drawned. If yes : end game
-                if (newTiles[j].name === "helipad"){
-                  alert("The helipad is drawned. GAMEOVER")
-                }
-
-                if (newTiles[j].templeFor !== ""){
-                    // it's a temple drawning
-                    if (this.state.posessedTreasures.indexOf(newTiles[j].templeFor) < 0){
-                      // the treasure of this temple isn't discovered yet
-                      for (let k = 0; k < 24; k++){
-                        if (k != j && newTiles[k].templeFor === newTiles[j].templeFor){
-                          if (newTiles[k].isDrawned){
-                            alert("Oh my God ! all the temples for " + this.getTreasureNameById(newTiles[j].templeFor) + " are drawned. You'll never get it. GAME OVER" );
-                          }
-                          break;
-                        }
-                      }
-                    }
-                }
-            }
-            else if(newTiles[j].isDrawned){
-              alert (newTiles[j].name + " is already drawned. it shouldn't be in the Leap !");
-            }
-            else{
-                newTiles[j].isImmersed = true;
-            }
-
-            break;
-          }
-        }
-        if (!tileHasDrawned){
-            newFloodCardsDiscard.push(card);
-        } else {
-            newFloodCardsOutOfGame.push(card);
-        }
-    }
-
-    this.setState({
-      floodCardsLeap: newFloodCardsLeap,
-      floodCardsOutOfGame: newFloodCardsOutOfGame,
-      tiles: newTiles,
-      floodCardsDiscard: newFloodCardsDiscard });
-
-    return true;
+  doMoveCursor(){
+    let newValue = document.getElementById('floodOmeterCursor').left;
+    alert("Clicked. New value is : " + newValue);
+    document.getElementById("floodOmeterCursor").left = newValue + "px";
   }
-*/
 
   doPickOnePlayerCard(cardNumber, tempState){
       let newPlayerCardsDiscard = tempState.playerCardsDiscard;
@@ -582,7 +509,6 @@ class Board extends React.Component {
       let newFloodCardsDiscard = tempState.floodCardsDiscard;
       let newFloodCardsOutOfGame = tempState.floodCardsOutOfGame;
       let newFloodMeter = tempState.floodMeter;
-      // let newTiles = tempState.tiles;
 
       let card = [];
       if (newPlayerCardsLeap.length < 1){
@@ -606,6 +532,10 @@ class Board extends React.Component {
             // upgrade the Flood Level
             newFloodMeter.level = newFloodMeter.level + 1;
             newFloodMeter.floodFactor = newFloodMeter.howManyCards(newFloodMeter.level);
+
+            // move the cursor
+            // let newValue = document.getElementById("floodOmeterCursor").left.value + 33;
+            // document.getElementById("floodOmeterCursor").left = newValue;
 
             alert("Flood Riiiiise ! New Flood level is " + newFloodMeter.level + "(pick " +  newFloodMeter.floodFactor + " at each flood)");
             if (newFloodMeter.level >= newFloodMeter.topLevel){
@@ -1360,7 +1290,7 @@ handleTileClick(i) {
 
   renderEmptySquare() {
     return (
-      <DrawEmptySquare/>
+      <DrawEmptySquare onClick={() => this.doMoveCursor()}/>
     );
   }
 
@@ -1602,64 +1532,72 @@ handleTileClick(i) {
     return (
 
       <div>
-        <div className="playerBoard-column">
+        <div className="messageBoard-column">
           {this.renderPlayerMessagePanel()}
         </div>
         <div className="board-column">
-          <div className="board-row">
-            {this.renderEmptySquare()}
-            {this.renderEmptySquare()}
-            {this.renderSquare(0)}
-            {this.renderSquare(1)}
-            {this.renderEmptySquare()}
-            {this.renderEmptySquare()}
+          <div className="islandBoard">
+            <div className="board-row">
+              {this.renderEmptySquare()}
+              {this.renderEmptySquare()}
+              {this.renderSquare(0)}
+              {this.renderSquare(1)}
+              {this.renderEmptySquare()}
+              {this.renderEmptySquare()}
+            </div>
+            <div className="board-row">
+              {this.renderEmptySquare()}
+              {this.renderSquare(2)}
+              {this.renderSquare(3)}
+              {this.renderSquare(4)}
+              {this.renderSquare(5)}
+              {this.renderEmptySquare()}
+            </div>
+            <div className="board-row">
+              {this.renderSquare(6)}
+              {this.renderSquare(7)}
+              {this.renderSquare(8)}
+              {this.renderSquare(9)}
+              {this.renderSquare(10)}
+              {this.renderSquare(11)}
+            </div>
+            <div className="board-row">
+              {this.renderSquare(12)}
+              {this.renderSquare(13)}
+              {this.renderSquare(14)}
+              {this.renderSquare(15)}
+              {this.renderSquare(16)}
+              {this.renderSquare(17)}
+            </div>
+            <div className="board-row">
+              {this.renderEmptySquare()}
+              {this.renderSquare(18)}
+              {this.renderSquare(19)}
+              {this.renderSquare(20)}
+              {this.renderSquare(21)}
+              {this.renderEmptySquare()}
+            </div>
+            <div className="board-row">
+              {this.renderEmptySquare()}
+              {this.renderEmptySquare()}
+              {this.renderSquare(22)}
+              {this.renderSquare(23)}
+              {this.renderEmptySquare()}
+              {this.renderEmptySquare()}
+            </div>
           </div>
-          <div className="board-row">
-            {this.renderEmptySquare()}
-            {this.renderSquare(2)}
-            {this.renderSquare(3)}
-            {this.renderSquare(4)}
-            {this.renderSquare(5)}
-            {this.renderEmptySquare()}
-          </div>
-          <div className="board-row">
-            {this.renderSquare(6)}
-            {this.renderSquare(7)}
-            {this.renderSquare(8)}
-            {this.renderSquare(9)}
-            {this.renderSquare(10)}
-            {this.renderSquare(11)}
-          </div>
-          <div className="board-row">
-            {this.renderSquare(12)}
-            {this.renderSquare(13)}
-            {this.renderSquare(14)}
-            {this.renderSquare(15)}
-            {this.renderSquare(16)}
-            {this.renderSquare(17)}
-          </div>
-          <div className="board-row">
-            {this.renderEmptySquare()}
-            {this.renderSquare(18)}
-            {this.renderSquare(19)}
-            {this.renderSquare(20)}
-            {this.renderSquare(21)}
-            {this.renderEmptySquare()}
-          </div>
-          <div className="board-row">
-            {this.renderEmptySquare()}
-            {this.renderEmptySquare()}
-            {this.renderSquare(22)}
-            {this.renderSquare(23)}
-            {this.renderEmptySquare()}
-            {this.renderEmptySquare()}
+          <div className="floodOmeter">
+              <img src="img/FloodOmeter.png"/>
+              <span className="floodOmeterCursor" id="floodOmeterCursor"><img src="img/FloodOmeterCursor.png"/></span>
           </div>
         </div>
         <div className="playerBoard-column">
-          {this.renderPlayerBoard(0)}
-          {this.renderPlayerBoard(1)}
-          {this.renderPlayerBoard(2)}
-          {this.renderPlayerBoard(3)}
+          <div>
+            {this.renderPlayerBoard(0)}
+            {this.renderPlayerBoard(1)}
+            {this.renderPlayerBoard(2)}
+            {this.renderPlayerBoard(3)}
+          </div>
         </div>
       </div>
     );

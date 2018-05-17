@@ -128,8 +128,8 @@ list-style:none;
 }
 
 .emptySquare {
-  background: #fff;
-  border: 1px solid #fff;
+  background: #fff0;
+  border: 1px solid #fff0;
   float: left;
   margin-right: 4px;
   margin-top: 2px;
@@ -141,14 +141,38 @@ list-style:none;
   width: 50px;
 }
 
-.playerBoard-column {
+.messageBoard-column {
     float: left;
     width: 330px;
+}
+
+.playerBoard-column {
+  float:left;
+  width: 330px;
 }
 
 .board-column {
     float: left;
     margin-left: 10px;
+    width: 350px;
+}
+
+.islandBoard {
+  background-image: url("img/sea.jpg");
+  float: left;
+  margin-left: 10px;
+}
+
+.floodOmeterCursor {
+  position: relative;
+  z-index:10;
+  top:-70px;
+  left: 5px;
+}
+
+.floodOmeter {
+    float: left;
+    height: 500px;
 }
 
 .messagePanel {

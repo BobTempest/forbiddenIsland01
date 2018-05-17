@@ -2,13 +2,12 @@
 *********************
 **** NOW *****
 
--save Message as an object and restore it after ClickOnCard stuff
--discociate the floodings with a nicest messageBoard (flood x of Y)
+
 -test the playing card ability
 
 -> do the Too many cards in Hand !
 -> do the People on drawning tile -> Rescue !
--> do a graphic Flood-O-meter
+-> do a graphic Flood-O-meter move the cursor by -33 px to the right
 -> do a graphic treasures found so far
 
 
