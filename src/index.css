@@ -129,7 +129,7 @@ list-style:none;
 
 .emptySquare {
   background: #fff0;
-  border: 1px solid #fff0;
+  border: 1px solid rgba(0,0,0,0);
   float: left;
   margin-right: 4px;
   margin-top: 2px;
@@ -158,16 +158,18 @@ list-style:none;
 }
 
 .islandBoard {
-  background-image: url("img/sea.jpg");
+  background-image: url("img/sea04.png");
   float: left;
   margin-left: 10px;
 }
 
 .floodOmeterCursor {
+  /*
   position: relative;
-  z-index:10;
   top:-70px;
   left: 5px;
+  */
+  z-index:10;
 }
 
 .floodOmeter {

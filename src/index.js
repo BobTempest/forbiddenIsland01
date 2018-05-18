@@ -94,7 +94,7 @@ const diagonalPaths = {0 : [4], 1 : [3], 2 : [6,8], 3 : [1,7,9], 4 : [0,8,10], 5
       {id : 2, name : "Give", text: "Give a card on a character on the same tile", enabled : true, triggers : "Give" }, //has a player on his tile ?
       {id : 3, name : "Get a Treasure !", text: "Get the treasure in this temple.", enabled : true, triggers : "GetATreasure"  }, // has 4 cards and is on the right temple
       {id : 4, name : "Nothing", text: "Simply do nothing.", enabled : true, triggers : "DoNothing"  }, // -
-      {id : 5, name : "Skip Turn", text: "Skip the player'sTurn.", enabled : true, triggers : "SkipTurn"  } // -
+      /* {id : 5, name : "Skip Turn", text: "Skip the player'sTurn.", enabled : true, triggers : "SkipTurn"  } // -*/
  ];
 
  const playerSpecialActions = [
@@ -147,7 +147,7 @@ function DrawSquare(props) {
   if (props.tile.isImmersed){
       squareStyle = ({background: '#01A9DB' });
   }else if (props.tile.isDrawned) {
-      squareStyle = ({background: '#FFF' });
+      squareStyle = ({background: '#FFF0' });
   }else if (props.tile.imgpath.length > 0 && props.tile.name === "helipad") {
       squareStyle = ({background: 'url(' + props.tile.imgpath + ')' });
   } else {
@@ -178,7 +178,7 @@ function DrawSquare(props) {
 
 function DrawEmptySquare(props) {
   return (
-    <button className="emptySquare" onClick={props.onClick}></button>
+    <button className="emptySquare" /* for testing purposes onClick={props.onClick}*/></button>
   );
 }
 
@@ -407,6 +407,7 @@ class Board extends React.Component {
     let n_FloodCardsLeap = this.state.floodCardsLeap;
     let n_FloodCardsDiscard = this.state.floodCardsDiscard;
     let n_FloodCardsOutOfGame = this.state.floodCardsOutOfGame;
+    let floodedTileId = "";
 
     let message = "<div>immersion " + number + " out of " + outOf + ".<br/>";
 
@@ -421,6 +422,7 @@ class Board extends React.Component {
     for (let j = 0; j < n_Tiles.length; j++){
       if (n_Tiles[j].name === card.name){
         console.log('****** TILE To flood IS ' + n_Tiles[j].name);
+        floodedTileId = j;
         if (n_Tiles[j].isImmersed){
           // Let's DRAWN this tile
           alert (n_Tiles[j].name + " at " + j + " is drawning !");
@@ -493,12 +495,17 @@ class Board extends React.Component {
       floodCardsOutOfGame: n_FloodCardsOutOfGame,
       floodCardsDiscard: n_FloodCardsDiscard,
       tiles: n_Tiles });
+
+      // make it blink
+      // alert(floodedTileId);
+      // document.getElementById('square' + floodedTileId).style.blink;
+      //  ne marche pas
   }
 
-  doMoveCursor(){
-    let newValue = document.getElementById('floodOmeterCursor').left;
-    alert("Clicked. New value is : " + newValue);
-    document.getElementById("floodOmeterCursor").left = newValue + "px";
+  doMoveFloodOmeterCursor(){
+    let newValue = document.getElementById('floodOmeterCursor').style.left;
+    newValue = parseInt(newValue.slice(0, newValue.indexOf('px'))) + 33;
+    document.getElementById("floodOmeterCursor").style.left = newValue + "px";
   }
 
   doPickOnePlayerCard(cardNumber, tempState){
@@ -533,11 +540,9 @@ class Board extends React.Component {
             newFloodMeter.level = newFloodMeter.level + 1;
             newFloodMeter.floodFactor = newFloodMeter.howManyCards(newFloodMeter.level);
 
-            // move the cursor
-            // let newValue = document.getElementById("floodOmeterCursor").left.value + 33;
-            // document.getElementById("floodOmeterCursor").left = newValue;
+            this.doMoveFloodOmeterCursor();
 
-            alert("Flood Riiiiise ! New Flood level is " + newFloodMeter.level + "(pick " +  newFloodMeter.floodFactor + " at each flood)");
+            // alert("Flood Riiiiise ! New Flood level is " + newFloodMeter.level + "(pick " +  newFloodMeter.floodFactor + " at each flood)");
             if (newFloodMeter.level >= newFloodMeter.topLevel){
               alert (" Top level reached. The Island is submerged. Game Over");
             }
@@ -580,18 +585,17 @@ class Board extends React.Component {
   }
 
   clickedOnHelicopterCard(playerId) {
-    // alert ( " Clicked on Helicopter. Where do you want to go number " + playerId + "?")
     let whatIsExpectedNext_toRestore = this.state.whatIsExpectedNext;
-    let n_Message = new UserMessage("Now choose a landing destination", false, []);
+    let n_Message = new UserMessage("Now choose a landing destination", false, [7]);
     let n_messageBoardState_toRestore = this.state.messageBoardState;
 
     // displays the board of co travellers choice
-    this.setState({ whatIsExpectedNext: "ResolveLeftPaneThing" ,
-                    mainUserMessage: n_Message,
+    this.setState({ whatIsExpectedNext_toRestore : whatIsExpectedNext_toRestore,
+                    whatIsExpectedNext: "ResolveLeftPaneThing" ,
                     mainUserMessage_toRestore: this.state.mainUserMessage,
-                    whatIsExpectedNext_toRestore : whatIsExpectedNext_toRestore,
-                    messageBoardState: "ChooseCoTravellers",
+                    mainUserMessage: n_Message,
                     messageBoardState_toRestore: n_messageBoardState_toRestore,
+                    messageBoardState: "ChooseCoTravellers",
                     cardUser : playerId });
     return null;
   }
@@ -608,22 +612,48 @@ class Board extends React.Component {
                     messageBoardState: n_messageBoardState });
   };
 
+  cancelHelicopterCardPick(){
+    this.unlightTheTiles();
+    this.showActionButtons();
+    this.setState({ whatIsExpectedNext: this.state.whatIsExpectedNext_toRestore,
+                    whatIsExpectedNext_toRestore : null,
+                    mainUserMessage: this.state.mainUserMessage_toRestore,
+                    mainUserMessage_toRestore: null,
+                    messageBoardState: this.state.messageBoardState_toRestore,
+                    messageBoardState_toRestore: null,
+                    cardUser : null,
+                    coTravellers : null });
+  }
+
   clickedOnSandBagCard(playerId) {
-    // TODO if no tile to dry : alert and exit
-    // alert ( " Clicked on SandBag. Which tile do you want to dry ? player number " + playerId + "?")
-    ;
     let tilesToLight = this.getImmersedTiles();
+    if (tilesToLight.length === 0){
+      alert("No tile to dry. Keep your Sandbag.");
+      return null;
+    }
+
     this.state.players[playerId].whereCanHeDry = tilesToLight;
-    let nada = this.lightTheTiles(tilesToLight, this.state.players[playerId].color);
-    let newMessage = new UserMessage("Now choose any tile to dry", false, []);
+    this.lightTheTiles(tilesToLight, this.state.players[playerId].color);
+    let newMessage = new UserMessage("Now choose any tile to dry", false, [6]);
     this.setState({ whatIsExpectedNext_toRestore : this.state.whatIsExpectedNext,
                     whatIsExpectedNext: "TileButtonClickForDryWithACard" ,
                     mainUserMessage_toRestore: this.state.mainUserMessage,
                     mainUserMessage: newMessage,
                     messageBoardState_toRestore: this.state.messageBoardState,
-                    messageBoardState: "empty",
                     cardUser : playerId });
     return null;
+  }
+
+  cancelSandBagCardPick(){
+    this.unlightTheTiles();
+    this.showActionButtons();
+    this.setState({ whatIsExpectedNext: this.state.whatIsExpectedNext_toRestore,
+                    whatIsExpectedNext_toRestore : null,
+                    mainUserMessage: this.state.mainUserMessage_toRestore,
+                    mainUserMessage_toRestore: null,
+                    messageBoardState: this.state.messageBoardState_toRestore,
+                    messageBoardState_toRestore: null,
+                    cardUser : null });
   }
 
   checkCardState(){
@@ -962,8 +992,6 @@ handleCardClick(card, playerId, toThrowIt){
   } else {
     alert("Please finish your action first.");
   }
-
-
 }
 
 handleTileClick(i) {
@@ -1290,7 +1318,7 @@ handleTileClick(i) {
 
   renderEmptySquare() {
     return (
-      <DrawEmptySquare onClick={() => this.doMoveCursor()}/>
+      <DrawEmptySquare /* for testing purposes onClick={() => this.doMoveCursor()} *//>
     );
   }
 
@@ -1337,7 +1365,7 @@ handleTileClick(i) {
         <div className="messagePanel">
           <div className="panelTitle"> FORBIDDEN<br/>::ReactJS::<br/>ISLAND</div>
           <div className="panelInfo"> Turn : {this.state.turn} <span className="littlePanelInfo">TreasureFound : {foundTreasures}/4 {foundTreasuresNames}</span></div>
-          <div className="panelInfo"> FloodLevel {this.state.floodMeter.level} <span className="littlePanelInfo"> ({this.state.floodMeter.floodFactor} cards per flood)</span></div>
+          <div className="littlePanelInfo"> FloodLevel {this.state.floodMeter.level} ({this.state.floodMeter.floodFactor} cards per flood)</div>
           <div className="panelInfo"> {this.state.players[this.state.currentPlayerPlaying].playersName} the <span style={{color: this.state.players[this.state.currentPlayerPlaying].color}}>{this.state.players[this.state.currentPlayerPlaying].role}</span> is Playing.
           <span className="littlePanelInfo"> {playerSteps[this.state.currentStep].name} </span></div>
           <div className="panelInfo" id="UserActions">
@@ -1467,6 +1495,8 @@ handleTileClick(i) {
       let showPick2CardsBtnStyle02 = (buttons.indexOf(3) >= 0)?({display: 'block'}):({display: 'none'});
       let showFloodBtnStyle = (buttons.indexOf(4) >= 0)?({display: 'block'}):({display: 'none'});
       let showNextFloodingBtnStyle = (buttons.indexOf(5) >= 0)?({display: 'block'}):({display: 'none'});
+      let showCancelSandBagCardStyle = (buttons.indexOf(6) >= 0)?({display: 'block'}):({display: 'none'});
+      let showCancelHelicopterCardStyle = (buttons.indexOf(7) >= 0)?({display: 'block'}):({display: 'none'});
 
       return(
           <div>
@@ -1478,6 +1508,8 @@ handleTileClick(i) {
           <button style={showPick2CardsBtnStyle02} onClick ={() => this.controller("PickTwoCardsTWO")}>Pick two cards 2nd</button>
           <button style={showFloodBtnStyle} onClick ={() => this.controller("PlayerFlood")}>Flood !</button>
           <button style={showNextFloodingBtnStyle} onClick ={() => this.doFloodATile(databag.nextFloodingNumber, databag.outOf)}>Next Flooding.. Hold your breath</button>
+          <button style={showCancelSandBagCardStyle} onClick ={() => this.cancelSandBagCardPick()}>Cancel</button>
+          <button style={showCancelHelicopterCardStyle} onClick ={() => this.cancelHelicopterCardPick()}>Cancel the flight</button>
         </div>
       )
     }
@@ -1495,14 +1527,14 @@ handleTileClick(i) {
       if (this.state.tiles[i].isDrawned === false){
         document.getElementById("square" + i).style.border = "1px solid #222";
       } else {
-        document.getElementById("square" + i).style.border = "1px solid #fff";
+        document.getElementById("square" + i).style.border = "1px solid #FFF0";
       }
     }
     return true;
   }
 
   graphicallyDrawnATile(i){
-    document.getElementById("square" + i).style.border = "1px solid #fff";
+    document.getElementById("square" + i).style.border = "1px solid #FFF0";
   }
 
   getTreasureNameById(id){
@@ -1528,6 +1560,9 @@ handleTileClick(i) {
   }
 
   render() {
+      let position_value = "relative";
+      let left_value = 5;
+      let top_value = -70;
 
     return (
 
@@ -1588,7 +1623,7 @@ handleTileClick(i) {
           </div>
           <div className="floodOmeter">
               <img src="img/FloodOmeter.png"/>
-              <span className="floodOmeterCursor" id="floodOmeterCursor"><img src="img/FloodOmeterCursor.png"/></span>
+              <span className="floodOmeterCursor" id="floodOmeterCursor" style={{position: position_value, left: left_value+'px', top: top_value+'px'}}><img src="img/FloodOmeterCursor.png"/></span>
           </div>
         </div>
         <div className="playerBoard-column">

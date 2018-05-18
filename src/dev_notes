@@ -7,9 +7,8 @@
 
 -> do the Too many cards in Hand !
 -> do the People on drawning tile -> Rescue !
--> do a graphic Flood-O-meter move the cursor by -33 px to the right
+-> do a blinking tile when immersed or drawn (blink until press next)
 -> do a graphic treasures found so far
-
 
 Give fails sometimes -> Not Any more ????
 -> Check+Fix select/unselect on radioBoxes
