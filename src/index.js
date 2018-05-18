@@ -425,12 +425,16 @@ class Board extends React.Component {
         floodedTileId = j;
         if (n_Tiles[j].isImmersed){
           // Let's DRAWN this tile
-          alert (n_Tiles[j].name + " at " + j + " is drawning !");
-            message = message + n_Tiles[j].name + " at " + j + " is drawning ! ";
+          // alert (n_Tiles[j].name + " at " + j + " is drawning !");
+            message = message + "<span style=\"color: #DC143C\">" + n_Tiles[j].name + " at " + j + " is drawning ! </span>";
             n_Tiles[j].isImmersed = false;
             n_Tiles[j].isDrawned = true;
             this.graphicallyDrawnATile(j);
             tileHasDrawned = true;
+            if (n_Tiles[j].name === "helipad"){
+              message = message + "<br/> Explorers can't leave the Island any more ! Game Over !";
+              alert("The helipad is drawned. GAMEOVER")
+            }
             // rescue some players ?
             if (n_Tiles[j].playerOn.length > 0){
                 message = message + "<br/> There are " + n_Tiles[j].playerOn.length + " explorer(s) on it. Let's evacuate them.";
@@ -438,11 +442,6 @@ class Board extends React.Component {
                 // TODO evacuate explorers from drawning island
             }
             // Check if all Temples of an undiscovered Treasure are drawned. If yes : end game
-            if (n_Tiles[j].name === "helipad"){
-              message = message + "<br/> Explorers can't leave the Island any more ! Game Over !";
-              alert("The helipad is drawned. GAMEOVER")
-            }
-
             if (n_Tiles[j].templeFor !== ""){
                 // it's a temple drawning
                 if (this.state.posessedTreasures.indexOf(n_Tiles[j].templeFor) < 0){

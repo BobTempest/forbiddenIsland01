@@ -19,6 +19,10 @@ list-style:none;
   margin-bottom: 10px;
 }
 
+.red {
+  color: '#DC143C';
+}
+
 .square {
   box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -304,4 +308,19 @@ list-style:none;
 
 .game-info {
   margin-left: 20px;
+}
+
+.blink {
+  animation: blink-animation 1s steps(5, start) infinite;
+  -webkit-animation: blink-animation 1s steps(5, start) infinite;
+}
+@keyframes blink-animation {
+  to {
+    visibility: hidden;
+  }
+}
+@-webkit-keyframes blink-animation {
+  to {
+    visibility: hidden;
+  }
 }
