@@ -254,7 +254,8 @@ class Board extends React.Component {
       messageBoardState_toRestore : null,
       cardUser : null,
       coTravellers : null,
-      cardFlyWith : []
+      cardFlyWith : [],
+      guysToEvacuate : null
     };
 
     this.doFloodInitialTiles(6);
@@ -306,7 +307,10 @@ class Board extends React.Component {
       console.log("InController turn :" + this.state.currentStep);
       this.checkCardState();
       this.showActionButtons();
-      if (input === "ActionIsDone"){
+      // let's evacuate people if Necessary and re loop there
+      if (this.state.guysToEvacuate!= null && this.state.guysToEvacuate.length > 0){
+          doEvacuate(this.state.guysToEvacuate[this.state.guysToEvacuate.length - 1]);
+      } else if (input === "ActionIsDone"){
         let nextStep = this.state.currentStep + 1;
         if (nextStep === 3){
           // draw player cards 01
@@ -412,6 +416,8 @@ class Board extends React.Component {
     let message = "<div>immersion " + number + " out of " + outOf + ".<br/>";
 
     let tileHasDrawned = false;
+    let guysToEvacuate = [];
+
     if (n_FloodCardsLeap.length < 1){
       n_FloodCardsLeap = shuffleArray(n_FloodCardsDiscard);
       n_FloodCardsDiscard = [];
@@ -493,12 +499,31 @@ class Board extends React.Component {
       floodCardsLeap: n_FloodCardsLeap,
       floodCardsOutOfGame: n_FloodCardsOutOfGame,
       floodCardsDiscard: n_FloodCardsDiscard,
-      tiles: n_Tiles });
+      tiles: n_Tiles,
+      guysToEvacuate: guysToEvacuate});
 
       // make it blink
       // alert(floodedTileId);
       // document.getElementById('square' + floodedTileId).style.blink;
       //  ne marche pas
+  }
+
+  doEvacuate(i){
+      let player = this.state.players[i];
+      let tilesToLight = [];
+      if (player.role === "Pilot"){
+        tilesToLight = this.whereCanHeFly(this.state.players[id].position);
+      } else {
+        tilesToLight = this.whereCanHeMove(this.state.players[id].position, this.state.players[id].role)
+      }
+
+      if (tilesToLight.length === [0]){
+        alert ("Oh my God. There's nowhere he can go. He's drawning. Noooooooo. GAME OVER.");
+      }
+
+      // TODO VINCENAL : Set  a message : Name : choose a tile to evacuate !
+
+
   }
 
   doMoveFloodOmeterCursor(){
