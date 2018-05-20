@@ -45,9 +45,9 @@ const orthogonalPaths =  {0 : [1,3], 1 : [0,4], 2 : [3,7], 3 : [0,2,4,8], 4 : [1
   6 : [7,12], 7 : [2,6,8,13], 8 : [3,7,9,14], 9 : [4,8,10,15], 10 : [5,9,11,16], 11 : [10,17], 12 : [6,13], 13 : [7,12,14,18],
   14 : [8,13,15,19], 15 : [9,14,16,20], 16 : [10,15,17,21], 17 : [11,16], 18 : [13,19], 19 : [14,18,20,22], 20 : [15,19,21,23],
   21 : [16,20], 22 : [19,23], 23 : [20,22]};
-const diagonalPaths = {0 : [4], 1 : [3], 2 : [6,8], 3 : [1,7,9], 4 : [0,8,10], 5 : [1,9,11], 6 : [2,13], 7 : [3,12,14],
+const diagonalPaths = {0 : [2, 4], 1 : [3, 5], 2 : [0, 6, 8], 3 : [1,7,9], 4 : [0,8,10], 5 : [1,9,11], 6 : [2,13], 7 : [3,12,14],
    8 : [2,4,13,15], 9 : [3,5,14,16], 10 : [4,15,17], 11 : [5,16], 12 : [7,18], 13 : [6,8,19],
-   14 : [7,9,18,20], 15 : [8,10,19,21], 16 : [9,11,20], 17 : [10,21], 18 : [14,22], 19 : [13,15,23], 20 : [14,16,22],
+   14 : [7,9,18,20], 15 : [8,10,19,21], 16 : [9,11,20], 17 : [10,21], 18 : [12,14,22], 19 : [13,15,23], 20 : [14,16,22],
    21 : [15,17,23], 22 : [18,20], 23 : [19,21]};
 
  const gameSteps = ["init", "startTurn", "playerActionOne", "playerActionTwo", "playerActionThree", "playerPickACard", "floodRise", "endTurn", "final"];
@@ -95,6 +95,7 @@ const diagonalPaths = {0 : [4], 1 : [3], 2 : [6,8], 3 : [1,7,9], 4 : [0,8,10], 5
       {id : 3, name : "Get a Treasure !", text: "Get the treasure in this temple.", enabled : true, triggers : "GetATreasure"  }, // has 4 cards and is on the right temple
       {id : 4, name : "Nothing", text: "Simply do nothing.", enabled : true, triggers : "DoNothing"  }, // -
       /* {id : 5, name : "Skip Turn", text: "Skip the player'sTurn.", enabled : true, triggers : "SkipTurn"  } // -*/
+      {id : 6, name : "Skip Actions", text: "Skip the player's Actions.", enabled : true, triggers : "SkipActions"  }
  ];
 
  const playerSpecialActions = [
@@ -255,7 +256,8 @@ class Board extends React.Component {
       cardUser : null,
       coTravellers : null,
       cardFlyWith : [],
-      guysToEvacuate : null
+      guysToEvacuate : null,
+      floodingSequence : null
     };
 
     this.doFloodInitialTiles(6);
@@ -307,10 +309,7 @@ class Board extends React.Component {
       console.log("InController turn :" + this.state.currentStep);
       this.checkCardState();
       this.showActionButtons();
-      // let's evacuate people if Necessary and re loop there
-      if (this.state.guysToEvacuate!= null && this.state.guysToEvacuate.length > 0){
-          doEvacuate(this.state.guysToEvacuate[this.state.guysToEvacuate.length - 1]);
-      } else if (input === "ActionIsDone"){
+      if (input === "ActionIsDone"){
         let nextStep = this.state.currentStep + 1;
         if (nextStep === 3){
           // draw player cards 01
@@ -442,10 +441,10 @@ class Board extends React.Component {
               alert("The helipad is drawned. GAMEOVER")
             }
             // rescue some players ?
+            guysToEvacuate = n_Tiles[j].playerOn;
             if (n_Tiles[j].playerOn.length > 0){
                 message = message + "<br/> There are " + n_Tiles[j].playerOn.length + " explorer(s) on it. Let's evacuate them.";
-                alert ("There is " + n_Tiles[j].playerOn.length + " explorer(s) on the drawning tile. Let's evacuate them.");
-                // TODO evacuate explorers from drawning island
+                // alert ("There is " + n_Tiles[j].playerOn.length + " explorer(s) on the drawning tile. Let's evacuate them.");
             }
             // Check if all Temples of an undiscovered Treasure are drawned. If yes : end game
             if (n_Tiles[j].templeFor !== ""){
@@ -482,12 +481,24 @@ class Board extends React.Component {
     }
 
     let n_userMessage = null;
-    if (number === outOf){
+    let floodingSequence = [number, outOf];
+
+    if (guysToEvacuate.length > 0){
+        message = message + "<br/>!!! WE NEED TO EVACUATE THE TILE !!!</div>";
+        n_userMessage = new UserMessage(message , false, [8]);
+    }
+    /*
+    If guys To evacuate
+          , go to DoEvacuate with the button in the message,
+          and then go to either Do evacuate if other guys to evacuate, do flood if other needed or action next if flooding is over
+          */
+    else if (number === outOf){
       // floodings are finished
+      // floodingSequence = null;
       message = message + "<br/> Floodings are over.... for now.</div>";
       n_userMessage = new UserMessage(message , false, [0]);
     }
-    else{
+    else {
       // next flooding
       let databag = {nextFloodingNumber: number + 1, outOf: outOf};
       message = message + "</div>";
@@ -500,7 +511,8 @@ class Board extends React.Component {
       floodCardsOutOfGame: n_FloodCardsOutOfGame,
       floodCardsDiscard: n_FloodCardsDiscard,
       tiles: n_Tiles,
-      guysToEvacuate: guysToEvacuate});
+      guysToEvacuate: guysToEvacuate,
+      floodingSequence: floodingSequence});
 
       // make it blink
       // alert(floodedTileId);
@@ -508,22 +520,67 @@ class Board extends React.Component {
       //  ne marche pas
   }
 
-  doEvacuate(i){
-      let player = this.state.players[i];
+  doEvacuate(){
+      let drawningGuy = this.state.players[this.state.guysToEvacuate[0]];
+      let drawningGuyId = drawningGuy.id;
       let tilesToLight = [];
-      if (player.role === "Pilot"){
-        tilesToLight = this.whereCanHeFly(this.state.players[id].position);
+
+      if (drawningGuy.role === "Pilot"){
+        tilesToLight = this.whereCanHeFly(drawningGuy.position);
+        this.state.players[drawningGuyId].whereCanHeFly = tilesToLight;
       } else {
-        tilesToLight = this.whereCanHeMove(this.state.players[id].position, this.state.players[id].role)
+        tilesToLight = this.whereCanHeMove(drawningGuy.position, drawningGuy.role)
+        this.state.players[drawningGuyId].whereCanHeMove = tilesToLight;
       }
 
       if (tilesToLight.length === [0]){
-        alert ("Oh my God. There's nowhere he can go. He's drawning. Noooooooo. GAME OVER.");
+        alert ("Oh my God. There's nowhere he can go. " + drawningGuy.playersName+ " is drawning. Noooooooo. GAME OVER.");
       }
 
-      // TODO VINCENAL : Set  a message : Name : choose a tile to evacuate !
+      this.lightTheTiles(tilesToLight, drawningGuy.color);
 
+      let newMessage = new UserMessage("Now choose a destination to EVACUATE", false, []);
+      this.setState({ whatIsExpectedNext: "TileButtonClickForEvacuate" ,
+                      mainUserMessage: newMessage });
+  }
 
+  doResolveEvacuate(){
+    let n_guysToEvacuate = this.state.guysToEvacuate;
+    if (n_guysToEvacuate.length > 1 )
+    {
+      n_guysToEvacuate.splice(0,1);
+    } else {
+      n_guysToEvacuate = [];
+    }
+
+    let floodingSequence = this.state.floodingSequence;
+    let floodNumber = floodingSequence[0];
+    let floodTotal = floodingSequence[1];
+
+    let message = "<div>";
+    let n_userMessage = null;
+
+    // Branching
+    if (n_guysToEvacuate.length > 0){
+        message = message + "!!! WE NEED ALSO TO EVACUATE THIS GUY !!!</div>";
+        n_userMessage = new UserMessage(message , false, [8]);
+    }
+    else if (floodNumber === floodTotal){
+      // floodings are finished
+      floodingSequence = null;
+      message = message + "<br/> Floodings are over.... for now.</div>";
+      n_userMessage = new UserMessage(message , false, [0]);
+    }
+    else {
+      // next flooding
+      let databag = {nextFloodingNumber: floodNumber + 1, outOf: floodTotal};
+      message = message + "Flooding Goes on </div>";
+      n_userMessage = new UserMessage(message , false, [5], databag);
+    }
+    this.setState({
+      guysToEvacuate: n_guysToEvacuate,
+      mainUserMessage: n_userMessage
+    });
   }
 
   doMoveFloodOmeterCursor(){
@@ -581,7 +638,7 @@ class Board extends React.Component {
       // has Player too much cards ?
       let nbrOfCardsInHand = newPlayers[this.state.currentPlayerPlaying].cards.length + 1;
       if (nbrOfCardsInHand > 5){
-        alert ("Oh no ! Over 5 cards in Hand !");
+        //alert ("Oh no ! Over 5 cards in Hand !");
       }
 
       if (cardToPushToPlayer != null){
@@ -996,6 +1053,10 @@ class Board extends React.Component {
              let newMessage = new UserMessage("Skip turn ", false, [0]);
              this.setState({ mainUserMessage: newMessage,
                               currentStep: 4});
+      } else if (action === "SkipActions"){
+             let newMessage = new UserMessage("Skip actions ", false, [0]);
+             this.setState({ mainUserMessage: newMessage,
+                              currentStep: 2});
       }
     }
     else{
@@ -1185,6 +1246,68 @@ handleTileClick(i) {
         else {
           alert("He can't DRY there with his card");
         }
+      }
+      else if (this.state.whatIsExpectedNext === "TileButtonClickForEvacuate") {
+        // get player : first of To Evacuate
+        let n_guysToEvacuate = this.state.guysToEvacuate;
+        let player = n_guysToEvacuate[0];
+
+        if ( (player.role === "Pilot" && player.whereCanHeFly.indexOf(i) >= 0 ) || player.whereCanHeMove.indexOf(i) >= 0 ){
+
+            // Move
+            // let returnPack = this.moveAPlayer(player, i, this.state.players, this.state.tiles);
+              let n_Tiles = this.state.tiles;
+              // remove player from current Tile
+              let index = n_Tiles[player.position].playerOn.indexOf(player.id);
+              n_Tiles[player.position].playerOn.splice(index, 1);
+              // adding player to new tile
+              n_Tiles[i].playerOn.push(player.id);
+
+              let n_players = this.state.players;
+              n_players[player.id].position = i;
+              n_players[player.id].whereCanHeMove = null;
+              n_players[player.id].whereCanHeFly = null;
+
+            let bozo = n_guysToEvacuate.shift();
+
+            let floodingSequence = this.state.floodingSequence;
+            let floodNumber = floodingSequence[0];
+            let floodTotal = floodingSequence[1];
+
+            let message = "<div>";
+            let n_userMessage = null;
+
+            // Branching
+            if (n_guysToEvacuate.length > 0){
+                message = message + "!!! WE NEED ALSO TO EVACUATE THIS GUY !!!</div>";
+                n_userMessage = new UserMessage(message , false, [8]);
+            }
+            else if (floodNumber === floodTotal){
+              // floodings are finished
+              floodingSequence = null;
+              message = message + "<br/> Floodings are over.... for now.</div>";
+              n_userMessage = new UserMessage(message , false, [0]);
+            }
+            else {
+              // next flooding
+              let databag = {nextFloodingNumber: floodNumber + 1, outOf: floodTotal};
+              message = message + "Flooding Goes on </div>";
+              n_userMessage = new UserMessage(message , false, [5], databag);
+            }
+            this.setState({
+              whatIsExpectedNext: "",
+              tiles: n_Tiles,
+              players:n_players,
+              guysToEvacuate: n_guysToEvacuate,
+              mainUserMessage: n_userMessage
+            });
+
+            this.unlightTheTiles();
+        }
+        else{
+          alert ("He can't move there !");
+        }
+
       } else {
             alert ("Unexpected Clic On a Tile");
       }
@@ -1521,6 +1644,7 @@ handleTileClick(i) {
       let showNextFloodingBtnStyle = (buttons.indexOf(5) >= 0)?({display: 'block'}):({display: 'none'});
       let showCancelSandBagCardStyle = (buttons.indexOf(6) >= 0)?({display: 'block'}):({display: 'none'});
       let showCancelHelicopterCardStyle = (buttons.indexOf(7) >= 0)?({display: 'block'}):({display: 'none'});
+      let showEvacuateStyle = (buttons.indexOf(8) >= 0)?({display: 'block'}):({display: 'none'});
 
       return(
           <div>
@@ -1534,6 +1658,7 @@ handleTileClick(i) {
           <button style={showNextFloodingBtnStyle} onClick ={() => this.doFloodATile(databag.nextFloodingNumber, databag.outOf)}>Next Flooding.. Hold your breath</button>
           <button style={showCancelSandBagCardStyle} onClick ={() => this.cancelSandBagCardPick()}>Cancel</button>
           <button style={showCancelHelicopterCardStyle} onClick ={() => this.cancelHelicopterCardPick()}>Cancel the flight</button>
+          <button style={showEvacuateStyle} onClick ={() => this.doEvacuate()}>Evacuate Explorer</button>
         </div>
       )
     }
@@ -1727,7 +1852,7 @@ class FloodMeter {
   }
 
   howManyCards(level){
-    if (level < 3){
+    if (level < 4){
         return 2;
     } else if (level < 6) {
         return 3;
