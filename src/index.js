@@ -218,7 +218,7 @@ class Board extends React.Component {
     var playerCardsDiscard = [];
     var floodCardsLeap = generateFloodCardsLeap();
     var floodCardsDiscard = [];
-    var floodMeter = new FloodMeter(1);
+    var floodMeter = new FloodMeter(5);
     let mainUserMessage = new UserMessage("Welcome new Player. Choose a first action for the first character.", false, []);
 
     // generer les joueurs
@@ -272,7 +272,7 @@ class Board extends React.Component {
       for (let i = 0; i < tiles.length; i++){
         if (tiles[i].startBase === player.type){
           player.position = tiles[i].position;
-          tiles[i].playerOn.push(player.id); // ok
+          tiles[i].playerOn.push(player.id);
           break;
         }
       }
@@ -438,7 +438,7 @@ class Board extends React.Component {
             tileHasDrawned = true;
             if (n_Tiles[j].name === "helipad"){
               message = message + "<br/> Explorers can't leave the Island any more ! Game Over !";
-              alert("The helipad is drawned. GAMEOVER")
+              // alert("The helipad is drawned. GAMEOVER")
             }
             // rescue some players ?
             guysToEvacuate = n_Tiles[j].playerOn;
@@ -455,7 +455,7 @@ class Board extends React.Component {
                     if (k != j && n_Tiles[k].templeFor === n_Tiles[j].templeFor){
                       if (n_Tiles[k].isDrawned){
                         message = message + "<br/>Oh my God ! all the temples for " + this.getTreasureNameById(n_Tiles[j].templeFor) + " are drawned. You'll never get it. GAME OVER";
-                        alert("Oh my God ! all the temples for " + this.getTreasureNameById(n_Tiles[j].templeFor) + " are drawned. You'll never get it. GAME OVER" );
+                        // alert("Oh my God ! all the temples for " + this.getTreasureNameById(n_Tiles[j].templeFor) + " are drawned. You'll never get it. GAME OVER" );
                       }
                       break;
                     }
@@ -521,19 +521,20 @@ class Board extends React.Component {
   }
 
   doEvacuate(){
-      let drawningGuy = this.state.players[this.state.guysToEvacuate[0]];
+      let n_players = this.state.players;
+      let drawningGuy = n_players[this.state.guysToEvacuate[0]];
       let drawningGuyId = drawningGuy.id;
       let tilesToLight = [];
 
       if (drawningGuy.role === "Pilot"){
         tilesToLight = this.whereCanHeFly(drawningGuy.position);
-        this.state.players[drawningGuyId].whereCanHeFly = tilesToLight;
+        n_players[drawningGuyId].whereCanHeFly = tilesToLight;
       } else {
         tilesToLight = this.whereCanHeMove(drawningGuy.position, drawningGuy.role)
-        this.state.players[drawningGuyId].whereCanHeMove = tilesToLight;
+        n_players[drawningGuyId].whereCanHeMove = tilesToLight;
       }
 
-      if (tilesToLight.length === [0]){
+      if (tilesToLight.length === 0){
         alert ("Oh my God. There's nowhere he can go. " + drawningGuy.playersName+ " is drawning. Noooooooo. GAME OVER.");
       }
 
@@ -541,9 +542,11 @@ class Board extends React.Component {
 
       let newMessage = new UserMessage("Now choose a destination to EVACUATE", false, []);
       this.setState({ whatIsExpectedNext: "TileButtonClickForEvacuate" ,
+                      players : n_players,
                       mainUserMessage: newMessage });
   }
 
+/*
   doResolveEvacuate(){
     let n_guysToEvacuate = this.state.guysToEvacuate;
     if (n_guysToEvacuate.length > 1 )
@@ -582,7 +585,7 @@ class Board extends React.Component {
       mainUserMessage: n_userMessage
     });
   }
-
+*/
   doMoveFloodOmeterCursor(){
     let newValue = document.getElementById('floodOmeterCursor').style.left;
     newValue = parseInt(newValue.slice(0, newValue.indexOf('px'))) + 33;
@@ -1085,7 +1088,7 @@ handleTileClick(i) {
         let player = this.state.players[this.state.currentPlayerPlaying];
         if (player.whereCanHeMove.indexOf(i) >= 0){
             // Move
-            let returnPack = this.moveAPlayer(player, i, this.state.players, this.state.tiles);
+            let returnPack = this.moveAPlayer(player, i, this.state.players);
             let nada = this.unlightTheTiles();
             if (nada){
               this.setState({ whatIsExpectedNext: "",
@@ -1102,7 +1105,7 @@ handleTileClick(i) {
           let player = this.state.players[this.state.currentPlayerPlaying];
           if (player.whereCanHeFly.indexOf(i) >= 0){
               // Move
-                let returnPack = this.moveAPlayer(player, i, this.state.players, this.state.tiles);
+                let returnPack = this.moveAPlayer(player, i, this.state.players);
                 this.setState({ whatIsExpectedNext: "" ,
                                 hasPilotFlownThisTurn: true,
                                 tiles: returnPack.tiles,
@@ -1130,7 +1133,7 @@ handleTileClick(i) {
 
         if (this.puppet.whereCanHeMove.indexOf(i) >= 0){
             // Move
-              let returnPack = this.moveAPlayer(this.puppet, i, this.state.players, this.state.tiles);
+              let returnPack = this.moveAPlayer(this.puppet, i, this.state.players);
               // virer le puppet flag
               for (let j = 0; j < returnPack.players.length; j++){
                 returnPack.players[j].isPuppet = false;
@@ -1249,25 +1252,14 @@ handleTileClick(i) {
       }
       else if (this.state.whatIsExpectedNext === "TileButtonClickForEvacuate") {
         // get player : first of To Evacuate
+        let n_players = this.state.players;
         let n_guysToEvacuate = this.state.guysToEvacuate;
-        let player = n_guysToEvacuate[0];
 
-        if ( (player.role === "Pilot" && player.whereCanHeFly.indexOf(i) >= 0 ) || player.whereCanHeMove.indexOf(i) >= 0 ){
+        let rescued = n_players[n_guysToEvacuate[0]];
+
+        if ((rescued.role === "Pilot" && rescued.whereCanHeFly.indexOf(i) >= 0 ) || rescued.whereCanHeMove.indexOf(i) >= 0 ){
 
             // Move
-            // let returnPack = this.moveAPlayer(player, i, this.state.players, this.state.tiles);
-              let n_Tiles = this.state.tiles;
-              // remove player from current Tile
-              let index = n_Tiles[player.position].playerOn.indexOf(player.id);
-              n_Tiles[player.position].playerOn.splice(index, 1);
-              // adding player to new tile
-              n_Tiles[i].playerOn.push(player.id);
-
-              let n_players = this.state.players;
-              n_players[player.id].position = i;
-              n_players[player.id].whereCanHeMove = null;
-              n_players[player.id].whereCanHeFly = null;
-
             let bozo = n_guysToEvacuate.shift();
 
             let floodingSequence = this.state.floodingSequence;
@@ -1279,7 +1271,7 @@ handleTileClick(i) {
 
             // Branching
             if (n_guysToEvacuate.length > 0){
-                message = message + "!!! WE NEED ALSO TO EVACUATE THIS GUY !!!</div>";
+                message = message + "!!! There ARE " + n_guysToEvacuate.length + "people left to evacuate !!!</div>";
                 n_userMessage = new UserMessage(message , false, [8]);
             }
             else if (floodNumber === floodTotal){
@@ -1294,12 +1286,31 @@ handleTileClick(i) {
               message = message + "Flooding Goes on </div>";
               n_userMessage = new UserMessage(message , false, [5], databag);
             }
+
             this.setState({
               whatIsExpectedNext: "",
-              tiles: n_Tiles,
-              players:n_players,
               guysToEvacuate: n_guysToEvacuate,
               mainUserMessage: n_userMessage
+            });
+
+            let n_Tiles = this.state.tiles;
+
+
+            // remove player from current Tile
+            /* ON TENTE LE OSEF !
+            index = n_Tiles[rescued.position].playerOn.indexOf(rescued.id);
+            yoyoy = n_Tiles[rescued.position].playerOn.splice(index, 1);
+            */
+
+            // adding player to new tile
+            n_Tiles[i].playerOn.push(rescued.id);
+            n_players[rescued.id].position = i;
+            n_players[rescued.id].whereCanHeMove = null;
+            n_players[rescued.id].whereCanHeFly = null;
+
+            this.setState({
+              tiles: n_Tiles,
+              players: n_players
             });
 
             this.unlightTheTiles();
@@ -1313,10 +1324,12 @@ handleTileClick(i) {
       }
     }
 
-  moveAPlayer(player, destination, players, tiles){
+  moveAPlayer(player, destination, players){
     let n_Tiles = this.state.tiles;
     // remove player from current Tile
-    let index = n_Tiles[player.position].playerOn.indexOf(player.id);
+    let tile = n_Tiles[player.position]
+    let index = tile.playerOn.indexOf(player.id);
+    // alert(index);
     n_Tiles[player.position].playerOn.splice(index, 1);
     // adding player to new tile
     n_Tiles[destination].playerOn.push(player.id);
@@ -1327,6 +1340,24 @@ handleTileClick(i) {
     n_players[player.id].whereCanHeFly = null;
 
     return { players: n_players, tiles: n_Tiles};
+  }
+
+  moveAPlayerIndie(player, destination){
+    let n_Tiles = this.state.tiles;
+    // remove player from current Tile
+    let index = n_Tiles[player.position].playerOn.indexOf(player.id);
+    alert(index);
+    n_Tiles[player.position].playerOn.splice(index, 1);
+    // adding player to new tile
+    n_Tiles[destination].playerOn.push(player.id);
+
+    let n_players = this.state.players;
+    n_players[player.id].position = destination;
+    n_players[player.id].whereCanHeMove = null;
+    n_players[player.id].whereCanHeFly = null;
+
+    this.setState({ players: n_players, tiles: n_Tiles });
+
   }
 
   moveAGroupOfPlayers(leaderId, travellersIds, destination, players, tiles){
