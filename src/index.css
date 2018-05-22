@@ -309,18 +309,12 @@ list-style:none;
 .game-info {
   margin-left: 20px;
 }
-
 .blink {
-  animation: blink-animation 1s steps(5, start) infinite;
-  -webkit-animation: blink-animation 1s steps(5, start) infinite;
+  animation: blinker 2s linear infinite;
 }
-@keyframes blink-animation {
-  to {
-    visibility: hidden;
-  }
-}
-@-webkit-keyframes blink-animation {
-  to {
-    visibility: hidden;
+
+@keyframes blinker {
+  50% {
+    opacity: 0;
   }
 }

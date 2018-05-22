@@ -165,6 +165,10 @@ function DrawSquare(props) {
     squareClass = 'square';
   }
 
+  if (props.tile.blink){
+    squareClass = squareClass + ' blink';
+  }
+
   let squareId =  "square" + props.index;
 
   return (
@@ -218,7 +222,7 @@ class Board extends React.Component {
     var playerCardsDiscard = [];
     var floodCardsLeap = generateFloodCardsLeap();
     var floodCardsDiscard = [];
-    var floodMeter = new FloodMeter(5);
+    var floodMeter = new FloodMeter(1);
     let mainUserMessage = new UserMessage("Welcome new Player. Choose a first action for the first character.", false, []);
 
     // generer les joueurs
@@ -309,6 +313,7 @@ class Board extends React.Component {
       console.log("InController turn :" + this.state.currentStep);
       this.checkCardState();
       this.showActionButtons();
+      this.unblinkTheTiles();
       if (input === "ActionIsDone"){
         let nextStep = this.state.currentStep + 1;
         if (nextStep === 3){
@@ -406,6 +411,7 @@ class Board extends React.Component {
   }
 
   doFloodATile(number, outOf){
+    this.unblinkTheTiles();
     let n_Tiles = this.state.tiles;
     let n_FloodCardsLeap = this.state.floodCardsLeap;
     let n_FloodCardsDiscard = this.state.floodCardsDiscard;
@@ -434,6 +440,7 @@ class Board extends React.Component {
             message = message + "<span style=\"color: #DC143C\">" + n_Tiles[j].name + " at " + j + " is drawning ! </span>";
             n_Tiles[j].isImmersed = false;
             n_Tiles[j].isDrawned = true;
+            n_Tiles[j].blink = true;
             this.graphicallyDrawnATile(j);
             tileHasDrawned = true;
             if (n_Tiles[j].name === "helipad"){
@@ -469,6 +476,7 @@ class Board extends React.Component {
         else{
             message = message + n_Tiles[j].name + " at " + j + " is flooded ! ";
             n_Tiles[j].isImmersed = true;
+            n_Tiles[j].blink = true;
         }
 
         break;
@@ -515,9 +523,10 @@ class Board extends React.Component {
       floodingSequence: floodingSequence});
 
       // make it blink
-      // alert(floodedTileId);
+      //  alert(floodedTileId);marche
       // document.getElementById('square' + floodedTileId).style.blink;
-      //  ne marche pas
+      // document.getElementById('square' + floodedTileId).classList.add("blink");
+      //  marche !!! mais est over written par le setstate
   }
 
   doEvacuate(){
@@ -1295,7 +1304,6 @@ handleTileClick(i) {
 
             let n_Tiles = this.state.tiles;
 
-
             // remove player from current Tile
             /* ON TENTE LE OSEF !
             index = n_Tiles[rescued.position].playerOn.indexOf(rescued.id);
@@ -1713,6 +1721,16 @@ handleTileClick(i) {
     return true;
   }
 
+  unblinkTheTiles() {
+        for (let i = 0; i < 24; i++){
+          if ( document.getElementById("square" + i).classList.contains('blink') ){
+            document.getElementById("square" + i).className =
+               document.getElementById("square" + i).className.replace
+                  ( /(?:^|\s)blink(?!\S)/g , '' )
+          }
+        }
+  }
+
   graphicallyDrawnATile(i){
     document.getElementById("square" + i).style.border = "1px solid #FFF0";
   }
@@ -1839,11 +1857,12 @@ class Game extends React.Component {
 }
 
 class Tile {
-  constructor(name, position, isImmersed, isDrawned, startBase, templeFor, playerOn, backgroundColor, TextToDisplay, LittleTextToDisplay) {
+  constructor(name, position, isImmersed, isDrawned, blink, startBase, templeFor, playerOn, backgroundColor, TextToDisplay, LittleTextToDisplay) {
     this.name = name; // string
     this.position = position; // int
     this.isImmersed = isImmersed; // bool
     this.isDrawned = isDrawned; // bool
+    this.blink = blink; // bool
     this.startBase = startBase; // int [0-5]
     this.templeFor = templeFor; // string
     this.playerOn = playerOn; // int[]
@@ -1896,30 +1915,30 @@ class FloodMeter {
 }
 
 function riseTheIsland(){
-    var tile01 = new Tile("helipad", 0, false, false, 5, "", [], "#A9D0F5", "", "HELIPORT");
-    var tile02 = new Tile("doorBlack", 0, false, false, 3, "", [], "#6E6E6E", "", "");
-    var tile03 = new Tile("doorRed", 0, false, false, 0, "", [], "#F78181", "", "");
-    var tile04 = new Tile("doorGreen", 0, false, false, 4, "", [], "#9FF781", "", "");
-    var tile05 = new Tile("doorWhite", 0, false, false, 2, "", [], "#F2F2F2", "", "");
-    var tile06 = new Tile("doorYellow", 0, false, false, 1, "", [], "#F2F5A9", "", "");
-    var tile07 = new Tile("temple0001", 0, false, false, "", "CR", [], "#bdc3c7", "", "TEMPLE CRYSTAL");
-    var tile08 = new Tile("temple0002", 0, false, false, "", "CR", [], "#bdc3c7", "", "TEMPLE CRYSTAL");
-    var tile09 = new Tile("temple0101", 0, false, false, "", "CU", [], "#bdc3c7", "", "TEMPLE CUP");
-    var tile10 = new Tile("temple0102", 0, false, false, "", "CU", [], "#bdc3c7", "", "TEMPLE CUP");
-    var tile11 = new Tile("temple0201", 0, false, false, "", "SC", [], "#bdc3c7", "", "TEMPLE SCEPTRE");
-    var tile12 = new Tile("temple0202", 0, false, false, "", "SC", [], "#bdc3c7", "", "TEMPLE SCEPTRE");
-    var tile13 = new Tile("temple0301", 0, false, false, "", "ST", [], "#bdc3c7", "", "TEMPLE STATUE");
-    var tile14 = new Tile("temple0302", 0, false, false, "", "ST", [], "#bdc3c7", "", "TEMPLE STATUE");
-    var tile15 = new Tile("coast01", 0, false, false, "", "", [], "#825a2c", "", "");
-    var tile16 = new Tile("coast02", 0, false, false, "", "", [], "#825a2c", "", "");
-    var tile17 = new Tile("coast03", 0, false, false, "", "", [], "#825a2c", "", "");
-    var tile18 = new Tile("desert01", 0, false, false, "", "", [], "#ffd480", "", "");
-    var tile19 = new Tile("desert02", 0, false, false, "", "", [], "#ffd480", "", "");
-    var tile20 = new Tile("desert03", 0, false, false, "", "", [], "#ffd480", "", "");
-    var tile21 = new Tile("swamp01", 0, false, false, "", "", [], "#bcf0d2", "", "");
-    var tile22 = new Tile("swamp02", 0, false, false, "", "", [], "#bcf0d2", "", "");
-    var tile23 = new Tile("swamp03", 0, false, false, "", "", [], "#bcf0d2", "", "");
-    var tile24 = new Tile("swamp04", 0, false, false, "", "", [], "#bcf0d2", "", "");
+    var tile01 = new Tile("helipad", 0, false, false, false, 5, "", [], "#A9D0F5", "", "HELIPORT");
+    var tile02 = new Tile("doorBlack", 0, false, false, false, 3, "", [], "#6E6E6E", "", "");
+    var tile03 = new Tile("doorRed", 0, false, false, false, 0, "", [], "#F78181", "", "");
+    var tile04 = new Tile("doorGreen", 0, false, false, false, 4, "", [], "#9FF781", "", "");
+    var tile05 = new Tile("doorWhite", 0, false, false, false, 2, "", [], "#F2F2F2", "", "");
+    var tile06 = new Tile("doorYellow", 0, false, false, false, 1, "", [], "#F2F5A9", "", "");
+    var tile07 = new Tile("temple0001", 0, false, false, false, "", "CR", [], "#bdc3c7", "", "TEMPLE CRYSTAL");
+    var tile08 = new Tile("temple0002", 0, false, false, false, "", "CR", [], "#bdc3c7", "", "TEMPLE CRYSTAL");
+    var tile09 = new Tile("temple0101", 0, false, false, false, "", "CU", [], "#bdc3c7", "", "TEMPLE CUP");
+    var tile10 = new Tile("temple0102", 0, false, false, false, "", "CU", [], "#bdc3c7", "", "TEMPLE CUP");
+    var tile11 = new Tile("temple0201", 0, false, false, false, "", "SC", [], "#bdc3c7", "", "TEMPLE SCEPTRE");
+    var tile12 = new Tile("temple0202", 0, false, false, false, "", "SC", [], "#bdc3c7", "", "TEMPLE SCEPTRE");
+    var tile13 = new Tile("temple0301", 0, false, false, false, "", "ST", [], "#bdc3c7", "", "TEMPLE STATUE");
+    var tile14 = new Tile("temple0302", 0, false, false, false, "", "ST", [], "#bdc3c7", "", "TEMPLE STATUE");
+    var tile15 = new Tile("coast01", 0, false, false, false, "", "", [], "#825a2c", "", "");
+    var tile16 = new Tile("coast02", 0, false, false, false, "", "", [], "#825a2c", "", "");
+    var tile17 = new Tile("coast03", 0, false, false, false, "", "", [], "#825a2c", "", "");
+    var tile18 = new Tile("desert01", 0, false, false, false, "", "", [], "#ffd480", "", "");
+    var tile19 = new Tile("desert02", 0, false, false, false, "", "", [], "#ffd480", "", "");
+    var tile20 = new Tile("desert03", 0, false, false, false, "", "", [], "#ffd480", "", "");
+    var tile21 = new Tile("swamp01", 0, false, false, false, "", "", [], "#bcf0d2", "", "");
+    var tile22 = new Tile("swamp02", 0, false, false, false, "", "", [], "#bcf0d2", "", "");
+    var tile23 = new Tile("swamp03", 0, false, false, false, "", "", [], "#bcf0d2", "", "");
+    var tile24 = new Tile("swamp04", 0, false, false, false, "", "", [], "#bcf0d2", "", "");
     // create a 24 array
     let tiles = [tile01,tile02,tile03,tile04,tile05,tile06,tile07,tile08,tile09,tile10,
       tile11,tile12,tile13,tile14,tile15,tile16,tile17,tile18,tile19,tile20,
