@@ -293,7 +293,8 @@ class Board extends React.Component {
         */
         //end of helicopter Hack
 
-      for (let i = 0; i < 2; i++){
+      // for (let i = 0; i < 2; i++){
+      for (let i = 0; i < 4; i++){ // HACK OF 4 Cards in the beg
             let card = playerCardsLeap.pop();
             while (card.name === "floodRise"){
               playerCardsLeap.push(card);
@@ -376,6 +377,9 @@ class Board extends React.Component {
           tempState = this.doPickOnePlayerCard(2, tempState);
           this.setState(tempState);
           // TODO : Check if not Too many Cards in Hand
+
+
+
       }
       else if (input === "PlayerFlood"){
         this.doFloodATile(1, this.state.floodMeter.howManyCards(this.state.floodMeter.level));
@@ -440,7 +444,7 @@ class Board extends React.Component {
             message = message + "<span style=\"color: #DC143C\">" + n_Tiles[j].name + " at " + j + " is drawning ! </span>";
             n_Tiles[j].isImmersed = false;
             n_Tiles[j].isDrawned = true;
-            n_Tiles[j].blink = true;
+            // n_Tiles[j].blink = true;
             this.graphicallyDrawnATile(j);
             tileHasDrawned = true;
             if (n_Tiles[j].name === "helipad"){
@@ -523,8 +527,8 @@ class Board extends React.Component {
       floodingSequence: floodingSequence});
 
       // make it blink
-      //  alert(floodedTileId);marche
-      // document.getElementById('square' + floodedTileId).style.blink;
+      //  alert(floodedTileId); marche
+
       // document.getElementById('square' + floodedTileId).classList.add("blink");
       //  marche !!! mais est over written par le setstate
   }
@@ -555,46 +559,6 @@ class Board extends React.Component {
                       mainUserMessage: newMessage });
   }
 
-/*
-  doResolveEvacuate(){
-    let n_guysToEvacuate = this.state.guysToEvacuate;
-    if (n_guysToEvacuate.length > 1 )
-    {
-      n_guysToEvacuate.splice(0,1);
-    } else {
-      n_guysToEvacuate = [];
-    }
-
-    let floodingSequence = this.state.floodingSequence;
-    let floodNumber = floodingSequence[0];
-    let floodTotal = floodingSequence[1];
-
-    let message = "<div>";
-    let n_userMessage = null;
-
-    // Branching
-    if (n_guysToEvacuate.length > 0){
-        message = message + "!!! WE NEED ALSO TO EVACUATE THIS GUY !!!</div>";
-        n_userMessage = new UserMessage(message , false, [8]);
-    }
-    else if (floodNumber === floodTotal){
-      // floodings are finished
-      floodingSequence = null;
-      message = message + "<br/> Floodings are over.... for now.</div>";
-      n_userMessage = new UserMessage(message , false, [0]);
-    }
-    else {
-      // next flooding
-      let databag = {nextFloodingNumber: floodNumber + 1, outOf: floodTotal};
-      message = message + "Flooding Goes on </div>";
-      n_userMessage = new UserMessage(message , false, [5], databag);
-    }
-    this.setState({
-      guysToEvacuate: n_guysToEvacuate,
-      mainUserMessage: n_userMessage
-    });
-  }
-*/
   doMoveFloodOmeterCursor(){
     let newValue = document.getElementById('floodOmeterCursor').style.left;
     newValue = parseInt(newValue.slice(0, newValue.indexOf('px'))) + 33;
@@ -661,7 +625,7 @@ class Board extends React.Component {
       if (cardNumber == 1){
             newMessage = new UserMessage('First card : ' + card.name + '. <br/><img src='  + card.url + ' width="30px" height="46px"/>', false, [3]);
       }else{
-            newMessage = new UserMessage('Second card : ' + card.name + '. <br/><img src=' + card.url  + ' width="30px" height="46px"/>', false, [0]);
+            newMessage = new UserMessage('Second card : ' + card.name + '. <br/><img src=' + card.url  + ' width="30px" height="46px"/>', false, [9]);
       }
 
       tempState.mainUserMessage = newMessage;
@@ -675,6 +639,54 @@ class Board extends React.Component {
       // tempState.tiles = newTiles;
 
       return tempState;
+  }
+
+  doCheckIfMoreThan5CardsInHand(passages) {
+    let cardsInHand = this.state.players[this.state.currentPlayerPlaying].cards;
+    if (cardsInHand.length > 5){
+      alert ("Oh no ! Over 5 cards in Hand ! : " + cardsInHand.length);
+
+      let whatIsExpectedNext_toRestore = this.state.whatIsExpectedNext;
+      let n_Message = new UserMessage("Let's get rid of " + cardsInHand.length - 5 +" card(s)", false, [10]);
+      let n_messageBoardState_toRestore = this.state.messageBoardState;
+
+      // displays the board of co travellers choice
+      this.setState({ mainUserMessage: n_Message });
+      if (passages === 0){
+        this.setState({ whatIsExpectedNext_toRestore : whatIsExpectedNext_toRestore,
+                        whatIsExpectedNext: "ResolveOver5Cards" ,
+                        mainUserMessage_toRestore: this.state.mainUserMessage,
+                        // mainUserMessage: n_Message,
+                        messageBoardState_toRestore: n_messageBoardState_toRestore,
+                        messageBoardState: "SolveOver5Cards",
+                        cardUser : this.state.players[this.state.currentPlayerPlaying].id });
+      }
+      return null;
+    }
+    else {
+      //TODO does not work in case of a 'give' or a 'send-a-card'
+      if (passages > 0){
+        // a throw or two have been made, let's restore the states
+        this.setState({ whatIsExpectedNext: this.state.whatIsExpectedNext_toRestore,
+                        whatIsExpectedNext_toRestore: null,
+                        mainUserMessage: this.state.mainUserMessage_toRestore,
+                        mainUserMessage_toRestore: null,
+                        messageBoardState: "Default"});
+      }
+
+      this.controller("ActionIsDone");
+    }
+  }
+
+  throwCard(cardtype, index, userId){
+      let n_players = this.state.players;
+      let n_playerCardsDiscard = this.state.playerCardsDiscard;
+
+      n_playerCardsDiscard.push(n_players[userId].cards[index]);
+      n_players[userId].cards.splice(index, 1);
+
+      this.setState({ players: n_players });
+      this.doCheckIfMoreThan5CardsInHand(1);
   }
 
   clickedOnHelicopterCard(playerId) {
@@ -1350,24 +1362,6 @@ handleTileClick(i) {
     return { players: n_players, tiles: n_Tiles};
   }
 
-  moveAPlayerIndie(player, destination){
-    let n_Tiles = this.state.tiles;
-    // remove player from current Tile
-    let index = n_Tiles[player.position].playerOn.indexOf(player.id);
-    alert(index);
-    n_Tiles[player.position].playerOn.splice(index, 1);
-    // adding player to new tile
-    n_Tiles[destination].playerOn.push(player.id);
-
-    let n_players = this.state.players;
-    n_players[player.id].position = destination;
-    n_players[player.id].whereCanHeMove = null;
-    n_players[player.id].whereCanHeFly = null;
-
-    this.setState({ players: n_players, tiles: n_Tiles });
-
-  }
-
   moveAGroupOfPlayers(leaderId, travellersIds, destination, players, tiles){
     let n_Tiles = this.state.tiles;
     let startingFrom = this.state.players[leaderId].position;
@@ -1668,6 +1662,26 @@ handleTileClick(i) {
               <button className="actionButton" value="Give" onClick={() => this.doMoveSomeOne(puppet)}>{"Move this character"} </button>
             </div>
           )
+    } else if (this.state.messageBoardState === "SolveOver5Cards") {
+      let user = this.state.cardUser;
+      let cardsInHand = this.state.players[user].cards;
+      console.log("user is : " + user + ". His cards : " + cardsInHand);
+
+      return(
+        <div>
+          Get rid Ov some cards :<br/>
+
+          {
+            (this.state.players[user].cards.map((card, index) => {
+              return (card.type === "H" || card.type === "SB") ?
+                  (<span key={index}>{card.name} <button onClick={() => this.throwCard(card.type, index, user)}>throw away</button> <button >use it now</button><br/></span>)
+                  :
+                  (<span key={index}>{card.name} <button onClick={() => this.throwCard(card.type, index, user)}>throw away</button><br/></span>)
+            }))
+          }
+
+        </div>
+      )
     } else if (this.state.messageBoardState === "empty"){
           <div>empty</div>
     } else {
@@ -1684,6 +1698,7 @@ handleTileClick(i) {
       let showCancelSandBagCardStyle = (buttons.indexOf(6) >= 0)?({display: 'block'}):({display: 'none'});
       let showCancelHelicopterCardStyle = (buttons.indexOf(7) >= 0)?({display: 'block'}):({display: 'none'});
       let showEvacuateStyle = (buttons.indexOf(8) >= 0)?({display: 'block'}):({display: 'none'});
+      let showCheckIfMoreThan5Style = (buttons.indexOf(9) >= 0)?({display: 'block'}):({display: 'none'});
 
       return(
           <div>
@@ -1698,6 +1713,7 @@ handleTileClick(i) {
           <button style={showCancelSandBagCardStyle} onClick ={() => this.cancelSandBagCardPick()}>Cancel</button>
           <button style={showCancelHelicopterCardStyle} onClick ={() => this.cancelHelicopterCardPick()}>Cancel the flight</button>
           <button style={showEvacuateStyle} onClick ={() => this.doEvacuate()}>Evacuate Explorer</button>
+          <button style={showCheckIfMoreThan5Style} onClick ={() => this.doCheckIfMoreThan5CardsInHand(0)}>Next</button>
         </div>
       )
     }
@@ -1729,6 +1745,7 @@ handleTileClick(i) {
                   ( /(?:^|\s)blink(?!\S)/g , '' )
           }
         }
+
   }
 
   graphicallyDrawnATile(i){

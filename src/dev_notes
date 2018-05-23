@@ -2,13 +2,17 @@
 *********************
 **** NOW *****
 
+TODO : check card # after give or Send
+TODO : plug the 'use a card' option if over 5
+TODO : remove actions when not possible
+
+- BUG : when drying, the tile blink
+
 - FIX : the diver can dive through several immersed tiles !
 
 -test the playing card ability
 
 -> do the Too many cards in Hand !
--> do the People on drawning tile -> Rescue !
--> do a blinking tile when immersed or drawn (blink until press next)
 -> do a graphic treasures found so far
 
 Give fails sometimes -> Not Any more ????
@@ -31,18 +35,6 @@ Give fails sometimes -> Not Any more ????
 ******** BUGS *******
 
 Diver can finish on a drawned tile !
-
-*********************
-evacuate :
-list of char on the tile.
-Has anyone an H card ?
-  wanna play it ?
-
-Are there still people on the tile ?
-For each people :
-  where can he go ?
-    if where can he go is empty : DEATH. Game Over !
-  move.
 
 *********************
   ***** A la fin des actions :
