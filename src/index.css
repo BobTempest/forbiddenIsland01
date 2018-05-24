@@ -151,7 +151,7 @@ list-style:none;
 }
 
 .playerBoard-column {
-  float:left;
+  float:right;
   width: 330px;
 }
 
