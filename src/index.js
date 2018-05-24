@@ -1858,6 +1858,50 @@ handleTileClick(i) {
   }
 }
 
+
+/* VOIR DANS LA PLAYER LEAP / DISCARD
+<div className="playerBoard-column">
+  <table border="1">
+      <tr><th>Leap</th><th>Discard</th></tr>
+      <tr><td>{
+        this.state.playerCardsLeap.map((card,index) =>
+          <span id={index} class="superSmall">{card.name}<br/></span>
+        )
+      }</td>
+      <td>{
+        this.state.playerCardsDiscard.map((card,index) =>
+          <span id={index} class="superSmall">{card.name}<br/></span>
+        )
+      }</td></tr>
+  </table>
+</div>
+*/
+
+/*
+VOIR DANS LE Flood Leap
+<div className="playerBoard-column">
+  <table border="1">
+      <tr><th>Leap</th><th>Discard</th></tr>
+      <tr><td>{
+        this.state.floodCardsLeap.map((card,index) =>
+          <span id={index} class="superSmall">{card.name}<br/></span>
+        )
+      }</td>
+      <td>
+        {
+        this.state.floodCardsDiscard.map((card,index) =>
+          <span id={index} class="superSmall">{card.name}<br/></span>
+        )
+      }
+    </td>
+    <td>{
+      this.state.floodCardsOutOfGame.map((card, index) =>
+        <span id={index} class="superSmall">{card.name}<br/></span>)
+      }
+    </td></tr>
+  </table>
+</div>
+*/
 ////// END OF Board Class
 
 class Game extends React.Component {
@@ -1998,11 +2042,11 @@ function generatePlayerCardsLeap(){
         let card = { id : i + 20, name : "helicopter", type : "H", url : "img/helicopterCard.png"};
         cards.push(card);
     }
-    for (let i = 0; i < 2; i++){
+    for (let i = 0; i < 2; i++){ // 2 cards
         let card = { id : i + 23, name : "sandBag", type : "SB", url : "img/sandBagCard.png"};
         cards.push(card);
     }
-    for (let i = 0; i < 3; i++){
+    for (let i = 0; i < 3; i++){ // 3 cards
         let card = { id : i + 25, name : "floodRise", type : 5, url : "img/floodRise.png"};
         cards.push(card);
     }
