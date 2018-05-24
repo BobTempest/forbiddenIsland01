@@ -2,9 +2,9 @@
 *********************
 **** NOW *****
 
-TODO : check card # after give or Send
-TODO : plug the 'use a card' option if over 5
 TODO : remove actions when not possible
+TODO : check player cards leap
+TODO : if Hcard and 4 players and 4 treasures : Win message
 
 - BUG : when drying, the tile blink
 
@@ -12,7 +12,6 @@ TODO : remove actions when not possible
 
 -test the playing card ability
 
--> do the Too many cards in Hand !
 -> do a graphic treasures found so far
 
 Give fails sometimes -> Not Any more ????
@@ -35,12 +34,3 @@ Give fails sometimes -> Not Any more ????
 ******** BUGS *******
 
 Diver can finish on a drawned tile !
-
-*********************
-  ***** A la fin des actions :
-  Solve 'Too Many Cards in Hand !'
-  -> Does he has an Action card ?
-    -> use it ?
-
- throw a card
-    -> again ?

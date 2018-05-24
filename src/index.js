@@ -832,6 +832,42 @@ class Board extends React.Component {
         moves = moves.concat(diagonalPaths[position]);
     }
     else if (role === "Diver"){
+      let positionsToInvestigate = orthogonalPaths[position];
+      let investigatedPositions = [];
+      let groundsHeCanGoTo = [];
+
+      while (positionsToInvestigate.length > 0 ){
+        let i = positionsToInvestigate.pop();
+        investigatedPositions.push(i);
+
+        if (this.state.tiles[i].isDrawned || this.state.tiles[i].isImmersed){
+
+          if (this.state.tiles[i].isImmersed){
+            groundsHeCanGoTo.push(i);
+          }
+
+          let candidates = orthogonalPaths[i];
+          for(let z = 0; z < candidates.length; z++){
+            if (!(investigatedPositions.indexOf(candidates[z]) >= 0)) {
+              if (this.state.tiles[candidates[z]].isDrawned){
+                positionsToInvestigate.push(candidates[z]);
+              } else if (this.state.tiles[candidates[z]].isImmersed) {
+                positionsToInvestigate.push(candidates[z]);
+                groundsHeCanGoTo.push(candidates[z]);
+              } else {
+                groundsHeCanGoTo.push(candidates[z]);
+              }
+            }
+          }
+        } else {
+          // it's dry
+          groundsHeCanGoTo.push(i);
+        }
+      }
+
+      moves =  groundsHeCanGoTo;
+
+      /*
         let afterSwimPositions = [];
         moves = orthogonalPaths[position];
         for (let j = 0 ; j < moves.length; j++){
@@ -841,9 +877,12 @@ class Board extends React.Component {
               afterSwimPositions = afterSwimPositions.concat(orthogonalPaths[moves[j]]);
           }
         }
+
         moves = moves.concat(afterSwimPositions);
+        */
     }
     else {
+      // regular orthogonal possibilities
         moves = orthogonalPaths[position];
     }
 
@@ -2062,9 +2101,9 @@ function generateFloodCardsLeap(){
 
 function generatePlayers(){
     // navigator hack off
-    let roles = [0,1,2,3,4,5];
-    roles = shuffleArray(roles);
-    //let roles = [1,5,2,3,4,0];
+    // let roles = [0,1,2,3,4,5];
+    // roles = shuffleArray(roles);
+    let roles = [3,5,2,1,4,0];
     let players = [];
     for (let i = 0; i < 4; i++){
       let type = roles[i];
