@@ -832,8 +832,9 @@ class Board extends React.Component {
         moves = moves.concat(diagonalPaths[position]);
     }
     else if (role === "Diver"){
-      let positionsToInvestigate = orthogonalPaths[position];
-      let investigatedPositions = [];
+      let positionsToInvestigate = [];
+      positionsToInvestigate = positionsToInvestigate.concat(orthogonalPaths[position]);
+      let investigatedPositions = [position];
       let groundsHeCanGoTo = [];
 
       while (positionsToInvestigate.length > 0 ){
