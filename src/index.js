@@ -76,7 +76,7 @@ const diagonalPaths = {0 : [2, 4], 1 : [3, 5], 2 : [0, 6, 8], 3 : [1,7,9], 4 : [
       {id : 3, name : "Get a Treasure !", text: "Get the treasure in this temple.", enabled : true, triggers : "GetATreasure"  }, // has 4 cards and is on the right temple
       {id : 4, name : "Nothing", text: "Simply do nothing.", enabled : true, triggers : "DoNothing"  }, // -
       /* {id : 5, name : "Skip Turn", text: "Skip the player'sTurn.", enabled : true, triggers : "SkipTurn"  } // -*/
-      {id : 6, name : "Skip Actions", text: "Skip the player's Actions.", enabled : true, triggers : "SkipActions"  }
+      /*{id : 6, name : "Skip Actions", text: "Skip the player's Actions.", enabled : true, triggers : "SkipActions"  }*/
  ];
 
  const playerSpecialActions = [
@@ -689,6 +689,13 @@ class Board extends React.Component {
   }
 
   clickedOnHelicopterCard(playerId) {
+    // Check if the game is won :
+    // on the helipad, 4 treasures found, all players on the tile
+    if (this.state.posessedTreasures.length === 4 &&
+        this.tiles[this.state.players[playerId].position].name === "helipad" &&
+        this.tiles[this.state.players[playerId].position].playerOn.length === this.state.nbrOfPlayers) {
+          alert("The 4 valliant exppplorers leave the island with the 4 treasures. You WON !");
+        }
     let whatIsExpectedNext_toRestore = this.state.whatIsExpectedNext;
     let n_Message = new UserMessage("Now choose a landing destination", false, [7]);
     let n_messageBoardState_toRestore = this.state.messageBoardState;
@@ -799,6 +806,13 @@ class Board extends React.Component {
             }
           }
           // TODO : is action possible ? Check the validity of an action and remove it
+          /*
+          remove move if nowhere to go
+          remove dry if nothing to dry
+          remove give if noOne
+          remove Get a treasure if no 4 and no temple0002
+          */
+
           actions.push(action);
       }
 
