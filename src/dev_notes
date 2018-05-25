@@ -4,18 +4,12 @@
 
 TODO : remove actions when not possible
 TODO : check player cards leap
-TODO : if Hcard and 4 players and 4 treasures : Win message
-
-- BUG : when drying, the tile blink
-
-- FIX : the diver can dive through several immersed tiles !
+TODO : Put warning and Name in too much card Message
 
 -test the playing card ability
 
 -> do a graphic treasures found so far
 
-Give fails sometimes -> Not Any more ????
--> Check+Fix select/unselect on radioBoxes
 
 *********************
 **** SHORT TERM *****

@@ -99,6 +99,22 @@ list-style:none;
   left: 16px;
 }
 
+.jaugePlayer {
+    width:25px;
+    height:10px;
+    background:brown;
+}
+
+.jaugeFlood {
+    width:25px;
+    height:10px;
+    background:blue;
+}
+
+.stuckBehind {
+    float: right;
+}
+
 .superSmall {
   font-size: 10px;
 }
@@ -172,17 +188,17 @@ list-style:none;
 }
 
 .floodOmeterCursor {
-  /*
-  position: relative;
-  top:-70px;
-  left: 5px;
-  */
   z-index:10;
 }
 
 .floodOmeter {
     float: left;
     /* height: 000px; */
+}
+
+.cardsPilesTable , th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
 }
 
 .messagePanel {

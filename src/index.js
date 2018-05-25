@@ -1901,6 +1901,13 @@ handleTileClick(i) {
               <span className="floodOmeterCursor" id="floodOmeterCursor" style={{position: position_value, left: left_value+'px', top: top_value+'px'}}><img src="img/FloodOmeterCursor.png"/></span>
           </div>
         </div>
+        <div>
+          <table class="cardsPilesTable">
+            <tr><th colspan="2">Player Cards</th><th colspan="2">Flood Cards</th></tr>
+            <tr><td>leap</td><td style={{width: '50px'}}><div class="jaugePlayer" style={{width: this.state.playerCardsLeap.length}}></div><span class="superSmall stuckBehind">{this.state.playerCardsLeap.length}</span></td><td>leap</td><td style={{width: '50px'}}><div class="jaugeFlood" style={{width: this.state.floodCardsLeap.length}}></div><span class="superSmall">{this.state.floodCardsLeap.length}</span></td></tr>
+            <tr><td>discard</td><td style={{width: '50px'}}><div class="jaugeFlood" style={{width: this.state.playerCardsDiscard.length}}></div><span class="superSmall">{this.state.playerCardsDiscard.length}</span></td><td>discard</td><td style={{width: '50px'}}><div class="jaugeFlood" style={{width: this.state.floodCardsDiscard.length}}></div><span class="superSmall">{this.state.floodCardsDiscard.length}</span></td></tr>
+          </table>
+        </div>
         <div className="playerBoard-column">
           <div>
             {this.renderPlayerBoard(0)}
