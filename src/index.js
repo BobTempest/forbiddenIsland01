@@ -589,9 +589,9 @@ class Board extends React.Component {
 
       // has Player too much cards ?
       let nbrOfCardsInHand = newPlayers[this.state.currentPlayerPlaying].cards.length + 1;
-      if (nbrOfCardsInHand > 5){
+      // if (nbrOfCardsInHand > 5){
         //alert ("Oh no ! Over 5 cards in Hand !");
-      }
+      // }
 
       if (cardToPushToPlayer != null){
               newPlayers[this.state.currentPlayerPlaying].cards.push(cardToPushToPlayer);
@@ -622,7 +622,7 @@ class Board extends React.Component {
   doCheckIfMoreThan5CardsInHand(passages, userId) { // TODO : player Id has to be dynamic in cases of give or send!
     let cardsInHand = this.state.players[userId].cards;
     if (cardsInHand.length > 5){
-      alert ("Oh no ! Over 5 cards in Hand ! : " + cardsInHand.length);
+      // alert ("Oh no ! Over 5 cards in Hand ! : " + cardsInHand.length);
 
       let n_whatIsExpectedNext_toRestore = this.state.whatIsExpectedNext;
       // let n_Message = new UserMessage("Let's get rid of " + cardsInHand.length - 5 +" card(s)", false, []);
@@ -692,8 +692,8 @@ class Board extends React.Component {
     // Check if the game is won :
     // on the helipad, 4 treasures found, all players on the tile
     if (this.state.posessedTreasures.length === 4 &&
-        this.tiles[this.state.players[playerId].position].name === "helipad" &&
-        this.tiles[this.state.players[playerId].position].playerOn.length === this.state.nbrOfPlayers) {
+        this.state.tiles[this.state.players[playerId].position].name === "helipad" &&
+        this.state.tiles[this.state.players[playerId].position].playerOn.length === this.state.nbrOfPlayers) {
           alert("The 4 valliant exppplorers leave the island with the 4 treasures. You WON !");
         }
     let whatIsExpectedNext_toRestore = this.state.whatIsExpectedNext;
@@ -1720,13 +1720,15 @@ handleTileClick(i) {
           )
     } else if (this.state.messageBoardState === "SolveOver5Cards") {
       let userId = this.state.cardUser;
+      let color = this.state.players[userId].color;
+      let name = this.state.players[userId].playersName;
       let cardsInHand = this.state.players[userId].cards;
       // console.log("user is : " + user + ". His cards : " + cardsInHand);
 
       return(
         <div>
-          Get rid Ov some cards :<br/>
-
+          <span  style={{color: color}}>{name}</span> has more than 5 cards in Hand.<br/>
+          Let's get rid Ov it : <br/>
           {
             (this.state.players[userId].cards.map((card, index) => {
               return (card.type === "H" || card.type === "SB") ?
