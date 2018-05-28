@@ -76,7 +76,7 @@ const diagonalPaths = {0 : [2, 4], 1 : [3, 5], 2 : [0, 6, 8], 3 : [1,7,9], 4 : [
       {id : 3, name : "Get a Treasure !", text: "Get the treasure in this temple.", enabled : true, triggers : "GetATreasure"  }, // has 4 cards and is on the right temple
       {id : 4, name : "Nothing", text: "Simply do nothing.", enabled : true, triggers : "DoNothing"  }, // -
       /* {id : 5, name : "Skip Turn", text: "Skip the player'sTurn.", enabled : true, triggers : "SkipTurn"  } // -*/
-      /*{id : 6, name : "Skip Actions", text: "Skip the player's Actions.", enabled : true, triggers : "SkipActions"  }*/
+      {id : 6, name : "Skip Actions", text: "Skip the player's Actions.", enabled : true, triggers : "SkipActions"  }
  ];
 
  const playerSpecialActions = [
@@ -1900,12 +1900,16 @@ handleTileClick(i) {
               <img src="img/FloodOmeter.png"/>
               <span className="floodOmeterCursor" id="floodOmeterCursor" style={{position: position_value, left: left_value+'px', top: top_value+'px'}}><img src="img/FloodOmeterCursor.png"/></span>
           </div>
-        </div>
-        <div>
           <table class="cardsPilesTable">
-            <tr><th colspan="2">Player Cards</th><th colspan="2">Flood Cards</th></tr>
-            <tr><td>leap</td><td style={{width: '50px'}}><div class="jaugePlayer" style={{width: this.state.playerCardsLeap.length}}></div><span class="superSmall stuckBehind">{this.state.playerCardsLeap.length}</span></td><td>leap</td><td style={{width: '50px'}}><div class="jaugeFlood" style={{width: this.state.floodCardsLeap.length}}></div><span class="superSmall">{this.state.floodCardsLeap.length}</span></td></tr>
-            <tr><td>discard</td><td style={{width: '50px'}}><div class="jaugeFlood" style={{width: this.state.playerCardsDiscard.length}}></div><span class="superSmall">{this.state.playerCardsDiscard.length}</span></td><td>discard</td><td style={{width: '50px'}}><div class="jaugeFlood" style={{width: this.state.floodCardsDiscard.length}}></div><span class="superSmall">{this.state.floodCardsDiscard.length}</span></td></tr>
+            <tr><th colspan="2" width="150px">Player Cards</th><th colspan="2" width="150px">Flood Cards</th></tr>
+            <tr style={{height: '18px'}}>
+              <td width="60px">leap</td><td width="90px"><table class="invisiTable"><tr class="invisiTable"><td class="jaugePlayer invisiTable" style={{width: this.state.playerCardsLeap.length}}></td><td class="superSmall invisiTable">{this.state.playerCardsLeap.length}</td></tr></table></td>
+              <td width="60px">leap</td><td width="90px"><table class="invisiTable"><tr class="invisiTable"><td class="jaugeFlood invisiTable" style={{width: this.state.floodCardsLeap.length}}></td><td class="superSmall invisiTable">{this.state.floodCardsLeap.length}</td></tr></table></td>
+            </tr>
+            <tr>
+              <td width="60px">discard</td><td width="90px"><table class="invisiTable"><tr class="invisiTable"><td class="jaugePlayer invisiTable" style={{width: this.state.playerCardsDiscard.length}}></td><td class="superSmall invisiTable">{this.state.playerCardsDiscard.length}</td></tr></table></td>
+              <td width="60px">discard</td><td width="90px"><table class="invisiTable"><tr class="invisiTable"><td class="jaugeFlood invisiTable" style={{width: this.state.floodCardsDiscard.length}}></td><td class="superSmall invisiTable">{this.state.floodCardsDiscard.length}</td></tr></table></td>
+            </tr>
           </table>
         </div>
         <div className="playerBoard-column">

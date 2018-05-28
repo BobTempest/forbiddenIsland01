@@ -100,15 +100,13 @@ list-style:none;
 }
 
 .jaugePlayer {
-    width:25px;
     height:10px;
-    background:brown;
+    background: brown;
 }
 
 .jaugeFlood {
-    width:25px;
     height:10px;
-    background:blue;
+    background: blue;
 }
 
 .stuckBehind {
@@ -193,11 +191,16 @@ list-style:none;
 
 .floodOmeter {
     float: left;
-    /* height: 000px; */
+    height: 86px;
 }
 
 .cardsPilesTable , th, td {
   border: 1px solid black;
+  border-collapse: collapse;
+}
+
+.invisiTable {
+  border: 0px solid white;
   border-collapse: collapse;
 }
 
