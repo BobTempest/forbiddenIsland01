@@ -74,7 +74,7 @@ const diagonalPaths = {0 : [2, 4], 1 : [3, 5], 2 : [0, 6, 8], 3 : [1,7,9], 4 : [
       {id : 1, name : "Dry", text: "Dry an adjacent tile", enabled : true, triggers : "Dry"  }, //has an adjacent immersed tile around ?
       {id : 2, name : "Give", text: "Give a card on a character on the same tile", enabled : true, triggers : "Give" }, //has a player on his tile ?
       {id : 3, name : "Get a Treasure !", text: "Get the treasure in this temple.", enabled : true, triggers : "GetATreasure"  }, // has 4 cards and is on the right temple
-      {id : 4, name : "Nothing", text: "Simply do nothing.", enabled : true, triggers : "DoNothing"  }, // -
+      {id : 4, name : "Sleep", text: "Simply do nothing.", enabled : true, triggers : "DoNothing"  }, // -
       /* {id : 5, name : "Skip Turn", text: "Skip the player'sTurn.", enabled : true, triggers : "SkipTurn"  } // -*/
       {id : 6, name : "Skip Actions", text: "Skip the player's Actions.", enabled : true, triggers : "SkipActions"  }
  ];
@@ -213,7 +213,7 @@ class Board extends React.Component {
     // assigner les positions de depart
     players.forEach(getInitialPlayerPosition);
 
-    var possibleActions = this.getPossibleActions(players[0].role, false);
+    var possibleActions = this.getPossibleActions(players[0], false, true);
 
     this.state = {
       tiles: tiles,
@@ -321,7 +321,7 @@ class Board extends React.Component {
             let newMessage = new UserMessage("Next Turn ! Please " + this.state.players[0].playersName + ", Choose an action " , false, []);
             let nextTurn = this.state.turn + 1;
             let nextPlayer = this.state.players[0].id;
-            let psblactn = this.getPossibleActions(this.state.players[0].role, false);
+            let psblactn = this.getPossibleActions(this.state.players[0], false, false);
             this.setState({ currentStep : 0,
               turn : nextTurn,
               currentPlayerPlaying : nextPlayer,
@@ -334,7 +334,7 @@ class Board extends React.Component {
             // next Player
             let newMessage = new UserMessage("Next player ! Please Choose an action " , false, []);
             let nextPlayer = this.state.players[this.state.currentPlayerPlaying + 1].id;
-            let psblactn = this.getPossibleActions(this.state.players[nextPlayer].role, false);
+            let psblactn = this.getPossibleActions(this.state.players[nextPlayer], false, false);
             this.setState({ currentStep : 0,
               currentPlayerPlaying : nextPlayer,
               possibleActions : psblactn,
@@ -348,7 +348,7 @@ class Board extends React.Component {
         else{
           // next action for the same player
           let newMessage = new UserMessage("Choose an action " , false, []);
-          let psblactn = this.getPossibleActions(this.state.players[this.state.currentPlayerPlaying].role, this.state.hasPilotFlownThisTurn);
+          let psblactn = this.getPossibleActions(this.state.players[this.state.currentPlayerPlaying], this.state.hasPilotFlownThisTurn, false);
           this.setState({ currentStep : nextStep,
             possibleActions : psblactn,
             whatIsExpectedNext : "CharacterActionButtonClick" ,
@@ -795,13 +795,13 @@ class Board extends React.Component {
     }
   }
 
-  getPossibleActions(role, hasPilotFlownThisTurn) {
+  getPossibleActions(player, hasPilotFlownThisTurn, isInitial) {
       let actions = [];
       for (let i = 0; i < playerDefaultActions.length; i++){
           let action = playerDefaultActions[i];
           for (let j = 0; j < playerSpecialActions.length; j++ )
           {
-            if (playerSpecialActions[j].forRole === role && playerSpecialActions[j].replacesAction === i.toString()){
+            if (playerSpecialActions[j].forRole === player.role && playerSpecialActions[j].replacesAction === i.toString()){
               action = playerSpecialActions[j];
             }
           }
@@ -812,11 +812,33 @@ class Board extends React.Component {
           remove give if noOne
           remove Get a treasure if no 4 and no temple0002
           */
-
-          actions.push(action);
+          if (isInitial && (action.name === "Give" || action.name === "Get a Treasure !"){
+            // nothing happens. You can never give or find a treasure on the first action of the game
+          } else if (!isInitial && action.name === "Give"){
+            if (this.state.tiles[player.position].playerOn.length > 1 ){
+              actions.push(action);
+            }
+          } else if(!isInitial && action.name === "Get a Treasure !"){
+            if (this.state.tiles[player.position].templeFor.length === 2){
+              actions.push(action);
+            }
+          } else if (!isInitial && ( action.name === "Dry" || action.name === "Dry around")){
+            let whereCanHeDry = this.whereCanHeDry(player.position, player.role);
+            if (whereCanHeDry.length > 0){
+              actions.push(action);
+            }
+          } else if (!isInitial && ( action.name === "Move" || action.name === "Move around")){
+            let whereCanHeMove = this.whereCanHeMove(player.position, player.role);
+            if (whereCanHeMove.length > 0){
+              actions.push(action);
+            }
+          }
+          else {
+            actions.push(action);
+          }
       }
 
-      if (role === "Pilot"){
+      if (player.role === "Pilot"){
         // remove the first action which is fly
         let nada = actions.shift();
         let pilotActions = [];
@@ -827,7 +849,7 @@ class Board extends React.Component {
         return pilotActions.concat(actions);
       }
 
-      if (role === "Navigator"){
+      if (player.role === "Navigator"){
         // remove the first action which is move
         let nada = actions.shift();
         let navigatorActions = [];
@@ -1124,7 +1146,7 @@ class Board extends React.Component {
           }
       } else if (action === "MoveSomeone") {
               this.setState({ whatIsExpectedNext: "ResolveUserDialogSequence" , messageBoardState: "moveSomeOneSequence"});
-      } else if (action === "DoNothing"){
+      } else if (action === "Sleep"){
               let newMessage = new UserMessage("Doing nothing ZZZZZZZ ", false, [0]);
               this.setState({ mainUserMessage: newMessage});
       } else if (action === "SkipTurn"){
