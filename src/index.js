@@ -74,9 +74,9 @@ const diagonalPaths = {0 : [2, 4], 1 : [3, 5], 2 : [0, 6, 8], 3 : [1,7,9], 4 : [
       {id : 1, name : "Dry", text: "Dry an adjacent tile", enabled : true, triggers : "Dry"  }, //has an adjacent immersed tile around ?
       {id : 2, name : "Give", text: "Give a card on a character on the same tile", enabled : true, triggers : "Give" }, //has a player on his tile ?
       {id : 3, name : "Get a Treasure !", text: "Get the treasure in this temple.", enabled : true, triggers : "GetATreasure"  }, // has 4 cards and is on the right temple
-      {id : 4, name : "Sleep", text: "Simply do nothing.", enabled : true, triggers : "DoNothing"  }, // -
+      /*{id : 4, name : "DoNothing", text: "Simply do nothing.", enabled : true, triggers : "DoNothing"  }, // -*/
       /* {id : 5, name : "Skip Turn", text: "Skip the player'sTurn.", enabled : true, triggers : "SkipTurn"  } // -*/
-      {id : 6, name : "Skip Actions", text: "Skip the player's Actions.", enabled : true, triggers : "SkipActions"  }
+      {id : 6, name : "Sleep", text: "Skip the player's Actions.", enabled : true, triggers : "SkipActions"  }
  ];
 
  const playerSpecialActions = [
@@ -812,7 +812,7 @@ class Board extends React.Component {
           remove give if noOne
           remove Get a treasure if no 4 and no temple0002
           */
-          if (isInitial && (action.name === "Give" || action.name === "Get a Treasure !"){
+          if (isInitial && (action.name === "Give" || action.name === "Get a Treasure !")){
             // nothing happens. You can never give or find a treasure on the first action of the game
           } else if (!isInitial && action.name === "Give"){
             if (this.state.tiles[player.position].playerOn.length > 1 ){
@@ -1101,14 +1101,14 @@ class Board extends React.Component {
                   }
 
                   if (cardsIndexes.length < 4){
-                    alert("You do not have enough " + this.getTreasureNameById(treasureId) + " cards to get the treasure... you need 4 , you have only " + cardsIndexes.length);
+                    alert("You do not have enough " + this.getTreasureNameById(treasureId) + " cards to get the treasure... you need 4 , you have " + cardsIndexes.length);
                     this.showActionButtons();
                   } else if (this.state.posessedTreasures.includes(treasureId)){
                     alert("This treasure has been found already.");
                     this.showActionButtons();
                     } else {
                       if (this.state.posessedTreasures.length === 3 ){
-                        alert("You found the 4th treasure ! Now, leave the Island !");
+                        alert("You found the 4th treasure ! Now, go to the heliport and leave the Island !");
                       } else if (this.state.posessedTreasures.length === 0) {
                         alert("You found your first treasure ! Go on !");
                       } else {
@@ -1146,15 +1146,15 @@ class Board extends React.Component {
           }
       } else if (action === "MoveSomeone") {
               this.setState({ whatIsExpectedNext: "ResolveUserDialogSequence" , messageBoardState: "moveSomeOneSequence"});
-      } else if (action === "Sleep"){
+      } else if (action === "DoNothing"){ // skip one action
               let newMessage = new UserMessage("Doing nothing ZZZZZZZ ", false, [0]);
               this.setState({ mainUserMessage: newMessage});
-      } else if (action === "SkipTurn"){
+      } else if (action === "SkipTurn"){ // skip the whole player turn
              let newMessage = new UserMessage("Skip turn ", false, [0]);
              this.setState({ mainUserMessage: newMessage,
                               currentStep: 4});
-      } else if (action === "SkipActions"){
-             let newMessage = new UserMessage("Skip actions ", false, [0]);
+      } else if (action === "Sleep"){ // finish the actions, go to card picking
+             let newMessage = new UserMessage("Sleep ZZZZZZZ ", false, [0]);
              this.setState({ mainUserMessage: newMessage,
                               currentStep: 2});
       }
