@@ -204,6 +204,12 @@ list-style:none;
   border-collapse: collapse;
 }
 
+.trophyImage {
+  z-index: 10;
+  position: relative;
+  top: -53px;
+}
+
 .messagePanel {
   background: #fff;
   border: 2px solid #000;

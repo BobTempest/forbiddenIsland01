@@ -53,10 +53,10 @@ const diagonalPaths = {0 : [2, 4], 1 : [3, 5], 2 : [0, 6, 8], 3 : [1,7,9], 4 : [
  const gameSteps = ["init", "startTurn", "playerActionOne", "playerActionTwo", "playerActionThree", "playerPickACard", "floodRise", "endTurn", "final"];
 
  const treasures = [
-     { id : "CR" , name : "crystal" },
-     { id : "CU" , name : "cup" },
-     { id : "SC" , name : "sceptre"},
-     { id : "ST" , name : "statue"}
+     { id : "CR" , name : "crystal", trophyImg : "img/wonCrystal.png" },
+     { id : "CU" , name : "cup", trophyImg : "img/wonCup.png" },
+     { id : "SC" , name : "sceptre", trophyImg : "img/wonSceptre.png"},
+     { id : "ST" , name : "statue", trophyImg : "img/wonStatue.png"}
  ];
 
  const buttons = ["Next", "Cancel", "PickTwoCards 1st", "PickTwoCards 2nd", "Flood"];
@@ -74,9 +74,9 @@ const diagonalPaths = {0 : [2, 4], 1 : [3, 5], 2 : [0, 6, 8], 3 : [1,7,9], 4 : [
       {id : 1, name : "Dry", text: "Dry an adjacent tile", enabled : true, triggers : "Dry"  }, //has an adjacent immersed tile around ?
       {id : 2, name : "Give", text: "Give a card on a character on the same tile", enabled : true, triggers : "Give" }, //has a player on his tile ?
       {id : 3, name : "Get a Treasure !", text: "Get the treasure in this temple.", enabled : true, triggers : "GetATreasure"  }, // has 4 cards and is on the right temple
-      /*{id : 4, name : "DoNothing", text: "Simply do nothing.", enabled : true, triggers : "DoNothing"  }, // -*/
+      /*{id : 4, name : "DoNothing", text: "Simply do nothing.", enabled : true, triggers : "DoNothing"  }, // -
       /* {id : 5, name : "Skip Turn", text: "Skip the player'sTurn.", enabled : true, triggers : "SkipTurn"  } // -*/
-      {id : 6, name : "Sleep", text: "Skip the player's Actions.", enabled : true, triggers : "SkipActions"  }
+      {id : 6, name : "Sleep", text: "Skip the player's Actions.", enabled : true, triggers : "DoSleep"  }
  ];
 
  const playerSpecialActions = [
@@ -168,6 +168,13 @@ function DrawEmptySquare(props) {
   );
 }
 
+function DrawEmptySquareWithTreasure(props) {
+  return (
+    <span><button className="emptySquare"></button>
+    <img className="trophyImage" src={props.imagePath}/></span>
+  );
+}
+
 function DrawPlayerPawn(props){
   if (props.pawns && props.pawns.length === 1){
     return (
@@ -249,7 +256,6 @@ class Board extends React.Component {
 
     // Let's start ... waiting for the first action click
 
-
     function getInitialPlayerPosition(player, y, z){
       //start hack
       // tiles[14].playerOn.push(player.id);
@@ -261,7 +267,6 @@ class Board extends React.Component {
           break;
         }
       }
-
     }
 
     function giveTwoInitialCards(player, y , z){
@@ -1147,13 +1152,13 @@ class Board extends React.Component {
       } else if (action === "MoveSomeone") {
               this.setState({ whatIsExpectedNext: "ResolveUserDialogSequence" , messageBoardState: "moveSomeOneSequence"});
       } else if (action === "DoNothing"){ // skip one action
-              let newMessage = new UserMessage("Doing nothing ZZZZZZZ ", false, [0]);
+              let newMessage = new UserMessage("Doing nothing ZZZZZZZ", false, [0]);
               this.setState({ mainUserMessage: newMessage});
-      } else if (action === "SkipTurn"){ // skip the whole player turn
+      } else if (action === "SkipTurn"){ // skip the whole player turn, goes to next player
              let newMessage = new UserMessage("Skip turn ", false, [0]);
              this.setState({ mainUserMessage: newMessage,
                               currentStep: 4});
-      } else if (action === "Sleep"){ // finish the actions, go to card picking
+      } else if (action === "DoSleep"){ // finish the actions, go to card picking
              let newMessage = new UserMessage("Sleep ZZZZZZZ ", false, [0]);
              this.setState({ mainUserMessage: newMessage,
                               currentStep: 2});
@@ -1580,6 +1585,32 @@ handleTileClick(i) {
     );
   }
 
+  renderTreasureSquare(treasureId) {
+    // if le tresor a été trouvé draw it else Draw empty square
+    let trophyPath = "";
+    if (this.state.posessedTreasures.indexOf(treasureId) >= 0){
+
+      for (let i = 0 ; i < treasures.length; i++){
+        if (treasures[i].id === treasureId)
+        {
+          trophyPath = treasures[i].trophyImg;
+          break;
+        }
+      }
+    }
+
+    return (
+      <span>
+      {
+        trophyPath.length > 0 ?
+          <DrawEmptySquareWithTreasure imagePath={trophyPath}/>
+            :
+          <DrawEmptySquare />
+      }
+      </span>)
+  }
+
+
   renderPlayerBoard(i) { // passing a player index
     this.state.players[i].printIntroduction; // TO REMOVE
     let isPlaying = this.state.currentPlayerPlaying === i;
@@ -1870,12 +1901,12 @@ handleTileClick(i) {
         <div className="board-column">
           <div className="islandBoard">
             <div className="board-row">
-              {this.renderEmptySquare()}
+              {this.renderTreasureSquare("ST")}
               {this.renderEmptySquare()}
               {this.renderSquare(0)}
               {this.renderSquare(1)}
               {this.renderEmptySquare()}
-              {this.renderEmptySquare()}
+              {this.renderTreasureSquare("SC")}
             </div>
             <div className="board-row">
               {this.renderEmptySquare()}
@@ -1910,12 +1941,12 @@ handleTileClick(i) {
               {this.renderEmptySquare()}
             </div>
             <div className="board-row">
-              {this.renderEmptySquare()}
+              {this.renderTreasureSquare("CU")}
               {this.renderEmptySquare()}
               {this.renderSquare(22)}
               {this.renderSquare(23)}
               {this.renderEmptySquare()}
-              {this.renderEmptySquare()}
+              {this.renderTreasureSquare("CR")}
             </div>
           </div>
           <div className="floodOmeter">
@@ -2150,10 +2181,10 @@ function generateFloodCardsLeap(){
 }
 
 function generatePlayers(){
-    // navigator hack off
-    // let roles = [0,1,2,3,4,5];
-    // roles = shuffleArray(roles);
-    let roles = [3,5,2,1,4,0];
+    // Diver hack off
+    let roles = [0,1,2,3,4,5];
+    roles = shuffleArray(roles);
+    // let roles = [3,5,2,1,4,0];
     let players = [];
     for (let i = 0; i < 4; i++){
       let type = roles[i];
