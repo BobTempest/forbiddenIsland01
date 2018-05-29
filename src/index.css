@@ -207,7 +207,6 @@ list-style:none;
 .trophyImage {
   z-index: 10;
   position: relative;
-  top: -53px;
 }
 
 .messagePanel {

@@ -170,8 +170,9 @@ function DrawEmptySquare(props) {
 
 function DrawEmptySquareWithTreasure(props) {
   return (
-    <span><button className="emptySquare"></button>
-    <img className="trophyImage" src={props.imagePath}/></span>
+    <button className="emptySquare">
+        <img className="trophyImage" src={props.imagePath}/>
+    </button>
   );
 }
 
