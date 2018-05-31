@@ -215,7 +215,7 @@ class Board extends React.Component {
     let mainUserMessage = new UserMessage("Welcome new Player. Choose a first action for the first character.", false, []);
 
     // generer les joueurs
-    var players = generatePlayers();
+    var players = generatePlayers(4);
     // distribuer les cartes aux joueurs
     players.forEach(giveTwoInitialCards);
     // assigner les positions de depart
@@ -280,7 +280,7 @@ class Board extends React.Component {
         */
         //end of helicopter Hack
 
-      for (let i = 0; i < 2; i++){
+      for (let i = 0; i < 2; i++){ // 2
       // for (let i = 0; i < 5; i++){ // HACK OF 5 Cards in the beg
             let card = playerCardsLeap.pop();
             while (card.name === "floodRise"){
@@ -700,7 +700,7 @@ class Board extends React.Component {
     if (this.state.posessedTreasures.length === 4 &&
         this.state.tiles[this.state.players[playerId].position].name === "helipad" &&
         this.state.tiles[this.state.players[playerId].position].playerOn.length === this.state.nbrOfPlayers) {
-          alert("The 4 valliant exppplorers leave the island with the 4 treasures. You WON !");
+          alert("The " + this.state.nbrOfPlayers + " valliant exppplorers leave the island with the 4 treasures. You WON !");
         }
     let whatIsExpectedNext_toRestore = this.state.whatIsExpectedNext;
     let n_Message = new UserMessage("Now choose a landing destination", false, [7]);
@@ -811,13 +811,8 @@ class Board extends React.Component {
               action = playerSpecialActions[j];
             }
           }
-          // TODO : is action possible ? Check the validity of an action and remove it
-          /*
-          remove move if nowhere to go
-          remove dry if nothing to dry
-          remove give if noOne
-          remove Get a treasure if no 4 and no temple0002
-          */
+          // is action possible ? Check the validity of an action and remove it
+
           if (isInitial && (action.name === "Give" || action.name === "Get a Treasure !")){
             // nothing happens. You can never give or find a treasure on the first action of the game
           } else if (!isInitial && action.name === "Give"){
@@ -910,19 +905,6 @@ class Board extends React.Component {
 
       moves =  groundsHeCanGoTo;
 
-      /*
-        let afterSwimPositions = [];
-        moves = orthogonalPaths[position];
-        for (let j = 0 ; j < moves.length; j++){
-          if (this.state.tiles[moves[j]].isDrawned || this.state.tiles[moves[j]].isImmersed)
-          {
-              //  isDrawned
-              afterSwimPositions = afterSwimPositions.concat(orthogonalPaths[moves[j]]);
-          }
-        }
-
-        moves = moves.concat(afterSwimPositions);
-        */
     }
     else {
       // regular orthogonal possibilities
@@ -1081,10 +1063,10 @@ class Board extends React.Component {
               let newMessage = new UserMessage("Now choose two tiles to dry", false, [1]);
               this.setState({ whatIsExpectedNext: "TileButtonClickForDryTwoTimes" , mainUserMessage: newMessage});
             }
-      } else if (action === "SendACard" || action === "Give") {
+      } else if (action === "Give") {
               let playersAround = this.getPlayersOnTheSameTileExceptMe();
               if (this.state.players[id].cards.length < 1 ){
-                alert("No cards to send or to give. Try something else.");
+                alert("No cards to give. Try something else.");
                 this.showActionButtons();
               } else if ( action === "Give" && playersAround.length < 1) {
                   alert("No other player on your tile. Try something else.");
@@ -1092,6 +1074,13 @@ class Board extends React.Component {
               } else {
                 this.setState({ whatIsExpectedNext: "ResolveUserDialogSequence" , messageBoardState: "giveACardSequence"});
               }
+      } else if (action === "SendACard") {
+            if (this.state.players[id].cards.length < 1 ){
+              alert("No cards to send. Try something else.");
+              this.showActionButtons();
+            } else {
+              this.setState({ whatIsExpectedNext: "ResolveUserDialogSequence" , messageBoardState: "sendACardSequence"});
+            }
       } else if (action === "GetATreasure") {
               let treasureId = this.state.tiles[this.state.players[id].position].templeFor;
               if (treasureId === ""){
@@ -1420,9 +1409,8 @@ handleTileClick(i) {
         else{
           alert ("He can't move there !");
         }
-
       } else {
-            alert ("Unexpected Clic On a Tile");
+        alert ("Unexpected Clic On a Tile");
       }
     }
 
@@ -1528,7 +1516,6 @@ handleTileClick(i) {
                     players: n_players}, () => {
                             this.doCheckIfMoreThan5CardsInHand(0, receiver);
                     });
-      // this.controller("ActionIsDone");
     }
   }
 
@@ -1548,19 +1535,20 @@ handleTileClick(i) {
     return playersOnTheSameTileExceptMe;
   }
 
-/*
-  getPlayersOnTheSameTileExceptMeById(id){
-    let playersOnTheSameTileExceptMe = [];
-    let currentpostion = this.state.players[id].position;
+  getPlayersIdsExceptMe(id){
+    let playersIdsExceptMe = [];
+    if (id === null || id === undefined){
+      id = this.state.currentPlayerPlaying;
+    }
 
     for (let i = 0 ; i < this.state.players.length; i++){
-      if (this.state.players[i].position === currentpostion && this.state.players[i].id !== id){
-        playersOnTheSameTileExceptMe.push(this.state.players[i].id);
+      if ( this.state.players[i].id !== id){
+        playersIdsExceptMe.push(this.state.players[i].id);
       }
     }
-    return playersOnTheSameTileExceptMe;
+    return playersIdsExceptMe;
   }
-*/
+
   getPlayersOnATile(position){
     let playersOnTheTile = [];
 
@@ -1678,45 +1666,84 @@ handleTileClick(i) {
       let giverId = this.state.players[this.state.currentPlayerPlaying].id;
       let playersOnTheSameTileExceptMe = this.getPlayersOnTheSameTileExceptMe();
       console.log('playersOnTheSameTileExceptMe = ' + playersOnTheSameTileExceptMe);// seems Ok
-      let chosenCard = null;
+      let chosenCard = this.state.players[giverId].cards.length === 1 ? this.state.players[giverId].cards[0].id : null;
       let receiver = playersOnTheSameTileExceptMe.length === 1 ? playersOnTheSameTileExceptMe[0] : null;
 
       return (
           <div>
-            Which card do you want to give { playersOnTheSameTileExceptMe.length === 1 ?
-                (<span>to { this.state.players[playersOnTheSameTileExceptMe[0]].playersName} </span> )
-                : <span></span> }
+            Which card do you want to give
+                { playersOnTheSameTileExceptMe.length === 1 ?
+                  (<span> to <span style={{color: this.state.players[playersOnTheSameTileExceptMe[0]].color}}>{ this.state.players[playersOnTheSameTileExceptMe[0]].playersName} </span></span> )
+                  : <span></span>
+                }
             ? <br/>
             {
+              this.state.players[giverId].cards.length === 1 ?
+              <span key="0"><input type="radio" name="chosenCard" key="0" checked="checked" value={this.state.players[giverId].cards[0].id} onChange={() => chosenCard = this.state.players[giverId].cards[0].id} /> { this.state.players[giverId].cards[0].name} <br/></span>
+              :
               this.state.players[giverId].cards.map((card, index) =>
               <span key={index}><input type="radio" name="chosenCard" key={index} value={card.id} onChange={() => chosenCard = card.id} />{card.name}<br/></span>
               )
             }
             {
-              playersOnTheSameTileExceptMe.length > 1 || this.state.players[giverId].role === "Messenger" ?
+              playersOnTheSameTileExceptMe.length > 1 ?
               <span>To whom do you want to give it ?<br/></span>
               :
               <span></span>
             }
             {
-              this.state.players[giverId].role === "Messenger" ?
-
-                 this.state.players.map((player, index) => {
-                  return (player.id != giverId) ?
-                    (<span key={index}><input type="radio" name="receiver" key={index} value={player.id} onChange={() => receiver = player.id}/>{player.playersName}<br/></span>)
-                    :
-                    (<span key={index}></span>)
-                  })
-              :
-              (playersOnTheSameTileExceptMe.length > 1 ?
+              playersOnTheSameTileExceptMe.length > 1 ?
                 playersOnTheSameTileExceptMe.map((player, index) => {
-                    return <span key={index}><input type="radio" name="receiver" key={index} value={this.state.players[player].id} onChange={() => receiver = this.state.players[player].id}/>{this.state.players[player].playersName}<br/></span>
+                    return <span key={index}><input type="radio" name="receiver" key={index} value={this.state.players[player].id} onChange={() => receiver = this.state.players[player].id}/><span style={{color: this.state.players[player].color}}>{this.state.players[player].playersName}</span><br/></span>
                   })
                 :
                 <span></span>
+            }
+            <button className="actionButton" value="Give" onClick={() => this.doGiveACard(giverId, chosenCard, receiver)}> Give </button><br/>
+            <button className="actionButton" value="Cancel" onClick={() => this.cancelAnAction()}>Cancel</button>
+          </div>
+      )
+    } else if (this.state.messageBoardState === "sendACardSequence") {
+      let giverId = this.state.players[this.state.currentPlayerPlaying].id;
+      let otherPlayers = this.getPlayersIdsExceptMe(giverId);
+      let chosenCard = this.state.players[giverId].cards.length === 1 ? this.state.players[giverId].cards[0].id : null;
+      let receiver = otherPlayers.length === 1 ? otherPlayers[0] : null;
+
+      return (
+          <div>
+            Which card do you want to send
+                    { otherPlayers.length === 1 ?
+                      (<span> to <span style={{color: this.state.players[otherPlayers[0]].color}}> {this.state.players[otherPlayers[0]].playersName} </span></span> )
+                      : <span></span>
+                    }
+            ? <br/>
+            {
+              // TODO : if only one card
+              this.state.players[giverId].cards.length === 1 ?
+              <span key="0"><input type="radio" name="chosenCard" key="0" checked="checked" value={this.state.players[giverId].cards[0].id} onChange={() => chosenCard = this.state.players[giverId].cards[0].id} /> { this.state.players[giverId].cards[0].name} <br/></span>
+              :
+              this.state.players[giverId].cards.map((card, index) =>
+              <span key={index}><input type="radio" name="chosenCard" key={index} value={card.id} onChange={() => chosenCard = card.id} />{card.name}<br/></span>
               )
             }
-            <button className="actionButton" value="Give" onClick={() => this.doGiveACard(giverId, chosenCard, receiver)}>{this.state.players[giverId].role === "Messenger" ? "Send" : "Give" } </button><br/>
+            {
+              otherPlayers.length > 1  ?
+              <span>To whom do you want to send it ?<br/></span>
+              :
+              <span></span>
+            }
+            {
+              otherPlayers.length > 1 ?
+                 this.state.players.map((player, index) => {
+                  return (player.id != giverId) ?
+                    (<span key={index}><input type="radio" name="receiver" key={index} value={player.id} onChange={() => receiver = player.id}/><span style={{color: player.color}}>{player.playersName}</span><br/></span>)
+                    :
+                    (<span key={index}></span>)
+                  })
+                :
+                <span></span>
+            }
+            <button className="actionButton" value="Give" onClick={() => this.doGiveACard(giverId, chosenCard, receiver)}> Send </button><br/>
             <button className="actionButton" value="Cancel" onClick={() => this.cancelAnAction()}>Cancel</button>
           </div>
       )
@@ -1738,17 +1765,17 @@ handleTileClick(i) {
           <div>
             {
                   playersOnTheSameTileExceptMe.length === 0 ? // Ok
-                     (<div> {this.state.players[flyerId].playersName}, choose a landing destination.</div>)
+                     (<div> <span style={{color: this.state.players[flyerId].color}}>{this.state.players[flyerId].playersName}</span>, choose a landing destination.</div>)
                     : playersOnTheSameTileExceptMe.length === 1 ? // Ok
-                       (<div> {this.state.players[flyerId].playersName}, do you want to take {this.state.players[playersOnTheSameTileExceptMe[0]].playersName} with you ? <br/>
+                       (<div> <span style={{color: this.state.players[flyerId].color}}>{this.state.players[flyerId].playersName}</span>, do you want to take <span style={{color: this.state.players[playersOnTheSameTileExceptMe[0]].color}}>{this.state.players[playersOnTheSameTileExceptMe[0]].playersName}</span> with you ? <br/>
                          <input type="radio" name="coTraveller" key="yes" value="yes" onChange={() => travellers = [flyerId, playersOnTheSameTileExceptMe[0]]}/>Yes<br/>
                          <input type="radio" name="coTraveller" key="no" value="no" onChange={() => travellers = [flyerId]}/>No<br/>
                        </div>)
                       :
-                        (<div> {this.state.players[flyerId].playersName}, select the guys you want to take with you ? <br/>
+                        (<div><span style={{color: this.state.players[flyerId].color}}>{this.state.players[flyerId].playersName}</span>, select the guys you want to take with you ? <br/>
                         {
                           playersOnTheSameTileExceptMe.map((playerId, index) => {
-                             return <span key={index}><input type="checkBox" name="traveller" id={"checkBoxAmadeusFor"+playerId} key={index} value={playerId} onChange={() => Amadeus(playerId, "checkBoxAmadeusFor"+playerId)} />{this.state.players[playerId].playersName}<br/></span>
+                             return <span key={index}><input type="checkBox" name="traveller" id={"checkBoxAmadeusFor"+playerId} key={index} value={playerId} onChange={() => Amadeus(playerId, "checkBoxAmadeusFor"+playerId)} /><span style={{color: this.state.players[playerId].color}}>{this.state.players[playerId].playersName}</span><br/></span>
                           })
                         }
                         </div>)
@@ -1764,7 +1791,7 @@ handleTileClick(i) {
               {
               (this.state.players.map((player, index) => {
                 return (player.role != "Navigator") ?
-                  (<span key={index}><input type="radio" name="puppet" key={index} value={player.id} onChange={() => puppet = player.id}/>{player.playersName}<br/></span>)
+                  (<span key={index}><input type="radio" name="puppet" key={index} value={player.id} onChange={() => puppet = player.id}/><span style={{color: player.color}}>{player.playersName}</span><br/></span>)
                   :
                   (<span key={index}></span>)
                 }))
@@ -1783,15 +1810,16 @@ handleTileClick(i) {
         <div>
           <span  style={{color: color}}>{name}</span> has more than 5 cards in Hand.<br/>
           Let's get rid Ov it : <br/>
+          <table class="throwTable">
           {
             (this.state.players[userId].cards.map((card, index) => {
               return (card.type === "H" || card.type === "SB") ?
-                  (<span key={index}>{card.name} <button onClick={() => this.throwCard(card.type, index, userId)}>throw away</button> <button onClick={() => this.useACardToGetRidOfIt(card.type, index, userId)}>use it now</button><br/></span>)
+                  (<tr><td><span key={index}/>{card.name}</td><td> <img src= {card.url}  width="20px" height="32px"/></td><td><button onClick={() => this.throwCard(card.type, index, userId)}>throw away</button></td><td><button onClick={() => this.useACardToGetRidOfIt(card.type, index, userId)}>use it now</button></td></tr>)
                   :
-                  (<span key={index}>{card.name} <button onClick={() => this.throwCard(card.type, index, userId)}>throw away</button><br/></span>)
+                  (<tr><td><span key={index}/>{card.name}</td><td> <img src= {card.url}  width="20px" height="32px"/></td><td><button onClick={() => this.throwCard(card.type, index, userId)}>throw away</button></td><td>&nbsp;</td></tr>)
             }))
           }
-
+        </table>
         </div>
       )
     } else if (this.state.messageBoardState === "empty"){
@@ -1968,10 +1996,19 @@ handleTileClick(i) {
         </div>
         <div className="playerBoard-column">
           <div>
-            {this.renderPlayerBoard(0)}
-            {this.renderPlayerBoard(1)}
-            {this.renderPlayerBoard(2)}
-            {this.renderPlayerBoard(3)}
+
+              {this.renderPlayerBoard(0)}
+              {this.renderPlayerBoard(1)}
+              {this.state.nbrOfPlayers > 2 ?
+                this.renderPlayerBoard(2)
+                :
+                <span></span>
+              }
+              {this.state.nbrOfPlayers > 3 ?
+                this.renderPlayerBoard(3)
+                :
+                <span></span>
+              }
           </div>
         </div>
       </div>
@@ -2181,13 +2218,16 @@ function generateFloodCardsLeap(){
     return cards;
 }
 
-function generatePlayers(){
+function generatePlayers(howMany){
+    if (howMany > 4 || howMany < 2){
+      alert ("CONCEPTUAL ERROR : Too many player requested");
+    }
     // Diver hack off
     let roles = [0,1,2,3,4,5];
     roles = shuffleArray(roles);
     // let roles = [3,5,2,1,4,0];
     let players = [];
-    for (let i = 0; i < 4; i++){
+    for (let i = 0; i < howMany; i++){
       let type = roles[i];
       let player = new Player(
           i, type, playerTypes[type].role, playerTypes[type].color, playerTypes[type].name, 0, [], true, false

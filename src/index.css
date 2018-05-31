@@ -199,6 +199,11 @@ list-style:none;
   border-collapse: collapse;
 }
 
+.throwTable, th, tr, td  {
+  border: 0px solid white;
+  border-collapse: collapse;
+}
+
 .invisiTable {
   border: 0px solid white;
   border-collapse: collapse;

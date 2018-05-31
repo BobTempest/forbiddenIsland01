@@ -2,19 +2,18 @@
 *********************
 **** NOW *****
 
-TODO : remove actions when not possible
-TODO : check player cards leap
-TODO : Put warning and Name in too much card Message
 
--test the playing card ability
-
--> do a graphic treasures found so far
+TODO : Remove one when there's only one card to give
+TODO : images in menu throw
+TODO : animated gif on the actionable cards
+TODO : Welcome boardBoard, how many players + set difficulty
+TODO : GameOver Board
 
 
 *********************
 **** SHORT TERM *****
 
- - en dev mode : voir les leaps et discards
+
 
 *********************
 ***** LONG TERM *****
