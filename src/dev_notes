@@ -2,13 +2,10 @@
 *********************
 **** NOW *****
 
-
-TODO : Remove one when there's only one card to give
-TODO : images in menu throw
+TODO : image on the givable cards
 TODO : animated gif on the actionable cards
 TODO : Welcome boardBoard, how many players + set difficulty
 TODO : GameOver Board
-
 
 *********************
 **** SHORT TERM *****
@@ -22,6 +19,7 @@ TODO : GameOver Board
 - losange pic ? clickable losange pic ?
 - story telling : Diary of events
  bar des aventuriers et cimetière dans la ville
+- animations
 
 *********************
 ******** BUGS *******

@@ -348,8 +348,6 @@ class Board extends React.Component {
               mainUserMessage : newMessage,
               tiles: n_tiles });
           }
-
-          // TODO here : suppress blink from all the tiles
         }
         else{
           // next action for the same player
@@ -490,7 +488,6 @@ class Board extends React.Component {
     }
     else if (number === outOf){
       // floodings are finished
-      // floodingSequence = null;
       message = message + "<br/> Floodings are over.... for now.</div>";
       n_userMessage = new UserMessage(message , false, [0]);
     }
@@ -509,11 +506,6 @@ class Board extends React.Component {
       tiles: n_Tiles,
       guysToEvacuate: guysToEvacuate,
       floodingSequence: floodingSequence});
-
-      // make it blink
-      //  alert(floodedTileId); marche
-      // document.getElementById('square' + floodedTileId).classList.add("blink");
-      //  marche !!! mais est over written par le setstate
   }
 
   doEvacuate(){
@@ -595,9 +587,6 @@ class Board extends React.Component {
 
       // has Player too much cards ?
       let nbrOfCardsInHand = newPlayers[this.state.currentPlayerPlaying].cards.length + 1;
-      // if (nbrOfCardsInHand > 5){
-        //alert ("Oh no ! Over 5 cards in Hand !");
-      // }
 
       if (cardToPushToPlayer != null){
               newPlayers[this.state.currentPlayerPlaying].cards.push(cardToPushToPlayer);
@@ -619,7 +608,6 @@ class Board extends React.Component {
       tempState.floodCardsDiscard = newFloodCardsDiscard;
       tempState.floodCardsOutOfGame = newFloodCardsOutOfGame;
       tempState.floodMeter = newFloodMeter;
-      // tempState.tiles = newTiles;
 
       return tempState;
   }
@@ -695,6 +683,7 @@ class Board extends React.Component {
   }
 
   clickedOnHelicopterCard(playerId) {
+    /*
     // Check if the game is won :
     // on the helipad, 4 treasures found, all players on the tile
     if (this.state.posessedTreasures.length === 4 &&
@@ -702,6 +691,7 @@ class Board extends React.Component {
         this.state.tiles[this.state.players[playerId].position].playerOn.length === this.state.nbrOfPlayers) {
           alert("The " + this.state.nbrOfPlayers + " valliant exppplorers leave the island with the 4 treasures. You WON !");
         }
+        */
     let whatIsExpectedNext_toRestore = this.state.whatIsExpectedNext;
     let n_Message = new UserMessage("Now choose a landing destination", false, [7]);
     let n_messageBoardState_toRestore = this.state.messageBoardState;
@@ -717,6 +707,13 @@ class Board extends React.Component {
   }
 
   helicopterCardEnRoute(playerId, travellers){
+    // Check if the game is won :
+    // on the helipad, 4 treasures found, all players on the tile
+    if (this.state.posessedTreasures.length === 4 &&
+        this.state.tiles[this.state.players[playerId].position].name === "helipad" &&
+        this.state.tiles[this.state.players[playerId].position].playerOn.length === this.state.nbrOfPlayers) {
+          alert("The " + this.state.nbrOfPlayers + " valliant exppplorers leave the island with the 4 treasures. You WON !");
+        }
     // displays the possible destinations
     let tilesToLight = this.whereCanHeFly(this.state.players[playerId].position);
     this.state.players[playerId].whereCanHeFly = tilesToLight;
@@ -1013,6 +1010,7 @@ class Board extends React.Component {
     return cases;
   }
 
+// Handles a click on an action button in the left menu
  handleActionClick(action) {
     this.hideActionButtons();
     console.log("clicked on " + action);
@@ -1174,6 +1172,7 @@ handleCardClick(card, playerId, toThrowIt){
   }
 }
 
+// Handles a click on a tile
 handleTileClick(i) {
     this.showActionButtons();
     if (this.state.whatIsExpectedNext === "TileButtonClickForMove") {
@@ -1289,9 +1288,27 @@ handleTileClick(i) {
 
             player.whereCanHeFly = [];
             n_Players[player.id] = player;
+
+
+            // If the currently active player is among the travellers and destination tile has a guy on it,
+            // recalculate the current active player possible actions to include the 'give' action unless he is the messenger
+            let n_possibleActions = this.state.possibleActions;
+            if (this.state.currentPlayerPlaying === this.state.cardUser
+                && this.state.tiles[i].playerOn.length > 0
+                && n_Players[this.state.cardUser].role != "Messenger")
+              {
+                  let y = n_possibleActions.length - 1;
+                  n_possibleActions.splice(y, 0, playerDefaultActions[2]);
+              }
+              else {
+                //
+              }
+
+
             // Move
             let returnPack = this.moveAGroupOfPlayers(player.id, this.state.coTravellers, i, n_Players, this.state.tiles);
             //
+
             this.setState({ whatIsExpectedNext: this.state.whatIsExpectedNext_toRestore,
                             messageBoardState: this.state.messageBoardState_toRestore,
                             mainUserMessage: this.state.mainUserMessage_toRestore,
@@ -1299,12 +1316,13 @@ handleTileClick(i) {
                             coTravellers: [],
                             players: returnPack.players,
                             tiles: returnPack.tiles,
+                            possibleActions: n_possibleActions,
                             playerCardsDiscard: n_PlayerCardsDiscard,
                             messageBoardState_toRestore: null,
                             whatIsExpectedNext_toRestore: null });
             let nada = this.unlightTheTiles();
         } else {
-          alert("He can't fly there with his card");
+          alert("He can't fly there with his H card");
         }
       }
       else if (this.state.whatIsExpectedNext === "TileButtonClickForDryWithACard") {
@@ -1677,14 +1695,26 @@ handleTileClick(i) {
                   : <span></span>
                 }
             ? <br/>
+            <table class="throwTable">
+              <tbody>
             {
               this.state.players[giverId].cards.length === 1 ?
-              <span key="0"><input type="radio" name="chosenCard" key="0" checked="checked" value={this.state.players[giverId].cards[0].id} onChange={() => chosenCard = this.state.players[giverId].cards[0].id} /> { this.state.players[giverId].cards[0].name} <br/></span>
+              <tr>
+                <td><span key="0" /><input type="radio" name="chosenCard" key="0" checked="checked" value={this.state.players[giverId].cards[0].id} onChange={() => chosenCard = this.state.players[giverId].cards[0].id} /></td>
+                <td><img src= {this.state.players[giverId].cards[0].url}  width="20px" height="32px"/></td>
+                <td>{ this.state.players[giverId].cards[0].name} </td>
+              </tr>
               :
               this.state.players[giverId].cards.map((card, index) =>
-              <span key={index}><input type="radio" name="chosenCard" key={index} value={card.id} onChange={() => chosenCard = card.id} />{card.name}<br/></span>
+              <tr>
+                <td><span key={index}/><input type="radio" name="chosenCard" key={index} value={card.id} onChange={() => chosenCard = card.id} /></td>
+                <td><img src= {card.url}  width="20px" height="32px"/></td>
+                <td>{card.name}</td>
+              </tr>
               )
             }
+              </tbody>
+            </table>
             {
               playersOnTheSameTileExceptMe.length > 1 ?
               <span>To whom do you want to give it ?<br/></span>
@@ -1717,15 +1747,26 @@ handleTileClick(i) {
                       : <span></span>
                     }
             ? <br/>
+            <table class="throwTable">
+              <tbody>
             {
-              // TODO : if only one card
               this.state.players[giverId].cards.length === 1 ?
-              <span key="0"><input type="radio" name="chosenCard" key="0" checked="checked" value={this.state.players[giverId].cards[0].id} onChange={() => chosenCard = this.state.players[giverId].cards[0].id} /> { this.state.players[giverId].cards[0].name} <br/></span>
+              <tr>
+                <td><span key="0"/><input type="radio" name="chosenCard" key="0" checked="checked" value={this.state.players[giverId].cards[0].id} onChange={() => chosenCard = this.state.players[giverId].cards[0].id} /></td>
+                <td>{ this.state.players[giverId].cards[0].name} </td>
+                <td><img src= {this.state.players[giverId].cards[0].url}  width="20px" height="32px"/></td>
+              </tr>
               :
               this.state.players[giverId].cards.map((card, index) =>
-              <span key={index}><input type="radio" name="chosenCard" key={index} value={card.id} onChange={() => chosenCard = card.id} />{card.name}<br/></span>
+              <tr>
+                <td><span key={index}/><input type="radio" name="chosenCard" key={index} value={card.id} onChange={() => chosenCard = card.id} /></td>
+                <td>{card.name}</td>
+                <td><img src= {card.url}  width="20px" height="32px"/></td>
+              </tr>
               )
             }
+              </tbody>
+            </table>
             {
               otherPlayers.length > 1  ?
               <span>To whom do you want to send it ?<br/></span>
@@ -1811,15 +1852,27 @@ handleTileClick(i) {
           <span  style={{color: color}}>{name}</span> has more than 5 cards in Hand.<br/>
           Let's get rid Ov it : <br/>
           <table class="throwTable">
+            <tbody>
           {
             (this.state.players[userId].cards.map((card, index) => {
               return (card.type === "H" || card.type === "SB") ?
-                  (<tr><td><span key={index}/>{card.name}</td><td> <img src= {card.url}  width="20px" height="32px"/></td><td><button onClick={() => this.throwCard(card.type, index, userId)}>throw away</button></td><td><button onClick={() => this.useACardToGetRidOfIt(card.type, index, userId)}>use it now</button></td></tr>)
+                  (<tr>
+                    <td><span key={index}/>{card.name}</td>
+                    <td> <img src= {card.url}  width="20px" height="32px"/></td>
+                    <td><button onClick={() => this.throwCard(card.type, index, userId)}>throw away</button></td>
+                    <td><button onClick={() => this.useACardToGetRidOfIt(card.type, index, userId)}>use it now</button></td>
+                  </tr>)
                   :
-                  (<tr><td><span key={index}/>{card.name}</td><td> <img src= {card.url}  width="20px" height="32px"/></td><td><button onClick={() => this.throwCard(card.type, index, userId)}>throw away</button></td><td>&nbsp;</td></tr>)
+                  (<tr>
+                    <td><span key={index}/>{card.name}</td>
+                    <td> <img src= {card.url}  width="20px" height="32px"/></td>
+                    <td><button onClick={() => this.throwCard(card.type, index, userId)}>throw away</button></td>
+                    <td>&nbsp;</td>
+                  </tr>)
             }))
           }
-        </table>
+            </tbody>
+          </table>
         </div>
       )
     } else if (this.state.messageBoardState === "empty"){
@@ -1982,16 +2035,18 @@ handleTileClick(i) {
               <img src="img/FloodOmeter.png"/>
               <span className="floodOmeterCursor" id="floodOmeterCursor" style={{position: position_value, left: left_value+'px', top: top_value+'px'}}><img src="img/FloodOmeterCursor.png"/></span>
           </div>
-          <table class="cardsPilesTable">
-            <tr><th colspan="2" width="150px">Player Cards</th><th colspan="2" width="150px">Flood Cards</th></tr>
+          <table className="cardsPilesTable">
+            <tbody>
+            <tr><th colSpan="2" width="150px">Player Cards</th><th colSpan="2" width="150px">Flood Cards</th></tr>
             <tr style={{height: '18px'}}>
-              <td width="60px">leap</td><td width="90px"><table class="invisiTable"><tr class="invisiTable"><td class="jaugePlayer invisiTable" style={{width: this.state.playerCardsLeap.length}}></td><td class="superSmall invisiTable">{this.state.playerCardsLeap.length}</td></tr></table></td>
-              <td width="60px">leap</td><td width="90px"><table class="invisiTable"><tr class="invisiTable"><td class="jaugeFlood invisiTable" style={{width: this.state.floodCardsLeap.length}}></td><td class="superSmall invisiTable">{this.state.floodCardsLeap.length}</td></tr></table></td>
+              <td width="60px">leap</td><td width="90px"><table className="invisiTable"><tbody><tr className="invisiTable"><td className="jaugePlayer invisiTable" style={{width: this.state.playerCardsLeap.length}}></td><td className="superSmall invisiTable">{this.state.playerCardsLeap.length}</td></tr></tbody></table></td>
+              <td width="60px">leap</td><td width="90px"><table className="invisiTable"><tbody><tr className="invisiTable"><td className="jaugeFlood invisiTable" style={{width: this.state.floodCardsLeap.length}}></td><td className="superSmall invisiTable">{this.state.floodCardsLeap.length}</td></tr></tbody></table></td>
             </tr>
             <tr>
-              <td width="60px">discard</td><td width="90px"><table class="invisiTable"><tr class="invisiTable"><td class="jaugePlayer invisiTable" style={{width: this.state.playerCardsDiscard.length}}></td><td class="superSmall invisiTable">{this.state.playerCardsDiscard.length}</td></tr></table></td>
-              <td width="60px">discard</td><td width="90px"><table class="invisiTable"><tr class="invisiTable"><td class="jaugeFlood invisiTable" style={{width: this.state.floodCardsDiscard.length}}></td><td class="superSmall invisiTable">{this.state.floodCardsDiscard.length}</td></tr></table></td>
+              <td width="60px">discard</td><td width="90px"><table className="invisiTable"><tbody><tr className="invisiTable"><td className="jaugePlayer invisiTable" style={{width: this.state.playerCardsDiscard.length}}></td><td className="superSmall invisiTable">{this.state.playerCardsDiscard.length}</td></tr></tbody></table></td>
+              <td width="60px">discard</td><td width="90px"><table className="invisiTable"><tbody><tr className="invisiTable"><td className="jaugeFlood invisiTable" style={{width: this.state.floodCardsDiscard.length}}></td><td className="superSmall invisiTable">{this.state.floodCardsDiscard.length}</td></tr></tbody></table></td>
             </tr>
+          </tbody>
           </table>
         </div>
         <div className="playerBoard-column">
