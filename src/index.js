@@ -7,36 +7,42 @@ const playerTypes = [
     id : 0,
     role : "Engineer", // dry two tiles for one action
     color : "#CC0000", // red
+    ability : "Can dry two tiles in one action.",
     name : "Natacha"
   },
   {
     id : 1,
     role : "Navigator", // move another player from one or two tiles (straight ?) for one action
     color : "#FFF200", //yellow
+    ability : "Can move another player up to two tiles for one action.",
     name : "Boris"
   },
   {
     id : 2,
     role : "Messenger", // can give one card for one action to anyone
     color : "#FFFFFF", //white
+    ability : "Can send a card to another player for one action.",
     name : "Francois"
   },
   {
     id : 3,
     role : "Diver", // can move one wet case and one other case
     color : "#000000", // black
+    ability : "Can move throught immersed and drawned tiles.",
     name : "Gina"
   },
   {
     id : 4,
     role : "Explorer", // can move and dry orth and diagonaly
     color : "#0AB300", //green
+    ability : "Can move and dry orthogonaly and diagonaly.",
     name : "Brian"
   },
   {
     id : 5,
     role : "Pilot", // once per turn, fly where you want for 1 action
     color : "#0064b3", //blue
+    ability : "Can fly on any tile once per turn.",
     name : "Bob"
   },
 ];
@@ -1626,7 +1632,6 @@ handleTileClick(i) {
 
 
   renderPlayerBoard(i) { // passing a player index
-    this.state.players[i].printIntroduction; // TO REMOVE
     let isPlaying = this.state.currentPlayerPlaying === i;
     let boardClass = isPlaying?  ('playerBoard playerBoardPlaying') : ('playerBoard ');
 
@@ -1634,17 +1639,26 @@ handleTileClick(i) {
       <div className={boardClass}>
         <span className="inBoardName">{this.state.players[i].playersName}</span>&nbsp;the&nbsp;
         <span className="inBoardRole" style={{color: this.state.players[i].color}}>{this.state.players[i].role}</span>
+        <a className="tooltips helpCharacterIcon" id={'tooltip' + i} href="#">?<span class="inToolTipsText">{this.state.players[i].playersAbility}</span></a>
         <br/>
         <div className="inBoardCards">
           {
             this.state.players[i].cards.map((card, index) => {
               if (card){
                 return card.name === "helicopter" ?
-                  <span key={index} className="boardPlayerCards"><img src={card.url} width="45px" height="70px" onClick={() => this.handleCardClick("helicopterCard", this.state.players[i].id, false)} /></span>
+                    <span key={index} className="boardPlayerCards">
+                      <img src={card.url} width="45px" height="70px" onClick={() => this.handleCardClick("helicopterCard", this.state.players[i].id, false)} />
+                      <img className="overHand doRotate" src="img/hand.png" /*width="20px" height="24px" *//>
+                    </span>
                   : card.name === "sandBag" ?
-                      <span key={index} className="boardPlayerCards"><img src={card.url} width="45px" height="70px" onClick={() => this.handleCardClick("sandBagCard", this.state.players[i].id, false)}/></span>
+                      <span key={index} className="boardPlayerCards">
+                        <img src={card.url} width="45px" height="70px" onClick={() => this.handleCardClick("sandBagCard", this.state.players[i].id, false)}/>
+                        <img className="overHand doRotate" src="img/hand.png" /*width="20px" height="24px" *//>
+                      </span>
                       :
-                      <span key={index} className="boardPlayerCards"><img src={card.url} width="45px" height="70px" /></span>
+                      <span key={index} className="boardPlayerCards">
+                        <img src={card.url} width="45px" height="70px" />
+                      </span>
               }
             })
           }
@@ -2168,12 +2182,13 @@ class Tile {
 }
 
 class Player {
-  constructor(id, type, role, color, playersName, position, cards, isInGame, leftTheIsland) {
+  constructor(id, type, role, color, playersName, ability, position, cards, isInGame, leftTheIsland) {
     this.id = id; // int
     this.type = type; // int
     this.role = role // string
     this.color = color; // string in hexa
     this.playersName = playersName; // string
+    this.playersAbility = ability; // string
     this.position = position; // int
     this.cards = cards; // string[]
     this.isInGame = isInGame; // bool
@@ -2301,7 +2316,7 @@ function generatePlayers(howMany){
     for (let i = 0; i < howMany; i++){
       let type = roles[i];
       let player = new Player(
-          i, type, playerTypes[type].role, playerTypes[type].color, playerTypes[type].name, 0, [], true, false
+          i, type, playerTypes[type].role, playerTypes[type].color, playerTypes[type].name, playerTypes[type].ability, 0, [], true, false
       )
       players.push(player);
     }

@@ -294,6 +294,7 @@ list-style:none;
 
 .boardPlayerCards {
   margin-left: 5px;
+  width:50px;
 }
 
 .actionButton {
@@ -343,6 +344,8 @@ list-style:none;
 .game-info {
   margin-left: 20px;
 }
+
+/* Blink Animation*/
 .blink {
   animation: blinker 2s linear infinite;
 }
@@ -351,4 +354,100 @@ list-style:none;
   50% {
     opacity: 0;
   }
+}
+
+.doRotate {
+  animation: rototo 1.5s linear infinite;
+}
+
+@keyframes rototo {
+  0% {
+    top: -5px;
+    left: -21px;
+  }
+  50% {
+    top: -10px;
+    left: -26px;
+  }
+}
+
+.overHand {
+  position: relative;
+  display: inline;
+  top: -5px;
+  left: -21px;
+  z-index: 5;
+  width:20px;
+  height:26px;
+}
+
+.helpCharacterIcon {
+    float: right;
+    text-decoration:none;
+    color: black;
+    text-shadow: 1px 1px 3px #333333;
+}
+
+.inToolTipsText {
+  /*display: inline-block;*/
+  text-align: left;
+  font-size: 12px;
+  line-height: 12px;
+  padding: 10px 20px 10px 20px;
+  text-shadow: none;
+  /*
+  position: relative;
+  line-height: 9px;
+  top: -20px;
+  */
+}
+
+a.tooltips {
+  position: relative;
+  display: inline;
+}
+a.tooltips span {
+  position: absolute;
+  width:140px;
+  color: #000000;
+  background: #81DAF5;
+  border: 2px solid #080808;
+  /*
+  height: 50px;
+  line-height: 50px;
+  text-align: center;
+  */
+  visibility: hidden;
+  border-radius: 5px;
+}
+a.tooltips span:before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  margin-top: -12px;
+  width: 0; height: 0;
+  border-left: 12px solid #080808;
+  border-top: 12px solid transparent;
+  border-bottom: 12px solid transparent;
+}
+a.tooltips span:after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  margin-top: -8px;
+  width: 0; height: 0;
+  border-left: 8px solid #81DAF5;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+}
+a:hover.tooltips span {
+  visibility: visible;
+  opacity: 0.8;
+  right: 100%;
+  top: 50%;
+  margin-top: -25px;
+  margin-right: 15px;
+  z-index: 999;
 }
