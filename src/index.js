@@ -7,36 +7,42 @@ const playerTypes = [
     id : 0,
     role : "Engineer", // dry two tiles for one action
     color : "#CC0000", // red
+    ability : "Can dry two tiles in one action.",
     name : "Natacha"
   },
   {
     id : 1,
     role : "Navigator", // move another player from one or two tiles (straight ?) for one action
     color : "#FFF200", //yellow
+    ability : "Can move another player up to two tiles for one action.",
     name : "Boris"
   },
   {
     id : 2,
     role : "Messenger", // can give one card for one action to anyone
     color : "#FFFFFF", //white
+    ability : "Can send a card to another player for one action.",
     name : "Francois"
   },
   {
     id : 3,
     role : "Diver", // can move one wet case and one other case
     color : "#000000", // black
+    ability : "Can move throught immersed and drawned tiles.",
     name : "Gina"
   },
   {
     id : 4,
     role : "Explorer", // can move and dry orth and diagonaly
     color : "#0AB300", //green
+    ability : "Can move and dry orthogonaly and diagonaly.",
     name : "Brian"
   },
   {
     id : 5,
     role : "Pilot", // once per turn, fly where you want for 1 action
     color : "#0064b3", //blue
+    ability : "Can fly on any tile once per turn.",
     name : "Bob"
   },
 ];
@@ -419,6 +425,7 @@ class Board extends React.Component {
     }
 
     let card = n_FloodCardsLeap.pop();
+    let gameOver = false;
 
     for (let j = 0; j < n_Tiles.length; j++){
       if (n_Tiles[j].name === card.name){
@@ -435,6 +442,7 @@ class Board extends React.Component {
             tileHasDrawned = true;
             if (n_Tiles[j].name === "helipad"){
               message = message + "<br/> Explorers can't leave the Island any more ! Game Over !";
+              gameOver = true;
               // alert("The helipad is drawned. GAMEOVER")
             }
             // rescue some players ?
@@ -452,6 +460,7 @@ class Board extends React.Component {
                     if (k != j && n_Tiles[k].templeFor === n_Tiles[j].templeFor){
                       if (n_Tiles[k].isDrawned){
                         message = message + "<br/>Oh my God ! all the temples for " + this.getTreasureNameById(n_Tiles[j].templeFor) + " are drawned. You'll never get it. GAME OVER";
+                        gameOver = true;
                         // alert("Oh my God ! all the temples for " + this.getTreasureNameById(n_Tiles[j].templeFor) + " are drawned. You'll never get it. GAME OVER" );
                       }
                       break;
@@ -503,6 +512,7 @@ class Board extends React.Component {
       floodCardsLeap: n_FloodCardsLeap,
       floodCardsOutOfGame: n_FloodCardsOutOfGame,
       floodCardsDiscard: n_FloodCardsDiscard,
+      gameIsOver: gameOver,
       tiles: n_Tiles,
       guysToEvacuate: guysToEvacuate,
       floodingSequence: floodingSequence});
@@ -513,6 +523,7 @@ class Board extends React.Component {
       let drawningGuy = n_players[this.state.guysToEvacuate[0]];
       let drawningGuyId = drawningGuy.id;
       let tilesToLight = [];
+      let gameIsOver = false;
 
       if (drawningGuy.role === "Pilot"){
         tilesToLight = this.whereCanHeFly(drawningGuy.position);
@@ -524,6 +535,7 @@ class Board extends React.Component {
 
       if (tilesToLight.length === 0){
         alert ("Oh my God. There's nowhere he can go. " + drawningGuy.playersName+ " is drawning. Noooooooo. GAME OVER.");
+        gameIsOver = true;
       }
 
       this.lightTheTiles(tilesToLight, drawningGuy.color);
@@ -531,6 +543,7 @@ class Board extends React.Component {
       let newMessage = new UserMessage("Now choose a destination to EVACUATE", false, []);
       this.setState({ whatIsExpectedNext: "TileButtonClickForEvacuate" ,
                       players : n_players,
+                      gameIsOver : gameIsOver,
                       mainUserMessage: newMessage });
   }
 
@@ -1619,7 +1632,6 @@ handleTileClick(i) {
 
 
   renderPlayerBoard(i) { // passing a player index
-    this.state.players[i].printIntroduction; // TO REMOVE
     let isPlaying = this.state.currentPlayerPlaying === i;
     let boardClass = isPlaying?  ('playerBoard playerBoardPlaying') : ('playerBoard ');
 
@@ -1627,17 +1639,26 @@ handleTileClick(i) {
       <div className={boardClass}>
         <span className="inBoardName">{this.state.players[i].playersName}</span>&nbsp;the&nbsp;
         <span className="inBoardRole" style={{color: this.state.players[i].color}}>{this.state.players[i].role}</span>
+        <a className="tooltips helpCharacterIcon" id={'tooltip' + i} href="#">?<span class="inToolTipsText">{this.state.players[i].playersAbility}</span></a>
         <br/>
         <div className="inBoardCards">
           {
             this.state.players[i].cards.map((card, index) => {
               if (card){
                 return card.name === "helicopter" ?
-                  <span key={index} className="boardPlayerCards"><img src={card.url} width="45px" height="70px" onClick={() => this.handleCardClick("helicopterCard", this.state.players[i].id, false)} /></span>
+                    <span key={index} className="boardPlayerCards">
+                      <img src={card.url} width="45px" height="70px" onClick={() => this.handleCardClick("helicopterCard", this.state.players[i].id, false)} />
+                      <img className="overHand doRotate" src="img/hand.png" /*width="20px" height="24px" *//>
+                    </span>
                   : card.name === "sandBag" ?
-                      <span key={index} className="boardPlayerCards"><img src={card.url} width="45px" height="70px" onClick={() => this.handleCardClick("sandBagCard", this.state.players[i].id, false)}/></span>
+                      <span key={index} className="boardPlayerCards">
+                        <img src={card.url} width="45px" height="70px" onClick={() => this.handleCardClick("sandBagCard", this.state.players[i].id, false)}/>
+                        <img className="overHand doRotate" src="img/hand.png" /*width="20px" height="24px" *//>
+                      </span>
                       :
-                      <span key={index} className="boardPlayerCards"><img src={card.url} width="45px" height="70px" /></span>
+                      <span key={index} className="boardPlayerCards">
+                        <img src={card.url} width="45px" height="70px" />
+                      </span>
               }
             })
           }
@@ -1884,6 +1905,7 @@ handleTileClick(i) {
       // classic message  with one button
       let buttons = this.state.mainUserMessage.buttons;
       let databag = this.state.mainUserMessage.databag;
+      let gameIsOver = this.state.gameIsOver;
 
       let showNextBtnStyle = (buttons.indexOf(0) >= 0)?({display: 'block'}):({display: 'none'});
       let showCancelBtnStyle = (buttons.indexOf(1) >= 0)?({display: 'block'}):({display: 'none'});
@@ -1898,21 +1920,26 @@ handleTileClick(i) {
       let showCheckIfMoreThan5SecondTimeStyle = (buttons.indexOf(10) >= 0)?({display: 'block'}):({display: 'none'});
 
       return(
-          <div>
-          <span dangerouslySetInnerHTML={{__html: this.state.mainUserMessage.message}} />
-
-          <button style={showNextBtnStyle} onClick ={() => this.controller("ActionIsDone")}>Next</button>
-          <button style={showCancelBtnStyle} onClick ={() => this.cancelAnAction()}>Cancel</button>
-          <button style={showPick2CardsBtnStyle01} onClick ={() => this.controller("PickTwoCardsONE")}>Pick two cards 1st</button>
-          <button style={showPick2CardsBtnStyle02} onClick ={() => this.controller("PickTwoCardsTWO")}>Pick two cards 2nd</button>
-          <button style={showFloodBtnStyle} onClick ={() => this.controller("PlayerFlood")}>Flood !</button>
-          <button style={showNextFloodingBtnStyle} onClick ={() => this.doFloodATile(databag.nextFloodingNumber, databag.outOf)}>Next Flooding.. Hold your breath</button>
-          <button style={showCancelSandBagCardStyle} onClick ={() => this.cancelSandBagCardPick()}>Cancel</button>
-          <button style={showCancelHelicopterCardStyle} onClick ={() => this.cancelHelicopterCardPick()}>Cancel the flight</button>
-          <button style={showEvacuateStyle} onClick ={() => this.doEvacuate()}>Evacuate Explorer</button>
-          <button style={showCheckIfMoreThan5Style} onClick ={() => this.doCheckIfMoreThan5CardsInHand(0, databag.userId)}>Next</button>
-          <button style={showCheckIfMoreThan5SecondTimeStyle} onClick ={() => this.doCheckIfMoreThan5CardsInHand(1, this.state.cardUser)}>Next</button>
-        </div>
+          <div><span dangerouslySetInnerHTML={{__html: this.state.mainUserMessage.message}} />
+          {
+            !gameIsOver ?
+              (<div>
+                <button style={showNextBtnStyle} onClick ={() => this.controller("ActionIsDone")}>Next</button>
+                <button style={showCancelBtnStyle} onClick ={() => this.cancelAnAction()}>Cancel</button>
+                <button style={showPick2CardsBtnStyle01} onClick ={() => this.controller("PickTwoCardsONE")}>Pick two cards 1st</button>
+                <button style={showPick2CardsBtnStyle02} onClick ={() => this.controller("PickTwoCardsTWO")}>Pick two cards 2nd</button>
+                <button style={showFloodBtnStyle} onClick ={() => this.controller("PlayerFlood")}>Flood !</button>
+                <button style={showNextFloodingBtnStyle} onClick ={() => this.doFloodATile(databag.nextFloodingNumber, databag.outOf)}>Next Flooding.. Hold your breath</button>
+                <button style={showCancelSandBagCardStyle} onClick ={() => this.cancelSandBagCardPick()}>Cancel</button>
+                <button style={showCancelHelicopterCardStyle} onClick ={() => this.cancelHelicopterCardPick()}>Cancel the flight</button>
+                <button style={showEvacuateStyle} onClick ={() => this.doEvacuate()}>Evacuate Explorer</button>
+                <button style={showCheckIfMoreThan5Style} onClick ={() => this.doCheckIfMoreThan5CardsInHand(0, databag.userId)}>Next</button>
+                <button style={showCheckIfMoreThan5SecondTimeStyle} onClick ={() => this.doCheckIfMoreThan5CardsInHand(1, this.state.cardUser)}>Next</button>
+              </div>)
+              :
+              (<div><button onClick ={() => this.retry()}>Retry ?</button></div>)
+        }
+      </div>
       )
     }
   }
@@ -1943,11 +1970,14 @@ handleTileClick(i) {
                   ( /(?:^|\s)blink(?!\S)/g , '' )
           }
         }
-
   }
 
   graphicallyDrawnATile(i){
     document.getElementById("square" + i).style.border = "1px solid #FFF0";
+  }
+
+  retry(){
+    this.location.reload();
   }
 
   getTreasureNameById(id){
@@ -2155,12 +2185,13 @@ class Tile {
 }
 
 class Player {
-  constructor(id, type, role, color, playersName, position, cards, isInGame, leftTheIsland) {
+  constructor(id, type, role, color, playersName, ability, position, cards, isInGame, leftTheIsland) {
     this.id = id; // int
     this.type = type; // int
     this.role = role // string
     this.color = color; // string in hexa
     this.playersName = playersName; // string
+    this.playersAbility = ability; // string
     this.position = position; // int
     this.cards = cards; // string[]
     this.isInGame = isInGame; // bool
@@ -2288,7 +2319,7 @@ function generatePlayers(howMany){
     for (let i = 0; i < howMany; i++){
       let type = roles[i];
       let player = new Player(
-          i, type, playerTypes[type].role, playerTypes[type].color, playerTypes[type].name, 0, [], true, false
+          i, type, playerTypes[type].role, playerTypes[type].color, playerTypes[type].name, playerTypes[type].ability, 0, [], true, false
       )
       players.push(player);
     }
