@@ -234,21 +234,24 @@ list-style:none;
 .panelTitle {
   float: left;
   margin-left: 10px;
-  font-size: 44px;
+  font-size: 34px;
   font-weight: bold;
   text-shadow: 1px 1px 3px #333333;
   line-height: 39px;
+  width: 280px
 }
 
 .panelInfo {
   float: left;
   margin-left: 10px;
-  font-size: 20px;
+  font-size: 18px;
   text-shadow: 1px 1px 3px #333333;
 }
 
 .littlePanelInfo {
+  margin-left: 10px;
   font-size: 12px;
+  line-height: 12px;
 }
 
 .playerBoard {
@@ -351,4 +354,16 @@ list-style:none;
   50% {
     opacity: 0;
   }
+}
+
+.lilGuy {
+  position:relative;
+  text-indent: -9999px;
+  z-index: 20px;
+  width: 35px;
+  height: 100px;
+  background: url(img/lilGuy.svg);
+  background-size: 50px 50px;
+  background-repeat: none;
+  fill: #FF0000;
 }

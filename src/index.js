@@ -179,7 +179,7 @@ function DrawEmptySquareWithTreasure(props) {
 function DrawPlayerPawn(props){
   if (props.pawns && props.pawns.length === 1){
     return (
-      <div className="playerPawn singlePP" style={{color: props.players[props.pawns[0]].color}}>P</div>
+      <div className="playerPawn singlePP lilGuy" style={{color: props.players[props.pawns[0]].color}}>P</div>
     );
   }
   else if(props.pawns && props.pawns.length === 2){
@@ -536,7 +536,7 @@ class Board extends React.Component {
 
   doMoveFloodOmeterCursor(){
     let newValue = document.getElementById('floodOmeterCursor').style.left;
-    newValue = parseInt(newValue.slice(0, newValue.indexOf('px'))) + 33;
+    newValue = parseInt(newValue.slice(0, newValue.indexOf('px')), 10) + 33;
     document.getElementById("floodOmeterCursor").style.left = newValue + "px";
   }
 
@@ -1093,13 +1093,13 @@ class Board extends React.Component {
                     }
                   }
 
-                  if (cardsIndexes.length < 4){
+                  if (this.state.posessedTreasures.includes(treasureId)){
+                    alert("This treasure has been found already.");
+                  }
+                  else if (cardsIndexes.length < 4){
                     alert("You do not have enough " + this.getTreasureNameById(treasureId) + " cards to get the treasure... you need 4 , you have " + cardsIndexes.length);
                     this.showActionButtons();
-                  } else if (this.state.posessedTreasures.includes(treasureId)){
-                    alert("This treasure has been found already.");
-                    this.showActionButtons();
-                    } else {
+                  } else {
                       if (this.state.posessedTreasures.length === 3 ){
                         alert("You found the 4th treasure ! Now, go to the heliport and leave the Island !");
                       } else if (this.state.posessedTreasures.length === 0) {
@@ -1514,7 +1514,7 @@ handleTileClick(i) {
       let index = null;
       for (let i = 0; i < n_players[giver].cards.length; i++){
         if (n_players[giver].cards[i].id === card){
-          this.givenCard = n_players[giver].cards[i];
+          givenCard = n_players[giver].cards[i]; // this this. is strange
           index = i;
           break;
         }
@@ -1526,8 +1526,8 @@ handleTileClick(i) {
       n_players[giver].cards.splice(index, 1);
 
       // give to
-      n_players[receiver].cards.push(this.givenCard);
-      console.log("POST Given : " + this.givenCard.id + " to " + receiver);
+      n_players[receiver].cards.push(givenCard);
+      console.log("POST Given : " + givenCard.id + " to " + receiver);
       // alert("GIVE A CARD : " + giver + " will give the " + card + " to " + receiver);
       this.setState({whatIsExpectedNext: "" ,
                     messageBoardState: "default",
@@ -1649,21 +1649,24 @@ handleTileClick(i) {
   renderPlayerMessagePanel() {
     let foundTreasures = this.state.posessedTreasures.length;
     let foundTreasuresNames = "";
+    /*
     if (foundTreasures > 0){
       for (let i = 0; i < foundTreasures; i++){
         foundTreasuresNames = foundTreasuresNames + " " + this.getTreasureNameById(this.state.posessedTreasures[i]);
       }
       foundTreasuresNames = "(" + foundTreasuresNames + ")";
     }
+    */
 
     return (
       <span>
         <div className="messagePanel">
-          <div className="panelTitle"> FORBIDDEN<br/>::ReactJS::<br/>ISLAND</div>
-          <div className="panelInfo"> Turn : {this.state.turn} <span className="littlePanelInfo">TreasureFound : {foundTreasures}/4 {foundTreasuresNames}</span></div>
+          <div className="panelTitle"> FORBIDDEN<br/>::ReactJS::<br/>ISLAND <span className="littlePanelInfo">v.0.5.1</span></div>
+          <div className="littlePanelInfo"> Turn : {this.state.turn} </div>
+          <div className="littlePanelInfo">TreasureFound : {foundTreasures}/4 {foundTreasuresNames}</div>
           <div className="littlePanelInfo"> FloodLevel {this.state.floodMeter.level} ({this.state.floodMeter.floodFactor} cards per flood)</div>
           <div className="panelInfo"> {this.state.players[this.state.currentPlayerPlaying].playersName} the <span style={{color: this.state.players[this.state.currentPlayerPlaying].color}}>{this.state.players[this.state.currentPlayerPlaying].role}</span> is Playing.
-          <span className="littlePanelInfo"> {playerSteps[this.state.currentStep].name} </span></div>
+          <br/><span className="littlePanelInfo"> {playerSteps[this.state.currentStep].name} </span></div>
           <div className="panelInfo" id="UserActions">
             <ul>
               {this.state.possibleActions.map((action) =>
@@ -1695,19 +1698,19 @@ handleTileClick(i) {
                   : <span></span>
                 }
             ? <br/>
-            <table class="throwTable">
+            <table className="throwTable">
               <tbody>
             {
               this.state.players[giverId].cards.length === 1 ?
               <tr>
-                <td><span key="0" /><input type="radio" name="chosenCard" key="0" checked="checked" value={this.state.players[giverId].cards[0].id} onChange={() => chosenCard = this.state.players[giverId].cards[0].id} /></td>
-                <td><img src= {this.state.players[giverId].cards[0].url}  width="20px" height="32px"/></td>
+                <td><span key="card0" /><input type="radio" name="chosenCard" key="0" checked="checked" value={this.state.players[giverId].cards[0].id} onChange={() => chosenCard = this.state.players[giverId].cards[0].id} /></td>
                 <td>{ this.state.players[giverId].cards[0].name} </td>
+                <td><img src= {this.state.players[giverId].cards[0].url}  width="20px" height="32px"/></td>
               </tr>
               :
               this.state.players[giverId].cards.map((card, index) =>
               <tr>
-                <td><span key={index}/><input type="radio" name="chosenCard" key={index} value={card.id} onChange={() => chosenCard = card.id} /></td>
+                <td><span key={'card'+index}/><input type="radio" name="chosenCard" key={index} value={card.id} onChange={() => chosenCard = card.id} /></td>
                 <td><img src= {card.url}  width="20px" height="32px"/></td>
                 <td>{card.name}</td>
               </tr>
@@ -1724,7 +1727,7 @@ handleTileClick(i) {
             {
               playersOnTheSameTileExceptMe.length > 1 ?
                 playersOnTheSameTileExceptMe.map((player, index) => {
-                    return <span key={index}><input type="radio" name="receiver" key={index} value={this.state.players[player].id} onChange={() => receiver = this.state.players[player].id}/><span style={{color: this.state.players[player].color}}>{this.state.players[player].playersName}</span><br/></span>
+                    return <span key={'char'+index}><input type="radio" name="receiver" key={index} value={this.state.players[player].id} onChange={() => receiver = this.state.players[player].id}/><span style={{color: this.state.players[player].color}}>{this.state.players[player].playersName}</span><br/></span>
                   })
                 :
                 <span></span>
@@ -1747,21 +1750,21 @@ handleTileClick(i) {
                       : <span></span>
                     }
             ? <br/>
-            <table class="throwTable">
+            <table className="throwTable">
               <tbody>
             {
               this.state.players[giverId].cards.length === 1 ?
               <tr>
                 <td><span key="0"/><input type="radio" name="chosenCard" key="0" checked="checked" value={this.state.players[giverId].cards[0].id} onChange={() => chosenCard = this.state.players[giverId].cards[0].id} /></td>
-                <td>{ this.state.players[giverId].cards[0].name} </td>
                 <td><img src= {this.state.players[giverId].cards[0].url}  width="20px" height="32px"/></td>
+                <td>{ this.state.players[giverId].cards[0].name} </td>
               </tr>
               :
               this.state.players[giverId].cards.map((card, index) =>
               <tr>
-                <td><span key={index}/><input type="radio" name="chosenCard" key={index} value={card.id} onChange={() => chosenCard = card.id} /></td>
-                <td>{card.name}</td>
+                <td><span key={'card'+index}/><input type="radio" name="chosenCard" key={index} value={card.id} onChange={() => chosenCard = card.id} /></td>
                 <td><img src= {card.url}  width="20px" height="32px"/></td>
+                <td>{card.name}</td>
               </tr>
               )
             }
@@ -1777,9 +1780,9 @@ handleTileClick(i) {
               otherPlayers.length > 1 ?
                  this.state.players.map((player, index) => {
                   return (player.id != giverId) ?
-                    (<span key={index}><input type="radio" name="receiver" key={index} value={player.id} onChange={() => receiver = player.id}/><span style={{color: player.color}}>{player.playersName}</span><br/></span>)
+                    (<span key={'char'+index}><input type="radio" name="receiver" key={index} value={player.id} onChange={() => receiver = player.id}/><span style={{color: player.color}}>{player.playersName}</span><br/></span>)
                     :
-                    (<span key={index}></span>)
+                    (<span key={'char'+index}></span>)
                   })
                 :
                 <span></span>
@@ -1851,7 +1854,7 @@ handleTileClick(i) {
         <div>
           <span  style={{color: color}}>{name}</span> has more than 5 cards in Hand.<br/>
           Let's get rid Ov it : <br/>
-          <table class="throwTable">
+          <table className="throwTable">
             <tbody>
           {
             (this.state.players[userId].cards.map((card, index) => {
