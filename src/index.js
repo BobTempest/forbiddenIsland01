@@ -1,6 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
+// import './strings.js';
+import {str} from './strings.js';
 
 const playerTypes = [
   {
@@ -8,44 +10,85 @@ const playerTypes = [
     role : "Engineer", // dry two tiles for one action
     color : "#CC0000", // red
     ability : "Can dry two tiles in one action.",
-    name : "Natacha"
+    name : "Natacha",
+    roleAttachedToName: "roleStringEngineer"
   },
   {
     id : 1,
     role : "Navigator", // move another player from one or two tiles (straight ?) for one action
     color : "#FFF200", //yellow
     ability : "Can move another player up to two tiles for one action.",
-    name : "Boris"
+    name : "Boris",
+    roleAttachedToName: "roleStringNavigator"
   },
   {
     id : 2,
     role : "Messenger", // can give one card for one action to anyone
     color : "#FFFFFF", //white
     ability : "Can send a card to another player for one action.",
-    name : "Francois"
+    name : "Francois",
+    roleAttachedToName: "roleStringMessenger"
   },
   {
     id : 3,
     role : "Diver", // can move one wet case and one other case
     color : "#000000", // black
     ability : "Can move throught immersed and drawned tiles.",
-    name : "Gina"
+    name : "Gina",
+    roleAttachedToName: "roleStringDiver"
   },
   {
     id : 4,
     role : "Explorer", // can move and dry orth and diagonaly
     color : "#0AB300", //green
     ability : "Can move and dry orthogonaly and diagonaly.",
-    name : "Brian"
+    name : "Brian",
+    roleAttachedToName: "roleStringExplorer"
   },
   {
     id : 5,
     role : "Pilot", // once per turn, fly where you want for 1 action
     color : "#0064b3", //blue
     ability : "Can fly on any tile once per turn.",
-    name : "Bob"
+    name : "Bob",
+    roleAttachedToName: "roleStringPilot"
   },
 ];
+
+/*
+let str = {
+ en:{
+   treasuresFound:"Treasures found",
+   turn:"Turn :",
+   floodLevel:"Flood level",
+   playerIsPlaying:"{0} {1} is playing.",
+   roleStringDiver: "Diver",
+   roleStringPilot: "Pilot",
+   roleStringExplorer: "Explorer",
+   roleStringMessenger: "Messenger",
+   roleStringNavigator: "Navigator",
+   roleStringEngineer: "Engineer",
+   sustentif_M: "the",
+   sustentif_F: "the",
+   sustentif_F: "the",
+
+ },
+ fr:{
+   treasuresFound:"Trésors trouvés",
+   turn:"Tour :",
+   floodLevel:"Niveau d'innondation",
+   playerIsPlaying:"{0} {1} joue.",
+   roleStringDiver: "Plongeuse",
+   roleStringPilot: "Pilote",
+   roleStringExplorer: "Explorateur",
+   roleStringMessenger: "Messager",
+   roleStringNavigator: "Navigateur",
+   roleStringEngineer: "Ingénieur",
+   sustentif_M: "le",
+   sustentif_F: "la",
+ }
+}
+*/
 
 const orthogonalPaths =  {0 : [1,3], 1 : [0,4], 2 : [3,7], 3 : [0,2,4,8], 4 : [1,3,5,9], 5 : [4,10],
   6 : [7,12], 7 : [2,6,8,13], 8 : [3,7,9,14], 9 : [4,8,10,15], 10 : [5,9,11,16], 11 : [10,17], 12 : [6,13], 13 : [7,12,14,18],
@@ -219,6 +262,7 @@ class Board extends React.Component {
     var floodCardsDiscard = [];
     var floodMeter = new FloodMeter(1);
     let mainUserMessage = new UserMessage("Welcome new Player. Choose a first action for the first character.", false, []);
+    var lng = 0 // 0:french 1:english
 
     // generer les joueurs
     var players = generatePlayers(4);
@@ -240,6 +284,7 @@ class Board extends React.Component {
       floodMeter: floodMeter,
       gameIsOver: false,
       nbrOfPlayers : players.length,
+      languageDistributor: str.fr,
       posessedTreasures : [],
       turn : 1,
       hasPilotFlownThisTurn : false,
@@ -438,7 +483,7 @@ class Board extends React.Component {
             n_Tiles[j].isImmersed = false;
             n_Tiles[j].isDrawned = true;
             n_Tiles[j].blink = true;
-            this.graphicallyDrawnATile(j);
+            this.graphicallyDoDrawnATile(j);
             tileHasDrawned = true;
             if (n_Tiles[j].name === "helipad"){
               message = message + "<br/> Explorers can't leave the Island any more ! Game Over !";
@@ -1303,10 +1348,12 @@ handleTileClick(i) {
             n_Players[player.id] = player;
 
 
-            // If the currently active player is among the travellers and destination tile has a guy on it,
+            // If the currently active is the flyer or if the current player is on the reception ISLAND
+            // and destination tile has a guy on it and he's not the messanger,
             // recalculate the current active player possible actions to include the 'give' action unless he is the messenger
             let n_possibleActions = this.state.possibleActions;
-            if (this.state.currentPlayerPlaying === this.state.cardUser
+            if ((this.state.currentPlayerPlaying === this.state.cardUser
+                || this.state.tiles[i].playerOn.indexOf(this.state.currentPlayerPlaying) >= 0)
                 && this.state.tiles[i].playerOn.length > 0
                 && n_Players[this.state.cardUser].role != "Messenger")
               {
@@ -1669,23 +1716,15 @@ handleTileClick(i) {
 
   renderPlayerMessagePanel() {
     let foundTreasures = this.state.posessedTreasures.length;
-    let foundTreasuresNames = "";
-    /*
-    if (foundTreasures > 0){
-      for (let i = 0; i < foundTreasures; i++){
-        foundTreasuresNames = foundTreasuresNames + " " + this.getTreasureNameById(this.state.posessedTreasures[i]);
-      }
-      foundTreasuresNames = "(" + foundTreasuresNames + ")";
-    }
-    */
+    let lng = this.state.languageDistributor;
 
     return (
       <span>
         <div className="messagePanel">
           <div className="panelTitle"> FORBIDDEN<br/>::ReactJS::<br/>ISLAND <span className="littlePanelInfo">v.0.5.1</span></div>
-          <div className="littlePanelInfo"> Turn : {this.state.turn} </div>
-          <div className="littlePanelInfo">TreasureFound : {foundTreasures}/4 {foundTreasuresNames}</div>
-          <div className="littlePanelInfo"> FloodLevel {this.state.floodMeter.level} ({this.state.floodMeter.floodFactor} cards per flood)</div>
+          <div className="littlePanelInfo">{lng.turn} {this.state.turn} </div>
+          <div className="littlePanelInfo">{lng.treasuresFound} : {foundTreasures}/4 </div>
+          <div className="littlePanelInfo"> {lng.floodLevel} {this.state.floodMeter.level} ({this.state.floodMeter.floodFactor} cards per flood)</div>
           <div className="panelInfo"> {this.state.players[this.state.currentPlayerPlaying].playersName} the <span style={{color: this.state.players[this.state.currentPlayerPlaying].color}}>{this.state.players[this.state.currentPlayerPlaying].role}</span> is Playing.
           <br/><span className="littlePanelInfo"> {playerSteps[this.state.currentStep].name} </span></div>
           <div className="panelInfo" id="UserActions">
@@ -1972,7 +2011,7 @@ handleTileClick(i) {
         }
   }
 
-  graphicallyDrawnATile(i){
+  graphicallyDoDrawnATile(i){
     document.getElementById("square" + i).style.border = "1px solid #FFF0";
   }
 
@@ -2003,6 +2042,7 @@ handleTileClick(i) {
   }
 
   render() {
+      // Flood-O-meter values for the needle
       let position_value = "relative";
       let left_value = 5;
       let top_value = -70;
