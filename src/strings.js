@@ -18,6 +18,13 @@ export const str = {
    welcome_msg: "Welcome new Player. Choose a first action for the first character.",
    letsDrawSomePlayerCards_msg:"Let's' draw some Player Cards",
    letsFloodSomeTiles_msg: "Let\'s flood {0} tiles",
+   nextTurn_msg: "Next Turn ! Please {0}, Choose an action.",
+   nextPlayer_msg: "Next player ! Please Choose an action ",
+   chooseAnAction_msg: "Choose an action ",
+   immersionXoutofY: "<div>immersion {0} out of {1}.<br/>",
+   tileDrawning: "<span style=\"color: #DC143C\">{0} at {1} is drawning ! </span>",
+   explorersCantLeaveTheIsland: "<br/> Heliport is drawned. Explorers can't leave the Island any more ! Game Over !",
+   thereAreXexplorersOnIt: "<br/> There are {0} explorer(s) on it. Let's evacuate them.";
  },
  fr:{
    treasuresFound:"Trésors trouvés",
@@ -37,5 +44,12 @@ export const str = {
    welcome_msg: "Bienvenue sur l'île. Choisissez une première action pour le premier joueur.",
    letsDrawSomePlayerCards_msg: "Tirons une carte joueur.",
    letsFloodSomeTiles_msg: "Inondons {0} terrains",
+   nextTurn_msg: "Tour suivant ! {0}, choisis une action.",
+   nextPlayer_msg: "Joueur suivant ! Choisis une action.",
+   chooseAnAction_msg: "Choisis une action",
+   immersionXoutofY: "<div>Inondation {0} sur {1}.<br/>",
+   tileDrawning: "<span style=\"color: #DC143C\">{0} en {1} disparait sous les flots </span>",
+   explorersCantLeaveTheIsland: "<br/> L'Héliport est coulé, les joueurs ne peuvet plus quitter l'île. Fin de Partie !",
+   thereAreXexplorersOnIt: "<br/> Il y a {0} joueur(s) dessus. Evacuons-le !";
  }
 }

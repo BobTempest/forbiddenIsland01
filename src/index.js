@@ -55,41 +55,6 @@ const playerTypes = [
   },
 ];
 
-/*
-let str = {
- en:{
-   treasuresFound:"Treasures found",
-   turn:"Turn :",
-   floodLevel:"Flood level",
-   playerIsPlaying:"{0} {1} is playing.",
-   roleStringDiver: "Diver",
-   roleStringPilot: "Pilot",
-   roleStringExplorer: "Explorer",
-   roleStringMessenger: "Messenger",
-   roleStringNavigator: "Navigator",
-   roleStringEngineer: "Engineer",
-   sustentif_M: "the",
-   sustentif_F: "the",
-   sustentif_F: "the",
-
- },
- fr:{
-   treasuresFound:"Trésors trouvés",
-   turn:"Tour :",
-   floodLevel:"Niveau d'innondation",
-   playerIsPlaying:"{0} {1} joue.",
-   roleStringDiver: "Plongeuse",
-   roleStringPilot: "Pilote",
-   roleStringExplorer: "Explorateur",
-   roleStringMessenger: "Messager",
-   roleStringNavigator: "Navigateur",
-   roleStringEngineer: "Ingénieur",
-   sustentif_M: "le",
-   sustentif_F: "la",
- }
-}
-*/
-
 const orthogonalPaths =  {0 : [1,3], 1 : [0,4], 2 : [3,7], 3 : [0,2,4,8], 4 : [1,3,5,9], 5 : [4,10],
   6 : [7,12], 7 : [2,6,8,13], 8 : [3,7,9,14], 9 : [4,8,10,15], 10 : [5,9,11,16], 11 : [10,17], 12 : [6,13], 13 : [7,12,14,18],
   14 : [8,13,15,19], 15 : [9,14,16,20], 16 : [10,15,17,21], 17 : [11,16], 18 : [13,19], 19 : [14,18,20,22], 20 : [15,19,21,23],
@@ -378,7 +343,8 @@ class Board extends React.Component {
           }
 
           if (this.state.currentPlayerPlaying === this.state.players[this.state.players.length -1].id){
-            let newMessage = new UserMessage("Next Turn ! Please " + this.state.players[0].playersName + ", Choose an action " , false, []);
+            // let newMessage = new UserMessage("Next Turn ! Please " + this.state.players[0].playersName + ", Choose an action " , false, []);
+            let newMessage = new UserMessage(lng.nextTurn_msg.format(this.state.players[0].playersName) , false, []);
             let nextTurn = this.state.turn + 1;
             let nextPlayer = this.state.players[0].id;
             let psblactn = this.getPossibleActions(this.state.players[0], false, false);
@@ -392,7 +358,7 @@ class Board extends React.Component {
               tiles: n_tiles });
           } else {
             // next Player
-            let newMessage = new UserMessage("Next player ! Please Choose an action " , false, []);
+            let newMessage = new UserMessage(lng.nextPlayer_msg, false, []);
             let nextPlayer = this.state.players[this.state.currentPlayerPlaying + 1].id;
             let psblactn = this.getPossibleActions(this.state.players[nextPlayer], false, false);
             this.setState({ currentStep : 0,
@@ -405,7 +371,7 @@ class Board extends React.Component {
         }
         else{
           // next action for the same player
-          let newMessage = new UserMessage("Choose an action " , false, []);
+          let newMessage = new UserMessage(lng.chooseAnAction_msg , false, []);
           let psblactn = this.getPossibleActions(this.state.players[this.state.currentPlayerPlaying], this.state.hasPilotFlownThisTurn, false);
           this.setState({ currentStep : nextStep,
             possibleActions : psblactn,
@@ -456,13 +422,16 @@ class Board extends React.Component {
 
   doFloodATile(number, outOf){
     this.unblinkTheTiles();
+    let lng = this.state.languageDistributor;
+
     let n_Tiles = this.state.tiles;
     let n_FloodCardsLeap = this.state.floodCardsLeap;
     let n_FloodCardsDiscard = this.state.floodCardsDiscard;
     let n_FloodCardsOutOfGame = this.state.floodCardsOutOfGame;
     let floodedTileId = "";
 
-    let message = "<div>immersion " + number + " out of " + outOf + ".<br/>";
+    //let message = "<div>immersion " + number + " out of " + outOf + ".<br/>";
+    let message = lng.immersionXoutofY.format(number, outOf);
 
     let tileHasDrawned = false;
     let guysToEvacuate = [];
@@ -482,21 +451,23 @@ class Board extends React.Component {
         if (n_Tiles[j].isImmersed){
           // Let's DRAWN this tile
           // alert (n_Tiles[j].name + " at " + j + " is drawning !");
-            message = message + "<span style=\"color: #DC143C\">" + n_Tiles[j].name + " at " + j + " is drawning ! </span>";
+            // message = message + "<span style=\"color: #DC143C\">" + n_Tiles[j].name + " at " + j + " is drawning ! </span>";
+            message = message + lng.tileDrawning.format(n_Tiles[j].name, j);
             n_Tiles[j].isImmersed = false;
             n_Tiles[j].isDrawned = true;
             n_Tiles[j].blink = true;
             this.graphicallyDoDrawnATile(j);
             tileHasDrawned = true;
             if (n_Tiles[j].name === "helipad"){
-              message = message + "<br/> Explorers can't leave the Island any more ! Game Over !";
+              message = message + lng.explorersCantLeaveTheIsland;
               gameOver = true;
               // alert("The helipad is drawned. GAMEOVER")
             }
             // rescue some players ?
             guysToEvacuate = n_Tiles[j].playerOn;
-            if (n_Tiles[j].playerOn.length > 0){
-                message = message + "<br/> There are " + n_Tiles[j].playerOn.length + " explorer(s) on it. Let's evacuate them.";
+            if (n_Tiles[j].playerOn.length > 0 && !gameOver){
+                // message = message + "<br/> There are " + n_Tiles[j].playerOn.length + " explorer(s) on it. Let's evacuate them.";
+                message = message + lng.thereAreXexplorersOnIt.format(n_Tiles[j].playerOn.length);
                 // alert ("There is " + n_Tiles[j].playerOn.length + " explorer(s) on the drawning tile. Let's evacuate them.");
             }
             // Check if all Temples of an undiscovered Treasure are drawned. If yes : end game
@@ -507,7 +478,8 @@ class Board extends React.Component {
                   for (let k = 0; k < 24; k++){
                     if (k != j && n_Tiles[k].templeFor === n_Tiles[j].templeFor){
                       if (n_Tiles[k].isDrawned){
-                        message = message + "<br/>Oh my God ! all the temples for " + this.getTreasureNameById(n_Tiles[j].templeFor) + " are drawned. You'll never get it. GAME OVER";
+                        //message = message + "<br/>Oh my God ! all the temples for " + this.getTreasureNameById(n_Tiles[j].templeFor) + " are drawned. You'll never get it. GAME OVER";
+                        message = message + lng.allTheTemplesAreDrawned.format(this.getTreasureNameById(n_Tiles[j].templeFor));
                         gameOver = true;
                         // alert("Oh my God ! all the temples for " + this.getTreasureNameById(n_Tiles[j].templeFor) + " are drawned. You'll never get it. GAME OVER" );
                       }
@@ -521,7 +493,8 @@ class Board extends React.Component {
           alert ("CONCEPTUAL ERROR : " + n_Tiles[j].name + " is already drawned. it shouldn't be in the Leap !");
         }
         else{
-            message = message + n_Tiles[j].name + " at " + j + " is flooded ! ";
+            //message = message + n_Tiles[j].name + " at " + j + " is flooded ! ";
+            message = message + lng.tileIsFlooded.format(n_Tiles[j].name, j);
             n_Tiles[j].isImmersed = true;
             n_Tiles[j].blink = true;
         }
@@ -540,12 +513,14 @@ class Board extends React.Component {
 
     // BRANCHING : Soit on evacue des gars, soit on refais un flood, soit c'est fini
     if (guysToEvacuate.length > 0){
-        message = message + "<br/>!!! WE NEED TO EVACUATE THE TILE !!!</div>";
+        //message = message + "<br/>!!! WE NEED TO EVACUATE THE TILE !!!</div>";
+        message = message + lng.weNeedToEvacuateTheTile;
         n_userMessage = new UserMessage(message , false, [8]);
     }
     else if (number === outOf){
       // floodings are finished
-      message = message + "<br/> Floodings are over.... for now.</div>";
+      //message = message + "<br/> Floodings are over.... for now.</div>";
+      message = message + lng.floodingsAreOver;
       n_userMessage = new UserMessage(message , false, [0]);
     }
     else {
@@ -582,13 +557,14 @@ class Board extends React.Component {
       }
 
       if (tilesToLight.length === 0){
-        alert ("Oh my God. There's nowhere he can go. " + drawningGuy.playersName+ " is drawning. Noooooooo. GAME OVER.");
+        // let newMessage = new UserMessage("Oh my God. There's nowhere he can go. " + drawningGuy.playersName+ " is drawning. Noooooooo. GAME OVER.", false, []);
+        let newMessage = new UserMessage(lng.nowhereHeCanGo.format(drawningGuy.playersName), false, []);
         gameIsOver = true;
+      } else {
+        this.lightTheTiles(tilesToLight, drawningGuy.color);
+        let newMessage = new UserMessage(lng.chooseADestinationToEvacuate, false, []);
       }
 
-      this.lightTheTiles(tilesToLight, drawningGuy.color);
-
-      let newMessage = new UserMessage("Now choose a destination to EVACUATE", false, []);
       this.setState({ whatIsExpectedNext: "TileButtonClickForEvacuate" ,
                       players : n_players,
                       gameIsOver : gameIsOver,
