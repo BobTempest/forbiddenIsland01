@@ -178,7 +178,7 @@ function DrawSquare(props) {
 
 function DrawEmptySquare(props) {
   return (
-    <button className="emptySquare" /* for testing purposes onClick={props.onClick}*/></button>
+    <button className="emptySquare" onClick={props.onClick}></button>
   );
 }
 
@@ -542,6 +542,7 @@ class Board extends React.Component {
   }
 
   doEvacuate(){
+      let lng = this.state.languageDistributor;
       let n_players = this.state.players;
       let drawningGuy = n_players[this.state.guysToEvacuate[0]];
       let drawningGuyId = drawningGuy.id;
@@ -556,13 +557,14 @@ class Board extends React.Component {
         n_players[drawningGuyId].whereCanHeMove = tilesToLight;
       }
 
+      let newMessage = "";
       if (tilesToLight.length === 0){
         // let newMessage = new UserMessage("Oh my God. There's nowhere he can go. " + drawningGuy.playersName+ " is drawning. Noooooooo. GAME OVER.", false, []);
-        let newMessage = new UserMessage(lng.nowhereHeCanGo.format(drawningGuy.playersName), false, []);
+        newMessage = new UserMessage(lng.nowhereHeCanGo.format(drawningGuy.playersName), false, []);
         gameIsOver = true;
       } else {
         this.lightTheTiles(tilesToLight, drawningGuy.color);
-        let newMessage = new UserMessage(lng.chooseADestinationToEvacuate, false, []);
+        newMessage = new UserMessage(lng.chooseADestinationToEvacuate, false, []);
       }
 
       this.setState({ whatIsExpectedNext: "TileButtonClickForEvacuate" ,
@@ -1627,7 +1629,7 @@ handleTileClick(i) {
 
   renderEmptySquare() {
     return (
-      <DrawEmptySquare /* for testing purposes onClick={() => this.doMoveCursor()} *//>
+      <DrawEmptySquare onClick={() => this.doChangeLang()}/>
     );
   }
 
@@ -1994,15 +1996,6 @@ handleTileClick(i) {
     document.getElementById("square" + i).style.border = "1px solid #FFF0";
   }
 
-  doStrFrmt() {
-    var formatted = this;
-    for (var i = 0; i < arguments.length; i++) {
-        var regexp = new RegExp('\\{'+i+'\\}', 'gi');
-        formatted = formatted.replace(regexp, arguments[i]);
-    }
-    return formatted;
-}
-
   retry(){
     this.location.reload();
   }
@@ -2027,6 +2020,16 @@ handleTileClick(i) {
 
   showActionButtons() {
       document.getElementById("UserActions").style.display = "block";
+  }
+
+  doChangeLang(){
+    /*
+    NE COMPILE PAS
+    if (this.state.languageDistributor.currentLanguage === "FR"){
+        this.setState({languageDistributor: lng.en});
+    } else {
+        this.setState({languageDistributor: lng.fr});
+    }*/
   }
 
   render() {
@@ -2131,7 +2134,6 @@ handleTileClick(i) {
     );
   }
 }
-
 
 /* VOIR DANS LA PLAYER LEAP / DISCARD
 <div className="playerBoard-column">

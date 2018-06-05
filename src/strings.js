@@ -1,5 +1,6 @@
 export const str = {
  en:{
+   currentLanguage: "EN",
    treasuresFound:"Treasures found",
    turn:"Turn :",
    floodLevel:"Flood level",
@@ -24,9 +25,16 @@ export const str = {
    immersionXoutofY: "<div>immersion {0} out of {1}.<br/>",
    tileDrawning: "<span style=\"color: #DC143C\">{0} at {1} is drawning ! </span>",
    explorersCantLeaveTheIsland: "<br/> Heliport is drawned. Explorers can't leave the Island any more ! Game Over !",
-   thereAreXexplorersOnIt: "<br/> There are {0} explorer(s) on it. Let's evacuate them.";
+   thereAreXexplorersOnIt: "<br/> There are {0} explorer(s) on it. Let's evacuate them.",
+   allTheTemplesAreDrawned: "<br/>Oh my God ! all the temples for {0} are drawned. You'll never get it. GAME OVER",
+   tileIsFlooded: "{0} at {1} is flooded !",
+   weNeedToEvacuateTheTile: "<br/>!!! WE NEED TO EVACUATE THE TILE !!!</div>",
+   floodingsAreOver: "<br/> Floodings are over.... for now.</div>",
+   chooseADestinationToEvacuate: "Now choose a destination to EVACUATE",
+   nowhereHeCanGo: "Oh my God. There's nowhere he can go. {0} is drawning. Noooooooo. GAME OVER.",
  },
  fr:{
+   currentLanguage: "FR",
    treasuresFound:"Trésors trouvés",
    turn:"Tour :",
    floodLevel:"Niveau d'innondation",
@@ -50,6 +58,12 @@ export const str = {
    immersionXoutofY: "<div>Inondation {0} sur {1}.<br/>",
    tileDrawning: "<span style=\"color: #DC143C\">{0} en {1} disparait sous les flots </span>",
    explorersCantLeaveTheIsland: "<br/> L'Héliport est coulé, les joueurs ne peuvet plus quitter l'île. Fin de Partie !",
-   thereAreXexplorersOnIt: "<br/> Il y a {0} joueur(s) dessus. Evacuons-le !";
+   thereAreXexplorersOnIt: "<br/> Il y a {0} joueur(s) dessus. Evacuation !",
+   allTheTemplesAreDrawned: "<br/>Oh non ! Tous les temples pour {0} sont immergés. Vous n'aurez jamais ce trésor. Fin de Partie !",
+   tileIsFlooded: "{0} à {1} est inondé !",
+   weNeedToEvacuateTheTile: "<br/>!!! IL FAUT EVACUER CE TERRAIN !!!</div>",
+   floodingsAreOver: "<br/> Les inondations sont terminées... pour le moment.</div>",
+   chooseADestinationToEvacuate: "Maintenant, choisissez un terrain où évacuer.",
+   nowhereHeCanGo: "Oh non. Il n'a nulle part où aller. {0} se noie. Noooooooon. Fin de partie.",
  }
 }
