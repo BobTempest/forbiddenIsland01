@@ -261,7 +261,8 @@ class Board extends React.Component {
     var floodCardsLeap = generateFloodCardsLeap();
     var floodCardsDiscard = [];
     var floodMeter = new FloodMeter(1);
-    let mainUserMessage = new UserMessage("Welcome new Player. Choose a first action for the first character.", false, []);
+    // let mainUserMessage = new UserMessage("Welcome new Player. Choose a first action for the first character.", false, []);
+    let mainUserMessage = new UserMessage(str.fr.welcome_msg, false, []);
     var lng = 0 // 0:french 1:english
 
     // generer les joueurs
@@ -350,6 +351,7 @@ class Board extends React.Component {
 
   controller(input, data){
       console.log("InController turn :" + this.state.currentStep);
+      let lng = this.state.languageDistributor;
       this.checkCardState();
       this.showActionButtons();
       this.unblinkTheTiles();
@@ -357,14 +359,15 @@ class Board extends React.Component {
         let nextStep = this.state.currentStep + 1;
         if (nextStep === 3){
           // draw player cards 01
-          let newMessage = new UserMessage("Let's' draw some Player Cards", false, [2]);
+          let newMessage = new UserMessage(lng.letsDrawSomePlayerCards_msg, false, [2]);
           this.setState({ currentStep : nextStep, possibleActions : [], mainUserMessage : newMessage});
         } else if (nextStep === 4){
           // TODO Check if too muchCardsInHand
           // flood some tiles.
           this.setState({ currentStep : nextStep });
           let howMuch = this.state.floodMeter.floodFactor;
-          let newMessage = new UserMessage("Let's flood " + howMuch + " tiles", false, [4]);
+          // let newMessage = new UserMessage("Let's flood " + howMuch + " tiles", false, [4]);
+          let newMessage = new UserMessage((lng.letsFloodSomeTiles_msg.format(howMuch)) , false, [4]);
           this.setState({ currentStep : nextStep, possibleActions : [], mainUserMessage : newMessage});
         }
         else if (nextStep === 5){
@@ -2015,6 +2018,15 @@ handleTileClick(i) {
     document.getElementById("square" + i).style.border = "1px solid #FFF0";
   }
 
+  doStrFrmt() {
+    var formatted = this;
+    for (var i = 0; i < arguments.length; i++) {
+        var regexp = new RegExp('\\{'+i+'\\}', 'gi');
+        formatted = formatted.replace(regexp, arguments[i]);
+    }
+    return formatted;
+}
+
   retry(){
     this.location.reload();
   }
@@ -2265,6 +2277,17 @@ class FloodMeter {
     }
   }
 }
+
+// WORKS !
+String.prototype.format = function() {
+  var args = arguments;
+  return this.replace(/{(\d+)}/g, function(match, number) {
+    return typeof args[number] != 'undefined'
+      ? args[number]
+      : match
+    ;
+  });
+};
 
 function riseTheIsland(){
     var tile01 = new Tile("helipad", 0, false, false, false, 5, "", [], "#A9D0F5", "", "HELIPORT");
