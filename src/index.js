@@ -2,56 +2,68 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 // import './strings.js';
-import {str} from './strings.js';
+import {stringsCatalog} from './strings.js';
 
 const playerTypes = [
   {
     id : 0,
     role : "Engineer", // dry two tiles for one action
     color : "#CC0000", // red
-    ability : "Can dry two tiles in one action.",
+    ability : "ab_Engineer",
     name : "Natacha",
-    roleAttachedToName: "roleStringEngineer"
+    roleAttachedToName: "ro_Engineer",
+    roleQualifier: "qualificatif_N",
+    fullFormattedNameAndRole: 'fullFormattedNameAndRoleNavigator'
   },
   {
     id : 1,
     role : "Navigator", // move another player from one or two tiles (straight ?) for one action
     color : "#FFF200", //yellow
-    ability : "Can move another player up to two tiles for one action.",
+    ability : "ab_Navigator",
     name : "Boris",
-    roleAttachedToName: "roleStringNavigator"
+    roleAttachedToName: "ro_Navigator",
+    roleQualifier: "qualificatif_M",
+    fullFormattedNameAndRole: 'fullFormattedNameAndRoleNavigator'
   },
   {
     id : 2,
     role : "Messenger", // can give one card for one action to anyone
     color : "#FFFFFF", //white
-    ability : "Can send a card to another player for one action.",
+    ability : "ab_Messenger",
     name : "Francois",
-    roleAttachedToName: "roleStringMessenger"
+    roleAttachedToName: "ro_Messenger",
+    roleQualifier: "qualificatif_M",
+    fullFormattedNameAndRole: 'fullFormattedNameAndRoleMessenger'
   },
   {
     id : 3,
     role : "Diver", // can move one wet case and one other case
     color : "#000000", // black
-    ability : "Can move throught immersed and drawned tiles.",
+    ability : "ab_Diver",
     name : "Gina",
-    roleAttachedToName: "roleStringDiver"
+    roleAttachedToName: "ro_Diver",
+    roleQualifier: "qualificatif_F",
+    fullFormattedNameAndRole: 'fullFormattedNameAndRoleDiver'
   },
   {
     id : 4,
     role : "Explorer", // can move and dry orth and diagonaly
     color : "#0AB300", //green
-    ability : "Can move and dry orthogonaly and diagonaly.",
+    ability : "ab_Explorer",
     name : "Brian",
-    roleAttachedToName: "roleStringExplorer"
+    roleAttachedToName: "ro_Explorer",
+    roleQualifier: "qualificatif_N",
+    fullFormattedNameAndRole: 'fullFormattedNameAndRoleExplorer'
   },
   {
     id : 5,
     role : "Pilot", // once per turn, fly where you want for 1 action
     color : "#0064b3", //blue
-    ability : "Can fly on any tile once per turn.",
+    ability : "ab_Pilot",
     name : "Bob",
-    roleAttachedToName: "roleStringPilot"
+    roleAttachedToName: "ro_Pilot",
+    roleQualifier: "qualificatif_M",
+    fullFormattedNameAndRole: 'fullFormattedNameAndRolePilot'
   },
 ];
 
@@ -76,32 +88,32 @@ const diagonalPaths = {0 : [2, 4], 1 : [3, 5], 2 : [0, 6, 8], 3 : [1,7,9], 4 : [
  const buttons = ["Next", "Cancel", "PickTwoCards 1st", "PickTwoCards 2nd", "Flood"];
 
  const playerSteps = [
-     {id : 0, name : "action 1/3" },
-     {id : 1, name : "action 2/3" },
-     {id : 2, name : "action 3/3" },
-     {id : 3, name : "draw player cards" },
-     {id : 4, name : "draw flood cards" }
+     {id : 0, name : "step_act1outOf3" },
+     {id : 1, name : "step_act2outOf3" },
+     {id : 2, name : "step_act3outOf3" },
+     {id : 3, name : "step_DrawPlayerCards" },
+     {id : 4, name : "step_DrawFloodCards" }
  ];
 
  const playerDefaultActions = [
-      {id : 0, name : "Move", text: "Move to an adjacent tile.", enabled : true, triggers : "Move" }, //has an adjacent tile around ?
-      {id : 1, name : "Dry", text: "Dry an adjacent tile", enabled : true, triggers : "Dry"  }, //has an adjacent immersed tile around ?
-      {id : 2, name : "Give", text: "Give a card on a character on the same tile", enabled : true, triggers : "Give" }, //has a player on his tile ?
-      {id : 3, name : "Get a Treasure !", text: "Get the treasure in this temple.", enabled : true, triggers : "GetATreasure"  }, // has 4 cards and is on the right temple
+      {id : 0, name : "Move", locName: "ac_move", text: "Move to an adjacent tile.", enabled : true, triggers : "Move" }, //has an adjacent tile around ?
+      {id : 1, name : "Dry", locName: "ac_dry", text: "Dry an adjacent tile", enabled : true, triggers : "Dry"  }, //has an adjacent immersed tile around ?
+      {id : 2, name : "Give", locName: "ac_give", text: "Give a card on a character on the same tile", enabled : true, triggers : "Give" }, //has a player on his tile ?
+      {id : 3, name : "Get a Treasure !", locName: "ac_getATreasure", text: "Get the treasure in this temple.", enabled : true, triggers : "GetATreasure"  }, // has 4 cards and is on the right temple
       /*{id : 4, name : "DoNothing", text: "Simply do nothing.", enabled : true, triggers : "DoNothing"  }, // -
       /* {id : 5, name : "Skip Turn", text: "Skip the player'sTurn.", enabled : true, triggers : "SkipTurn"  } // -*/
-      {id : 6, name : "Sleep", text: "Skip the player's Actions.", enabled : true, triggers : "DoSleep"  }
+      {id : 6, name : "Sleep", locName: "ac_sleep", text: "Skip the player's Actions.", enabled : true, triggers : "DoSleep"  }
  ];
 
  const playerSpecialActions = [
    // Special actions
-   {id : 0, name : "Send a card", forRole: "Messenger", replacesAction: "2", text: "Send a card to any character.", enabled : true, triggers : "SendACard"  }, // has a treasure card
-   {id : 1, name : "Move someone", forRole: "Navigator", replacesAction: "-", text: "Move any character from one or two tiles.", enabled : true, triggers : "MoveSomeone"  }, // there's another player in game
-   {id : 2, name : "Dry two tiles", forRole: "Engineer", replacesAction: "1", text: "Dry two adjacent tiles.", enabled : true, triggers : "DryTwoTiles"  }, // has two immersed adjacent tiles around
-   {id : 3, name : "Move around", forRole: "Explorer", replacesAction: "0", text: "Move to any tile around.", enabled : true, triggers : "MoveAround"  },//has an tile around ?
-   {id : 4, name : "Dry around", forRole: "Explorer", replacesAction: "1", text: "Dry any tile around." , enabled : true, triggers : "DryAround" },// has an immersed tile around
-   {id : 5, name : "Fly", forRole: "Pilot", replacesAction: "-", text: "Fly to any tile.", enabled : true, triggers : "Fly"  },// any other non dranwned tile
-   {id : 6, name : "Move/Dive", forRole: "Diver", replacesAction: "0", text: "Dive through any adjacent tile.", enabled : true, triggers : "Dive"  }, // a tile to dive to
+   {id : 0, name : "Send a card", locName: "ac_sendACard", forRole: "Messenger", replacesAction: "2", text: "Send a card to any character.", enabled : true, triggers : "SendACard"  }, // has a treasure card
+   {id : 1, name : "Move someone", locName: "ac_moveSomeone", forRole: "Navigator", replacesAction: "-", text: "Move any character from one or two tiles.", enabled : true, triggers : "MoveSomeone"  }, // there's another player in game
+   {id : 2, name : "Dry two tiles", locName: "ac_dry2Tiles", forRole: "Engineer", replacesAction: "1", text: "Dry two adjacent tiles.", enabled : true, triggers : "DryTwoTiles"  }, // has two immersed adjacent tiles around
+   {id : 3, name : "Move around", locName: "ac_moveAround", forRole: "Explorer", replacesAction: "0", text: "Move to any tile around.", enabled : true, triggers : "MoveAround"  },//has an tile around ?
+   {id : 4, name : "Dry around", locName: "ac_dryAround", forRole: "Explorer", replacesAction: "1", text: "Dry any tile around." , enabled : true, triggers : "DryAround" },// has an immersed tile around
+   {id : 5, name : "Fly", locName: "ac_fly", forRole: "Pilot", replacesAction: "-", text: "Fly to any tile.", enabled : true, triggers : "Fly"  },// any other non dranwned tile
+   {id : 6, name : "Move/Dive", locName: "ac_MoveDive", forRole: "Diver", replacesAction: "0", text: "Dive through any adjacent tile.", enabled : true, triggers : "Dive"  }, // a tile to dive to
  ];
 
  // QUESTIONS :
@@ -227,7 +239,7 @@ class Board extends React.Component {
     var floodCardsDiscard = [];
     var floodMeter = new FloodMeter(1);
     // let mainUserMessage = new UserMessage("Welcome new Player. Choose a first action for the first character.", false, []);
-    let mainUserMessage = new UserMessage(str.fr.welcome_msg, false, []);
+    let mainUserMessage = new UserMessage(stringsCatalog.fr.welcome_msg, false, []);
     var lng = 0 // 0:french 1:english
 
     // generer les joueurs
@@ -250,7 +262,7 @@ class Board extends React.Component {
       floodMeter: floodMeter,
       gameIsOver: false,
       nbrOfPlayers : players.length,
-      languageDistributor: str.fr,
+      languageDistributor: stringsCatalog.fr,
       posessedTreasures : [],
       turn : 1,
       hasPilotFlownThisTurn : false,
@@ -343,8 +355,8 @@ class Board extends React.Component {
           }
 
           if (this.state.currentPlayerPlaying === this.state.players[this.state.players.length -1].id){
-            // let newMessage = new UserMessage("Next Turn ! Please " + this.state.players[0].playersName + ", Choose an action " , false, []);
-            let newMessage = new UserMessage(lng.nextTurn_msg.format(this.state.players[0].playersName) , false, []);
+            // let newMessage = new UserMessage("Next Turn ! Please " + this.state.players[0].name + ", Choose an action " , false, []);
+            let newMessage = new UserMessage(lng.nextTurn_msg.format(this.state.players[0].name) , false, []);
             let nextTurn = this.state.turn + 1;
             let nextPlayer = this.state.players[0].id;
             let psblactn = this.getPossibleActions(this.state.players[0], false, false);
@@ -559,8 +571,8 @@ class Board extends React.Component {
 
       let newMessage = "";
       if (tilesToLight.length === 0){
-        // let newMessage = new UserMessage("Oh my God. There's nowhere he can go. " + drawningGuy.playersName+ " is drawning. Noooooooo. GAME OVER.", false, []);
-        newMessage = new UserMessage(lng.nowhereHeCanGo.format(drawningGuy.playersName), false, []);
+        // let newMessage = new UserMessage("Oh my God. There's nowhere he can go. " + drawningGuy.name+ " is drawning. Noooooooo. GAME OVER.", false, []);
+        newMessage = new UserMessage(lng.nowhereHeCanGo.format(drawningGuy.name), false, []);
         gameIsOver = true;
       } else {
         this.lightTheTiles(tilesToLight, drawningGuy.color);
@@ -1678,7 +1690,7 @@ handleTileClick(i) {
 
     return (
       <div className={boardClass}>
-        <span className="inBoardName">{this.state.players[i].playersName}</span>&nbsp;the&nbsp;
+        <span className="inBoardName">{this.state.players[i].name}</span>&nbsp;the&nbsp;
         <span className="inBoardRole" style={{color: this.state.players[i].color}}>{this.state.players[i].role}</span>
         <a className="tooltips helpCharacterIcon" id={'tooltip' + i} href="#">?<span class="inToolTipsText">{this.state.players[i].playersAbility}</span></a>
         <br/>
@@ -1712,6 +1724,10 @@ handleTileClick(i) {
     let foundTreasures = this.state.posessedTreasures.length;
     let lng = this.state.languageDistributor;
     let currentPlayer = this.state.players[this.state.currentPlayerPlaying];
+    let str_roleQualifier = this.getStringInTheCatalog(lng, currentPlayer.roleQualifier);
+    let str_roleAttachedToName = this.getStringInTheCatalog(lng, currentPlayer.roleAttachedToName);
+    let str_currentStep = this.getStringInTheCatalog(lng, playerSteps[this.state.currentStep].name);
+    // TODO order the inputs
 
     return (
       <span>
@@ -1720,12 +1736,12 @@ handleTileClick(i) {
           <div className="littlePanelInfo">{lng.turn} {this.state.turn} </div>
           <div className="littlePanelInfo">{lng.treasuresFound} : {foundTreasures}/4 </div>
           <div className="littlePanelInfo"> {lng.floodLevel} {this.state.floodMeter.level} {lng.xCardsPerFlood.format(this.state.floodMeter.floodFactor)}</div>
-          <div className="panelInfo"> {currentPlayer.playersName} the <span style={{color: currentPlayer.color}}>{currentPlayer.role}</span> is Playing.
-          <br/><span className="littlePanelInfo"> {playerSteps[this.state.currentStep].name} </span></div>
+          <div className="panelInfo"> {currentPlayer.name}&nbsp;{str_roleQualifier}&nbsp;<span style={{color: currentPlayer.color}}>{str_roleAttachedToName}</span>&nbsp;{lng.isPlaying}
+          <br/><span className="littlePanelInfo"> {str_currentStep} </span></div>
           <div className="panelInfo" id="UserActions">
             <ul>
               {this.state.possibleActions.map((action) =>
-                <li key={action.name}><button className="actionButton" onClick={() => this.handleActionClick(action.triggers)} >{action.name}</button></li>
+                <li key={action.name}><button className="actionButton" onClick={() => this.handleActionClick(action.triggers)} >{this.getStringInTheCatalog(lng, action.locName)}</button></li>
               )}
             </ul>
           </div>
@@ -1749,7 +1765,7 @@ handleTileClick(i) {
           <div>
             Which card do you want to give
                 { playersOnTheSameTileExceptMe.length === 1 ?
-                  (<span> to <span style={{color: this.state.players[playersOnTheSameTileExceptMe[0]].color}}>{ this.state.players[playersOnTheSameTileExceptMe[0]].playersName} </span></span> )
+                  (<span> to <span style={{color: this.state.players[playersOnTheSameTileExceptMe[0]].color}}>{ this.state.players[playersOnTheSameTileExceptMe[0]].name} </span></span> )
                   : <span></span>
                 }
             ? <br/>
@@ -1782,7 +1798,7 @@ handleTileClick(i) {
             {
               playersOnTheSameTileExceptMe.length > 1 ?
                 playersOnTheSameTileExceptMe.map((player, index) => {
-                    return <span key={'char'+index}><input type="radio" name="receiver" key={index} value={this.state.players[player].id} onChange={() => receiver = this.state.players[player].id}/><span style={{color: this.state.players[player].color}}>{this.state.players[player].playersName}</span><br/></span>
+                    return <span key={'char'+index}><input type="radio" name="receiver" key={index} value={this.state.players[player].id} onChange={() => receiver = this.state.players[player].id}/><span style={{color: this.state.players[player].color}}>{this.state.players[player].name}</span><br/></span>
                   })
                 :
                 <span></span>
@@ -1801,7 +1817,7 @@ handleTileClick(i) {
           <div>
             Which card do you want to send
                     { otherPlayers.length === 1 ?
-                      (<span> to <span style={{color: this.state.players[otherPlayers[0]].color}}> {this.state.players[otherPlayers[0]].playersName} </span></span> )
+                      (<span> to <span style={{color: this.state.players[otherPlayers[0]].color}}> {this.state.players[otherPlayers[0]].name} </span></span> )
                       : <span></span>
                     }
             ? <br/>
@@ -1835,7 +1851,7 @@ handleTileClick(i) {
               otherPlayers.length > 1 ?
                  this.state.players.map((player, index) => {
                   return (player.id != giverId) ?
-                    (<span key={'char'+index}><input type="radio" name="receiver" key={index} value={player.id} onChange={() => receiver = player.id}/><span style={{color: player.color}}>{player.playersName}</span><br/></span>)
+                    (<span key={'char'+index}><input type="radio" name="receiver" key={index} value={player.id} onChange={() => receiver = player.id}/><span style={{color: player.color}}>{player.name}</span><br/></span>)
                     :
                     (<span key={'char'+index}></span>)
                   })
@@ -1864,17 +1880,17 @@ handleTileClick(i) {
           <div>
             {
                   playersOnTheSameTileExceptMe.length === 0 ? // Ok
-                     (<div> <span style={{color: this.state.players[flyerId].color}}>{this.state.players[flyerId].playersName}</span>, choose a landing destination.</div>)
+                     (<div> <span style={{color: this.state.players[flyerId].color}}>{this.state.players[flyerId].name}</span>, choose a landing destination.</div>)
                     : playersOnTheSameTileExceptMe.length === 1 ? // Ok
-                       (<div> <span style={{color: this.state.players[flyerId].color}}>{this.state.players[flyerId].playersName}</span>, do you want to take <span style={{color: this.state.players[playersOnTheSameTileExceptMe[0]].color}}>{this.state.players[playersOnTheSameTileExceptMe[0]].playersName}</span> with you ? <br/>
+                       (<div> <span style={{color: this.state.players[flyerId].color}}>{this.state.players[flyerId].name}</span>, do you want to take <span style={{color: this.state.players[playersOnTheSameTileExceptMe[0]].color}}>{this.state.players[playersOnTheSameTileExceptMe[0]].name}</span> with you ? <br/>
                          <input type="radio" name="coTraveller" key="yes" value="yes" onChange={() => travellers = [flyerId, playersOnTheSameTileExceptMe[0]]}/>Yes<br/>
                          <input type="radio" name="coTraveller" key="no" value="no" onChange={() => travellers = [flyerId]}/>No<br/>
                        </div>)
                       :
-                        (<div><span style={{color: this.state.players[flyerId].color}}>{this.state.players[flyerId].playersName}</span>, select the guys you want to take with you ? <br/>
+                        (<div><span style={{color: this.state.players[flyerId].color}}>{this.state.players[flyerId].name}</span>, select the guys you want to take with you ? <br/>
                         {
                           playersOnTheSameTileExceptMe.map((playerId, index) => {
-                             return <span key={index}><input type="checkBox" name="traveller" id={"checkBoxAmadeusFor"+playerId} key={index} value={playerId} onChange={() => Amadeus(playerId, "checkBoxAmadeusFor"+playerId)} /><span style={{color: this.state.players[playerId].color}}>{this.state.players[playerId].playersName}</span><br/></span>
+                             return <span key={index}><input type="checkBox" name="traveller" id={"checkBoxAmadeusFor"+playerId} key={index} value={playerId} onChange={() => Amadeus(playerId, "checkBoxAmadeusFor"+playerId)} /><span style={{color: this.state.players[playerId].color}}>{this.state.players[playerId].name}</span><br/></span>
                           })
                         }
                         </div>)
@@ -1890,7 +1906,7 @@ handleTileClick(i) {
               {
               (this.state.players.map((player, index) => {
                 return (player.role != "Navigator") ?
-                  (<span key={index}><input type="radio" name="puppet" key={index} value={player.id} onChange={() => puppet = player.id}/><span style={{color: player.color}}>{player.playersName}</span><br/></span>)
+                  (<span key={index}><input type="radio" name="puppet" key={index} value={player.id} onChange={() => puppet = player.id}/><span style={{color: player.color}}>{player.name}</span><br/></span>)
                   :
                   (<span key={index}></span>)
                 }))
@@ -1901,7 +1917,7 @@ handleTileClick(i) {
     } else if (this.state.messageBoardState === "SolveOver5Cards") {
       let userId = this.state.cardUser;
       let color = this.state.players[userId].color;
-      let name = this.state.players[userId].playersName;
+      let name = this.state.players[userId].name;
       let cardsInHand = this.state.players[userId].cards;
       // console.log("user is : " + user + ". His cards : " + cardsInHand);
 
@@ -2044,6 +2060,18 @@ handleTileClick(i) {
     } else {
         this.setState({languageDistributor: lng.fr});
     }*/
+  }
+
+  getStringInTheCatalog(distributor, input){
+      var catalog = Object.entries(distributor);
+      var stringInput = input.toString();
+      for (let i = 0 ; i < catalog.length; i++){
+          if (catalog[i][0] == stringInput){
+            return catalog[i][1];
+          }
+      }
+
+      return "YYYYY FIX ME YYYYY";
   }
 
   render() {
@@ -2229,12 +2257,15 @@ class Tile {
 }
 
 class Player {
-  constructor(id, type, role, color, playersName, ability, position, cards, isInGame, leftTheIsland) {
+  constructor(id, type, role, color, name, roleAttachedToName, fullFormattedNameAndRole, roleQualifier, ability, position, cards, isInGame, leftTheIsland) {
     this.id = id; // int
     this.type = type; // int
     this.role = role // string
     this.color = color; // string in hexa
-    this.playersName = playersName; // string
+    this.name = name; // string
+    this.roleAttachedToName = roleAttachedToName;
+    this.fullFormattedNameAndRole = fullFormattedNameAndRole; // .format(<span style={{color: currentPlayer.color}}>,</span>)}
+    this.roleQualifier = roleQualifier;
     this.playersAbility = ability; // string
     this.position = position; // int
     this.cards = cards; // string[]
@@ -2245,7 +2276,7 @@ class Player {
     this.imgpath = "/images/char" + role + ".png"; // string
 
     printIntroduction: {
-        console.log(`My name is ${this.playersName}. Im an ${this.role} and my color is ${this.color}`);
+        console.log(`My name is ${this.name}. Im an ${this.role} and my color is ${this.color}`);
     }
   }
 }
@@ -2374,7 +2405,7 @@ function generatePlayers(howMany){
     for (let i = 0; i < howMany; i++){
       let type = roles[i];
       let player = new Player(
-          i, type, playerTypes[type].role, playerTypes[type].color, playerTypes[type].name, playerTypes[type].ability, 0, [], true, false
+          i, type, playerTypes[type].role, playerTypes[type].color, playerTypes[type].name, playerTypes[type].roleAttachedToName, playerTypes[type].fullFormattedNameAndRole, playerTypes[type].roleQualifier, playerTypes[type].ability, 0, [], true, false
       )
       players.push(player);
     }
