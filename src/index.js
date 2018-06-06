@@ -580,6 +580,7 @@ class Board extends React.Component {
   }
 
   doPickOnePlayerCard(cardNumber, tempState){
+      let lng = this.state.languageDistributor;
       let newPlayerCardsDiscard = tempState.playerCardsDiscard;
       let newPlayerCardsLeap = tempState.playerCardsLeap;
       let newPlayers = tempState.players;
@@ -614,7 +615,8 @@ class Board extends React.Component {
 
           // alert("Flood Riiiiise ! New Flood level is " + newFloodMeter.level + "(pick " +  newFloodMeter.floodFactor + " at each flood)");
           if (newFloodMeter.level >= newFloodMeter.topLevel){
-            alert (" Top level reached. The Island is submerged. Game Over");
+            // alert (" Top level reached. The Island is submerged. Game Over");
+            alert (lng.topLevelReached);
           }
 
           // put the flood card in the discards
@@ -633,10 +635,10 @@ class Board extends React.Component {
 
       let newMessage = "";
       if (cardNumber == 1){
-            newMessage = new UserMessage('First card : ' + card.name + '. <br/><img src='  + card.url + ' width="30px" height="46px"/>', false, [3]);
+            newMessage = new UserMessage(lng.firstCard_msg.format(card.name) + '. <br/><img src='  + card.url + ' width="30px" height="46px"/>', false, [3]);
       }else{
             let databag = {userId : this.state.currentPlayerPlaying}
-            newMessage = new UserMessage('Second card : ' + card.name + '. <br/><img src=' + card.url  + ' width="30px" height="46px"/>', false, [9], databag);
+            newMessage = new UserMessage(lng.secondCard_msg.format(card.name) + '. <br/><img src=' + card.url  + ' width="30px" height="46px"/>', false, [9], databag);
       }
 
       tempState.mainUserMessage = newMessage;
@@ -708,9 +710,10 @@ class Board extends React.Component {
   }
 
   useACardToGetRidOfIt(type, index, userId){
-      let n_message = new UserMessage("Ok. What's next ?" , false, [10]);
+      let lng = this.state.languageDistributor;
+      let n_message = new UserMessage(lng.okWhatsNext , false, [10]);
       // ici set un state to recover à 'Voilà, on a utilisé une carte -> next doCheckIfMoreThan5CardsInHand'
-      this.setState({mainUserMessage: n_message, messageBoardState: "default",}, () => {
+      this.setState({mainUserMessage: n_message, messageBoardState: "default"}, () => {
         if (type === "H"){
             this.clickedOnHelicopterCard(userId);
         } else if (type === "SB"){
@@ -722,17 +725,9 @@ class Board extends React.Component {
   }
 
   clickedOnHelicopterCard(playerId) {
-    /*
-    // Check if the game is won :
-    // on the helipad, 4 treasures found, all players on the tile
-    if (this.state.posessedTreasures.length === 4 &&
-        this.state.tiles[this.state.players[playerId].position].name === "helipad" &&
-        this.state.tiles[this.state.players[playerId].position].playerOn.length === this.state.nbrOfPlayers) {
-          alert("The " + this.state.nbrOfPlayers + " valliant exppplorers leave the island with the 4 treasures. You WON !");
-        }
-        */
+    let lng = this.state.languageDistributor;
     let whatIsExpectedNext_toRestore = this.state.whatIsExpectedNext;
-    let n_Message = new UserMessage("Now choose a landing destination", false, [7]);
+    let n_Message = new UserMessage(lng.chooseALandingDestination, false, [7]);
     let n_messageBoardState_toRestore = this.state.messageBoardState;
 
     // displays the board of co travellers choice
@@ -746,12 +741,13 @@ class Board extends React.Component {
   }
 
   helicopterCardEnRoute(playerId, travellers){
+    let lng = this.state.languageDistributor;
     // Check if the game is won :
     // on the helipad, 4 treasures found, all players on the tile
     if (this.state.posessedTreasures.length === 4 &&
         this.state.tiles[this.state.players[playerId].position].name === "helipad" &&
         this.state.tiles[this.state.players[playerId].position].playerOn.length === this.state.nbrOfPlayers) {
-          alert("The " + this.state.nbrOfPlayers + " valliant exppplorers leave the island with the 4 treasures. You WON !");
+          alert(lng.youWonMsg.format(this.state.nbrOfPlayers));
         }
     // displays the possible destinations
     let tilesToLight = this.whereCanHeFly(this.state.players[playerId].position);
@@ -778,15 +774,16 @@ class Board extends React.Component {
   }
 
   clickedOnSandBagCard(playerId) {
+    let lng = this.state.languageDistributor;
     let tilesToLight = this.getImmersedTiles();
     if (tilesToLight.length === 0){
-      alert("No tile to dry. Keep your Sandbag.");
+      alert(lng.noTileToDry);
       return null;
     }
 
     this.state.players[playerId].whereCanHeDry = tilesToLight;
     this.lightTheTiles(tilesToLight, this.state.players[playerId].color);
-    let newMessage = new UserMessage("Now choose any tile to dry", false, [6]);
+    let newMessage = new UserMessage(lng.chooseATileToDry, false, [6]);
     this.setState({ whatIsExpectedNext_toRestore : this.state.whatIsExpectedNext,
                     whatIsExpectedNext: "TileButtonClickForDryWithACard" ,
                     mainUserMessage_toRestore: this.state.mainUserMessage,
@@ -1051,6 +1048,7 @@ class Board extends React.Component {
 
 // Handles a click on an action button in the left menu
  handleActionClick(action) {
+    let lng = this.state.languageDistributor;
     this.hideActionButtons();
     console.log("clicked on " + action);
     if (this.state.whatIsExpectedNext === "CharacterActionButtonClick") {
@@ -1058,70 +1056,76 @@ class Board extends React.Component {
       if (action === "Move" || action === "Dive" || action === "MoveAround"){
             let tilesToLight = this.whereCanHeMove(this.state.players[id].position, this.state.players[id].role);
             if (tilesToLight.length === 0 ){
-              alert ("Nowhere to go. Please choose another action");
+              alert (lng.nowhereToGo);
               this.showActionButtons();
             } else  {
               this.state.players[id].whereCanHeMove = tilesToLight;
               let nada = this.lightTheTiles(tilesToLight, this.state.players[id].color);
               // set a new Expected PlayerInput
-              let newMessage = new UserMessage("Now choose a destination", false, [1]);
-              this.setState({ whatIsExpectedNext: "TileButtonClickForMove" , mainUserMessage: newMessage });
+              let newMessage = new UserMessage(lng.chooseADestination, false, [1]);
+              this.setState({ whatIsExpectedNext: "TileButtonClickForMove" ,
+                              mainUserMessage: newMessage });
             }
       } if (action === "Fly"){
           let tilesToLight = this.whereCanHeFly(this.state.players[id].position);
           this.state.players[id].whereCanHeFly = tilesToLight;
           let nada = this.lightTheTiles(tilesToLight, this.state.players[id].color);
-          let newMessage = new UserMessage("Now choose a landing destination", false, [1]);
+          let newMessage = new UserMessage(lng.chooseALandingDestination, false, [1]);
           this.setState({ whatIsExpectedNext: "TileButtonClickForFly" , mainUserMessage: newMessage });
       } else if (action === "Dry" || action === "DryAround"){
             let tilesToLight = this.whereCanHeDry(this.state.players[id].position, this.state.players[id].role);
             if (tilesToLight.length === 0 ){
-              alert ("No tiles to dry. Please choose another action");
+              alert (lng.noTilesToDry);
               this.showActionButtons();
             } else {
               this.state.players[id].whereCanHeDry = tilesToLight;
               let nada = this.lightTheTiles(tilesToLight, this.state.players[id].color);
-              let newMessage = new UserMessage("Now choose a tile to dry", false, [1]);
-              this.setState({ whatIsExpectedNext: "TileButtonClickForDry" , mainUserMessage: newMessage});
+              let newMessage = new UserMessage(lng.nowChooseATileToDry, false, [1]);
+              this.setState({ whatIsExpectedNext: "TileButtonClickForDry",
+                              mainUserMessage: newMessage});
             }
       } else if (action === "DryTwoTiles"){
             let tilesToLight = this.whereCanHeDry(this.state.players[id].position, this.state.players[id].role);
             if (tilesToLight.length === 0 ){
-              alert ("No tiles to dry. Please choose another action");
+              alert (lng.noTilesToDry);
               this.showActionButtons();
             } else if (tilesToLight.length === 1 ){
               this.state.players[id].whereCanHeDry = tilesToLight;
               let nada = this.lightTheTiles(tilesToLight, this.state.players[id].color);
-              let newMessage = new UserMessage("THere's only one tile you can dry. Dry it.", false, [1]);
-              this.setState({ whatIsExpectedNext: "TileButtonClickForDry" , mainUserMessage: newMessage});
+              let newMessage = new UserMessage(lng.onlyOneTileToDry, false, [1]);
+              this.setState({ whatIsExpectedNext: "TileButtonClickForDry" ,
+                              mainUserMessage: newMessage});
             } else {
               this.state.players[id].whereCanHeDry = tilesToLight;
               let nada = this.lightTheTiles(tilesToLight, this.state.players[id].color);
-              let newMessage = new UserMessage("Now choose two tiles to dry", false, [1]);
-              this.setState({ whatIsExpectedNext: "TileButtonClickForDryTwoTimes" , mainUserMessage: newMessage});
+              let newMessage = new UserMessage(lng.nowChooseTwoTilesToDry, false, [1]);
+              this.setState({ whatIsExpectedNext: "TileButtonClickForDryTwoTimes" ,
+                              mainUserMessage: newMessage});
             }
       } else if (action === "Give") {
               let playersAround = this.getPlayersOnTheSameTileExceptMe();
               if (this.state.players[id].cards.length < 1 ){
-                alert("No cards to give. Try something else.");
+                alert(lng.noCardToGive);
                 this.showActionButtons();
               } else if ( action === "Give" && playersAround.length < 1) {
-                  alert("No other player on your tile. Try something else.");
+                  alert(lng.noOtherPlayerOnYourTile);
                   this.showActionButtons();
               } else {
-                this.setState({ whatIsExpectedNext: "ResolveUserDialogSequence" , messageBoardState: "giveACardSequence"});
+                this.setState({ whatIsExpectedNext: "ResolveUserDialogSequence" ,
+                                messageBoardState: "giveACardSequence"});
               }
       } else if (action === "SendACard") {
             if (this.state.players[id].cards.length < 1 ){
-              alert("No cards to send. Try something else.");
+              alert(lng.noCardToSend);
               this.showActionButtons();
             } else {
-              this.setState({ whatIsExpectedNext: "ResolveUserDialogSequence" , messageBoardState: "sendACardSequence"});
+              this.setState({ whatIsExpectedNext: "ResolveUserDialogSequence" ,
+                              messageBoardState: "sendACardSequence"});
             }
       } else if (action === "GetATreasure") {
               let treasureId = this.state.tiles[this.state.players[id].position].templeFor;
               if (treasureId === ""){
-                alert("This tile is not a temple.");
+                alert(lng.thisTileIsNotATemple);
                 this.showActionButtons();
               }
               else {
@@ -1133,18 +1137,20 @@ class Board extends React.Component {
                   }
 
                   if (this.state.posessedTreasures.includes(treasureId)){
-                    alert("This treasure has been found already.");
+                    alert(lng.thisTreasureHasBeenFoundAlready);
                   }
                   else if (cardsIndexes.length < 4){
-                    alert("You do not have enough " + this.getTreasureNameById(treasureId) + " cards to get the treasure... you need 4 , you have " + cardsIndexes.length);
+                    // alert("You do not have enough " + this.getTreasureNameById(treasureId) + " cards to get the treasure... you need 4 , you have " + cardsIndexes.length);
+                    alert(lng.notEnoughCards4Treasure.format(this.getTreasureNameById(treasureId), cardsIndexes.length));
                     this.showActionButtons();
                   } else {
                       if (this.state.posessedTreasures.length === 3 ){
-                        alert("You found the 4th treasure ! Now, go to the heliport and leave the Island !");
+                        //alert("You found the 4th treasure ! Now, go to the heliport and leave the Island with an Helicopter card !");
+                        alert(lng.youFoundThe4th);
                       } else if (this.state.posessedTreasures.length === 0) {
-                        alert("You found your first treasure ! Go on !");
+                        alert(lng.youFoundThe1st);
                       } else {
-                        alert(" You have another treasure ! Go ! Go ! Gotta catch them all");
+                        alert(lng.youFoundAnotherTreasure);
                       }
                       // PICK A TREASURE
                       let n_playerCardsDiscard = this.state.playerCardsDiscard;
@@ -1167,8 +1173,7 @@ class Board extends React.Component {
                       //update posessedTreasures
                       n_posessedTreasures.push(treasureId);
 
-
-                      let newMessage = new UserMessage("You found the treasure " + this.getTreasureNameById(treasureId) + " !!!", false, [0]);
+                      let newMessage = new UserMessage(lng.youFoundTheTreasureX.format(this.getTreasureNameById(treasureId)), false, [0]);
                       this.setState({ mainUserMessage: newMessage,
                                       posessedTreasures: n_posessedTreasures,
                                       players: n_players,
@@ -1179,25 +1184,26 @@ class Board extends React.Component {
       } else if (action === "MoveSomeone") {
               this.setState({ whatIsExpectedNext: "ResolveUserDialogSequence" , messageBoardState: "moveSomeOneSequence"});
       } else if (action === "DoNothing"){ // skip one action
-              let newMessage = new UserMessage("Doing nothing ZZZZZZZ", false, [0]);
+              let newMessage = new UserMessage(lng.doingNothing, false, [0]);
               this.setState({ mainUserMessage: newMessage});
       } else if (action === "SkipTurn"){ // skip the whole player turn, goes to next player
-             let newMessage = new UserMessage("Skip turn ", false, [0]);
+             let newMessage = new UserMessage(lng.skipTurn, false, [0]);
              this.setState({ mainUserMessage: newMessage,
                               currentStep: 4});
       } else if (action === "DoSleep"){ // finish the actions, go to card picking
-             let newMessage = new UserMessage("Sleep ZZZZZZZ ", false, [0]);
+             let newMessage = new UserMessage(lng.sleep, false, [0]);
              this.setState({ mainUserMessage: newMessage,
                               currentStep: 2});
       }
     }
     else{
-      alert ("UnexpectedClickOnActionButton");
+      alert (lng.unexpectedClickOnActionButton);
     }
     return null;
 }
 
 handleCardClick(card, playerId, toThrowIt){
+  let lng = this.state.languageDistributor;
   if (this.state.whatIsExpectedNext !== "TileButtonClickForMove")
   {
     this.hideActionButtons();
@@ -1207,12 +1213,13 @@ handleCardClick(card, playerId, toThrowIt){
           this.clickedOnSandBagCard(playerId)
     }
   } else {
-    alert("Please finish your action first.");
+    alert(lng.pleaseFinishYourActionFirst);
   }
 }
 
 // Handles a click on a tile
 handleTileClick(i) {
+    let lng = this.state.languageDistributor;
     this.showActionButtons();
     if (this.state.whatIsExpectedNext === "TileButtonClickForMove") {
         let player = this.state.players[this.state.currentPlayerPlaying];
@@ -1228,7 +1235,7 @@ handleTileClick(i) {
             }
         }
         else{
-          alert ("He can't move there !");
+          alert (lng.heCantMoveThere);
         }
       }
       else if (this.state.whatIsExpectedNext === "TileButtonClickForFly") {
@@ -1245,7 +1252,7 @@ handleTileClick(i) {
                 });
           }
           else{
-            alert ("He can't move there !");
+            alert (lng.heCantMoveThere);
           }
       } else if (this.state.whatIsExpectedNext === "TileButtonClickForMoveSomeone") {
 
@@ -1276,7 +1283,7 @@ handleTileClick(i) {
               });
         }
         else{
-          alert ("He can't move there !");
+          alert (lng.heCantMoveThere);
         }
       } else if (this.state.whatIsExpectedNext === "TileButtonClickForDry"){
         let newplayers = this.state.players;
@@ -1293,7 +1300,7 @@ handleTileClick(i) {
             }
         }
         else {
-          alert ("He can't dry anything there !");
+          alert (lng.heCantDryThere);
         }
       } else if (this.state.whatIsExpectedNext === "TileButtonClickForDryTwoTimes") {
         let newplayers = this.state.players;
@@ -1302,12 +1309,13 @@ handleTileClick(i) {
             // Dry
             this.dryATile(i);
             this.unlightATile(i);
-            let newMessage = new UserMessage("Now choose a second one to dry", false, []);
+            let newMessage = new UserMessage(lng.nowChooseASecondOneToDry, false, []);
             this.hideActionButtons();
-            this.setState({ whatIsExpectedNext: "TileButtonClickForDry" , mainUserMessage: newMessage});
+            this.setState({ whatIsExpectedNext: "TileButtonClickForDry" ,
+                            mainUserMessage: newMessage});
         }
         else {
-          alert ("He can't dry anything there !");
+          alert (lng.heCantDryThere);
         }
       } else if (this.state.whatIsExpectedNext === "TileButtonClickForFlyWithACard") {
         let player = this.state.players[this.state.cardUser];
@@ -1327,7 +1335,6 @@ handleTileClick(i) {
 
             player.whereCanHeFly = [];
             n_Players[player.id] = player;
-
 
             // If the currently active is the flyer or if the current player is on the reception ISLAND
             // and destination tile has a guy on it and he's not the messanger,
@@ -1363,7 +1370,7 @@ handleTileClick(i) {
                             whatIsExpectedNext_toRestore: null });
             let nada = this.unlightTheTiles();
         } else {
-          alert("He can't fly there with his H card");
+          alert(lng.cantFlyThereWithHisHCard);
         }
       }
       else if (this.state.whatIsExpectedNext === "TileButtonClickForDryWithACard") {
@@ -1398,7 +1405,7 @@ handleTileClick(i) {
           let nada = this.unlightTheTiles();
         }
         else {
-          alert("He can't DRY there with his card");
+          alert(lng.cantDryThereWithHisCard);
         }
       }
       else if (this.state.whatIsExpectedNext === "TileButtonClickForEvacuate") {
@@ -1422,19 +1429,19 @@ handleTileClick(i) {
 
             // Branching
             if (n_guysToEvacuate.length > 0){
-                message = message + "!!! There ARE " + n_guysToEvacuate.length + "people left to evacuate !!!</div>";
+                message = message + lng.thereAreXpeopleToEvacuate.format(n_guysToEvacuate.length);
                 n_userMessage = new UserMessage(message , false, [8]);
             }
             else if (floodNumber === floodTotal){
               // floodings are finished
               floodingSequence = null;
-              message = message + "<br/> Floodings are over.... for now.</div>";
+              message = message + lng.floodingsAreOverForNow;
               n_userMessage = new UserMessage(message , false, [0]);
             }
             else {
               // next flooding
               let databag = {nextFloodingNumber: floodNumber + 1, outOf: floodTotal};
-              message = message + "Flooding Goes on </div>";
+              message = message + lng.floodingsGoesOn;
               n_userMessage = new UserMessage(message , false, [5], databag);
             }
 
@@ -1466,10 +1473,10 @@ handleTileClick(i) {
             this.unlightTheTiles();
         }
         else{
-          alert ("He can't move there !");
+          alert (lng.heCantMoveThere);
         }
       } else {
-        alert ("Unexpected Clic On a Tile");
+        alert (lng.unexpectedClickOnATile);
       }
     }
 
@@ -1522,8 +1529,9 @@ handleTileClick(i) {
   }
 
   cancelAnAction(){
+    let lng = this.state.languageDistributor;
     let nada = this.unlightTheTiles();
-    let newMessage = new UserMessage("Choose an action " , false, []);
+    let newMessage = new UserMessage(lng.chooseAnAction_msg , false, []);
     this.showActionButtons();
     this.setState({
       whatIsExpectedNext: "CharacterActionButtonClick" ,
@@ -1532,22 +1540,27 @@ handleTileClick(i) {
   }
 
   doMoveSomeOne(puppet) {
+    let lng = this.state.languageDistributor;
     let whereCanHeMove = this.whereNavigatorCanMoveHim(this.state.players[puppet].position);
     this.state.players[puppet].whereCanHeMove = whereCanHeMove;
     let n_players = this.state.players;
     n_players[puppet].isPuppet = true;
     this.lightTheTiles(whereCanHeMove, this.state.players[puppet].color);
-    let newMessage = new UserMessage("Now choose a destination", false, []); // TODO : SET a cancel
-    this.setState({ whatIsExpectedNext: "TileButtonClickForMoveSomeone" , mainUserMessage: newMessage, messageBoardState : "default", players : n_players });
+    let newMessage = new UserMessage(lng.chooseADestination, false, []); // TODO : SET a cancel
+    this.setState({ whatIsExpectedNext: "TileButtonClickForMoveSomeone" ,
+                    mainUserMessage: newMessage,
+                    messageBoardState : "default",
+                    players : n_players });
   }
 
   doGiveACard(giver, card, receiver){
+    let lng = this.state.languageDistributor;
     // alert("GIVE A CARD : " + giver + " will give the " + card + " to " + receiver);
     console.log("PRE  Given : " + card + " to " + receiver);
     if (card == null){
-      alert("Please select a card to give.");
+      alert(lng.pleaseSelectACardToGive);
     } else if (receiver == null){
-      alert("Please select a recipient for the card.");
+      alert(lng.pleaseSelectARecipientForTheCard);
     } else {
       // remove from player
       let n_players = this.state.players;
@@ -1698,15 +1711,16 @@ handleTileClick(i) {
   renderPlayerMessagePanel() {
     let foundTreasures = this.state.posessedTreasures.length;
     let lng = this.state.languageDistributor;
+    let currentPlayer = this.state.players[this.state.currentPlayerPlaying];
 
     return (
       <span>
         <div className="messagePanel">
-          <div className="panelTitle"> FORBIDDEN<br/>::ReactJS::<br/>ISLAND <span className="littlePanelInfo">v.0.5.1</span></div>
+          <div className="panelTitle"> {lng.mainTitle01}<br/>::ReactJS::<br/>{lng.mainTitle02} <span className="littlePanelInfo">v.0.5.1</span></div>
           <div className="littlePanelInfo">{lng.turn} {this.state.turn} </div>
           <div className="littlePanelInfo">{lng.treasuresFound} : {foundTreasures}/4 </div>
-          <div className="littlePanelInfo"> {lng.floodLevel} {this.state.floodMeter.level} ({this.state.floodMeter.floodFactor} cards per flood)</div>
-          <div className="panelInfo"> {this.state.players[this.state.currentPlayerPlaying].playersName} the <span style={{color: this.state.players[this.state.currentPlayerPlaying].color}}>{this.state.players[this.state.currentPlayerPlaying].role}</span> is Playing.
+          <div className="littlePanelInfo"> {lng.floodLevel} {this.state.floodMeter.level} {lng.xCardsPerFlood.format(this.state.floodMeter.floodFactor)}</div>
+          <div className="panelInfo"> {currentPlayer.playersName} the <span style={{color: currentPlayer.color}}>{currentPlayer.role}</span> is Playing.
           <br/><span className="littlePanelInfo"> {playerSteps[this.state.currentStep].name} </span></div>
           <div className="panelInfo" id="UserActions">
             <ul>
