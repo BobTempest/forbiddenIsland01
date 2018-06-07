@@ -286,7 +286,6 @@ list-style:none;
   font-size: 24px;
   font-weight: bold;
   text-shadow: 1px 1px 3px #333333;
-  /*margin-left: 10px;*/
   margin-top: 10px;
 }
 
@@ -296,6 +295,12 @@ list-style:none;
 }
 
 .boardPlayerCards {
+  margin-left: 5px;
+  width:50px;
+}
+
+.activableBoardPlayerCards{
+  /* box-shadow: 0px 0px 5px #F00;*/
   margin-left: 5px;
   width:50px;
 }

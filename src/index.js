@@ -12,8 +12,7 @@ const playerTypes = [
     ability : "ab_Engineer",
     name : "Natacha",
     roleAttachedToName: "ro_Engineer",
-    roleQualifier: "qualificatif_N",
-    fullFormattedNameAndRole: 'fullFormattedNameAndRoleNavigator'
+    roleQualifier: "qualificatif_N"
   },
   {
     id : 1,
@@ -22,8 +21,7 @@ const playerTypes = [
     ability : "ab_Navigator",
     name : "Boris",
     roleAttachedToName: "ro_Navigator",
-    roleQualifier: "qualificatif_M",
-    fullFormattedNameAndRole: 'fullFormattedNameAndRoleNavigator'
+    roleQualifier: "qualificatif_M"
   },
   {
     id : 2,
@@ -32,8 +30,7 @@ const playerTypes = [
     ability : "ab_Messenger",
     name : "Francois",
     roleAttachedToName: "ro_Messenger",
-    roleQualifier: "qualificatif_M",
-    fullFormattedNameAndRole: 'fullFormattedNameAndRoleMessenger'
+    roleQualifier: "qualificatif_M"
   },
   {
     id : 3,
@@ -42,8 +39,7 @@ const playerTypes = [
     ability : "ab_Diver",
     name : "Gina",
     roleAttachedToName: "ro_Diver",
-    roleQualifier: "qualificatif_F",
-    fullFormattedNameAndRole: 'fullFormattedNameAndRoleDiver'
+    roleQualifier: "qualificatif_F"
   },
   {
     id : 4,
@@ -52,8 +48,7 @@ const playerTypes = [
     ability : "ab_Explorer",
     name : "Brian",
     roleAttachedToName: "ro_Explorer",
-    roleQualifier: "qualificatif_N",
-    fullFormattedNameAndRole: 'fullFormattedNameAndRoleExplorer'
+    roleQualifier: "qualificatif_N"
   },
   {
     id : 5,
@@ -62,8 +57,7 @@ const playerTypes = [
     ability : "ab_Pilot",
     name : "Bob",
     roleAttachedToName: "ro_Pilot",
-    roleQualifier: "qualificatif_M",
-    fullFormattedNameAndRole: 'fullFormattedNameAndRolePilot'
+    roleQualifier: "qualificatif_M"
   },
 ];
 
@@ -1686,9 +1680,9 @@ handleTileClick(i) {
     let isPlaying = this.state.currentPlayerPlaying === i; // bool
     let boardClass = isPlaying?  ('playerBoard playerBoardPlaying') : ('playerBoard ');
     let player = this.state.players[i];
-    let str_roleQualifier = this.getStringInTheCatalog(lng, player.roleQualifier);
-    let str_roleAttachedToName = this.getStringInTheCatalog(lng, player.roleAttachedToName);
-    let str_abilityHelp = this.getStringInTheCatalog(lng, player.playersAbility);
+    let str_roleQualifier = this.getStringInTheCatalog(this.state.languageDistributor, player.roleQualifier);
+    let str_roleAttachedToName = this.getStringInTheCatalog(this.state.languageDistributor, player.roleAttachedToName);
+    let str_abilityHelp = this.getStringInTheCatalog(this.state.languageDistributor, player.playersAbility);
 
 
     return (
@@ -1702,14 +1696,14 @@ handleTileClick(i) {
             this.state.players[i].cards.map((card, index) => {
               if (card){
                 return card.name === "helicopter" ?
-                    <span key={index} className="boardPlayerCards">
-                      <img src={card.url} width="45px" height="70px" onClick={() => this.handleCardClick("helicopterCard", this.state.players[i].id, false)} />
-                      <img className="overHand doRotate" src="img/hand.png" /*width="20px" height="24px" *//>
+                    <span key={index} className="activableBoardPlayerCards">
+                      <img className="overHand doRotate" src="img/hand.png"/>
+                      <img src={card.url} width="45px" height="70px" onClick={() => this.handleCardClick("helicopterCard", this.state.players[i].id, false)}/>
                     </span>
                   : card.name === "sandBag" ?
-                      <span key={index} className="boardPlayerCards">
+                      <span key={index} className="activableBoardPlayerCards">
                         <img src={card.url} width="45px" height="70px" onClick={() => this.handleCardClick("sandBagCard", this.state.players[i].id, false)}/>
-                        <img className="overHand doRotate" src="img/hand.png" /*width="20px" height="24px" *//>
+                        <img className="overHand doRotate" src="img/hand.png"/>
                       </span>
                       :
                       <span key={index} className="boardPlayerCards">
@@ -1884,7 +1878,7 @@ handleTileClick(i) {
           <div>
             {
                   playersOnTheSameTileExceptMe.length === 0 ? // Ok
-                     (<div> <span style={{color: this.state.players[flyerId].color}}>{this.state.players[flyerId].name}</span>{lng.chooseALandingDestination}</div>)
+                     (<div> <span style={{color: this.state.players[flyerId].color}}>{this.state.players[flyerId].name}</span>{lng.playerChooseALandingDestination}</div>)
                     : playersOnTheSameTileExceptMe.length === 1 ? // Ok
                        (<div> <span style={{color: this.state.players[flyerId].color}}>{this.state.players[flyerId].name}</span>{lng.doYouWantToTake}<span style={{color: this.state.players[playersOnTheSameTileExceptMe[0]].color}}>{this.state.players[playersOnTheSameTileExceptMe[0]].name}</span>{lng.withYou} <br/>
                          <input type="radio" name="coTraveller" key="yes" value="yes" onChange={() => travellers = [flyerId, playersOnTheSameTileExceptMe[0]]}/> {lng.btn_yes}<br/>
@@ -2039,7 +2033,7 @@ handleTileClick(i) {
     console.log("In getTreasureById with : " + id);
     for (let i = 0; i < treasures.length; i ++){
       if (treasures[i].id === id){
-        return treasures[i].name;
+        return this.getStringInTheCatalog(this.state.languageDistributor, treasures[i].loc_name);
       }
     }
     return "** Unknown Treasure was " + id + "**";
@@ -2058,13 +2052,13 @@ handleTileClick(i) {
   }
 
   doChangeLang(){
-    /*
-    NE COMPILE PAS
+
+    // NE COMPILE PAS
     if (this.state.languageDistributor.currentLanguage === "FR"){
-        this.setState({languageDistributor: lng.en});
+        this.setState({languageDistributor: stringsCatalog.en});
     } else {
-        this.setState({languageDistributor: lng.fr});
-    }*/
+        this.setState({languageDistributor: stringsCatalog.fr});
+    }
   }
 
   getStringInTheCatalog(distributor, input){
@@ -2263,14 +2257,13 @@ class Tile {
 }
 
 class Player {
-  constructor(id, type, role, color, name, roleAttachedToName, fullFormattedNameAndRole, roleQualifier, ability, position, cards, isInGame, leftTheIsland) {
+  constructor(id, type, role, color, name, roleAttachedToName, roleQualifier, ability, position, cards, isInGame, leftTheIsland) {
     this.id = id; // int
     this.type = type; // int
     this.role = role // string
     this.color = color; // string in hexa
     this.name = name; // string
     this.roleAttachedToName = roleAttachedToName;
-    this.fullFormattedNameAndRole = fullFormattedNameAndRole; // .format(<span style={{color: currentPlayer.color}}>,</span>)}
     this.roleQualifier = roleQualifier;
     this.playersAbility = ability; // string
     this.position = position; // int
@@ -2411,7 +2404,7 @@ function generatePlayers(howMany){
     for (let i = 0; i < howMany; i++){
       let type = roles[i];
       let player = new Player(
-          i, type, playerTypes[type].role, playerTypes[type].color, playerTypes[type].name, playerTypes[type].roleAttachedToName, playerTypes[type].fullFormattedNameAndRole, playerTypes[type].roleQualifier, playerTypes[type].ability, 0, [], true, false
+          i, type, playerTypes[type].role, playerTypes[type].color, playerTypes[type].name, playerTypes[type].roleAttachedToName, playerTypes[type].roleQualifier, playerTypes[type].ability, 0, [], true, false
       )
       players.push(player);
     }
