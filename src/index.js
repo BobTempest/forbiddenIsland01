@@ -639,10 +639,10 @@ class Board extends React.Component {
 
       let newMessage = "";
       if (cardNumber == 1){
-            newMessage = new UserMessage(lng.firstCard_msg.format(card.name) + '. <br/><img src='  + card.url + ' width="30px" height="46px"/>', false, [3]);
+            newMessage = new UserMessage(lng.firstCard_msg.format(this.getStringInTheCatalog(lng, card.name)) + '. <br/><img src='  + card.url + ' width="30px" height="46px"/>', false, [3]);
       }else{
             let databag = {userId : this.state.currentPlayerPlaying}
-            newMessage = new UserMessage(lng.secondCard_msg.format(card.name) + '. <br/><img src=' + card.url  + ' width="30px" height="46px"/>', false, [9], databag);
+            newMessage = new UserMessage(lng.secondCard_msg.format(this.getStringInTheCatalog(lng, card.name)) + '. <br/><img src=' + card.url  + ' width="30px" height="46px"/>', false, [9], databag);
       }
 
       tempState.mainUserMessage = newMessage;
@@ -2052,8 +2052,6 @@ handleTileClick(i) {
   }
 
   doChangeLang(){
-
-    // NE COMPILE PAS
     if (this.state.languageDistributor.currentLanguage === "FR"){
         this.setState({languageDistributor: stringsCatalog.en});
     } else {

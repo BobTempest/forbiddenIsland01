@@ -153,8 +153,8 @@ export const stringsCatalog = {
  },
  fr:{
    currentLanguage: "FR",
-   mainTitle01: "L'ÎLE",
-   mainTitle02: "INTERDITE",
+   mainTitle01: "L'ÎLE INTERDITE",
+   mainTitle02: "",
    treasuresFound:"Trésors trouvés",
    turn:"Tour :",
    floodLevel:"Niveau d'innondation",
