@@ -1700,12 +1700,12 @@ handleTileClick(i) {
                 return card.name === "helicopter" ?
                     <span key={index} className="activableBoardPlayerCards">
                       <img src={card.url} width="45px" height="70px" onClick={() => this.handleCardClick("helicopterCard", this.state.players[i].id, false)}/>
-                      <img className="overHand doRotate" src="img/hand.png"/>
+                      <img id={"actionCard:" + index + "::" + i} className="overHand doRotate" src="img/hand.png"/>
                     </span>
                   : card.name === "sandBag" ?
                       <span key={index} className="activableBoardPlayerCards">
                         <img src={card.url} width="45px" height="70px" onClick={() => this.handleCardClick("sandBagCard", this.state.players[i].id, false)}/>
-                        <img className="overHand doRotate" src="img/hand.png"/>
+                        <img id={"actionCard:" + index + "::" + i} className="overHand doRotate" src="img/hand.png"/>
                       </span>
                       :
                       <span key={index} className="boardPlayerCards">
@@ -2028,7 +2028,8 @@ handleTileClick(i) {
   }
 
   retry(){
-    this.location.reload();
+    alert ("Feature is Broken");
+    // this.location.reload();
   }
 
   getTreasureNameById(id){
@@ -2143,14 +2144,14 @@ handleTileClick(i) {
           </div>
           <table className="cardsPilesTable">
             <tbody>
-            <tr><th colSpan="2" width="150px">{this.state.languageDistributor.playerCards}</th><th colSpan="2" width="150px">{this.state.languageDistributor.floodCards}</th></tr>
+            <tr><th colSpan="2" width="173px">{this.state.languageDistributor.playerCards}</th><th colSpan="2" width="150px">{this.state.languageDistributor.floodCards}</th></tr>
             <tr style={{height: '18px'}}>
-              <td width="60px">{this.state.languageDistributor.leap}</td><td width="90px"><table className="invisiTable"><tbody><tr className="invisiTable"><td className="jaugePlayer invisiTable" style={{width: this.state.playerCardsLeap.length}}></td><td className="superSmall invisiTable">{this.state.playerCardsLeap.length}</td></tr></tbody></table></td>
-              <td width="60px">{this.state.languageDistributor.leap}</td><td width="90px"><table className="invisiTable"><tbody><tr className="invisiTable"><td className="jaugeFlood invisiTable" style={{width: this.state.floodCardsLeap.length}}></td><td className="superSmall invisiTable">{this.state.floodCardsLeap.length}</td></tr></tbody></table></td>
+              <td width="60px">{this.state.languageDistributor.leap}</td><td width="113px"><table className="invisiTable"><tbody><tr className="invisiTable"><td className="jaugePlayer invisiTable" style={{width: this.state.playerCardsLeap.length *2}}></td><td className="superSmall invisiTable">{this.state.playerCardsLeap.length}</td></tr></tbody></table></td>
+              <td width="60px">{this.state.languageDistributor.leap}</td><td width="113px"><table className="invisiTable"><tbody><tr className="invisiTable"><td className="jaugeFlood invisiTable" style={{width: this.state.floodCardsLeap.length *2}}></td><td className="superSmall invisiTable">{this.state.floodCardsLeap.length}</td></tr></tbody></table></td>
             </tr>
             <tr>
-              <td width="60px">{this.state.languageDistributor.discard}</td><td width="90px"><table className="invisiTable"><tbody><tr className="invisiTable"><td className="jaugePlayer invisiTable" style={{width: this.state.playerCardsDiscard.length}}></td><td className="superSmall invisiTable">{this.state.playerCardsDiscard.length}</td></tr></tbody></table></td>
-              <td width="60px">{this.state.languageDistributor.discard}</td><td width="90px"><table className="invisiTable"><tbody><tr className="invisiTable"><td className="jaugeFlood invisiTable" style={{width: this.state.floodCardsDiscard.length}}></td><td className="superSmall invisiTable">{this.state.floodCardsDiscard.length}</td></tr></tbody></table></td>
+              <td width="60px">{this.state.languageDistributor.discard}</td><td width="113px"><table className="invisiTable"><tbody><tr className="invisiTable"><td className="jaugePlayer invisiTable" style={{width: this.state.playerCardsDiscard.length *2}}></td><td className="superSmall invisiTable">{this.state.playerCardsDiscard.length}</td></tr></tbody></table></td>
+              <td width="60px">{this.state.languageDistributor.discard}</td><td width="113px"><table className="invisiTable"><tbody><tr className="invisiTable"><td className="jaugeFlood invisiTable" style={{width: this.state.floodCardsDiscard.length *2}}></td><td className="superSmall invisiTable">{this.state.floodCardsDiscard.length}</td></tr></tbody></table></td>
             </tr>
           </tbody>
           </table>
