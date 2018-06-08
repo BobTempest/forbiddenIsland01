@@ -9,12 +9,20 @@
 player1 is Playing / player 2uses a H card to come to his case :
 player 1 should have the GIVE option
 
+player1 is Playing / uses H should add dry to actions if destination tile is dryable ???? NO REPRO ?
+
+if use H card on third action (with someone), the give action appears after the flight)
+
+actions are shown after use a card to get rid of it.
+
+HAND display
 
 *********************
 **** NOW *****
 
 TODO : Welcome boardBoard, how many players + set difficulty + set Language
 TODO : GameOver Board
+TODO : over help on actions and cards
 
 *********************
 **** SHORT TERM *****

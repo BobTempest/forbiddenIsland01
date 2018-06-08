@@ -73,10 +73,10 @@ const diagonalPaths = {0 : [2, 4], 1 : [3, 5], 2 : [0, 6, 8], 3 : [1,7,9], 4 : [
  const gameSteps = ["init", "startTurn", "playerActionOne", "playerActionTwo", "playerActionThree", "playerPickACard", "floodRise", "endTurn", "final"];
 
  const treasures = [
-     { id : "CR" , name : "crystal", loc_name : "tr_crystal", trophyImg : "img/wonCrystal.png" },
-     { id : "CU" , name : "cup", loc_name : "tr_cup", trophyImg : "img/wonCup.png" },
-     { id : "SC" , name : "sceptre", loc_name : "tr_sceptre", trophyImg : "img/wonSceptre.png"},
-     { id : "ST" , name : "statue", loc_name : "tr_statue", trophyImg : "img/wonStatue.png"}
+     { id : "CR" , name : "crystal", loc_key : "tr_crystal", trophyImg : "img/wonCrystal.png" },
+     { id : "CU" , name : "cup", loc_key : "tr_cup", trophyImg : "img/wonCup.png" },
+     { id : "SC" , name : "sceptre", loc_key : "tr_sceptre", trophyImg : "img/wonSceptre.png"},
+     { id : "ST" , name : "statue", loc_key : "tr_statue", trophyImg : "img/wonStatue.png"}
  ];
 
  const buttons = ["Next", "Cancel", "PickTwoCards 1st", "PickTwoCards 2nd", "Flood"];
@@ -639,10 +639,10 @@ class Board extends React.Component {
 
       let newMessage = "";
       if (cardNumber == 1){
-            newMessage = new UserMessage(lng.firstCard_msg.format(this.getStringInTheCatalog(lng, card.name)) + '. <br/><img src='  + card.url + ' width="30px" height="46px"/>', false, [3]);
+            newMessage = new UserMessage(lng.firstCard_msg.format(this.getStringInTheCatalog(lng, card.loc_key)) + '. <br/><img src='  + card.url + ' width="30px" height="46px"/>', false, [3]);
       }else{
             let databag = {userId : this.state.currentPlayerPlaying}
-            newMessage = new UserMessage(lng.secondCard_msg.format(this.getStringInTheCatalog(lng, card.name)) + '. <br/><img src=' + card.url  + ' width="30px" height="46px"/>', false, [9], databag);
+            newMessage = new UserMessage(lng.secondCard_msg.format(this.getStringInTheCatalog(lng, card.loc_key)) + '. <br/><img src=' + card.url  + ' width="30px" height="46px"/>', false, [9], databag);
       }
 
       tempState.mainUserMessage = newMessage;
@@ -1151,10 +1151,12 @@ class Board extends React.Component {
                       if (this.state.posessedTreasures.length === 3 ){
                         //alert("You found the 4th treasure ! Now, go to the heliport and leave the Island with an Helicopter card !");
                         alert(lng.youFoundThe4th);
-                      } else if (this.state.posessedTreasures.length === 0) {
+                      } else if (this.state.posessedTreasures.length === 1) {
+                        alert(lng.youFoundThe2nd);
+                      } else if (this.state.posessedTreasures.length === 2) {
+                        alert(lng.youFoundThe3rd);
+                      }else {
                         alert(lng.youFoundThe1st);
-                      } else {
-                        alert(lng.youFoundAnotherTreasure);
                       }
                       // PICK A TREASURE
                       let n_playerCardsDiscard = this.state.playerCardsDiscard;
@@ -1697,8 +1699,8 @@ handleTileClick(i) {
               if (card){
                 return card.name === "helicopter" ?
                     <span key={index} className="activableBoardPlayerCards">
-                      <img className="overHand doRotate" src="img/hand.png"/>
                       <img src={card.url} width="45px" height="70px" onClick={() => this.handleCardClick("helicopterCard", this.state.players[i].id, false)}/>
+                      <img className="overHand doRotate" src="img/hand.png"/>
                     </span>
                   : card.name === "sandBag" ?
                       <span key={index} className="activableBoardPlayerCards">
@@ -1773,7 +1775,7 @@ handleTileClick(i) {
               this.state.players[giverId].cards.length === 1 ?
               <tr>
                 <td><span key="card0" /><input type="radio" name="chosenCard" key="0" checked="checked" value={this.state.players[giverId].cards[0].id} onChange={() => chosenCard = this.state.players[giverId].cards[0].id} /></td>
-                <td>{ this.state.players[giverId].cards[0].name} </td>
+                <td>{ this.getStringInTheCatalog(lng, this.state.players[giverId].cards[0].loc_key)} </td>
                 <td><img src= {this.state.players[giverId].cards[0].url}  width="20px" height="32px"/></td>
               </tr>
               :
@@ -1781,7 +1783,7 @@ handleTileClick(i) {
               <tr>
                 <td><span key={'card'+index}/><input type="radio" name="chosenCard" key={index} value={card.id} onChange={() => chosenCard = card.id} /></td>
                 <td><img src= {card.url}  width="20px" height="32px"/></td>
-                <td>{card.name}</td>
+                <td>{this.getStringInTheCatalog(lng, card.loc_key)}</td>
               </tr>
               )
             }
@@ -1826,14 +1828,14 @@ handleTileClick(i) {
               <tr>
                 <td><span key="0"/><input type="radio" name="chosenCard" key="0" checked="checked" value={this.state.players[giverId].cards[0].id} onChange={() => chosenCard = this.state.players[giverId].cards[0].id} /></td>
                 <td><img src= {this.state.players[giverId].cards[0].url}  width="20px" height="32px"/></td>
-                <td>{ this.state.players[giverId].cards[0].name} </td>
+                <td>{ this.getStringInTheCatalog(lng, this.state.players[giverId].cards[0].loc_key) } </td>
               </tr>
               :
               this.state.players[giverId].cards.map((card, index) =>
               <tr>
                 <td><span key={'card'+index}/><input type="radio" name="chosenCard" key={index} value={card.id} onChange={() => chosenCard = card.id} /></td>
                 <td><img src= {card.url}  width="20px" height="32px"/></td>
-                <td>{card.name}</td>
+                <td>{ this.getStringInTheCatalog(lng, card.loc_key)}</td>
               </tr>
               )
             }
@@ -2033,7 +2035,7 @@ handleTileClick(i) {
     console.log("In getTreasureById with : " + id);
     for (let i = 0; i < treasures.length; i ++){
       if (treasures[i].id === id){
-        return this.getStringInTheCatalog(this.state.languageDistributor, treasures[i].loc_name);
+        return this.getStringInTheCatalog(this.state.languageDistributor, treasures[i].loc_key);
       }
     }
     return "** Unknown Treasure was " + id + "**";
@@ -2353,31 +2355,31 @@ function riseTheIsland(){
 function generatePlayerCardsLeap(){
     let cards = [];
     for (let i = 0; i < 5; i++){
-        let card = { id : i, name : "crystal", type : "CR", url : "img/crystalCard.png"};
+        let card = { id : i, name : "crystal", loc_key: "ca_crytal", type : "CR", url : "img/crystalCard.png"};
         cards.push(card);
     }
     for (let i = 0; i < 5; i++){
-        let card = { id : i + 5, name : "cup", type : "CU", url : "img/cupCard.png"};
+        let card = { id : i + 5, name : "cup", loc_key: "ca_cup", type : "CU", url : "img/cupCard.png"};
         cards.push(card);
     }
     for (let i = 0; i < 5; i++){
-        let card = { id : i + 10, name : "sceptre", type : "SC", url : "img/sceptreCard.png"};
+        let card = { id : i + 10, name : "sceptre", loc_key: "ca_sceptre", type : "SC", url : "img/sceptreCard.png"};
         cards.push(card);
     }
     for (let i = 0; i < 5; i++){
-        let card = {id : i + 15, name : "statue", type : "ST", url : "img/statueCard.png"};
+        let card = {id : i + 15, name : "statue", loc_key: "ca_statue", type : "ST", url : "img/statueCard.png"};
         cards.push(card);
     }
     for (let i = 0; i < 3; i++){
-        let card = { id : i + 20, name : "helicopter", type : "H", url : "img/helicopterCard.png"};
+        let card = { id : i + 20, name : "helicopter", loc_key: "ca_helicopter", type : "H", url : "img/helicopterCard.png"};
         cards.push(card);
     }
     for (let i = 0; i < 2; i++){ // 2 cards
-        let card = { id : i + 23, name : "sandBag", type : "SB", url : "img/sandBagCard.png"};
+        let card = { id : i + 23, name : "sandBag", loc_key: "ca_sandBag", type : "SB", url : "img/sandBagCard.png"};
         cards.push(card);
     }
     for (let i = 0; i < 3; i++){ // 3 cards
-        let card = { id : i + 25, name : "floodRise", type : 5, url : "img/floodRise.png"};
+        let card = { id : i + 25, name : "floodRise", loc_key: "ca_floodRise", type : 5, url : "img/floodRise.png"};
         cards.push(card);
     }
     cards = shuffleArray(cards);
