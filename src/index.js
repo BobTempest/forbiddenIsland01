@@ -750,7 +750,8 @@ class Board extends React.Component {
     // on the helipad, 4 treasures found, all players on the tile
     if (this.state.posessedTreasures.length === 4 &&
         this.state.tiles[this.state.players[playerId].position].name === "helipad" &&
-        this.state.tiles[this.state.players[playerId].position].playerOn.length === this.state.nbrOfPlayers) {
+        //this.state.tiles[this.state.players[playerId].position].playerOn.length === this.state.nbrOfPlayers ) {
+        travellers.length === this.state.nbrOfPlayers - 1  ) {
           alert(lng.youWonMsg.format(this.state.nbrOfPlayers));
         }
     // displays the possible destinations
@@ -1349,7 +1350,7 @@ handleTileClick(i) {
             if ((this.state.currentPlayerPlaying === this.state.cardUser
                 || this.state.tiles[i].playerOn.indexOf(this.state.currentPlayerPlaying) >= 0)
                 && this.state.tiles[i].playerOn.length > 0
-                && n_Players[this.state.cardUser].role != "Messenger")
+                && this.state.currentStep <= 3)
               {
                   let y = n_possibleActions.length - 1;
                   n_possibleActions.splice(y, 0, playerDefaultActions[2]);
@@ -1358,6 +1359,20 @@ handleTileClick(i) {
                 //
               }
 
+              // Same. if after a fly, one lands on a flooded or surrounded by flooded tiles, let's add the DRY action
+              if (this.state.currentPlayerPlaying === this.state.cardUser
+                  && this.state.currentStep <= 3)
+                {
+                    let dryableTiles = this.whereCanHeDry(i, this.state.players[this.state.cardUser].role);
+                    if (dryableTiles.length > 0){
+
+                          n_possibleActions.splice(1, 0, playerDefaultActions[1]);
+                    }
+                    // n_possibleActions.splice(y, 0, playerDefaultActions[2]);
+                }
+                else {
+                  //
+                }
 
             // Move
             let returnPack = this.moveAGroupOfPlayers(player.id, this.state.coTravellers, i, n_Players, this.state.tiles);

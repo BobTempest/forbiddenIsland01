@@ -4,12 +4,8 @@
 
 -> reload crashes
 -> tiles do not disapear when drawning on EDGE
--> FIREFOX crashes on 'you got a treasure !'
+-> FIREFOX crashes on 'you got a treasure !' // not always ... sometimes, chrome crashes too
 
-player1 is Playing / player 2uses a H card to come to his case :
-player 1 should have the GIVE option
-
-player1 is Playing / uses H should add dry to actions if destination tile is dryable ???? NO REPRO ?
 
 if use H card on third action (with someone), the give action appears after the flight)
 
