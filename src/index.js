@@ -2016,7 +2016,7 @@ handleTileClick(i) {
       let showCheckIfMoreThan5SecondTimeStyle = (buttons.indexOf(10) >= 0)?({display: 'block'}):({display: 'none'});
 
       return(
-          <div><span dangerouslySetInnerHTML={{__html: this.state.mainUserMessage.message}} />
+          <div><span id="mainMessage" dangerouslySetInnerHTML={{__html: this.state.mainUserMessage.message}} />
           {
             !gameIsOver ?
               (<div>
@@ -2103,9 +2103,11 @@ handleTileClick(i) {
     if (this.state.languageDistributor.currentLanguage === "FR"){
         document.getElementById("langToggle").src = "img/toggle_left.png";
         this.setState({languageDistributor: stringsCatalog.en});
+        // TODO : reload the MainMessage
     } else {
         document.getElementById("langToggle").src = "img/toggle_right.png";
         this.setState({languageDistributor: stringsCatalog.fr});
+        // TODO : reload the MainMessage
     }
   }
 
