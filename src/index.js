@@ -133,8 +133,9 @@ const diagonalPaths = {0 : [2, 4], 1 : [3, 5], 2 : [0, 6, 8], 3 : [1,7,9], 4 : [
  { name : "coast03" }, { name : "swamp01" }, { name : "swamp02" }, { name : "swamp03" }, { name : "swamp04" }];
 
  class UserMessage {
-   constructor(message, isImportant, buttons, databag) {
+   constructor(message, complexMessage, isImportant, buttons, databag) {
      this.message = message;
+     this.complexMessage = complexMessage;
      this.isImportant = isImportant;
      this.buttons = buttons;
      this.databag = databag;
@@ -233,7 +234,7 @@ class Board extends React.Component {
     var floodCardsDiscard = [];
     var floodMeter = new FloodMeter(1);
     // let mainUserMessage = new UserMessage("Welcome new Player. Choose a first action for the first character.", false, []);
-    let mainUserMessage = new UserMessage("... INITIALIZATION... ", false, []);
+    let mainUserMessage = new UserMessage("... INITIALIZATION... ", null, false, []);
     var selectedLanguage = 0 // 0:french 1:english
 
     // generer les joueurs
@@ -328,7 +329,6 @@ class Board extends React.Component {
       let lng = this.state.languageDistributor;
 
       for ( let i = 0; i < 6; i++){
-
           let card = n_FloodCardsLeap.pop();
 
           for (let j = 0; j < n_Tiles.length; j++){
@@ -339,13 +339,14 @@ class Board extends React.Component {
           }
           n_FloodCardsDiscard.push(card);
       }
-
+      let n_userMessage = new UserMessage('welcome_msg', null, false, []);
+      // n_userMessage.messageElements = ['<span style=\"color: #F00\">','welcome_msg', '</span>', '<span style=\"color: #00F\">','welcome_msg', '</span>'];
       // And add a localised welcome message
       this.setState({
         floodCardsLeap: n_FloodCardsLeap,
         tiles: n_Tiles,
         floodCardsDiscard: n_FloodCardsDiscard,
-        mainUserMessage: new UserMessage(lng.welcome_msg, false, []) });
+        mainUserMessage: n_userMessage});
   }
 
   controller(input, data){
@@ -358,13 +359,13 @@ class Board extends React.Component {
         let nextStep = this.state.currentStep + 1;
         if (nextStep === 3){
           // draw player cards 01
-          let newMessage = new UserMessage(lng.letsDrawSomePlayerCards_msg, false, [2]);
+          let newMessage = new UserMessage('letsDrawSomePlayerCards_msg', null, false, [2]);
           this.setState({ currentStep : nextStep, possibleActions : [], mainUserMessage : newMessage});
         } else if (nextStep === 4){
           // flood some tiles.
           this.setState({ currentStep : nextStep });
           let howMuch = this.state.floodMeter.floodFactor;
-          let newMessage = new UserMessage((lng.letsFloodSomeTiles_msg.format(howMuch)) , false, [4]);
+          let newMessage = new UserMessage(null, lng.letsFloodSomeTiles_msg.format(howMuch) , false, [4]);
           this.setState({ currentStep : nextStep, possibleActions : [], mainUserMessage : newMessage});
         }
         else if (nextStep === 5){
@@ -376,7 +377,7 @@ class Board extends React.Component {
 
           if (this.state.currentPlayerPlaying === this.state.players[this.state.players.length -1].id){
             // let newMessage = new UserMessage("Next Turn ! Please " + this.state.players[0].name + ", Choose an action " , false, []);
-            let newMessage = new UserMessage(lng.nextTurn_msg.format(this.state.players[0].name) , false, []);
+            let newMessage = new UserMessage(null, lng.nextTurn_msg.format(this.state.players[0].name) , false, []);
             let nextTurn = this.state.turn + 1;
             let nextPlayer = this.state.players[0].id;
             let psblactn = this.getPossibleActions(this.state.players[0], false, false);
@@ -390,7 +391,7 @@ class Board extends React.Component {
               tiles: n_tiles });
           } else {
             // next Player
-            let newMessage = new UserMessage(lng.nextPlayer_msg, false, []);
+            let newMessage = new UserMessage('nextPlayer_msg', null, false, []);
             let nextPlayer = this.state.players[this.state.currentPlayerPlaying + 1].id;
             let psblactn = this.getPossibleActions(this.state.players[nextPlayer], false, false);
             this.setState({ currentStep : 0,
@@ -403,7 +404,7 @@ class Board extends React.Component {
         }
         else{
           // next action for the same player
-          let newMessage = new UserMessage(lng.chooseAnAction_msg , false, []);
+          let newMessage = new UserMessage('chooseAnAction_msg' , false, []);
           let psblactn = this.getPossibleActions(this.state.players[this.state.currentPlayerPlaying], this.state.hasPilotFlownThisTurn, false);
           this.setState({ currentStep : nextStep,
             possibleActions : psblactn,
@@ -426,6 +427,7 @@ class Board extends React.Component {
         this.doFloodATile(1, this.state.floodMeter.howManyCards(this.state.floodMeter.level));
       }
   }
+  // end of Controller
 
 /*
   doFloodInitialTiles(howMany){
@@ -494,7 +496,7 @@ class Board extends React.Component {
             tileHasDrawned = true;
             if (n_Tiles[j].name === "helipad"){
               message = message + lng.explorersCantLeaveTheIsland;
-              gameOver = true;
+              // gameOver = true;
               // alert("The helipad is drawned. GAMEOVER")
             }
             // rescue some players ?
@@ -514,7 +516,7 @@ class Board extends React.Component {
                       if (n_Tiles[k].isDrawned){
                         //message = message + "<br/>Oh my God ! all the temples for " + this.getTreasureNameById(n_Tiles[j].templeFor) + " are drawned. You'll never get it. GAME OVER";
                         message = message + lng.allTheTemplesAreDrawned.format(this.getTreasureNameById(n_Tiles[j].templeFor));
-                        gameOver = true;
+                        // gameOver = true;
                         // alert("Oh my God ! all the temples for " + this.getTreasureNameById(n_Tiles[j].templeFor) + " are drawned. You'll never get it. GAME OVER" );
                       }
                       break;
@@ -549,19 +551,19 @@ class Board extends React.Component {
     if (guysToEvacuate.length > 0){
         //message = message + "<br/>!!! WE NEED TO EVACUATE THE TILE !!!</div>";
         message = message + lng.weNeedToEvacuateTheTile;
-        n_userMessage = new UserMessage(message , false, [8]);
+        n_userMessage = new UserMessage(null, message , false, [8]);
     }
     else if (number === outOf){
       // floodings are finished
       //message = message + "<br/> Floodings are over.... for now.</div>";
       message = message + lng.floodingsAreOver;
-      n_userMessage = new UserMessage(message , false, [0]);
+      n_userMessage = new UserMessage(null, message , false, [0]);
     }
     else {
       // next flooding
       let databag = {nextFloodingNumber: number + 1, outOf: outOf};
       message = message + "</div>";
-      n_userMessage = new UserMessage(message , false, [5], databag);
+      n_userMessage = new UserMessage(null, message , false, [5], databag);
     }
 
     this.setState({
@@ -594,11 +596,11 @@ class Board extends React.Component {
       let newMessage = "";
       if (tilesToLight.length === 0){
         // let newMessage = new UserMessage("Oh my God. There's nowhere he can go. " + drawningGuy.name+ " is drawning. Noooooooo. GAME OVER.", false, []);
-        newMessage = new UserMessage(lng.nowhereHeCanGo.format(drawningGuy.name), false, []);
-        gameIsOver = true;
+        newMessage = new UserMessage(null, lng.nowhereHeCanGo.format(drawningGuy.name), false, []);
+        // gameIsOver = true;
       } else {
         this.lightTheTiles(tilesToLight, drawningGuy.color);
-        newMessage = new UserMessage(lng.chooseADestinationToEvacuate, false, []);
+        newMessage = new UserMessage('chooseADestinationToEvacuate', null, false, []);
       }
 
       this.setState({ whatIsExpectedNext: "TileButtonClickForEvacuate" ,
@@ -669,10 +671,10 @@ class Board extends React.Component {
 
       let newMessage = "";
       if (cardNumber == 1){
-            newMessage = new UserMessage(lng.firstCard_msg.format(this.getStringInTheCatalog(lng, card.loc_key)) + '. <br/><img src='  + card.url + ' width="30px" height="46px"/>', false, [3]);
+            newMessage = new UserMessage(null, lng.firstCard_msg.format(this.getStringInTheCatalog(lng, card.loc_key)) + '. <br/><img src='  + card.url + ' width="30px" height="46px"/>', false, [3]);
       }else{
             let databag = {userId : this.state.currentPlayerPlaying}
-            newMessage = new UserMessage(lng.secondCard_msg.format(this.getStringInTheCatalog(lng, card.loc_key)) + '. <br/><img src=' + card.url  + ' width="30px" height="46px"/>', false, [9], databag);
+            newMessage = new UserMessage(null, lng.secondCard_msg.format(this.getStringInTheCatalog(lng, card.loc_key)) + '. <br/><img src=' + card.url  + ' width="30px" height="46px"/>', false, [9], databag);
       }
 
       tempState.mainUserMessage = newMessage;
@@ -745,7 +747,7 @@ class Board extends React.Component {
 
   useACardToGetRidOfIt(type, index, userId){
       let lng = this.state.languageDistributor;
-      let n_message = new UserMessage(lng.okWhatsNext , false, [10]);
+      let n_message = new UserMessage('okWhatsNext', null, false, [10]);
       // ici set un state to recover à 'Voilà, on a utilisé une carte -> next doCheckIfMoreThan5CardsInHand'
       this.setState({mainUserMessage: n_message, messageBoardState: "default"}, () => {
         if (type === "H"){
@@ -761,7 +763,7 @@ class Board extends React.Component {
   clickedOnHelicopterCard(playerId) {
     let lng = this.state.languageDistributor;
     let whatIsExpectedNext_toRestore = this.state.whatIsExpectedNext;
-    let n_Message = new UserMessage(lng.chooseALandingDestination, false, [7]);
+    let n_Message = new UserMessage('chooseALandingDestination', null, false, [7]);
     let n_messageBoardState_toRestore = this.state.messageBoardState;
 
     // displays the board of co travellers choice
@@ -818,7 +820,7 @@ class Board extends React.Component {
 
     this.state.players[playerId].whereCanHeDry = tilesToLight;
     this.lightTheTiles(tilesToLight, this.state.players[playerId].color);
-    let newMessage = new UserMessage(lng.chooseATileToDry, false, [6]);
+    let newMessage = new UserMessage('chooseATileToDry', null, false, [6]);
     this.setState({ whatIsExpectedNext_toRestore : this.state.whatIsExpectedNext,
                     whatIsExpectedNext: "TileButtonClickForDryWithACard" ,
                     mainUserMessage_toRestore: this.state.mainUserMessage,
@@ -1097,7 +1099,7 @@ class Board extends React.Component {
               this.state.players[id].whereCanHeMove = tilesToLight;
               let nada = this.lightTheTiles(tilesToLight, this.state.players[id].color);
               // set a new Expected PlayerInput
-              let newMessage = new UserMessage(lng.chooseADestination, false, [1]);
+              let newMessage = new UserMessage('chooseADestination', null, false, [1]);
               this.setState({ whatIsExpectedNext: "TileButtonClickForMove" ,
                               mainUserMessage: newMessage });
             }
@@ -1105,7 +1107,7 @@ class Board extends React.Component {
           let tilesToLight = this.whereCanHeFly(this.state.players[id].position);
           this.state.players[id].whereCanHeFly = tilesToLight;
           let nada = this.lightTheTiles(tilesToLight, this.state.players[id].color);
-          let newMessage = new UserMessage(lng.chooseALandingDestination, false, [1]);
+          let newMessage = new UserMessage('chooseALandingDestination', null, false, [1]);
           this.setState({ whatIsExpectedNext: "TileButtonClickForFly" , mainUserMessage: newMessage });
       } else if (action === "Dry" || action === "DryAround"){
             let tilesToLight = this.whereCanHeDry(this.state.players[id].position, this.state.players[id].role);
@@ -1115,7 +1117,7 @@ class Board extends React.Component {
             } else {
               this.state.players[id].whereCanHeDry = tilesToLight;
               let nada = this.lightTheTiles(tilesToLight, this.state.players[id].color);
-              let newMessage = new UserMessage(lng.nowChooseATileToDry, false, [1]);
+              let newMessage = new UserMessage('nowChooseATileToDry', null, false, [1]);
               this.setState({ whatIsExpectedNext: "TileButtonClickForDry",
                               mainUserMessage: newMessage});
             }
@@ -1127,13 +1129,13 @@ class Board extends React.Component {
             } else if (tilesToLight.length === 1 ){
               this.state.players[id].whereCanHeDry = tilesToLight;
               let nada = this.lightTheTiles(tilesToLight, this.state.players[id].color);
-              let newMessage = new UserMessage(lng.onlyOneTileToDry, false, [1]);
+              let newMessage = new UserMessage('onlyOneTileToDry', null, false, [1]);
               this.setState({ whatIsExpectedNext: "TileButtonClickForDry" ,
                               mainUserMessage: newMessage});
             } else {
               this.state.players[id].whereCanHeDry = tilesToLight;
               let nada = this.lightTheTiles(tilesToLight, this.state.players[id].color);
-              let newMessage = new UserMessage(lng.nowChooseTwoTilesToDry, false, [1]);
+              let newMessage = new UserMessage('nowChooseTwoTilesToDry', null, false, [1]);
               this.setState({ whatIsExpectedNext: "TileButtonClickForDryTwoTimes" ,
                               mainUserMessage: newMessage});
             }
@@ -1210,7 +1212,7 @@ class Board extends React.Component {
                       //update posessedTreasures
                       n_posessedTreasures.push(treasureId);
 
-                      let newMessage = new UserMessage(lng.youFoundTheTreasureX.format(this.getTreasureNameById(treasureId)), false, [0]);
+                      let newMessage = new UserMessage(null, lng.youFoundTheTreasureX.format(this.getTreasureNameById(treasureId)), false, [0]);
                       this.setState({ mainUserMessage: newMessage,
                                       posessedTreasures: n_posessedTreasures,
                                       players: n_players,
@@ -1221,14 +1223,14 @@ class Board extends React.Component {
       } else if (action === "MoveSomeone") {
               this.setState({ whatIsExpectedNext: "ResolveUserDialogSequence" , messageBoardState: "moveSomeOneSequence"});
       } else if (action === "DoNothing"){ // skip one action
-              let newMessage = new UserMessage(lng.doingNothing, false, [0]);
+              let newMessage = new UserMessage('doingNothing', null, false, [0]);
               this.setState({ mainUserMessage: newMessage});
       } else if (action === "SkipTurn"){ // skip the whole player turn, goes to next player
-             let newMessage = new UserMessage(lng.skipTurn, false, [0]);
+             let newMessage = new UserMessage('skipTurn', null, false, [0]);
              this.setState({ mainUserMessage: newMessage,
                               currentStep: 4});
       } else if (action === "DoSleep"){ // finish the actions, go to card picking
-             let newMessage = new UserMessage(lng.sleep, false, [0]);
+             let newMessage = new UserMessage('sleep', null, false, [0]);
              this.setState({ mainUserMessage: newMessage,
                               currentStep: 2});
       }
@@ -1346,7 +1348,7 @@ handleTileClick(i) {
             // Dry
             this.dryATile(i);
             this.unlightATile(i);
-            let newMessage = new UserMessage(lng.nowChooseASecondOneToDry, false, []);
+            let newMessage = new UserMessage('nowChooseASecondOneToDry', null, false, []);
             this.hideActionButtons();
             this.setState({ whatIsExpectedNext: "TileButtonClickForDry" ,
                             mainUserMessage: newMessage});
@@ -1481,19 +1483,19 @@ handleTileClick(i) {
             // Branching
             if (n_guysToEvacuate.length > 0){
                 message = message + lng.thereAreXpeopleToEvacuate.format(n_guysToEvacuate.length);
-                n_userMessage = new UserMessage(message , false, [8]);
+                n_userMessage = new UserMessage(null, message , false, [8]);
             }
             else if (floodNumber === floodTotal){
               // floodings are finished
               floodingSequence = null;
               message = message + lng.floodingsAreOverForNow;
-              n_userMessage = new UserMessage(message , false, [0]);
+              n_userMessage = new UserMessage(null, message , false, [0]);
             }
             else {
               // next flooding
               let databag = {nextFloodingNumber: floodNumber + 1, outOf: floodTotal};
               message = message + lng.floodingsGoesOn;
-              n_userMessage = new UserMessage(message , false, [5], databag);
+              n_userMessage = new UserMessage(null, message , false, [5], databag);
             }
 
             this.setState({
@@ -1582,7 +1584,7 @@ handleTileClick(i) {
   cancelAnAction(){
     let lng = this.state.languageDistributor;
     let nada = this.unlightTheTiles();
-    let newMessage = new UserMessage(lng.chooseAnAction_msg , false, []);
+    let newMessage = new UserMessage('chooseAnAction_msg', null , false, []);
     this.showActionButtons();
     this.setState({
       whatIsExpectedNext: "CharacterActionButtonClick" ,
@@ -1597,7 +1599,7 @@ handleTileClick(i) {
     let n_players = this.state.players;
     n_players[puppet].isPuppet = true;
     this.lightTheTiles(whereCanHeMove, this.state.players[puppet].color);
-    let newMessage = new UserMessage(lng.chooseADestination, false, []); // TODO : SET a cancel
+    let newMessage = new UserMessage('chooseADestination', null, false, []); // TODO : SET a cancel
     this.setState({ whatIsExpectedNext: "TileButtonClickForMoveSomeone" ,
                     mainUserMessage: newMessage,
                     messageBoardState : "default",
@@ -2015,8 +2017,34 @@ handleTileClick(i) {
       let showCheckIfMoreThan5Style = (buttons.indexOf(9) >= 0)?({display: 'block'}):({display: 'none'});
       let showCheckIfMoreThan5SecondTimeStyle = (buttons.indexOf(10) >= 0)?({display: 'block'}):({display: 'none'});
 
+      //complexMessages Are already translated.
+      let msgEts = this.state.mainUserMessage.complexMessage;
+
+      let translatedString = "";
+      if (this.state.mainUserMessage.complexMessage && this.state.mainUserMessage.complexMessage.length > 0){
+        translatedString = this.state.mainUserMessage.complexMessage;
+      }
+      else {
+        translatedString = this.getStringInTheCatalog(lng, this.state.mainUserMessage.message);
+      }
+      /*
+      if (msgEts && msgEts.length > 0){
+          for (let i = 0; i < msgEts.length; i++){
+            if (msgEts[i][0] === '<'){
+              composedString = composedString + msgEts[i];
+            }
+            else{
+              composedString = composedString + this.getStringInTheCatalog(this.state.languageDistributor, msgEts[i]);
+            }
+          }
+      } else {
+        composedString = this.getStringInTheCatalog(lng, this.state.mainUserMessage.message);
+      }
+      */
+
       return(
-          <div><span id="mainMessage" dangerouslySetInnerHTML={{__html: this.state.mainUserMessage.message}} />
+          <div><span id="mainMessage" dangerouslySetInnerHTML={{__html: translatedString}} />
+
           {
             !gameIsOver ?
               (<div>
