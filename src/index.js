@@ -233,7 +233,7 @@ class Board extends React.Component {
     var floodCardsDiscard = [];
     var floodMeter = new FloodMeter(1);
     // let mainUserMessage = new UserMessage("Welcome new Player. Choose a first action for the first character.", false, []);
-    let mainUserMessage = new UserMessage(stringsCatalog.fr.welcome_msg, false, []);
+    let mainUserMessage = new UserMessage("... INITIALIZATION... ", false, []);
     var selectedLanguage = 0 // 0:french 1:english
 
     // generer les joueurs
@@ -276,7 +276,7 @@ class Board extends React.Component {
       floodingSequence : null
     };
 
-    this.doFloodInitialTiles(6);
+    // this.doFloodInitialTiles(6);
 
     // Let's start ... waiting for the first action click
 
@@ -319,6 +319,34 @@ class Board extends React.Component {
 ///////////////////////////////////////////////////////////////////////////////////
 //        Out Of Board constructor
 ////////////////////////////////////////////////////////////////////////////////////
+  componentDidMount() {
+
+      // Perform the initil Flooding of 6 tiles
+      let n_FloodCardsLeap = this.state.floodCardsLeap;
+      let n_Tiles = this.state.tiles;
+      let n_FloodCardsDiscard = this.state.floodCardsDiscard;
+      let lng = this.state.languageDistributor;
+
+      for ( let i = 0; i < 6; i++){
+
+          let card = n_FloodCardsLeap.pop();
+
+          for (let j = 0; j < n_Tiles.length; j++){
+            if (n_Tiles[j].name === card.name){
+                  n_Tiles[j].isImmersed = true;
+                  break;
+              }
+          }
+          n_FloodCardsDiscard.push(card);
+      }
+
+      // And add a localised welcome message
+      this.setState({
+        floodCardsLeap: n_FloodCardsLeap,
+        tiles: n_Tiles,
+        floodCardsDiscard: n_FloodCardsDiscard,
+        mainUserMessage: new UserMessage(lng.welcome_msg, false, []) });
+  }
 
   controller(input, data){
       console.log("InController turn :" + this.state.currentStep);
@@ -399,6 +427,7 @@ class Board extends React.Component {
       }
   }
 
+/*
   doFloodInitialTiles(howMany){
     let n_FloodCardsLeap = this.state.floodCardsLeap;
     let n_Tiles = this.state.tiles;
@@ -423,6 +452,7 @@ class Board extends React.Component {
       floodCardsDiscard: n_FloodCardsDiscard });
     return true;
   }
+  */
 
   doFloodATile(number, outOf){
     this.unblinkTheTiles();
@@ -1663,7 +1693,7 @@ handleTileClick(i) {
 
   renderEmptySquare() {
     return (
-      <DrawEmptySquare onClick={() => this.doChangeLang()}/>
+      <DrawEmptySquare /* onClick={() => this.doChangeLang()}*/ />
     );
   }
 
@@ -1692,7 +1722,6 @@ handleTileClick(i) {
       </span>)
   }
 
-
   renderPlayerBoard(i) { // passing a player index
     let isPlaying = this.state.currentPlayerPlaying === i; // bool
     let boardClass = isPlaying?  ('playerBoard playerBoardPlaying') : ('playerBoard ');
@@ -1706,7 +1735,7 @@ handleTileClick(i) {
       <div className={boardClass}>
         <span className="inBoardName">{player.name}</span>&nbsp;{str_roleQualifier}&nbsp;
         <span className="inBoardRole" style={{color: player.color}}>{str_roleAttachedToName}</span>
-        <a className="tooltips helpCharacterIcon" id={'tooltip' + i} href="#">?<span class="inToolTipsText">{str_abilityHelp}</span></a>
+        <a className="tooltips helpCharacterIcon" id={'tooltip' + i} href="#">?<span className="inToolTipsText">{str_abilityHelp}</span></a>
         <br/>
         <div className="inBoardCards">
           {
@@ -1747,7 +1776,8 @@ handleTileClick(i) {
       <span>
         <div className="messagePanel">
           <div className="panelTitle"> {lng.mainTitle01}<br/>::ReactJS::<br/>{lng.mainTitle02} <span className="littlePanelInfo">v.0.5.1</span></div>
-          <div className="littlePanelInfo">{lng.turn} {this.state.turn} </div>
+          <div className="littlePanelInfo">English <img id="langToggle" src="img/toggle_right.png" onClick={() => this.doChangeLang()} /> Français</div>
+          <div className="littlePanelInfo">{lng.turn} {this.state.turn}</div>
           <div className="littlePanelInfo">{lng.treasuresFound} : {foundTreasures}/4 </div>
           <div className="littlePanelInfo"> {lng.floodLevel} {this.state.floodMeter.level} {lng.xCardsPerFlood.format(this.state.floodMeter.floodFactor)}</div>
           <div className="panelInfo"> {currentPlayer.name}&nbsp;{str_roleQualifier}&nbsp;<span style={{color: currentPlayer.color}}>{str_roleAttachedToName}</span>&nbsp;{lng.isPlaying}
@@ -2071,9 +2101,19 @@ handleTileClick(i) {
 
   doChangeLang(){
     if (this.state.languageDistributor.currentLanguage === "FR"){
+        document.getElementById("langToggle").src = "img/toggle_left.png";
         this.setState({languageDistributor: stringsCatalog.en});
     } else {
+        document.getElementById("langToggle").src = "img/toggle_right.png";
         this.setState({languageDistributor: stringsCatalog.fr});
+    }
+  }
+
+  doSetLang(lang){
+    if (lang === "FR" && !this.state.languageDistributor.currentLanguage === "FR"){
+        this.setState({languageDistributor: stringsCatalog.fr});
+    } else if (lang === "EN" && !this.state.languageDistributor.currentLanguage === "EN"){
+        this.setState({languageDistributor: stringsCatalog.en});
     }
   }
 
