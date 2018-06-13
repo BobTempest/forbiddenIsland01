@@ -404,7 +404,7 @@ class Board extends React.Component {
         }
         else{
           // next action for the same player
-          let newMessage = new UserMessage('chooseAnAction_msg' , false, []);
+          let newMessage = new UserMessage('chooseAnAction_msg', null, false, []);
           let psblactn = this.getPossibleActions(this.state.players[this.state.currentPlayerPlaying], this.state.hasPilotFlownThisTurn, false);
           this.setState({ currentStep : nextStep,
             possibleActions : psblactn,
