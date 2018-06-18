@@ -227,6 +227,9 @@ class Board extends React.Component {
   constructor(props) {
     super(props);
 
+    // var selectedLanguage = props.language === "FR" ? 0 : 1;// 0:french 1:english
+    var nbrOfPlayers = props.nbrOfPlayers;
+
     var tiles = riseTheIsland();
     var playerCardsLeap = generatePlayerCardsLeap();
     var playerCardsDiscard = [];
@@ -235,10 +238,9 @@ class Board extends React.Component {
     var floodMeter = new FloodMeter(1);
     // let mainUserMessage = new UserMessage("Welcome new Player. Choose a first action for the first character.", false, []);
     let mainUserMessage = new UserMessage("... INITIALIZATION... ", null, false, []);
-    var selectedLanguage = 0 // 0:french 1:english
 
     // generer les joueurs
-    var players = generatePlayers(4);
+    var players = generatePlayers(nbrOfPlayers);
     // distribuer les cartes aux joueurs
     players.forEach(giveTwoInitialCards);
     // assigner les positions de depart
@@ -257,7 +259,7 @@ class Board extends React.Component {
       floodMeter: floodMeter,
       gameIsOver: false,
       nbrOfPlayers : players.length,
-      languageDistributor: stringsCatalog.fr,
+      languageDistributor: props.language === "FR" ? stringsCatalog.fr : stringsCatalog.en,
       posessedTreasures : [],
       turn : 1,
       hasPilotFlownThisTurn : false,
@@ -1810,7 +1812,7 @@ handleTileClick(i) {
       <span>
         <div className="messagePanel">
           <div className="panelTitle"> {lng.mainTitle01}<br/>::ReactJS::<br/>{lng.mainTitle02} <span className="littlePanelInfo">v.0.5.1</span></div>
-          <div className="littlePanelInfo">English <img id="langToggle" src="img/toggle_right.png" onClick={() => this.doChangeLang()} /> Français</div>
+          <div className="littlePanelInfo">English <img id="langToggle" src="img/toggle_left.png" onClick={() => this.doChangeLang()} /> Français</div>
           <div className="littlePanelInfo">{lng.turn} {this.state.turn}</div>
           <div className="littlePanelInfo">{lng.treasuresFound} : {foundTreasures}/4 </div>
           <div className="littlePanelInfo"> {lng.floodLevel} {this.state.floodMeter.level} {lng.xCardsPerFlood.format(this.state.floodMeter.floodFactor)}</div>
@@ -2352,12 +2354,23 @@ VOIR DANS LE Flood Leap
 ////// END OF Board Class
 
 class Game extends React.Component {
+   constructor(props) {
+    super(props);
+   }
   render() {
+    //
+    var difficultyLevel = 0;
+    var language = "ZZ";
+    var nbrOfPlayers = 2;
     //
     return (
       <div className="game">
         <div className="game-board">
-          <Board />
+          <Board nbrOfPlayers={nbrOfPlayers} difficultyLevel={difficultyLevel} language={language}/>
+        </div>
+        <div className="game-start">
+        </div>
+        <div className="game-end">
         </div>
         <div className="game-info">
           <div>{/* status */}</div>
