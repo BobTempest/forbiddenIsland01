@@ -273,6 +273,7 @@ class Board extends React.Component {
       cardUser : null,
       coTravellers : null,
       cardFlyWith : [],
+      inAGetRidOfACardContext : false,
       guysToEvacuate : null,
       floodingSequence : null
     };
@@ -304,8 +305,8 @@ class Board extends React.Component {
         */
         //end of helicopter Hack
 
-      for (let i = 0; i < 2; i++){ // 2
-      // for (let i = 0; i < 5; i++){ // HACK OF 5 Cards in the beg
+        for (let i = 0; i < 2; i++){ // 2
+       //for (let i = 0; i < 5; i++){ // HACK OF 5 Cards in the beg
             let card = playerCardsLeap.pop();
             while (card.name === "floodRise"){
               playerCardsLeap.push(card);
@@ -339,9 +340,10 @@ class Board extends React.Component {
           }
           n_FloodCardsDiscard.push(card);
       }
-      let n_userMessage = new UserMessage('welcome_msg', null, false, []);
-      // n_userMessage.messageElements = ['<span style=\"color: #F00\">','welcome_msg', '</span>', '<span style=\"color: #00F\">','welcome_msg', '</span>'];
+
       // And add a localised welcome message
+      let n_userMessage = new UserMessage('welcome_msg', null, false, []);
+
       this.setState({
         floodCardsLeap: n_FloodCardsLeap,
         tiles: n_Tiles,
@@ -690,30 +692,24 @@ class Board extends React.Component {
   }
 
   // MUST BE DONE AT THE END OF AN ACTION -> embraye sur un ActionIsDone
-  doCheckIfMoreThan5CardsInHand(passages, userId) { // TODO : player Id has to be dynamic in cases of give or send!
+  doCheckIfMoreThan5CardsInHand(passages, userId) {
     let cardsInHand = this.state.players[userId].cards;
     if (cardsInHand.length > 5){
       // alert ("Oh no ! Over 5 cards in Hand ! : " + cardsInHand.length);
 
       let n_whatIsExpectedNext_toRestore = this.state.whatIsExpectedNext;
-      // let n_Message = new UserMessage("Let's get rid of " + cardsInHand.length - 5 +" card(s)", false, []);
       let n_messageBoardState_toRestore = this.state.messageBoardState;
 
-      // displays the board of co travellers choice
-      // this.setState({ mainUserMessage: n_Message });
       if (passages === 0){
         this.setState({ whatIsExpectedNext_toRestore : n_whatIsExpectedNext_toRestore,
                         whatIsExpectedNext: "ResolveOver5Cards" ,
                         mainUserMessage_toRestore: this.state.mainUserMessage,
-                        // mainUserMessage: n_Message,
                         messageBoardState_toRestore: n_messageBoardState_toRestore,
                         messageBoardState: "SolveOver5Cards",
                         cardUser : userId });
       } else {
         this.setState({
                         whatIsExpectedNext: "ResolveOver5Cards" ,
-                        // mainUserMessage_toRestore: this.state.mainUserMessage,
-                        // mainUserMessage: n_Message,
                         messageBoardState: "SolveOver5Cards",
                         cardUser : userId });
       }
@@ -751,16 +747,16 @@ class Board extends React.Component {
       // ici set un state to recover à 'Voilà, on a utilisé une carte -> next doCheckIfMoreThan5CardsInHand'
       this.setState({mainUserMessage: n_message, messageBoardState: "default"}, () => {
         if (type === "H"){
-            this.clickedOnHelicopterCard(userId);
+            this.clickedOnHelicopterCard(userId, true);
         } else if (type === "SB"){
-            this.clickedOnSandBagCard(userId);
+            this.clickedOnSandBagCard(userId, true);
         } else {
           alert("CONCEPTUAL ERROR : WRONG CARD TYPE");
         }
       });
   }
 
-  clickedOnHelicopterCard(playerId) {
+  clickedOnHelicopterCard(playerId, inAGetRidOfACardContext) {
     let lng = this.state.languageDistributor;
     let whatIsExpectedNext_toRestore = this.state.whatIsExpectedNext;
     let n_Message = new UserMessage('chooseALandingDestination', null, false, [7]);
@@ -773,6 +769,7 @@ class Board extends React.Component {
                     mainUserMessage: n_Message,
                     messageBoardState_toRestore: n_messageBoardState_toRestore,
                     messageBoardState: "ChooseCoTravellers",
+                    inAGetRidOfACardContext: inAGetRidOfACardContext,
                     cardUser : playerId });
   }
 
@@ -783,7 +780,7 @@ class Board extends React.Component {
     if (this.state.posessedTreasures.length === 4 &&
         this.state.tiles[this.state.players[playerId].position].name === "helipad" &&
         //this.state.tiles[this.state.players[playerId].position].playerOn.length === this.state.nbrOfPlayers ) {
-        travellers.length === this.state.nbrOfPlayers - 1  ) {
+        travellers.length === this.state.nbrOfPlayers /* - 1  */) {
           alert(lng.youWonMsg.format(this.state.nbrOfPlayers));
         }
     // displays the possible destinations
@@ -806,11 +803,12 @@ class Board extends React.Component {
                     mainUserMessage_toRestore: null,
                     messageBoardState: this.state.messageBoardState_toRestore,
                     messageBoardState_toRestore: null,
+                    inAGetRidOfACardContext: false,
                     // cardUser : null,
                     coTravellers : null });
   }
 
-  clickedOnSandBagCard(playerId) {
+  clickedOnSandBagCard(playerId, inAGetRidOfACardContext) {
     let lng = this.state.languageDistributor;
     let tilesToLight = this.getImmersedTiles();
     if (tilesToLight.length === 0){
@@ -826,6 +824,7 @@ class Board extends React.Component {
                     mainUserMessage_toRestore: this.state.mainUserMessage,
                     mainUserMessage: newMessage,
                     messageBoardState_toRestore: this.state.messageBoardState,
+                    inAGetRidOfACardContext: inAGetRidOfACardContext,
                     cardUser : playerId });
     return null;
   }
@@ -839,6 +838,7 @@ class Board extends React.Component {
                     mainUserMessage_toRestore: null,
                     messageBoardState: this.state.messageBoardState_toRestore,
                     messageBoardState_toRestore: null,
+                    inAGetRidOfACardContext: false,
                     // cardUser : null
                    });
   }
@@ -1175,6 +1175,7 @@ class Board extends React.Component {
 
                   if (this.state.posessedTreasures.includes(treasureId)){
                     alert(lng.thisTreasureHasBeenFoundAlready);
+                    this.showActionButtons();
                   }
                   else if (cardsIndexes.length < 4){
                     // alert("You do not have enough " + this.getTreasureNameById(treasureId) + " cards to get the treasure... you need 4 , you have " + cardsIndexes.length);
@@ -1378,37 +1379,61 @@ handleTileClick(i) {
             // If the currently active is the flyer or if the current player is on the reception ISLAND
             // and destination tile has a guy on it and he's not the messanger,
             // recalculate the current active player possible actions to include the 'give' action unless he is the messenger
+
             let n_possibleActions = this.state.possibleActions;
             if ((this.state.currentPlayerPlaying === this.state.cardUser
                 || this.state.tiles[i].playerOn.indexOf(this.state.currentPlayerPlaying) >= 0)
                 && this.state.tiles[i].playerOn.length > 0
-                && this.state.currentStep <= 3)
+                && this.state.currentStep <= 2)
               {
+                if (!this.actionIsInThePosibleActionsListAlready("Give")){
                   let y = n_possibleActions.length - 1;
                   n_possibleActions.splice(y, 0, playerDefaultActions[2]);
+                }
               }
               else {
                 //
               }
 
-              // Same. if after a fly, one lands on a flooded or surrounded by flooded tiles, let's add the DRY action
+              // Same. if after a fly, one lands on a flooded or surrounded by flooded tiles and is currently playing,
+              // Check if it's not in possibleActions already and let's add the DRY action
               if (this.state.currentPlayerPlaying === this.state.cardUser
-                  && this.state.currentStep <= 3)
-                {
-                    let dryableTiles = this.whereCanHeDry(i, this.state.players[this.state.cardUser].role);
-                    if (dryableTiles.length > 0){
+                  && this.state.currentStep <= 2)
+              {
+                  let dryableTiles = this.whereCanHeDry(i, this.state.players[this.state.cardUser].role);
+                  if (dryableTiles.length > 0
+                  && !this.actionIsInThePosibleActionsListAlready("Dry") && !this.actionIsInThePosibleActionsListAlready("Dry two tiles")
+                  ){
+                        n_possibleActions.splice(1, 0, playerDefaultActions[1]);
+                  }
+                  // n_possibleActions.splice(y, 0, playerDefaultActions[2]);
+              }
+              else {
+                //
+              }
 
-                          n_possibleActions.splice(1, 0, playerDefaultActions[1]);
-                    }
-                    // n_possibleActions.splice(y, 0, playerDefaultActions[2]);
-                }
-                else {
-                  //
-                }
+              // Same. if after a fly, one lands on a temple and is currently playing,
+              // Check if it's not in possibleActions already and let's add the Get A Treasure action
+              if (this.state.currentPlayerPlaying === this.state.cardUser
+                  && this.state.currentStep <= 2)
+              {
+                  if (this.state.tiles[i].templeFor.length > 0
+                    && !this.actionIsInThePosibleActionsListAlready("Get a Treasure !")){
+                    let y = n_possibleActions.length - 1;
+                    n_possibleActions.splice(y, 0, playerDefaultActions[3]);
+                  }
+              } else {
+              //
+              }
 
             // Move
             let returnPack = this.moveAGroupOfPlayers(player.id, this.state.coTravellers, i, n_Players, this.state.tiles);
             //
+
+            if (this.state.inAGetRidOfACardContext){
+                // hide the actionbuttons
+                this.hideActionButtons();
+            }
 
             this.setState({ whatIsExpectedNext: this.state.whatIsExpectedNext_toRestore,
                             messageBoardState: this.state.messageBoardState_toRestore,
@@ -1420,7 +1445,8 @@ handleTileClick(i) {
                             possibleActions: n_possibleActions,
                             playerCardsDiscard: n_PlayerCardsDiscard,
                             messageBoardState_toRestore: null,
-                            whatIsExpectedNext_toRestore: null });
+                            whatIsExpectedNext_toRestore: null,
+                            inAGetRidOfACardContext: false });
             let nada = this.unlightTheTiles();
         } else {
           alert(lng.cantFlyThereWithHisHCard);
@@ -1446,6 +1472,11 @@ handleTileClick(i) {
           NewPlayers[player.id] = player;
           // Dry
           this.dryATile(i);
+
+          if (this.state.inAGetRidOfACardContext){
+              this.hideActionButtons();
+          }
+
           this.setState({ whatIsExpectedNext: this.state.whatIsExpectedNext_toRestore,
                           messageBoardState: this.state.messageBoardState_toRestore,
                           mainUserMessage: this.state.mainUserMessage_toRestore,
@@ -1454,7 +1485,8 @@ handleTileClick(i) {
                           playerCardsDiscard: NewPlayerCardsDiscard,
                           messageBoardState_toRestore: null,
                           whatIsExpectedNext_toRestore: null,
-                          mainUserMessage_toRestore: null });
+                          mainUserMessage_toRestore: null,
+                          inAGetRidOfACardContext: false });
           let nada = this.unlightTheTiles();
         }
         else {
@@ -1962,6 +1994,8 @@ handleTileClick(i) {
             </div>
           )
     } else if (this.state.messageBoardState === "SolveOver5Cards") {
+
+      // TODO set a RED border
       let userId = this.state.cardUser;
       let color = this.state.players[userId].color;
       let name = this.state.players[userId].name;
@@ -2113,6 +2147,15 @@ handleTileClick(i) {
       }
     }
     return "** Unknown Treasure was " + id + "**";
+  }
+
+  actionIsInThePosibleActionsListAlready(actionName){
+    for(let i = 0 ; i < this.state.possibleActions.length; i++){
+      if (this.state.possibleActions[i].name === actionName){
+        return true;
+      }
+    }
+    return false;
   }
 
   unlightATile(i) {
