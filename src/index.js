@@ -260,6 +260,7 @@ class Board extends React.Component {
       gameIsOver: false,
       nbrOfPlayers : players.length,
       languageDistributor: props.language === "FR" ? stringsCatalog.fr : stringsCatalog.en,
+      selectedLanguage: props.language === "FR" ? "FR" : "EN",
       posessedTreasures : [],
       turn : 1,
       hasPilotFlownThisTurn : false,
@@ -279,10 +280,6 @@ class Board extends React.Component {
       guysToEvacuate : null,
       floodingSequence : null
     };
-
-    // this.doFloodInitialTiles(6);
-
-    // Let's start ... waiting for the first action click
 
     function getInitialPlayerPosition(player, y, z){
       //start hack
@@ -325,7 +322,7 @@ class Board extends React.Component {
 ////////////////////////////////////////////////////////////////////////////////////
   componentDidMount() {
 
-      // Perform the initil Flooding of 6 tiles
+      // Perform the initial Flooding of 6 tiles
       let n_FloodCardsLeap = this.state.floodCardsLeap;
       let n_Tiles = this.state.tiles;
       let n_FloodCardsDiscard = this.state.floodCardsDiscard;
@@ -2356,19 +2353,89 @@ VOIR DANS LE Flood Leap
 class Game extends React.Component {
    constructor(props) {
     super(props);
+
+    this.state = {
+      showStartPanel: true,
+      showBoardPanel: true,
+      showGameOverPanel: false,
+      difficultyLevel: 0,
+      language: "FR",
+      nbrOfPlayers: 2
+    };
    }
+
+    doChangeLangSelector(){
+       if (this.state.language === "FR"){
+           document.getElementById("homeLangToggle").src = "img/toggle_left.png";
+           this.setState({language: "EN",
+                          difficultyLevel: this.difficultyLevel,
+                          });
+       } else {
+           document.getElementById("homeLangToggle").src = "img/toggle_right.png";
+           this.setState({language: "FR",
+                          difficultyLevel: this.difficultyLevel,
+                          });
+           // TODO : reload the Panel with proper language
+       }
+     }
+
+     doChangeNbrOfPlayers(x){
+       this.setState({ nbrOfPlayers: x});
+     }
+
+     launchBoard(){
+        this.setState(
+          { difficultyLevel: this.difficultyLevel,
+            nbrOfPlayers: this.state.nbrOfPlayers,
+            showStartPanel: false,
+            showBoardPanel: true });
+
+          ReactDOM.render(
+            <Board nbrOfPlayers={this.state.nbrOfPlayers} difficultyLevel={this.difficultyLevel} language={this.state.language}/>,
+            document.getElementById('game-board'));
+     }
+
   render() {
     //
-    var difficultyLevel = 0;
-    var language = "ZZ";
-    var nbrOfPlayers = 2;
+
+    let difficultyLevel = 0;
+    let language = "FR";
+    let nbrOfPlayers = 2;
+
+    const showHideStartPanel = {
+      'display': this.state.showStartPanel ? 'block' : 'none'
+    };
+
+    const showHideGameOverPanel = {
+      'display': this.state.showGameOverPanel ? 'block' : 'none'
+    };
+
+    const showHideBoardPanel = {
+      'display': this.state.showBoardPanel ? 'block' : 'none'
+    };
     //
+
     return (
       <div className="game">
-        <div className="game-board">
-          <Board nbrOfPlayers={nbrOfPlayers} difficultyLevel={difficultyLevel} language={language}/>
+        <div className="game-board" id="game-board" style={showHideBoardPanel}>
+
         </div>
-        <div className="game-start">
+        <div id="start-panel" className="game-start" style={showHideStartPanel}>
+          <div>Holla Camarade.</div>
+          <div>Combien d'aventuriers ?
+                  2 <input type="radio" name="howManyAdventurers" key="howManyAdventurers2" checked="checked" value='2' onChange={() => this.doChangeNbrOfPlayers(2)}/> |
+                  3 <input type="radio" name="howManyAdventurers" key="howManyAdventurers3" value='3' onChange={() => this.doChangeNbrOfPlayers(3)}/> |
+                  4 <input type="radio" name="howManyAdventurers" key="howManyAdventurers4" value='4' onChange={() => this.doChangeNbrOfPlayers(4)} />
+          </div>
+          <div>Quelle difficultée ?
+                  Novice <input type="radio" name="WhichDifficulty" key="WhichDifficulty1" value='1' onChange={() => this.difficultyLevel = 1}/> |
+                  Normal <input type="radio" name="WhichDifficulty" key="WhichDifficulty2" checked="checked" value='2' onChange={() => this.difficultyLevel = 2}/> |
+                  Elite <input type="radio" name="WhichDifficulty" key="WhichDifficulty3" value='3' onChange={() => this.difficultyLevel = 3}/> |
+                  Légende <input type="radio" name="WhichDifficulty" key="WhichDifficulty4" value='4' onChange={() => this.difficultyLevel = 4}/> |
+            </div>
+          <div>Quelle langue ? English <img id="homeLangToggle" src="img/toggle_right.png" onClick={() => this.doChangeLangSelector()} /> Français</div>
+
+          <div><button onClick={() => this.launchBoard()}>En avant !</button></div>
         </div>
         <div className="game-end">
         </div>

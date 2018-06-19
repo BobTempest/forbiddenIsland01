@@ -20,10 +20,12 @@ HAND display
 TODO: UI separate msg boxes
 
 
-TODO : Welcome boardBoard, how many players + set difficulty + set Language
+TODO : Welcome Board, how many players + set difficulty + set Language
 TODO : GameOver Board
 TODO : over help on actions and cards
 TODO : Copyright message
+
+TODO : save state et annule un coup
 
 *********************
 **** SHORT TERM *****
