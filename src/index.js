@@ -1733,7 +1733,6 @@ handleTileClick(i) {
     // if le tresor a été trouvé draw it else Draw empty square
     let trophyPath = "";
     if (this.state.posessedTreasures.indexOf(treasureId) >= 0){
-
       for (let i = 0 ; i < treasures.length; i++){
         if (treasures[i].id === treasureId)
         {
@@ -1776,12 +1775,12 @@ handleTileClick(i) {
                 return card.name === "helicopter" ?
                     <span key={index} className="activableBoardPlayerCards">
                       <img src={card.url} width="45px" height="70px" onClick={() => this.handleCardClick("helicopterCard", this.state.players[i].id, false)}/>
-                      <img id={"actionCard:" + index + "::" + i} className="overHand doRotate" src="img/hand.png"/>
+                      <span className="spanOverHand"><img id={"actionCard:" + index + "::" + i} className="overHand doRotate" src="img/hand.png"/></span>
                     </span>
                   : card.name === "sandBag" ?
                       <span key={index} className="activableBoardPlayerCards">
                         <img src={card.url} width="45px" height="70px" onClick={() => this.handleCardClick("sandBagCard", this.state.players[i].id, false)}/>
-                        <img id={"actionCard:" + index + "::" + i} className="overHand doRotate" src="img/hand.png"/>
+                        <span className="spanOverHand"><img id={"actionCard:" + index + "::" + i} className="overHand doRotate" src="img/hand.png"/></span>
                       </span>
                       :
                       <span key={index} className="boardPlayerCards">
@@ -2343,6 +2342,7 @@ class Game extends React.Component {
       showStartPanel: true,
       showBoardPanel: true,
       showGameOverPanel: false,
+      languageDistributor: stringsCatalog.fr,
       difficultyLevel: 1,
       language: "FR",
       nbrOfPlayers: 2
@@ -2352,10 +2352,12 @@ class Game extends React.Component {
     doChangeLangSelector(){
        if (this.state.language === "FR"){
            document.getElementById("homeLangToggle").src = "img/toggle_left.png";
-           this.setState({language: "EN"});
+           this.setState({language: "EN",
+                          languageDistributor: stringsCatalog.en });
        } else {
            document.getElementById("homeLangToggle").src = "img/toggle_right.png";
-           this.setState({language: "FR"});
+           this.setState({language: "FR",
+                          languageDistributor: stringsCatalog.fr});
            // TODO : reload the Panel with proper language
        }
      }
@@ -2385,7 +2387,8 @@ class Game extends React.Component {
 
     let difficultyLevel = 0;
     let language = "FR";
-    let nbrOfPlayers = 2;
+    let nbrOfPlayers = 4;
+    let lng = this.state.languageDistributor;
 
     const showHideStartPanel = {
       'display': this.state.showStartPanel ? 'block' : 'none'
@@ -2406,21 +2409,21 @@ class Game extends React.Component {
 
         </div>
         <div id="start-panel" className="game-start" style={showHideStartPanel}>
-          <div>Holla Camarade.</div>
-          <div>Combien d'aventuriers ?
-                  2 <input type="radio" name="howManyAdventurers" key="howManyAdventurers2" value='2' onChange={() => this.doChangeNbrOfPlayers(2)}/> |
+          <div>{lng.welcomeIntro}</div>
+          <div>{lng.howManyAdventurers}
+                | 2 <input type="radio" name="howManyAdventurers" key="howManyAdventurers2" value='2' onChange={() => this.doChangeNbrOfPlayers(2)}/> |
                   3 <input type="radio" name="howManyAdventurers" key="howManyAdventurers3" value='3' onChange={() => this.doChangeNbrOfPlayers(3)}/> |
-                  4 <input type="radio" name="howManyAdventurers" key="howManyAdventurers4" value='4' onChange={() => this.doChangeNbrOfPlayers(4)} />
+                  4 <input type="radio" name="howManyAdventurers" key="howManyAdventurers4" value='4' onChange={() => this.doChangeNbrOfPlayers(4)}/> |
           </div>
-          <div>Quelle difficultée ?
-                  Novice <input type="radio" name="WhichDifficulty" key="WhichDifficulty1" value='1' onChange={() => this.doChangeDifficulty(1)}/> |
-                  Normal <input type="radio" name="WhichDifficulty" key="WhichDifficulty2" value='2' onChange={() => this.doChangeDifficulty(2)}/> |
-                  Elite <input type="radio" name="WhichDifficulty" key="WhichDifficulty3" value='3' onChange={() => this.doChangeDifficulty(3)}/> |
-                  Légende <input type="radio" name="WhichDifficulty" key="WhichDifficulty4" value='4' onChange={() => this.doChangeDifficulty(4)}/> |
+          <div>{lng.howDifficult}
+                  | {lng.novice} <input type="radio" name="WhichDifficulty" key="WhichDifficulty1" value='1' onChange={() => this.doChangeDifficulty(1)}/> |
+                  {lng.normal} <input type="radio" name="WhichDifficulty" key="WhichDifficulty2" value='2' onChange={() => this.doChangeDifficulty(2)}/> |
+                  {lng.elite} <input type="radio" name="WhichDifficulty" key="WhichDifficulty3" value='3' onChange={() => this.doChangeDifficulty(3)}/> |
+                  {lng.legendary} <input type="radio" name="WhichDifficulty" key="WhichDifficulty4" value='4' onChange={() => this.doChangeDifficulty(4)}/> |
             </div>
-          <div>Quelle langue ? English <img id="homeLangToggle" src="img/toggle_right.png" onClick={() => this.doChangeLangSelector()} /> Français</div>
+          <div>{lng.language} English <img id="homeLangToggle" src="img/toggle_right.png" onClick={() => this.doChangeLangSelector()} /> Français</div>
 
-          <div><button onClick={() => this.launchBoard()}>En avant !</button></div>
+          <div><button onClick={() => this.launchBoard()}>{lng.letsGo}</button></div>
         </div>
         <div className="game-end">
         </div>

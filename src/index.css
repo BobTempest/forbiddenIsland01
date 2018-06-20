@@ -308,12 +308,14 @@ list-style:none;
 }
 
 .boardPlayerCards {
-  margin-left: 5px;
+  float: left;
+  /*margin-left: 5px;*/
   width:50px;
 }
 
 .activableBoardPlayerCards{
   /* box-shadow: 0px 0px 5px #F00;*/
+  float: left; /* ??? */
   margin-left: 5px;
   width:50px;
 }
@@ -405,11 +407,14 @@ list-style:none;
   }
 }
 
-.overHand {
+.spanOverHand {
   position: relative;
   display: inline;
-  top: -5px;
-  left: -21px;
+  top: -43px;
+  left: 21px;
+}
+
+.overHand {
   z-index: 5;
   width:20px;
   height:26px;
