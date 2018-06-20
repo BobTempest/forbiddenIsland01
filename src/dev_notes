@@ -9,9 +9,12 @@
 
 if use H card on third action (with someone), the give action appears after the flight) :::: FIXED-> to be tested
 After a H card, recalculate ALL the possible actions, do not inject a few :::: FIXED-> to be tested
-
 actions are shown after use a card to get rid of it. :::: FIXED-> to be tested
 
+BUGS :
+on load : set the toggle button image to the right language
+fix flood scale :  |12|345|67|89|
+                   |2 |3  |4 |5 |
 
 HAND display
 
@@ -19,8 +22,6 @@ HAND display
 **** NOW *****
 TODO: UI separate msg boxes
 
-
-TODO : Welcome Board, how many players + set difficulty + set Language
 TODO : GameOver Board
 TODO : over help on actions and cards
 TODO : Copyright message

@@ -227,7 +227,6 @@ class Board extends React.Component {
   constructor(props) {
     super(props);
 
-    // var selectedLanguage = props.language === "FR" ? 0 : 1;// 0:french 1:english
     var nbrOfPlayers = props.nbrOfPlayers;
 
     var tiles = riseTheIsland();
@@ -235,7 +234,7 @@ class Board extends React.Component {
     var playerCardsDiscard = [];
     var floodCardsLeap = generateFloodCardsLeap();
     var floodCardsDiscard = [];
-    var floodMeter = new FloodMeter(1);
+    var floodMeter = new FloodMeter(props.difficultyLevel);
     // let mainUserMessage = new UserMessage("Welcome new Player. Choose a first action for the first character.", false, []);
     let mainUserMessage = new UserMessage("... INITIALIZATION... ", null, false, []);
 
@@ -2060,20 +2059,6 @@ handleTileClick(i) {
       else {
         translatedString = this.getStringInTheCatalog(lng, this.state.mainUserMessage.message);
       }
-      /*
-      if (msgEts && msgEts.length > 0){
-          for (let i = 0; i < msgEts.length; i++){
-            if (msgEts[i][0] === '<'){
-              composedString = composedString + msgEts[i];
-            }
-            else{
-              composedString = composedString + this.getStringInTheCatalog(this.state.languageDistributor, msgEts[i]);
-            }
-          }
-      } else {
-        composedString = this.getStringInTheCatalog(lng, this.state.mainUserMessage.message);
-      }
-      */
 
       return(
           <div><span id="mainMessage" dangerouslySetInnerHTML={{__html: translatedString}} />
@@ -2135,6 +2120,7 @@ handleTileClick(i) {
 
   retry(){
     alert ("Feature is Broken");
+    // TODO
     // this.location.reload();
   }
 
@@ -2197,7 +2183,6 @@ handleTileClick(i) {
             return catalog[i][1];
           }
       }
-
       return "YYYYY FIX ME YYYYY";
   }
 
@@ -2205,7 +2190,7 @@ handleTileClick(i) {
   render() {
       // Flood-O-meter values for the needle
       let position_value = "relative";
-      let left_value = 5;
+      let left_value = 5 + ((this.state.floodMeter.level - 1) * 33);
       let top_value = -70;
 
     return (
@@ -2358,7 +2343,7 @@ class Game extends React.Component {
       showStartPanel: true,
       showBoardPanel: true,
       showGameOverPanel: false,
-      difficultyLevel: 0,
+      difficultyLevel: 1,
       language: "FR",
       nbrOfPlayers: 2
     };
@@ -2367,20 +2352,20 @@ class Game extends React.Component {
     doChangeLangSelector(){
        if (this.state.language === "FR"){
            document.getElementById("homeLangToggle").src = "img/toggle_left.png";
-           this.setState({language: "EN",
-                          difficultyLevel: this.difficultyLevel,
-                          });
+           this.setState({language: "EN"});
        } else {
            document.getElementById("homeLangToggle").src = "img/toggle_right.png";
-           this.setState({language: "FR",
-                          difficultyLevel: this.difficultyLevel,
-                          });
+           this.setState({language: "FR"});
            // TODO : reload the Panel with proper language
        }
      }
 
      doChangeNbrOfPlayers(x){
        this.setState({ nbrOfPlayers: x});
+     }
+
+     doChangeDifficulty(x){
+       this.setState({ difficultyLevel: x});
      }
 
      launchBoard(){
@@ -2391,7 +2376,7 @@ class Game extends React.Component {
             showBoardPanel: true });
 
           ReactDOM.render(
-            <Board nbrOfPlayers={this.state.nbrOfPlayers} difficultyLevel={this.difficultyLevel} language={this.state.language}/>,
+            <Board nbrOfPlayers={this.state.nbrOfPlayers} difficultyLevel={this.state.difficultyLevel} language={this.state.language}/>,
             document.getElementById('game-board'));
      }
 
@@ -2423,15 +2408,15 @@ class Game extends React.Component {
         <div id="start-panel" className="game-start" style={showHideStartPanel}>
           <div>Holla Camarade.</div>
           <div>Combien d'aventuriers ?
-                  2 <input type="radio" name="howManyAdventurers" key="howManyAdventurers2" checked="checked" value='2' onChange={() => this.doChangeNbrOfPlayers(2)}/> |
+                  2 <input type="radio" name="howManyAdventurers" key="howManyAdventurers2" value='2' onChange={() => this.doChangeNbrOfPlayers(2)}/> |
                   3 <input type="radio" name="howManyAdventurers" key="howManyAdventurers3" value='3' onChange={() => this.doChangeNbrOfPlayers(3)}/> |
                   4 <input type="radio" name="howManyAdventurers" key="howManyAdventurers4" value='4' onChange={() => this.doChangeNbrOfPlayers(4)} />
           </div>
           <div>Quelle difficultée ?
-                  Novice <input type="radio" name="WhichDifficulty" key="WhichDifficulty1" value='1' onChange={() => this.difficultyLevel = 1}/> |
-                  Normal <input type="radio" name="WhichDifficulty" key="WhichDifficulty2" checked="checked" value='2' onChange={() => this.difficultyLevel = 2}/> |
-                  Elite <input type="radio" name="WhichDifficulty" key="WhichDifficulty3" value='3' onChange={() => this.difficultyLevel = 3}/> |
-                  Légende <input type="radio" name="WhichDifficulty" key="WhichDifficulty4" value='4' onChange={() => this.difficultyLevel = 4}/> |
+                  Novice <input type="radio" name="WhichDifficulty" key="WhichDifficulty1" value='1' onChange={() => this.doChangeDifficulty(1)}/> |
+                  Normal <input type="radio" name="WhichDifficulty" key="WhichDifficulty2" value='2' onChange={() => this.doChangeDifficulty(2)}/> |
+                  Elite <input type="radio" name="WhichDifficulty" key="WhichDifficulty3" value='3' onChange={() => this.doChangeDifficulty(3)}/> |
+                  Légende <input type="radio" name="WhichDifficulty" key="WhichDifficulty4" value='4' onChange={() => this.doChangeDifficulty(4)}/> |
             </div>
           <div>Quelle langue ? English <img id="homeLangToggle" src="img/toggle_right.png" onClick={() => this.doChangeLangSelector()} /> Français</div>
 
@@ -2497,7 +2482,9 @@ class FloodMeter {
   }
 
   howManyCards(level){
-    if (level < 4){
+    // fix flood scale :  |12|345|67|89|
+    //                    |2 |3  |4 |5 |
+    if (level < 3){
         return 2;
     } else if (level < 6) {
         return 3;
