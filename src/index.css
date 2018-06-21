@@ -232,6 +232,18 @@ list-style:none;
   box-shadow: 1px 1px 3px #333333;
 }
 
+.game-start {
+  position: absolute;
+  top: 50px;
+  left: 232px;
+  background: #fff;
+  border: 1px solid #BBB;
+  height: 380px;
+  width: 700px;
+  z-index: 50;
+  box-shadow: 1px 1px 3px #333333;
+}
+
 .panelTitle {
   float: left;
   margin-left: 10px;
@@ -296,13 +308,13 @@ list-style:none;
 }
 
 .boardPlayerCards {
-  margin-left: 5px;
+  float: left;
+  /*margin-left: 5px;*/
   width:50px;
 }
 
 .activableBoardPlayerCards{
-  /* box-shadow: 0px 0px 5px #F00;*/
-  margin-left: 5px;
+  float: left;
   width:50px;
 }
 
@@ -365,39 +377,46 @@ list-style:none;
   }
 }
 
-<<<<<<< HEAD
+/*
 .lilGuy {
   position:relative;
   text-indent: -9999px;
   z-index: 20px;
   width: 35px;
   height: 100px;
-  background: url(img/lilGuy.svg);
+  background: url(img/lilGuy.svgoverHand);
   background-size: 50px 50px;
   background-repeat: none;
   fill: #FF0000;
 }
+*/
 
 .doRotate {
-  animation: rototo 1.5s linear infinite;
+  animation: rototo 1s linear infinite;
+  animation-direction: alternate;
 }
 
 @keyframes rototo {
+
   0% {
-    top: -5px;
-    left: -21px;
+    top: 5px;
+    left: 0px;
   }
-  50% {
-    top: -10px;
-    left: -26px;
+  100% {
+    top: 0px;
+    left: -5px;
   }
+}
+
+.spanOverHand {
+  position: relative;
+  display: inline;
+  top: -43px;
+  left: 21px;
 }
 
 .overHand {
   position: relative;
-  display: inline;
-  top: -5px;
-  left: -21px;
   z-index: 5;
   width:20px;
   height:26px;

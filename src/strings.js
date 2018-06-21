@@ -84,6 +84,16 @@ export const stringsCatalog = {
    btn_cancelTheFlight: "Cancel the flight",
    btn_evacuate: "Evacuate !",
    btn_retry: "Retry ?",
+   // opening panel
+   welcomeIntro: "Hola Comrade",
+   howManyAdventurers: "How many adventurers ?",
+   howDifficult: "How difficult ?",
+   novice: "Beginner",
+   normal: "Normal",
+   elite: "Elite",
+   legendary: "Legendary",
+   language: "Which language ?",
+   letsGo: "Let's go !",
    // messages
    welcome_msg: "Welcome new Player. Choose a first action for the first character.",
    letsDrawSomePlayerCards_msg:"Let's' draw some Player Cards",
@@ -245,6 +255,16 @@ export const stringsCatalog = {
    btn_cancelTheFlight: "Annuler le vol",
    btn_evacuate: "Evacuez !",
    btn_retry: "Recommencer ?",
+   // opening panel
+   welcomeIntro: "Hola Camarade.",
+   howManyAdventurers: "Combien d'aventuriers ?",
+   howDifficult: "Quelle difficulté ?",
+   novice: "Novice",
+   normal: "Normal",
+   elite: "Elite",
+   legendary: "Légende",
+   language: "Quelle langue ?",
+   letsGo: "En avant !",
    // msgs
    welcome_msg: "Bienvenue sur l'île. Choisissez une première action pour le premier joueur.",
    letsDrawSomePlayerCards_msg: "Tirons une carte joueur.",
