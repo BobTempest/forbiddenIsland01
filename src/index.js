@@ -200,7 +200,7 @@ function DrawEmptySquareWithTreasure(props) {
 function DrawPlayerPawn(props){
   if (props.pawns && props.pawns.length === 1){
     return (
-      <div className="playerPawn singlePP lilGuy" style={{color: props.players[props.pawns[0]].color}}>P</div>
+      <div className="playerPawn singlePP" style={{color: props.players[props.pawns[0]].color}}>P</div>
     );
   }
   else if(props.pawns && props.pawns.length === 2){
