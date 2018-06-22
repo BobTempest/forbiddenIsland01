@@ -1745,7 +1745,7 @@ handleTileClick(i) {
 
   renderEmptySquare() {
     return (
-      <DrawEmptySquare  onClick={() => this.launchGameOver()} />
+      <DrawEmptySquare  onClick={() => this.launchGameOver(false, true, "Yolo")} />
     );
   }
 
@@ -2207,6 +2207,7 @@ handleTileClick(i) {
   }
 
   launchGameOver(gameIsWon, gameIsLost, msg){
+    alert ("Mow");
     this.setState({
       gameIsOver: true,
       gameIsLost: gameIsLost,

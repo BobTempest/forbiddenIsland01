@@ -12,11 +12,11 @@ After a H card, recalculate ALL the possible actions, do not inject a few :::: F
 actions are shown after use a card to get rid of it. :::: FIXED-> to be tested
 
 BUGS :
-on load : set the toggle button image to the right language
-fix flood scale :  |12|345|67|89|
-                   |2 |3  |4 |5 |
 
-HAND display
+if no cards : hide donner une carte
+
+
+
 
 *********************
 **** NOW *****
