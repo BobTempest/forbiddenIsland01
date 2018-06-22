@@ -245,7 +245,7 @@ list-style:none;
 }
 
 .panelTitle {
-  float: left;
+  /*float: left;*/
   margin-left: 10px;
   font-size: 34px;
   font-weight: bold;
@@ -265,6 +265,13 @@ list-style:none;
   margin-left: 10px;
   font-size: 12px;
   line-height: 12px;
+}
+
+.introChoices {
+  display: block;
+  margin-left: 10px;
+  font-size: 14px;
+  line-height: 14px;
 }
 
 .playerBoard {

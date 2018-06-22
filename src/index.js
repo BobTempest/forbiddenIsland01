@@ -1801,13 +1801,14 @@ handleTileClick(i) {
     let str_roleQualifier = this.getStringInTheCatalog(lng, currentPlayer.roleQualifier);
     let str_roleAttachedToName = this.getStringInTheCatalog(lng, currentPlayer.roleAttachedToName);
     let str_currentStep = this.getStringInTheCatalog(lng, playerSteps[this.state.currentStep].name);
+    let langToggleImg = this.state.selectedLanguage === "FR" ? "img/toggle_right.png" : "img/toggle_left.png";
     // TODO order the inputs
 
     return (
       <span>
         <div className="messagePanel">
           <div className="panelTitle"> {lng.mainTitle01}<br/>::ReactJS::<br/>{lng.mainTitle02} <span className="littlePanelInfo">v.0.5.1</span></div>
-          <div className="littlePanelInfo">English <img id="langToggle" src="img/toggle_left.png" onClick={() => this.doChangeLang()} /> Français</div>
+          <div className="littlePanelInfo">English <img id="langToggle" src={langToggleImg} onClick={() => this.doChangeLang()} /> Français</div>
           <div className="littlePanelInfo">{lng.turn} {this.state.turn}</div>
           <div className="littlePanelInfo">{lng.treasuresFound} : {foundTreasures}/4 </div>
           <div className="littlePanelInfo"> {lng.floodLevel} {this.state.floodMeter.level} {lng.xCardsPerFlood.format(this.state.floodMeter.floodFactor)}</div>
@@ -2390,6 +2391,7 @@ class Game extends React.Component {
     let nbrOfPlayers = 4;
     let lng = this.state.languageDistributor;
 
+
     const showHideStartPanel = {
       'display': this.state.showStartPanel ? 'block' : 'none'
     };
@@ -2409,21 +2411,24 @@ class Game extends React.Component {
 
         </div>
         <div id="start-panel" className="game-start" style={showHideStartPanel}>
-          <div>{lng.welcomeIntro}</div>
-          <div>{lng.howManyAdventurers}
-                | 2 <input type="radio" name="howManyAdventurers" key="howManyAdventurers2" value='2' onChange={() => this.doChangeNbrOfPlayers(2)}/> |
-                  3 <input type="radio" name="howManyAdventurers" key="howManyAdventurers3" value='3' onChange={() => this.doChangeNbrOfPlayers(3)}/> |
-                  4 <input type="radio" name="howManyAdventurers" key="howManyAdventurers4" value='4' onChange={() => this.doChangeNbrOfPlayers(4)}/> |
-          </div>
-          <div>{lng.howDifficult}
-                  | {lng.novice} <input type="radio" name="WhichDifficulty" key="WhichDifficulty1" value='1' onChange={() => this.doChangeDifficulty(1)}/> |
-                  {lng.normal} <input type="radio" name="WhichDifficulty" key="WhichDifficulty2" value='2' onChange={() => this.doChangeDifficulty(2)}/> |
-                  {lng.elite} <input type="radio" name="WhichDifficulty" key="WhichDifficulty3" value='3' onChange={() => this.doChangeDifficulty(3)}/> |
-                  {lng.legendary} <input type="radio" name="WhichDifficulty" key="WhichDifficulty4" value='4' onChange={() => this.doChangeDifficulty(4)}/> |
+          <div></div>
+          <div className="panelTitle"> {lng.mainTitle01}<br/>::ReactJS::<br/>{lng.mainTitle02} <span className="littlePanelInfo">v.0.5.1</span></div>
+          <div className="introChoices">
+            <div>{lng.welcomeIntro}</div>
+            <div>{lng.howManyAdventurers}
+                  | 2 <input type="radio" name="howManyAdventurers" key="howManyAdventurers2" value='2' onChange={() => this.doChangeNbrOfPlayers(2)}/> |
+                    3 <input type="radio" name="howManyAdventurers" key="howManyAdventurers3" value='3' onChange={() => this.doChangeNbrOfPlayers(3)}/> |
+                    4 <input type="radio" name="howManyAdventurers" key="howManyAdventurers4" value='4' onChange={() => this.doChangeNbrOfPlayers(4)}/> |
             </div>
-          <div>{lng.language} English <img id="homeLangToggle" src="img/toggle_right.png" onClick={() => this.doChangeLangSelector()} /> Français</div>
-
-          <div><button onClick={() => this.launchBoard()}>{lng.letsGo}</button></div>
+            <div>{lng.howDifficult}
+                    | {lng.novice} <input type="radio" name="WhichDifficulty" key="WhichDifficulty1" value='1' onChange={() => this.doChangeDifficulty(1)}/> |
+                    {lng.normal} <input type="radio" name="WhichDifficulty" key="WhichDifficulty2" value='2' onChange={() => this.doChangeDifficulty(2)}/> |
+                    {lng.elite} <input type="radio" name="WhichDifficulty" key="WhichDifficulty3" value='3' onChange={() => this.doChangeDifficulty(3)}/> |
+                    {lng.legendary} <input type="radio" name="WhichDifficulty" key="WhichDifficulty4" value='4' onChange={() => this.doChangeDifficulty(4)}/> |
+              </div>
+            <div>{lng.language} English <img id="homeLangToggle" src="img/toggle_right.png" onClick={() => this.doChangeLangSelector()} /> Français</div>
+            <div><button onClick={() => this.launchBoard()}>{lng.letsGo}</button></div>
+          </div>
         </div>
         <div className="game-end">
         </div>
