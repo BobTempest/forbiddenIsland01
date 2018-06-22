@@ -89,6 +89,15 @@ const diagonalPaths = {0 : [2, 4], 1 : [3, 5], 2 : [0, 6, 8], 3 : [1,7,9], 4 : [
      {id : 4, name : "step_DrawFloodCards" }
  ];
 
+ const endings = [
+    {id : 0, name : "gameNotFinished", loc_key : "" },
+    {id : 1, name : "aventurerIsDrawned", loc_key : "end_aventurerIsDrawned" },
+    {id : 2, name : "islandSunk", loc_key : "end_islandSunk" },
+    {id : 3, name : "templeDisapeared", loc_key : "end_templeDisapeared" },
+    {id : 4, name : "heliportDisapeared", loc_key : "end_heliportDisapeared" },
+    {id : 9, name : "victory", loc_key : "end_victory" }
+ ];
+
  const playerDefaultActions = [
       {id : 0, name : "Move", locName: "ac_move", text: "Move to an adjacent tile.", enabled : true, triggers : "Move" }, //has an adjacent tile around ?
       {id : 1, name : "Dry", locName: "ac_dry", text: "Dry an adjacent tile", enabled : true, triggers : "Dry"  }, //has an adjacent immersed tile around ?
@@ -254,12 +263,19 @@ class Board extends React.Component {
       floodCardsLeap: floodCardsLeap,
       floodCardsDiscard: floodCardsDiscard,
       floodCardsOutOfGame: [],
+      //
       players: players,
-      floodMeter: floodMeter,
-      gameIsOver: false,
       nbrOfPlayers : players.length,
+      floodMeter: floodMeter,
+      //
+      gameIsLost: false,
+      gameIsWon: false,
+      gameIsOver: false,
+      endMessage: "nada",
+      //
       languageDistributor: props.language === "FR" ? stringsCatalog.fr : stringsCatalog.en,
       selectedLanguage: props.language === "FR" ? "FR" : "EN",
+      //
       posessedTreasures : [],
       turn : 1,
       hasPilotFlownThisTurn : false,
@@ -498,6 +514,7 @@ class Board extends React.Component {
               message = message + lng.explorersCantLeaveTheIsland;
               // gameOver = true;
               // alert("The helipad is drawned. GAMEOVER")
+              this.launchGameOver(false, true, lng.explorersCantLeaveTheIsland);
             }
             // rescue some players ?
             guysToEvacuate = n_Tiles[j].playerOn;
@@ -517,7 +534,8 @@ class Board extends React.Component {
                         //message = message + "<br/>Oh my God ! all the temples for " + this.getTreasureNameById(n_Tiles[j].templeFor) + " are drawned. You'll never get it. GAME OVER";
                         message = message + lng.allTheTemplesAreDrawned.format(this.getTreasureNameById(n_Tiles[j].templeFor));
                         // gameOver = true;
-                        // alert("Oh my God ! all the temples for " + this.getTreasureNameById(n_Tiles[j].templeFor) + " are drawned. You'll never get it. GAME OVER" );
+                         console.log("Oh my God ! all the temples for " + this.getTreasureNameById(n_Tiles[j].templeFor) + " are drawned. You'll never get it. GAME OVER" );
+                        this.launchGameOver(false, true, lng.allTheTemplesAreDrawned.format(this.getTreasureNameById(n_Tiles[j].templeFor)));
                       }
                       break;
                     }
@@ -571,7 +589,7 @@ class Board extends React.Component {
       floodCardsLeap: n_FloodCardsLeap,
       floodCardsOutOfGame: n_FloodCardsOutOfGame,
       floodCardsDiscard: n_FloodCardsDiscard,
-      gameIsOver: gameOver,
+      gameIsLost: gameOver,
       tiles: n_Tiles,
       guysToEvacuate: guysToEvacuate,
       floodingSequence: floodingSequence});
@@ -583,7 +601,7 @@ class Board extends React.Component {
       let drawningGuy = n_players[this.state.guysToEvacuate[0]];
       let drawningGuyId = drawningGuy.id;
       let tilesToLight = [];
-      let gameIsOver = false;
+      let gameIsLost = false;
 
       if (drawningGuy.role === "Pilot"){
         tilesToLight = this.whereCanHeFly(drawningGuy.position);
@@ -597,7 +615,8 @@ class Board extends React.Component {
       if (tilesToLight.length === 0){
         // let newMessage = new UserMessage("Oh my God. There's nowhere he can go. " + drawningGuy.name+ " is drawning. Noooooooo. GAME OVER.", false, []);
         newMessage = new UserMessage(null, lng.nowhereHeCanGo.format(drawningGuy.name), false, []);
-        // gameIsOver = true;
+        this.launchGameOver(false, true, lng.nowhereHeCanGo.format(drawningGuy.name));
+        // gameIsLost = true;
       } else {
         this.lightTheTiles(tilesToLight, drawningGuy.color);
         newMessage = new UserMessage('chooseADestinationToEvacuate', null, false, []);
@@ -605,7 +624,7 @@ class Board extends React.Component {
 
       this.setState({ whatIsExpectedNext: "TileButtonClickForEvacuate" ,
                       players : n_players,
-                      gameIsOver : gameIsOver,
+                      gameIsLost : gameIsLost,
                       mainUserMessage: newMessage });
   }
 
@@ -652,7 +671,8 @@ class Board extends React.Component {
           // alert("Flood Riiiiise ! New Flood level is " + newFloodMeter.level + "(pick " +  newFloodMeter.floodFactor + " at each flood)");
           if (newFloodMeter.level >= newFloodMeter.topLevel){
             // alert (" Top level reached. The Island is submerged. Game Over");
-            alert (lng.topLevelReached);
+            // alert (lng.topLevelReached);
+            this.launchGameOver(false, true, lng.topLevelReached);
           }
 
           // put the flood card in the discards
@@ -1725,7 +1745,7 @@ handleTileClick(i) {
 
   renderEmptySquare() {
     return (
-      <DrawEmptySquare /* onClick={() => this.doChangeLang()}*/ />
+      <DrawEmptySquare  onClick={() => this.launchGameOver()} />
     );
   }
 
@@ -2035,7 +2055,7 @@ handleTileClick(i) {
       // classic message  with one button
       let buttons = this.state.mainUserMessage.buttons;
       let databag = this.state.mainUserMessage.databag;
-      let gameIsOver = this.state.gameIsOver;
+      let gameIsLost = this.state.gameIsLost;
 
       let showNextBtnStyle = (buttons.indexOf(0) >= 0)?({display: 'block'}):({display: 'none'});
       let showCancelBtnStyle = (buttons.indexOf(1) >= 0)?({display: 'block'}):({display: 'none'});
@@ -2064,7 +2084,7 @@ handleTileClick(i) {
           <div><span id="mainMessage" dangerouslySetInnerHTML={{__html: translatedString}} />
 
           {
-            !gameIsOver ?
+            !gameIsLost ?
               (<div>
                 <button style={showNextBtnStyle} onClick ={() => this.controller("ActionIsDone")}>{lng.btn_next}</button>
                 <button style={showCancelBtnStyle} onClick ={() => this.cancelAnAction()}>{lng.btn_cancel}</button>
@@ -2186,6 +2206,35 @@ handleTileClick(i) {
       return "YYYYY FIX ME YYYYY";
   }
 
+  launchGameOver(gameIsWon, gameIsLost, msg){
+    this.setState({
+      gameIsOver: true,
+      gameIsLost: gameIsLost,
+      gameIsWon: gameIsWon,
+      endMessage: msg,
+    });
+  }
+
+  renderGameOverPanel(msg) {
+    return (
+        <span>
+          <div className="game-over-title">[ Gamovah' ]</div>
+          <div className="game-over-msg">{msg}</div>
+        </span>
+    );
+  }
+
+  renderVictoryPanel(i) {
+    let msg = "You won !";
+    // alert("pow");
+    return (
+        <span>
+          <div className="game-over-title">Gamovah'</div>
+          <div className="game-over-msg">{msg}</div>
+        </span>
+    );
+  }
+
   // rendering de Board
   render() {
       // Flood-O-meter values for the needle
@@ -2196,6 +2245,11 @@ handleTileClick(i) {
     return (
 
       <div>
+        {this.state.gameIsLost ?
+        <div id="game-over-panel" className="game-end-panel">
+          {this.renderGameOverPanel(this.state.endMessage)}
+        </div> : <div></div>
+        }
         <div className="messageBoard-column">
           {this.renderPlayerMessagePanel()}
         </div>
@@ -2407,10 +2461,8 @@ class Game extends React.Component {
 
     return (
       <div className="game">
-        <div className="game-board" id="game-board" style={showHideBoardPanel}>
-
-        </div>
-        <div id="start-panel" className="game-start" style={showHideStartPanel}>
+        <div className="game-board" id="game-board" style={showHideBoardPanel}></div>
+        <div id="start-panel" className="game-start-panel" style={showHideStartPanel}>
           <div></div>
           <div className="panelTitle"> {lng.mainTitle01}<br/>::ReactJS::<br/>{lng.mainTitle02} <span className="littlePanelInfo">v.0.5.1</span></div>
           <div className="introChoices">
@@ -2430,8 +2482,7 @@ class Game extends React.Component {
             <div><button onClick={() => this.launchBoard()}>{lng.letsGo}</button></div>
           </div>
         </div>
-        <div className="game-end">
-        </div>
+
         <div className="game-info">
           <div>{/* status */}</div>
           <ol>{/* TODO */}</ol>

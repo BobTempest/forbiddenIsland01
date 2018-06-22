@@ -232,7 +232,7 @@ list-style:none;
   box-shadow: 1px 1px 3px #333333;
 }
 
-.game-start {
+.game-start-panel {
   position: absolute;
   top: 50px;
   left: 232px;
@@ -272,6 +272,37 @@ list-style:none;
   margin-left: 10px;
   font-size: 14px;
   line-height: 14px;
+}
+
+.game-end-panel {
+  position: absolute;
+  top: 50px;
+  left: 232px;
+  background: #012651;
+  border: 1px solid #012651;
+  height: 380px;
+  width: 700px;
+  z-index: 50;
+  box-shadow: 1px 1px 3px #012651;
+  border-radius: 5px;
+}
+
+.game-over-title {
+  position: relative;
+  top: 84px;
+  text-align: center;
+  font-size: 60px;
+  line-height: 12px;
+  color:#eaf4ff;
+}
+
+.game-over-msg {
+  position: relative;
+  top: 200px;
+  text-align: center;
+  font-size: 18px;
+  line-height: 12px;
+  color:#eaf4ff;
 }
 
 .playerBoard {
