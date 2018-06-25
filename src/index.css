@@ -276,32 +276,33 @@ list-style:none;
 
 .game-end-panel {
   position: absolute;
-  top: 50px;
-  left: 232px;
+  top: 424px;
+  left: 118px;
   background: #012651;
   border: 1px solid #012651;
-  height: 380px;
-  width: 700px;
+  height: 160px;
+  width: 900px;
   z-index: 50;
-  box-shadow: 1px 1px 3px #012651;
+  box-shadow: 5px 5px 3px #777;
   border-radius: 5px;
 }
 
 .game-over-title {
   position: relative;
-  top: 84px;
+  top: 25px;
   text-align: center;
-  font-size: 60px;
+  font-size: 40px;
   line-height: 12px;
   color:#eaf4ff;
 }
 
 .game-over-msg {
   position: relative;
-  top: 200px;
+  top: 20px;
   text-align: center;
-  font-size: 18px;
-  line-height: 12px;
+  font-size: 16px;
+  line-height: 24px;
+  padding: 50px;
   color:#eaf4ff;
 }
 

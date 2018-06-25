@@ -494,7 +494,11 @@ class Board extends React.Component {
     }
 
     let card = n_FloodCardsLeap.pop();
+
     let gameOver = false;
+    let gameOverMsg = "";
+    let gameOverCode = 0;
+
 
     for (let j = 0; j < n_Tiles.length; j++){
       if (n_Tiles[j].name === card.name){
@@ -511,10 +515,14 @@ class Board extends React.Component {
             this.graphicallyDoDrawnATile(j);
             tileHasDrawned = true;
             if (n_Tiles[j].name === "helipad"){
-              message = message + lng.explorersCantLeaveTheIsland;
+              message = message + '<br/>' +lng.explorersCantLeaveTheIsland;
               // gameOver = true;
               // alert("The helipad is drawned. GAMEOVER")
-              this.launchGameOver(false, true, lng.explorersCantLeaveTheIsland);
+              gameOver = true;
+              gameOverMsg = lng.explorersCantLeaveTheIsland;
+              gameOverCode = 4; // helipad disapeared
+
+              // this.launchGameOver(false, true, lng.explorersCantLeaveTheIsland);
             }
             // rescue some players ?
             guysToEvacuate = n_Tiles[j].playerOn;
@@ -535,7 +543,10 @@ class Board extends React.Component {
                         message = message + lng.allTheTemplesAreDrawned.format(this.getTreasureNameById(n_Tiles[j].templeFor));
                         // gameOver = true;
                          console.log("Oh my God ! all the temples for " + this.getTreasureNameById(n_Tiles[j].templeFor) + " are drawned. You'll never get it. GAME OVER" );
-                        this.launchGameOver(false, true, lng.allTheTemplesAreDrawned.format(this.getTreasureNameById(n_Tiles[j].templeFor)));
+                         gameOver = true;
+                         gameOverMsg = lng.allTheTemplesAreDrawned.format(this.getTreasureNameById(n_Tiles[j].templeFor));
+                         gameOverCode = 3; // all the temples for one undiscovered treasure disapeared
+                        // this.launchGameOver(false, true, lng.allTheTemplesAreDrawned.format(this.getTreasureNameById(n_Tiles[j].templeFor)));
                       }
                       break;
                     }
@@ -584,15 +595,25 @@ class Board extends React.Component {
       n_userMessage = new UserMessage(null, message , false, [5], databag);
     }
 
-    this.setState({
-      mainUserMessage: n_userMessage,
-      floodCardsLeap: n_FloodCardsLeap,
-      floodCardsOutOfGame: n_FloodCardsOutOfGame,
-      floodCardsDiscard: n_FloodCardsDiscard,
-      gameIsLost: gameOver,
-      tiles: n_Tiles,
-      guysToEvacuate: guysToEvacuate,
-      floodingSequence: floodingSequence});
+
+    if (gameOver === true){
+      this.setState({
+          mainUserMessage: n_userMessage,
+          gameIsOver: true,
+          gameIsLost: true,
+          endMessage: gameOverMsg});
+    }
+    else{
+      this.setState({
+        mainUserMessage: n_userMessage,
+        floodCardsLeap: n_FloodCardsLeap,
+        floodCardsOutOfGame: n_FloodCardsOutOfGame,
+        floodCardsDiscard: n_FloodCardsDiscard,
+        gameIsLost: gameOver,
+        tiles: n_Tiles,
+        guysToEvacuate: guysToEvacuate,
+        floodingSequence: floodingSequence});
+    }
   }
 
   doEvacuate(){
@@ -602,6 +623,8 @@ class Board extends React.Component {
       let drawningGuyId = drawningGuy.id;
       let tilesToLight = [];
       let gameIsLost = false;
+      let gameOverMsg = "";
+      let gameOverCode = 0;
 
       if (drawningGuy.role === "Pilot"){
         tilesToLight = this.whereCanHeFly(drawningGuy.position);
@@ -615,17 +638,31 @@ class Board extends React.Component {
       if (tilesToLight.length === 0){
         // let newMessage = new UserMessage("Oh my God. There's nowhere he can go. " + drawningGuy.name+ " is drawning. Noooooooo. GAME OVER.", false, []);
         newMessage = new UserMessage(null, lng.nowhereHeCanGo.format(drawningGuy.name), false, []);
-        this.launchGameOver(false, true, lng.nowhereHeCanGo.format(drawningGuy.name));
+
+        gameIsLost = true;
+        gameOverMsg = lng.nowhereHeCanGo.format(drawningGuy.name);
+        gameOverCode = 1; // guy drawned
+
+        // this.launchGameOver(false, true, lng.nowhereHeCanGo.format(drawningGuy.name));
         // gameIsLost = true;
       } else {
         this.lightTheTiles(tilesToLight, drawningGuy.color);
         newMessage = new UserMessage('chooseADestinationToEvacuate', null, false, []);
       }
 
-      this.setState({ whatIsExpectedNext: "TileButtonClickForEvacuate" ,
-                      players : n_players,
-                      gameIsLost : gameIsLost,
-                      mainUserMessage: newMessage });
+      if (gameIsLost === true){
+          this.setState({
+            mainUserMessage: newMessage,
+            gameIsOver: true,
+            gameIsLost: true,
+            endMessage: gameOverMsg});
+      }
+      else{
+        this.setState({ whatIsExpectedNext: "TileButtonClickForEvacuate" ,
+                        players : n_players,
+                        gameIsLost : gameIsLost,
+                        mainUserMessage: newMessage });
+      }
   }
 
   doMoveFloodOmeterCursor(){
@@ -643,6 +680,10 @@ class Board extends React.Component {
       let newFloodCardsDiscard = tempState.floodCardsDiscard;
       let newFloodCardsOutOfGame = tempState.floodCardsOutOfGame;
       let newFloodMeter = tempState.floodMeter;
+
+      let gameIsLost = false;
+      let gameOverMsg = "";
+      let gameOverCode = 0; // guy drawned
 
       let card = [];
       if (newPlayerCardsLeap.length < 1){
@@ -672,7 +713,12 @@ class Board extends React.Component {
           if (newFloodMeter.level >= newFloodMeter.topLevel){
             // alert (" Top level reached. The Island is submerged. Game Over");
             // alert (lng.topLevelReached);
-            this.launchGameOver(false, true, lng.topLevelReached);
+
+            // this.launchGameOver(false, true, lng.topLevelReached);
+
+            gameIsLost = true;
+            gameOverMsg = lng.topLevelReached;
+            gameOverCode = 2; // guy drawned
           }
 
           // put the flood card in the discards
@@ -705,6 +751,10 @@ class Board extends React.Component {
       tempState.floodCardsDiscard = newFloodCardsDiscard;
       tempState.floodCardsOutOfGame = newFloodCardsOutOfGame;
       tempState.floodMeter = newFloodMeter;
+
+      tempState.gameIsLost = gameIsLost;
+      tempState.endMessage = gameOverMsg;
+      tempState.gameOverCode = gameOverCode;
 
       return tempState;
   }
@@ -2207,7 +2257,7 @@ handleTileClick(i) {
   }
 
   launchGameOver(gameIsWon, gameIsLost, msg){
-    alert ("Mow");
+    alert ("Mow SHOULDN't BE USED ANY MORE");
     this.setState({
       gameIsOver: true,
       gameIsLost: gameIsLost,
