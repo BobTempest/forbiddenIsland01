@@ -2278,6 +2278,7 @@ handleTileClick(i) {
   }
 
   renderGameOverPanel(msg) {
+    let lng = this.state.languageDistributor;
     return (
         <span>
           <div className="game-over-title">[ Gamovah' ]</div>
@@ -2292,7 +2293,7 @@ handleTileClick(i) {
     // alert("pow");
     return (
         <span>
-          <div className="game-over-title">Gamovah'</div>
+          <div className="game-over-title">[ congratulations ]</div>
           <div className="game-over-msg">{msg}</div>
           <div><button onClick ={() => this.retry()}>{lng.btn_retry}</button></div>
         </span>
