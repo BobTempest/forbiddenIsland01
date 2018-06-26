@@ -324,7 +324,7 @@ export const stringsCatalog = {
    unexpectedClickOnATile: "un click sur un terrain n'est pas ce que l'on attend. Clique ailleurs.",
    pleaseSelectACardToGive: "Choisissez une carte à donner",
    pleaseSelectARecipientForTheCard: "Choisissez un destinataire pour la carte.",
-   xCardsPerFlood: "({0} carte par inondations)",
+   xCardsPerFlood: "({0} cartes par inondation)",
    isPlaying: "joue.",
    whichCardDoYouWantToGive: "Quelle carte voulez vous donner",
    whichCardDoYouWantToSend: "Quelle carte voulez vous envoyer",

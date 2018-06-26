@@ -2202,9 +2202,7 @@ handleTileClick(i) {
   }
 
   retry(){
-    alert ("Feature is Broken");
-    // TODO
-    // this.location.reload();
+    window.location.reload();
   }
 
   getTreasureNameById(id){
@@ -2284,6 +2282,7 @@ handleTileClick(i) {
         <span>
           <div className="game-over-title">[ Gamovah' ]</div>
           <div className="game-over-msg">{msg}</div>
+          <div><button onClick ={() => this.retry()}>{lng.btn_retry}</button></div>
         </span>
     );
   }
@@ -2295,6 +2294,7 @@ handleTileClick(i) {
         <span>
           <div className="game-over-title">Gamovah'</div>
           <div className="game-over-msg">{msg}</div>
+          <div><button onClick ={() => this.retry()}>{lng.btn_retry}</button></div>
         </span>
     );
   }
