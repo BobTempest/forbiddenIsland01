@@ -2449,9 +2449,9 @@ class Game extends React.Component {
       showBoardPanel: true,
       showGameOverPanel: false,
       languageDistributor: stringsCatalog.fr,
-      difficultyLevel: 1,
+      difficultyLevel: 2, // INIT
       language: "FR",
-      nbrOfPlayers: 2
+      nbrOfPlayers: 3 // INIT
     };
    }
 
@@ -2478,7 +2478,7 @@ class Game extends React.Component {
 
      launchBoard(){
         this.setState(
-          { difficultyLevel: this.difficultyLevel,
+          { difficultyLevel: this.state.difficultyLevel,
             nbrOfPlayers: this.state.nbrOfPlayers,
             showStartPanel: false,
             showBoardPanel: true });
@@ -2490,10 +2490,11 @@ class Game extends React.Component {
 
   render() {
     //
-
+/*
     let difficultyLevel = 0;
     let language = "FR";
     let nbrOfPlayers = 4;
+    */
     let lng = this.state.languageDistributor;
 
 
@@ -2510,6 +2511,15 @@ class Game extends React.Component {
     };
     //
 
+    let radioHowMany2 = this.state.nbrOfPlayers === 2 ? "checked" : "";
+    let radioHowMany3 = this.state.nbrOfPlayers === 3 ? "checked" : "";
+    let radioHowMany4 = this.state.nbrOfPlayers === 4 ? "checked" : "";
+
+    let radioDifficulty1 = this.state.difficultyLevel === 1 ? "checked" : "";
+    let radioDifficulty2 = this.state.difficultyLevel === 2 ? "checked" : "";
+    let radioDifficulty3 = this.state.difficultyLevel === 3 ? "checked" : "";
+    let radioDifficulty4 = this.state.difficultyLevel === 4 ? "checked" : "";
+
     return (
       <div className="game">
         <div className="game-board" id="game-board" style={showHideBoardPanel}></div>
@@ -2519,15 +2529,15 @@ class Game extends React.Component {
           <div className="introChoices">
             <div>{lng.welcomeIntro}</div>
             <div>{lng.howManyAdventurers}
-                  | 2 <input type="radio" name="howManyAdventurers" key="howManyAdventurers2" value='2' onChange={() => this.doChangeNbrOfPlayers(2)}/> |
-                    3 <input type="radio" name="howManyAdventurers" key="howManyAdventurers3" value='3' onChange={() => this.doChangeNbrOfPlayers(3)}/> |
-                    4 <input type="radio" name="howManyAdventurers" key="howManyAdventurers4" value='4' onChange={() => this.doChangeNbrOfPlayers(4)}/> |
+                  | 2 <input type="radio" name="howManyAdventurers" key="howManyAdventurers2" checked={radioHowMany2} value='2' onChange={() => this.doChangeNbrOfPlayers(2)}/> |
+                    3 <input type="radio" name="howManyAdventurers" key="howManyAdventurers3" checked={radioHowMany3} value='3' onChange={() => this.doChangeNbrOfPlayers(3)}/> |
+                    4 <input type="radio" name="howManyAdventurers" key="howManyAdventurers4" checked={radioHowMany4} value='4' onChange={() => this.doChangeNbrOfPlayers(4)}/> |
             </div>
             <div>{lng.howDifficult}
-                    | {lng.novice} <input type="radio" name="WhichDifficulty" key="WhichDifficulty1" value='1' onChange={() => this.doChangeDifficulty(1)}/> |
-                    {lng.normal} <input type="radio" name="WhichDifficulty" key="WhichDifficulty2" value='2' onChange={() => this.doChangeDifficulty(2)}/> |
-                    {lng.elite} <input type="radio" name="WhichDifficulty" key="WhichDifficulty3" value='3' onChange={() => this.doChangeDifficulty(3)}/> |
-                    {lng.legendary} <input type="radio" name="WhichDifficulty" key="WhichDifficulty4" value='4' onChange={() => this.doChangeDifficulty(4)}/> |
+                    | {lng.novice} <input type="radio" name="WhichDifficulty" key="WhichDifficulty1" checked={radioDifficulty1} value='1' onChange={() => this.doChangeDifficulty(1)}/> |
+                    {lng.normal} <input type="radio" name="WhichDifficulty" key="WhichDifficulty2" checked={radioDifficulty2} value='2' onChange={() => this.doChangeDifficulty(2)}/> |
+                    {lng.elite} <input type="radio" name="WhichDifficulty" key="WhichDifficulty3" checked={radioDifficulty3} value='3' onChange={() => this.doChangeDifficulty(3)}/> |
+                    {lng.legendary} <input type="radio" name="WhichDifficulty" key="WhichDifficulty4" checked={radioDifficulty4} value='4' onChange={() => this.doChangeDifficulty(4)}/> |
               </div>
             <div>{lng.language} English <img id="homeLangToggle" src="img/toggle_right.png" onClick={() => this.doChangeLangSelector()} /> Français</div>
             <div><button onClick={() => this.launchBoard()}>{lng.letsGo}</button></div>

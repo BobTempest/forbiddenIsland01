@@ -95,7 +95,7 @@ export const stringsCatalog = {
    language: "Which language ?",
    letsGo: "Let's go !",
    // messages
-   welcome_msg: "Welcome new Player. Choose a first action for the first character.",
+   welcome_msg: "Welcome on the island. Choose a first action for the first character.",
    letsDrawSomePlayerCards_msg:"Let's' draw some Player Cards",
    letsFloodSomeTiles_msg: "Let's flood {0} tiles",
    nextTurn_msg: "Next Turn ! Please {0}, Choose an action.",
