@@ -2289,7 +2289,9 @@ handleTileClick(i) {
   }
 
   renderVictoryPanel(i) {
-    let msg = "You won !";
+
+    let lng = this.state.languageDistributor;
+    let msg = lng.youWonMsg.format(this.state.nbrOfPlayers);
     // alert("pow");
     return (
         <span>
