@@ -843,13 +843,16 @@ class Board extends React.Component {
 
   helicopterCardEnRoute(playerId, travellers){
     let lng = this.state.languageDistributor;
+    let victory = false;
     // Check if the game is won :
     // on the helipad, 4 treasures found, all players on the tile
     if (this.state.posessedTreasures.length === 4 &&
         this.state.tiles[this.state.players[playerId].position].name === "helipad" &&
         //this.state.tiles[this.state.players[playerId].position].playerOn.length === this.state.nbrOfPlayers ) {
         travellers.length === this.state.nbrOfPlayers /* - 1  */) {
-          alert(lng.youWonMsg.format(this.state.nbrOfPlayers));
+          // YOU WON // VICTORY
+          // alert(lng.youWonMsg.format(this.state.nbrOfPlayers));
+          victory = true;
         }
     // displays the possible destinations
     let tilesToLight = this.whereCanHeFly(this.state.players[playerId].position);
@@ -857,9 +860,19 @@ class Board extends React.Component {
     let nada = this.lightTheTiles(tilesToLight, this.state.players[playerId].color);
     // set state
     let n_messageBoardState = "default";
-    this.setState({ whatIsExpectedNext: "TileButtonClickForFlyWithACard",
-                    coTravellers: travellers,
-                    messageBoardState: n_messageBoardState });
+
+    if (victory === true){
+        this.setState({
+            mainUserMessage: lng.youWonMsg.format(this.state.nbrOfPlayers),
+            gameIsOver: true,
+            gameIsWon: true,
+            endMessage: lng.youWonMsg.format(this.state.nbrOfPlayers)});
+    }
+    else{
+      this.setState({ whatIsExpectedNext: "TileButtonClickForFlyWithACard",
+                      coTravellers: travellers,
+                      messageBoardState: n_messageBoardState });
+    }
   };
 
   cancelHelicopterCardPick(){
@@ -2105,7 +2118,7 @@ handleTileClick(i) {
       // classic message  with one button
       let buttons = this.state.mainUserMessage.buttons;
       let databag = this.state.mainUserMessage.databag;
-      let gameIsLost = this.state.gameIsLost;
+      let gameIsOver = this.state.gameIsOver;
 
       let showNextBtnStyle = (buttons.indexOf(0) >= 0)?({display: 'block'}):({display: 'none'});
       let showCancelBtnStyle = (buttons.indexOf(1) >= 0)?({display: 'block'}):({display: 'none'});
@@ -2134,7 +2147,7 @@ handleTileClick(i) {
           <div><span id="mainMessage" dangerouslySetInnerHTML={{__html: translatedString}} />
 
           {
-            !gameIsLost ?
+            !gameIsOver ?
               (<div>
                 <button style={showNextBtnStyle} onClick ={() => this.controller("ActionIsDone")}>{lng.btn_next}</button>
                 <button style={showCancelBtnStyle} onClick ={() => this.cancelAnAction()}>{lng.btn_cancel}</button>
@@ -2297,7 +2310,12 @@ handleTileClick(i) {
 
       <div>
         {this.state.gameIsLost ?
-        <div id="game-over-panel" className="game-end-panel">
+        <div id="game-over-panel" className="game-lost-panel">
+          {this.renderGameOverPanel(this.state.endMessage)}
+        </div> : <div></div>
+        }
+        {this.state.gameIsWon ?
+        <div id="game-over-panel" className="game-won-panel">
           {this.renderGameOverPanel(this.state.endMessage)}
         </div> : <div></div>
         }

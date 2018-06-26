@@ -276,12 +276,25 @@ list-style:none;
   line-height: 14px;
 }
 
-.game-end-panel {
+.game-lost-panel {
   position: absolute;
   top: 424px;
   left: 118px;
   background: #012651;
   border: 1px solid #012651;
+  height: 160px;
+  width: 900px;
+  z-index: 50;
+  box-shadow: 5px 5px 3px #777;
+  border-radius: 5px;
+}
+
+.game-won-panel {
+  position: absolute;
+  top: 424px;
+  left: 118px;
+  background: #1ebdfc;
+  border: 1px solid #1ebdfc;
   height: 160px;
   width: 900px;
   z-index: 50;
