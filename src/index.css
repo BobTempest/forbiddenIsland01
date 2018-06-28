@@ -313,12 +313,18 @@ list-style:none;
 
 .game-over-msg {
   position: relative;
-  top: 20px;
+  top: -9px;
   text-align: center;
   font-size: 16px;
   line-height: 24px;
   padding: 50px;
   color:#eaf4ff;
+}
+
+.game-over-btn {
+  position: relative;
+  top: 20px;
+  text-align: center;
 }
 
 .playerBoard {

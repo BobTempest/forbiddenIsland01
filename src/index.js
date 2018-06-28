@@ -2283,7 +2283,7 @@ handleTileClick(i) {
         <span>
           <div className="game-over-title">[ Gamovah' ]</div>
           <div className="game-over-msg">{msg}</div>
-          <div><button onClick ={() => this.retry()}>{lng.btn_retry}</button></div>
+          <div className="game-over-btn"><button onClick ={() => this.retry()}>{lng.btn_retry}</button></div>
         </span>
     );
   }
@@ -2297,7 +2297,7 @@ handleTileClick(i) {
         <span>
           <div className="game-over-title">[ congratulations ]</div>
           <div className="game-over-msg">{msg}</div>
-          <div><button onClick ={() => this.retry()}>{lng.btn_retry}</button></div>
+          <div className="game-over-btn"><button onClick ={() => this.retry()}>{lng.btn_retry}</button></div>
         </span>
     );
   }
@@ -2470,9 +2470,9 @@ class Game extends React.Component {
       showBoardPanel: true,
       showGameOverPanel: false,
       languageDistributor: stringsCatalog.fr,
-      difficultyLevel: 2, // INIT
+      difficultyLevel: 4, // INIT
       language: "FR",
-      nbrOfPlayers: 3 // INIT
+      nbrOfPlayers: 4 // INIT
     };
    }
 
