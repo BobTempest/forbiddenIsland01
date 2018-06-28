@@ -1897,6 +1897,8 @@ handleTileClick(i) {
           <div className="littlePanelInfo"> {lng.floodLevel} {this.state.floodMeter.level} {lng.xCardsPerFlood.format(this.state.floodMeter.floodFactor)}</div>
           <div className="panelInfo"> {currentPlayer.name}&nbsp;{str_roleQualifier}&nbsp;<span style={{color: currentPlayer.color}}>{str_roleAttachedToName}</span>&nbsp;{lng.isPlaying}
           <br/><span className="littlePanelInfo"> {str_currentStep} </span></div>
+        </div>
+        <div className="actionPanel">
           <div className="panelInfo" id="UserActions">
             <ul>
               {this.state.possibleActions.map((action) =>
@@ -1963,7 +1965,7 @@ handleTileClick(i) {
                 :
                 <span></span>
             }
-            <button className="actionButton" value="Give" onClick={() => this.doGiveACard(giverId, chosenCard, receiver)}> {lng.btn_give} </button><br/>
+            <button className="actionButton" value="Give" onClick={() => this.doGiveACard(giverId, chosenCard, receiver)}> {lng.btn_give} </button>
             <button className="actionButton" value="Cancel" onClick={() => this.cancelAnAction()}>{lng.btn_cancel}</button>
           </div>
       )
@@ -2018,7 +2020,7 @@ handleTileClick(i) {
                 :
                 <span></span>
             }
-            <button className="actionButton" value="Give" onClick={() => this.doGiveACard(giverId, chosenCard, receiver)}> {lng.btn_send} </button><br/>
+            <button className="actionButton" value="Give" onClick={() => this.doGiveACard(giverId, chosenCard, receiver)}> {lng.btn_send} </button>
             <button className="actionButton" value="Cancel" onClick={() => this.cancelAnAction()}>{lng.btn_cancel}</button>
           </div>
       )
