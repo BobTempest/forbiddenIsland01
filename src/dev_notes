@@ -10,11 +10,12 @@ NOW : test the endings
 -> FIREFOX crashes on 'you got a treasure !' // not always ... sometimes, chrome crashes too
 
 
-if use H card on third action (with someone), the give action appears after the flight) :::: FIXED-> to be tested
-After a H card, recalculate ALL the possible actions, do not inject a few :::: FIXED-> to be tested
-actions are shown after use a card to get rid of it. :::: FIXED-> to be tested
+if use H card on third action (with someone), the give action appears after the flight)
+
 
 BUGS :
+=======
+
 
 if no cards : hide donner une carte
 
@@ -24,13 +25,10 @@ if no cards : hide donner une carte
 
 *********************
 **** NOW *****
-TODO: UI separate msg boxes
 
+TODO : Welcome boardBoard, how many players + set difficulty + set Language
 TODO : GameOver Board
 TODO : over help on actions and cards
-TODO : Copyright message
-
-TODO : save state et annule un coup
 
 *********************
 **** SHORT TERM *****
