@@ -18,6 +18,8 @@ BUGS :
 
 if no cards : hide donner une carte
 
+after clicking an unwanted tile, actions menu re appears. It may be unnapropriate ::: FIXED ???
+
 
 *********************
 
@@ -26,7 +28,6 @@ if no cards : hide donner une carte
 **** NOW *****
 TODO: UI separate msg boxes
 
-TODO : GameOver Board
 TODO : over help on actions and cards
 TODO : Copyright message
 
@@ -34,7 +35,6 @@ TODO : save state et annule un coup
 
 *********************
 **** SHORT TERM *****
-
 
 
 *********************
@@ -49,4 +49,4 @@ TODO : save state et annule un coup
 *********************
 ******** BUGS *******
 
-Diver can finish on a drawned tile !
+Diver can finish on a drawned tile ! ::: REALLY ?

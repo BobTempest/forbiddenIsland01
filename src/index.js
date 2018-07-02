@@ -991,8 +991,10 @@ class Board extends React.Component {
       }
 
       if (player.role === "Pilot"){
-        // remove the first action which is fly
-        let nada = actions.shift();
+        // remove the first action which is fly (if it is)
+        if (actions[0].name === "Fly"){
+                  let nada = actions.shift();
+        }
         let pilotActions = [];
         pilotActions.push(playerDefaultActions[0]); // move
         if (hasPilotFlownThisTurn === false){
@@ -1002,8 +1004,10 @@ class Board extends React.Component {
       }
 
       if (player.role === "Navigator"){
-        // remove the first action which is move
-        let nada = actions.shift();
+        // remove the first action which is move (if it is)
+        if (actions[0].name === "Move"){
+                  let nada = actions.shift();
+        }
         let navigatorActions = [];
         navigatorActions.push(playerDefaultActions[0]); // move
         navigatorActions.push(playerSpecialActions[1]); // move someone else
@@ -1698,7 +1702,10 @@ handleTileClick(i) {
     let lng = this.state.languageDistributor;
     let nada = this.unlightTheTiles();
     let newMessage = new UserMessage('chooseAnAction_msg', null , false, []);
-    this.showActionButtons();
+
+    if (!this.state.inAGetRidOfACardContext && this.state.currentStep < 3){
+      this.showActionButtons();
+    }
     this.setState({
       whatIsExpectedNext: "CharacterActionButtonClick" ,
       messageBoardState: "default",
