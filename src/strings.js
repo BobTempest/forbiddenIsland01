@@ -55,7 +55,7 @@ export const stringsCatalog = {
    step_act3outOf3: "action 3/3",
    step_DrawPlayerCards: "draw player cards",
    step_DrawFloodCards: "draw flood cards",
-   // actions:
+   // actionsNames:
    ac_move: "Move",
    ac_dry: "Dry",
    ac_give: "Give a card",
@@ -68,6 +68,19 @@ export const stringsCatalog = {
    ac_dryAround: "Dry around",
    ac_fly: "Fly",
    ac_MoveDive: "Move/Dive",
+   // actions help texts:
+   ah_move: "Move to an adjacent tile.",
+   ah_dry: "Dry an adjacent tile",
+   ah_give: "Give a card on a character on the same tile.",
+   ah_getATreasure: "Get the treasure in this temple. You need the 4 corresponding treasure cards.",
+   ah_sleep: "Skip the player's remaining actions.",
+   ah_sendACard: "Send a card to any character on the map.",
+   ah_moveSomeone: "Move any other character from one or two tiles.",
+   ah_dry2Tiles: "Dry two adjacent tiles for one action.",
+   ah_moveAround: "Move to any tile around. Orthogonally and diagonally.",
+   ah_dryAround: "Dry any tile around. Orthogonally and diagonally",
+   ah_fly: "Fly to any tile on the map. You cannot emboard anybody with you.",
+   ah_MoveDive: "Dive through any flooded or immersed tile.",
    // buttons
    btn_yes: "Yes",
    btn_no: "No",
@@ -239,6 +252,19 @@ export const stringsCatalog = {
    ac_dryAround: "Assécher",
    ac_fly: "Voler",
    ac_MoveDive: "Se déplacer/Plonger",
+   // actions help texts:
+   ah_move: "Se déplacer sur une case adjacente.",
+   ah_dry: "Assécher une case adjacente.",
+   ah_give: "Donner une carte à un autre aventurier sur la même case.",
+   ah_getATreasure: "Trouver le trésor dans ce temple. Il vous faut les 4 cartes trésor correspondantes.",
+   ah_sleep: "Passer ses actions restantes à ne rien faire.",
+   ah_sendACard: "Envoyer une de ses cartes à n'importe quel aventurier sur la carte.",
+   ah_moveSomeone: "Déplacer n'importe quel autre aventurier d'une ou deux cases.",
+   ah_dry2Tiles: "Assécher deux case adjacente pour une action.",
+   ah_moveAround: "Se déplacer d'une case. Orthogonalement ou diagonalement.",
+   ah_dryAround: "Assécher une case alentour. Orthogonalement ou diagonalement.",
+   ah_fly: "S'envoler sur n'importe quelle autre case. Le pilote ne peux pas emmener d'autres aventuriers avec lui.",
+   ah_MoveDive: "Se déplacer en nageant à travers n'importe quelle case innondée ou coulée.",
    // buttons
    btn_yes: "Oui",
    btn_no: "Non",

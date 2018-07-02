@@ -99,24 +99,24 @@ const diagonalPaths = {0 : [2, 4], 1 : [3, 5], 2 : [0, 6, 8], 3 : [1,7,9], 4 : [
  ];
 
  const playerDefaultActions = [
-      {id : 0, name : "Move", locName: "ac_move", text: "Move to an adjacent tile.", enabled : true, triggers : "Move" }, //has an adjacent tile around ?
-      {id : 1, name : "Dry", locName: "ac_dry", text: "Dry an adjacent tile", enabled : true, triggers : "Dry"  }, //has an adjacent immersed tile around ?
-      {id : 2, name : "Give", locName: "ac_give", text: "Give a card on a character on the same tile", enabled : true, triggers : "Give" }, //has a player on his tile ?
-      {id : 3, name : "Get a Treasure !", locName: "ac_getATreasure", text: "Get the treasure in this temple.", enabled : true, triggers : "GetATreasure"  }, // has 4 cards and is on the right temple
+      {id : 0, name : "Move", locName: "ac_move", locHelp: "ah_move", enabled : true, triggers : "Move" }, //has an adjacent tile around ?
+      {id : 1, name : "Dry", locName: "ac_dry", locHelp: "ah_dry", enabled : true, triggers : "Dry"  }, //has an adjacent immersed tile around ?
+      {id : 2, name : "Give", locName: "ac_give", locHelp: "ah_give", enabled : true, triggers : "Give" }, //has a player on his tile ?
+      {id : 3, name : "Get a Treasure !", locName: "ac_getATreasure", locHelp: "ah_getATreasure", enabled : true, triggers : "GetATreasure"  }, // has 4 cards and is on the right temple
       /*{id : 4, name : "DoNothing", text: "Simply do nothing.", enabled : true, triggers : "DoNothing"  }, // -
       /* {id : 5, name : "Skip Turn", text: "Skip the player'sTurn.", enabled : true, triggers : "SkipTurn"  } // -*/
-      {id : 6, name : "Sleep", locName: "ac_sleep", text: "Skip the player's Actions.", enabled : true, triggers : "DoSleep"  }
+      {id : 6, name : "Sleep", locName: "ac_sleep", locHelp: "ah_sleep", enabled : true, triggers : "DoSleep"  }
  ];
 
  const playerSpecialActions = [
    // Special actions
-   {id : 0, name : "Send a card", locName: "ac_sendACard", forRole: "Messenger", replacesAction: "2", text: "Send a card to any character.", enabled : true, triggers : "SendACard"  }, // has a treasure card
-   {id : 1, name : "Move someone", locName: "ac_moveSomeone", forRole: "Navigator", replacesAction: "-", text: "Move any character from one or two tiles.", enabled : true, triggers : "MoveSomeone"  }, // there's another player in game
-   {id : 2, name : "Dry two tiles", locName: "ac_dry2Tiles", forRole: "Engineer", replacesAction: "1", text: "Dry two adjacent tiles.", enabled : true, triggers : "DryTwoTiles"  }, // has two immersed adjacent tiles around
-   {id : 3, name : "Move around", locName: "ac_moveAround", forRole: "Explorer", replacesAction: "0", text: "Move to any tile around.", enabled : true, triggers : "MoveAround"  },//has an tile around ?
-   {id : 4, name : "Dry around", locName: "ac_dryAround", forRole: "Explorer", replacesAction: "1", text: "Dry any tile around." , enabled : true, triggers : "DryAround" },// has an immersed tile around
-   {id : 5, name : "Fly", locName: "ac_fly", forRole: "Pilot", replacesAction: "-", text: "Fly to any tile.", enabled : true, triggers : "Fly"  },// any other non dranwned tile
-   {id : 6, name : "Move/Dive", locName: "ac_MoveDive", forRole: "Diver", replacesAction: "0", text: "Dive through any adjacent tile.", enabled : true, triggers : "Dive"  }, // a tile to dive to
+   {id : 0, name : "Send a card", locName: "ac_sendACard", forRole: "Messenger", replacesAction: "2", locHelp: "ah_sendACard", enabled : true, triggers : "SendACard"  }, // has a treasure card
+   {id : 1, name : "Move someone", locName: "ac_moveSomeone", forRole: "Navigator", replacesAction: "-", locHelp: "ah_moveSomeone", enabled : true, triggers : "MoveSomeone"  }, // there's another player in game
+   {id : 2, name : "Dry two tiles", locName: "ac_dry2Tiles", forRole: "Engineer", replacesAction: "1", locHelp: "ah_dry2Tiles", enabled : true, triggers : "DryTwoTiles"  }, // has two immersed adjacent tiles around
+   {id : 3, name : "Move around", locName: "ac_moveAround", forRole: "Explorer", replacesAction: "0", locHelp: "ah_moveAround", enabled : true, triggers : "MoveAround"  },//has an tile around ?
+   {id : 4, name : "Dry around", locName: "ac_dryAround", forRole: "Explorer", replacesAction: "1", locHelp: "ah_dryAround" , enabled : true, triggers : "DryAround" },// has an immersed tile around
+   {id : 5, name : "Fly", locName: "ac_fly", forRole: "Pilot", replacesAction: "-", locHelp: "ah_fly", enabled : true, triggers : "Fly"  },// any other non dranwned tile
+   {id : 6, name : "Move/Dive", locName: "ac_MoveDive", forRole: "Diver", replacesAction: "0", locHelp: "ah_MoveDive", enabled : true, triggers : "Dive"  }, // a tile to dive to
  ];
 
  // QUESTIONS :
@@ -1908,8 +1908,13 @@ handleTileClick(i) {
         <div className="actionPanel">
           <div className="panelInfo" id="UserActions">
             <ul>
-              {this.state.possibleActions.map((action) =>
-                <li key={action.name}><button className="actionButton" onClick={() => this.handleActionClick(action.triggers)} >{this.getStringInTheCatalog(lng, action.locName)}</button></li>
+              {this.state.possibleActions.map((action, index) =>
+                <li key={action.name}>
+                    <button className="actionButton" onClick={() => this.handleActionClick(action.triggers)} >
+                      {this.getStringInTheCatalog(lng, action.locName)}
+                    </button>
+                    <a className="actionTooltips helpCharacterIcon" id={'tooltipAction' + index} href="#">?<span className="inToolTipsText">{this.getStringInTheCatalog(lng, action.locHelp)}</span></a>
+                  </li>
               )}
             </ul>
           </div>
