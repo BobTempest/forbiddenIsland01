@@ -11,6 +11,7 @@ export const stringsCatalog = {
    floodCards: "Flood Cards",
    leap: "leap",
    discard: "discard",
+   copyright: "Forbidden Island is a game created by Matt Leacock and published by Gamewright.",
    // roles
    ro_Diver: "Diver",
    ro_Pilot: "Pilot",
@@ -196,6 +197,7 @@ export const stringsCatalog = {
    floodCards: "Cartes inondation",
    leap: "Pioche",
    discard: "Défausse",
+   copyright: "Forbidden Island est un jeu crée par Matt Leacock et publié par Gamewright.",
    // roles
    ro_Diver: "Plongeuse",
    ro_Pilot: "Pilote",

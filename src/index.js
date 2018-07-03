@@ -347,7 +347,6 @@ class Board extends React.Component {
 //        Out Of Board constructor
 ////////////////////////////////////////////////////////////////////////////////////
   componentDidMount() {
-
       // Perform the initial Flooding of 6 tiles
       let n_FloodCardsLeap = this.state.floodCardsLeap;
       let n_Tiles = this.state.tiles;
@@ -2353,19 +2352,21 @@ handleTileClick(i) {
       let position_value = "relative";
       let left_value = 5 + ((this.state.floodMeter.level - 1) * 33);
       let top_value = -70;
+      let lng = this.state.languageDistributor;
 
     return (
-
+      <div>
+      <div class="littleCopyrightLine">{lng.copyright}</div>
       <div>
         {this.state.gameIsLost ?
-        <div id="game-over-panel" className="game-lost-panel">
-          {this.renderGameOverPanel(this.state.endMessage)}
-        </div> : <div></div>
+          <div id="game-over-panel" className="game-lost-panel">
+            {this.renderGameOverPanel(this.state.endMessage)}
+          </div> : <div></div>
         }
         {this.state.gameIsWon ?
-        <div id="game-over-panel" className="game-won-panel">
-          {this.renderGameOverPanel(this.state.endMessage)}
-        </div> : <div></div>
+          <div id="game-over-panel" className="game-won-panel">
+            {this.renderGameOverPanel(this.state.endMessage)}
+          </div> : <div></div>
         }
         <div className="messageBoard-column">
           {this.renderPlayerMessagePanel()}
@@ -2457,6 +2458,7 @@ handleTileClick(i) {
           </div>
         </div>
       </div>
+    </div>
     );
   }
 }

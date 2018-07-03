@@ -283,6 +283,11 @@ list-style:none;
   line-height: 12px;
 }
 
+.littleCopyrightLine{
+  margin-left: 10px;
+  font-size: 10px;
+}
+
 .introChoices {
   display: block;
   position: relative;
