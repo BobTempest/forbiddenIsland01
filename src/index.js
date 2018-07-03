@@ -1021,8 +1021,8 @@ class Board extends React.Component {
       }
 
       if (player.role === "Pilot"){
-        // remove the first action which is fly (if it is)
-        if (actions[0].name === "Fly"){
+        // remove the first action which is move (if it is)
+        if (actions[0].name === "Move"){
                   let nada = actions.shift();
         }
         let pilotActions = [];
