@@ -98,6 +98,13 @@ const diagonalPaths = {0 : [2, 4], 1 : [3, 5], 2 : [0, 6, 8], 3 : [1,7,9], 4 : [
     {id : 9, name : "victory", loc_key : "end_victory" }
  ];
 
+  const levels = [
+    {id : 0, loc_key : "novice" },
+    {id : 1, loc_key : "normal" },
+    {id : 2, loc_key : "elite" },
+    {id : 3, loc_key : "legendary" },
+  ];
+
  const playerDefaultActions = [
       {id : 0, name : "Move", locName: "ac_move", locHelp: "ah_move", enabled : true, triggers : "Move" }, //has an adjacent tile around ?
       {id : 1, name : "Dry", locName: "ac_dry", locHelp: "ah_dry", enabled : true, triggers : "Dry"  }, //has an adjacent immersed tile around ?
@@ -238,6 +245,9 @@ class Board extends React.Component {
 
     var nbrOfPlayers = props.nbrOfPlayers;
 
+    var difficultyLevel = props.difficultyLevel;
+    //var difficultyLevelString =
+
     var tiles = riseTheIsland();
     var playerCardsLeap = generatePlayerCardsLeap();
     var playerCardsDiscard = [];
@@ -267,6 +277,7 @@ class Board extends React.Component {
       players: players,
       nbrOfPlayers : players.length,
       floodMeter: floodMeter,
+      difficultyLevel: difficultyLevel,
       //
       gameIsLost: false,
       gameIsWon: false,
@@ -358,11 +369,30 @@ class Board extends React.Component {
       // And add a localised welcome message
       let n_userMessage = new UserMessage('welcome_msg', null, false, []);
 
+      let difficultyLevelString = "";
+      switch (this.state.difficultyLevel) {
+       case 1:
+            difficultyLevelString = lng.novice;
+            break;
+       case 2:
+           difficultyLevelString = lng.normal;
+           break;
+       case 3:
+           difficultyLevelString = lng.elite;
+           break;
+       case 4:
+           difficultyLevelString = lng.legendary;
+           break;
+       default:
+        console.log("CONCEPTUAL ERROR : Wrong Difficulty level input");
+      }
+
       this.setState({
         floodCardsLeap: n_FloodCardsLeap,
         tiles: n_Tiles,
         floodCardsDiscard: n_FloodCardsDiscard,
-        mainUserMessage: n_userMessage});
+        mainUserMessage: n_userMessage,
+        difficultyLevelString: difficultyLevelString});
   }
 
   controller(input, data){
@@ -1892,6 +1922,7 @@ handleTileClick(i) {
     let str_roleAttachedToName = this.getStringInTheCatalog(lng, currentPlayer.roleAttachedToName);
     let str_currentStep = this.getStringInTheCatalog(lng, playerSteps[this.state.currentStep].name);
     let langToggleImg = this.state.selectedLanguage === "FR" ? "img/toggle_right.png" : "img/toggle_left.png";
+
     // TODO order the inputs
 
     return (
@@ -1899,7 +1930,7 @@ handleTileClick(i) {
         <div className="messagePanel">
           <div className="panelTitle"> {lng.mainTitle01}<br/>::ReactJS::<br/>{lng.mainTitle02} <span className="littlePanelInfo">v.0.5.1</span></div>
           <div className="littlePanelInfo">English <img id="langToggle" src={langToggleImg} onClick={() => this.doChangeLang()} /> Français</div>
-          <div className="littlePanelInfo">{lng.turn} {this.state.turn}</div>
+          <div className="littlePanelInfo">{lng.turn} {this.state.turn} | {lng.level} {this.state.difficultyLevelString}</div>
           <div className="littlePanelInfo">{lng.treasuresFound} : {foundTreasures}/4 </div>
           <div className="littlePanelInfo"> {lng.floodLevel} {this.state.floodMeter.level} {lng.xCardsPerFlood.format(this.state.floodMeter.floodFactor)}</div>
           <div className="panelInfo"> {currentPlayer.name}&nbsp;{str_roleQualifier}&nbsp;<span style={{color: currentPlayer.color}}>{str_roleAttachedToName}</span>&nbsp;{lng.isPlaying}

@@ -107,6 +107,7 @@ export const stringsCatalog = {
    legendary: "Legendary",
    language: "Which language ?",
    letsGo: "Let's go !",
+   level: "Level :",
    // messages
    welcome_msg: "Welcome on the island. Choose a first action for the first character.",
    letsDrawSomePlayerCards_msg:"Let's' draw some Player Cards",
@@ -118,7 +119,7 @@ export const stringsCatalog = {
    tileDrawning: "<span style=\"color: #DC143C\">{0} at {1} is drawning ! </span>",
    explorersCantLeaveTheIsland: "Heliport is drawned. Explorers can't leave the Island any more ! Game Over !",
    thereAreXexplorersOnIt: "<br/> There are {0} explorer(s) on it. Let's evacuate them.",
-   allTheTemplesAreDrawned: "<br/>Oh my God ! all the temples for {0} are drawned. You'll never get it. GAME OVER",
+   allTheTemplesAreDrawned: "Oh my God ! all the temples for {0} are drawned. You'll never get it. GAME OVER",
    tileIsFlooded: "{0} at {1} is flooded !",
    weNeedToEvacuateTheTile: "<br/>!!! WE NEED TO EVACUATE THE TILE !!!</div>",
    floodingsAreOver: "<br/> Floodings are over.... for now.</div>",
@@ -291,6 +292,7 @@ export const stringsCatalog = {
    legendary: "Légende",
    language: "Quelle langue ?",
    letsGo: "En avant !",
+   level: "Niveau :",
    // msgs
    welcome_msg: "Bienvenue sur l'île. Choisissez une première action pour le premier joueur.",
    letsDrawSomePlayerCards_msg: "Tirons une carte joueur.",
@@ -302,7 +304,7 @@ export const stringsCatalog = {
    tileDrawning: "<span style=\"color: #DC143C\">{0} en {1} disparait sous les flots </span>",
    explorersCantLeaveTheIsland: "L'Héliport est coulé, les joueurs ne peuvent plus quitter l'île. Fin de Partie !",
    thereAreXexplorersOnIt: "<br/> Il y a {0} joueur(s) dessus. Evacuation !",
-   allTheTemplesAreDrawned: "<br/>Oh non ! Tous les temples pour {0} sont immergés. Vous n'aurez jamais ce trésor. Fin de Partie !",
+   allTheTemplesAreDrawned: "Oh non ! Tous les temples pour {0} sont immergés. Vous n'aurez jamais ce trésor. Fin de Partie !",
    tileIsFlooded: "{0} à {1} est inondé !",
    weNeedToEvacuateTheTile: "<br/>!!! IL FAUT EVACUER CE TERRAIN !!!</div>",
    floodingsAreOver: "<br/> Les inondations sont terminées... pour le moment.</div>",

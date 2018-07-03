@@ -16,11 +16,8 @@ if use H card on third action (with someone), the give action appears after the 
 BUGS :
 =======
 
-
 if no cards : hide donner une carte
-
 after clicking an unwanted tile, actions menu re appears. It may be unnapropriate ::: FIXED ???
-
 
 *********************
 
@@ -28,12 +25,11 @@ after clicking an unwanted tile, actions menu re appears. It may be unnapropriat
 *********************
 **** NOW *****
 
-<<<<<<< HEAD
-=======
 TODO : Welcome boardBoard, how many players + set difficulty + set Language
 TODO : GameOver Board
->>>>>>> d906ccbc38271df55eb1ad52a43ad23c9698d43d
-TODO : over help on actions and cards
+TODO : over on cards
+
+TODO : affiché la difficulté choisie sur le panel
 
 *********************
 **** SHORT TERM *****
