@@ -279,6 +279,8 @@ class Board extends React.Component {
       floodMeter: floodMeter,
       difficultyLevel: difficultyLevel,
       //
+      pastState: [],
+      //
       gameIsLost: false,
       gameIsWon: false,
       gameIsOver: false,
@@ -386,12 +388,22 @@ class Board extends React.Component {
         console.log("CONCEPTUAL ERROR : Wrong Difficulty level input");
       }
 
+      // save the state before an action
+      let stateCopy = this.state;
+          // reproduce what will be setted in the next setState
+          stateCopy.floodCardsLeap = n_FloodCardsLeap;
+          stateCopy.floodCardsDiscard = n_FloodCardsDiscard;
+          stateCopy.tiles = n_Tiles;
+          stateCopy.difficultyLevelString = difficultyLevelString;
+      let n_pastState = [stateCopy];
+
       this.setState({
         floodCardsLeap: n_FloodCardsLeap,
-        tiles: n_Tiles,
         floodCardsDiscard: n_FloodCardsDiscard,
+        tiles: n_Tiles,
         mainUserMessage: n_userMessage,
-        difficultyLevelString: difficultyLevelString});
+        difficultyLevelString: difficultyLevelString,
+        pastState: n_pastState});
   }
 
   controller(input, data){
@@ -415,10 +427,11 @@ class Board extends React.Component {
         }
         else if (nextStep === 5){
           // next Turn, new Player 0
+          /* CODE MORT DE GESTION DU BLINK ?
           let n_tiles = this.state.tiles;
           for (let i = 0; i< n_tiles.length; i++){
               n_tiles[i].blink = false;
-          }
+          }*/
 
           if (this.state.currentPlayerPlaying === this.state.players[this.state.players.length -1].id){
             // let newMessage = new UserMessage("Next Turn ! Please " + this.state.players[0].name + ", Choose an action " , false, []);
@@ -426,36 +439,80 @@ class Board extends React.Component {
             let nextTurn = this.state.turn + 1;
             let nextPlayer = this.state.players[0].id;
             let psblactn = this.getPossibleActions(this.state.players[0], false, false);
-            this.setState({ currentStep : 0,
+            // save the state before an action
+            let stateCopy = this.state;
+                // reproduce what will be setted in the next setState
+                stateCopy.currentStep = 0;
+                stateCopy.turn = nextTurn;
+                stateCopy.currentPlayerPlaying = nextPlayer;
+                stateCopy.possibleActions = psblactn;
+                stateCopy.hasPilotFlownThisTurn = false;
+                stateCopy.whatIsExpectedNext = "CharacterActionButtonClick";
+                stateCopy.mainUserMessage = newMessage;
+            let n_pastState = this.state.pastState;
+            n_pastState.push(stateCopy);
+
+            this.setState({
+              // Would you add something here, add it above
+              currentStep : 0,
               turn : nextTurn,
               currentPlayerPlaying : nextPlayer,
               possibleActions : psblactn,
               hasPilotFlownThisTurn : false,
               whatIsExpectedNext : "CharacterActionButtonClick" ,
               mainUserMessage : newMessage,
-              tiles: n_tiles });
+              pastState : n_pastState
+              });
+              // tiles: n_tiles });
           } else {
             // next Player
             let newMessage = new UserMessage('nextPlayer_msg', null, false, []);
             let nextPlayer = this.state.players[this.state.currentPlayerPlaying + 1].id;
             let psblactn = this.getPossibleActions(this.state.players[nextPlayer], false, false);
-            this.setState({ currentStep : 0,
+
+            // save the state before an action
+            let stateCopy = this.state;
+                // reproduce what will be setted in the next setState
+                stateCopy.currentStep = 0;
+                stateCopy.currentPlayerPlaying = nextPlayer;
+                stateCopy.possibleActions = psblactn;
+                stateCopy.whatIsExpectedNext = "CharacterActionButtonClick";
+                stateCopy.mainUserMessage = newMessage;
+            let n_pastState = [stateCopy];
+            // n_pastState.push(stateCopy);
+
+            this.setState({
+            // Would you add something here, add it above
+              currentStep : 0,
               currentPlayerPlaying : nextPlayer,
               possibleActions : psblactn,
               whatIsExpectedNext : "CharacterActionButtonClick",
               mainUserMessage : newMessage,
-              tiles: n_tiles });
+              pastState : n_pastState
+            });
+              // tiles: n_tiles
           }
-        }
-        else{
+        } else{
           // next action for the same player
           let newMessage = new UserMessage('chooseAnAction_msg', null, false, []);
           let psblactn = this.getPossibleActions(this.state.players[this.state.currentPlayerPlaying], this.state.hasPilotFlownThisTurn, false);
-          this.setState({ currentStep : nextStep,
+          // save the state before an action
+          let stateCopy = this.state;
+              // reproduce what will be setted in the next setState
+              stateCopy.currentStep = nextStep;
+              stateCopy.possibleActions = psblactn;
+              stateCopy.whatIsExpectedNext = "CharacterActionButtonClick";
+              stateCopy.mainUserMessage = newMessage;
+          let n_pastState = this.state.pastState;
+          n_pastState.push(stateCopy);
+          //
+          this.setState({
+            // Would you add something here, add it above
+            currentStep : nextStep,
             possibleActions : psblactn,
+            pastState: n_pastState,
             whatIsExpectedNext : "CharacterActionButtonClick" ,
             mainUserMessage : newMessage});
-          // TODO Check if too muchCardsInHand for any one
         }
       }
       // user has to pick two cards from the leap
@@ -473,33 +530,6 @@ class Board extends React.Component {
       }
   }
   // end of Controller
-
-/*
-  doFloodInitialTiles(howMany){
-    let n_FloodCardsLeap = this.state.floodCardsLeap;
-    let n_Tiles = this.state.tiles;
-    let n_FloodCardsDiscard = this.state.floodCardsDiscard;
-
-    for ( let i = 0; i < howMany; i++){
-
-        let card = n_FloodCardsLeap.pop();
-
-        for (let j = 0; j < n_Tiles.length; j++){
-          if (n_Tiles[j].name === card.name){
-                n_Tiles[j].isImmersed = true;
-                break;
-            }
-        }
-        n_FloodCardsDiscard.push(card);
-    }
-
-    this.setState({
-      floodCardsLeap: n_FloodCardsLeap,
-      tiles: n_Tiles,
-      floodCardsDiscard: n_FloodCardsDiscard });
-    return true;
-  }
-  */
 
   doFloodATile(number, outOf){
     this.unblinkTheTiles();
@@ -2684,7 +2714,7 @@ class FloodMeter {
   }
 }
 
-// WORKS !
+// WORKS ! un custom string.format
 String.prototype.format = function() {
   var args = arguments;
   return this.replace(/{(\d+)}/g, function(match, number) {
