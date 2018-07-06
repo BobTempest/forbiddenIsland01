@@ -278,8 +278,9 @@ class Board extends React.Component {
       nbrOfPlayers : players.length,
       floodMeter: floodMeter,
       difficultyLevel: difficultyLevel,
+      difficultyLevelString: "",
       //
-      pastState: [],
+      pastStates: [],
       //
       gameIsLost: false,
       gameIsWon: false,
@@ -307,6 +308,7 @@ class Board extends React.Component {
       inAGetRidOfACardContext : false,
       guysToEvacuate : null,
       floodingSequence : null
+      // IF ADDING ANYTHING, PLEASE FIX doStatePermutation
     };
 
     function getInitialPlayerPosition(player, y, z){
@@ -395,7 +397,7 @@ class Board extends React.Component {
           stateCopy.floodCardsDiscard = n_FloodCardsDiscard;
           stateCopy.tiles = n_Tiles;
           stateCopy.difficultyLevelString = difficultyLevelString;
-      let n_pastState = [stateCopy];
+      let n_pastState = Object.assign({}, stateCopy);
 
       this.setState({
         floodCardsLeap: n_FloodCardsLeap,
@@ -403,7 +405,7 @@ class Board extends React.Component {
         tiles: n_Tiles,
         mainUserMessage: n_userMessage,
         difficultyLevelString: difficultyLevelString,
-        pastState: n_pastState});
+        pastStates: n_pastState});
   }
 
   controller(input, data){
@@ -449,8 +451,9 @@ class Board extends React.Component {
                 stateCopy.hasPilotFlownThisTurn = false;
                 stateCopy.whatIsExpectedNext = "CharacterActionButtonClick";
                 stateCopy.mainUserMessage = newMessage;
-            let n_pastState = this.state.pastState;
-            n_pastState.push(stateCopy);
+            let backup = Object.assign({}, stateCopy);
+            let n_pastState = this.state.pastStates;
+            n_pastState.push(backup);
 
             this.setState({
               // Would you add something here, add it above
@@ -461,7 +464,7 @@ class Board extends React.Component {
               hasPilotFlownThisTurn : false,
               whatIsExpectedNext : "CharacterActionButtonClick" ,
               mainUserMessage : newMessage,
-              pastState : n_pastState
+              pastStates : n_pastState
               });
               // tiles: n_tiles });
           } else {
@@ -478,7 +481,8 @@ class Board extends React.Component {
                 stateCopy.possibleActions = psblactn;
                 stateCopy.whatIsExpectedNext = "CharacterActionButtonClick";
                 stateCopy.mainUserMessage = newMessage;
-            let n_pastState = [stateCopy];
+            let backup = Object.assign({}, stateCopy);
+            let n_pastState = backup;
             // n_pastState.push(stateCopy);
 
             this.setState({
@@ -488,7 +492,7 @@ class Board extends React.Component {
               possibleActions : psblactn,
               whatIsExpectedNext : "CharacterActionButtonClick",
               mainUserMessage : newMessage,
-              pastState : n_pastState
+              pastStates : n_pastState
             });
               // tiles: n_tiles
           }
@@ -503,14 +507,15 @@ class Board extends React.Component {
               stateCopy.possibleActions = psblactn;
               stateCopy.whatIsExpectedNext = "CharacterActionButtonClick";
               stateCopy.mainUserMessage = newMessage;
-          let n_pastState = this.state.pastState;
-          n_pastState.push(stateCopy);
+          let backup = Object.assign({}, stateCopy);
+          let n_pastState = this.state.pastStates;
+          n_pastState = n_pastState.push(backup);
           //
           this.setState({
             // Would you add something here, add it above
             currentStep : nextStep,
             possibleActions : psblactn,
-            pastState: n_pastState,
+            pastStates: n_pastState,
             whatIsExpectedNext : "CharacterActionButtonClick" ,
             mainUserMessage : newMessage});
         }
@@ -1709,6 +1714,18 @@ handleTileClick(i) {
       }
     }
 
+  handleRollBack(){
+    if (this.state.pastStates.length > 0 ){
+      let pastStates = this.state.pastStates;
+      let stateToThrow = pastStates.pop();
+      let stateToRestore = pastStates.pop();
+      stateToRestore.pastStates = pastStates;
+      return this.doStatePermutation(stateToRestore);
+    } else {
+      alert("CONCEPTUAL ERROR : No state to restore");
+    }
+  }
+
   moveAPlayer(player, destination, players){
     let n_Tiles = this.state.tiles;
     // remove player from current Tile
@@ -1864,6 +1881,59 @@ handleTileClick(i) {
     return playersOnTheTile;
   }
 
+  doStatePermutation(newState){
+/*
+    for (let i = 0; i < this.state.length; i++){
+      let key = this.state.keys(i);
+      this.setState({key : newState.key});
+    }*/
+
+      this.setState({
+        tiles: newState.tiles,
+        playerCardsLeap: newState.playerCardsLeap,
+        playerCardsDiscard: newState.playerCardsDiscard,
+        floodCardsLeap: newState.floodCardsLeap,
+        floodCardsDiscard: newState.floodCardsDiscard,
+        floodCardsOutOfGame: newState.floodCardsOutOfGame,
+        //
+        players: newState.players,
+        nbrOfPlayers : newState.nbrOfPlayers,
+        floodMeter: newState.floodMeter,
+        difficultyLevel: newState.difficultyLevel,
+        difficultyLevelString: newState.difficultyLevelString,
+        //
+        pastStates: newState.pastStates,
+        //
+        gameIsLost: newState.gameIsLost,
+        gameIsWon: newState.gameIsWon,
+        gameIsOver: newState.gameIsOver,
+        endMessage: newState.endMessage,
+        //
+        languageDistributor: newState.languageDistributor,
+        selectedLanguage: newState.selectedLanguage,
+        //
+        posessedTreasures : newState.posessedTreasures,
+        turn : newState.turn,
+        hasPilotFlownThisTurn : newState.hasPilotFlownThisTurn,
+        currentPlayerPlaying : newState.currentPlayerPlaying,
+        possibleActions : newState.possibleActions,
+        currentStep : newState.currentStep,
+        whatIsExpectedNext : newState.whatIsExpectedNext,
+        whatIsExpectedNext_toRestore : newState.whatIsExpectedNext_toRestore,
+        mainUserMessage : newState.mainUserMessage,
+        mainUserMessage_toRestore: newState.mainUserMessage_toRestore,
+        messageBoardState : newState.messageBoardState,
+        messageBoardState_toRestore : newState.messageBoardState_toRestore,
+        cardUser : newState.cardUser,
+        coTravellers : newState.coTravellers,
+        cardFlyWith : newState.cardFlyWith,
+        inAGetRidOfACardContext : newState.inAGetRidOfACardContext,
+        guysToEvacuate : newState.guysToEvacuate,
+        floodingSequence : newState.floodingSequence
+      });
+
+  }
+
   renderSquare(i) {
     return(
       <span>
@@ -1910,7 +1980,6 @@ handleTileClick(i) {
     let str_roleAttachedToName = this.getStringInTheCatalog(this.state.languageDistributor, player.roleAttachedToName);
     let str_abilityHelp = this.getStringInTheCatalog(this.state.languageDistributor, player.playersAbility);
 
-
     return (
       <div className={boardClass}>
         <span className="inBoardName">{player.name}</span>&nbsp;{str_roleQualifier}&nbsp;
@@ -1952,7 +2021,8 @@ handleTileClick(i) {
     let str_currentStep = this.getStringInTheCatalog(lng, playerSteps[this.state.currentStep].name);
     let langToggleImg = this.state.selectedLanguage === "FR" ? "img/toggle_right.png" : "img/toggle_left.png";
 
-    // TODO order the inputs
+    // Either we're in action  or 3 or before picking the first player card :
+    let showBackButton = (this.state.currentStep > 0 && this.state.currentStep < 3) || ( this.state.mainUserMessage.buttons.indexOf(2) >= 0);
 
     return (
       <span>
@@ -1967,6 +2037,10 @@ handleTileClick(i) {
         </div>
         <div className="actionPanel">
           <div className="panelInfo" id="UserActions">
+            { showBackButton ?
+                <span className="rollBackButton"><img src="../img/backButton.png" onClick= {() => this.handleRollBack()}/></span>
+                : <span></span>
+            }
             <ul>
               {this.state.possibleActions.map((action, index) =>
                 <li key={action.name}>
@@ -2386,7 +2460,7 @@ handleTileClick(i) {
 
     return (
       <div>
-      <div class="littleCopyrightLine">{lng.copyright}</div>
+      <div className="littleCopyrightLine">{lng.copyright}</div>
       <div>
         {this.state.gameIsLost ?
           <div id="game-over-panel" className="game-lost-panel">

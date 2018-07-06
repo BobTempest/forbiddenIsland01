@@ -297,6 +297,12 @@ list-style:none;
   line-height: 14px;
 }
 
+.rollBackButton {
+  position: absolute;
+  top: 256px;
+  left: 307px;
+}
+
 .game-lost-panel {
   position: absolute;
   top: 424px;
