@@ -244,9 +244,7 @@ class Board extends React.Component {
     super(props);
 
     var nbrOfPlayers = props.nbrOfPlayers;
-
     var difficultyLevel = props.difficultyLevel;
-    //var difficultyLevelString =
 
     var tiles = riseTheIsland();
     var playerCardsLeap = generatePlayerCardsLeap();
@@ -285,7 +283,7 @@ class Board extends React.Component {
       gameIsLost: false,
       gameIsWon: false,
       gameIsOver: false,
-      endMessage: "nada",
+      endMessage: "",
       //
       languageDistributor: props.language === "FR" ? stringsCatalog.fr : stringsCatalog.en,
       selectedLanguage: props.language === "FR" ? "FR" : "EN",
@@ -352,12 +350,13 @@ class Board extends React.Component {
 ////////////////////////////////////////////////////////////////////////////////////
   componentDidMount() {
       // Perform the initial Flooding of 6 tiles
+      let initialFlood = 6,
       let n_FloodCardsLeap = this.state.floodCardsLeap;
       let n_Tiles = this.state.tiles;
       let n_FloodCardsDiscard = this.state.floodCardsDiscard;
       let lng = this.state.languageDistributor;
 
-      for ( let i = 0; i < 6; i++){
+      for ( let i = 0; i < initialFlood; i++){
           let card = n_FloodCardsLeap.pop();
 
           for (let j = 0; j < n_Tiles.length; j++){
@@ -390,14 +389,15 @@ class Board extends React.Component {
         console.log("CONCEPTUAL ERROR : Wrong Difficulty level input");
       }
 
-      // save the state before an action
+      // save the state before the first action
       let stateCopy = this.state;
           // reproduce what will be setted in the next setState
           stateCopy.floodCardsLeap = n_FloodCardsLeap;
           stateCopy.floodCardsDiscard = n_FloodCardsDiscard;
           stateCopy.tiles = n_Tiles;
           stateCopy.difficultyLevelString = difficultyLevelString;
-      let n_pastState = Object.assign({}, stateCopy);
+          stateCopy.mainUserMessage = n_userMessage;
+      let n_pastState = JSON.stringify(stateCopy);
 
       this.setState({
         floodCardsLeap: n_FloodCardsLeap,
@@ -405,7 +405,7 @@ class Board extends React.Component {
         tiles: n_Tiles,
         mainUserMessage: n_userMessage,
         difficultyLevelString: difficultyLevelString,
-        pastStates: n_pastState});
+        pastStates: [n_pastState]});
   }
 
   controller(input, data){
@@ -451,9 +451,7 @@ class Board extends React.Component {
                 stateCopy.hasPilotFlownThisTurn = false;
                 stateCopy.whatIsExpectedNext = "CharacterActionButtonClick";
                 stateCopy.mainUserMessage = newMessage;
-            let backup = Object.assign({}, stateCopy);
-            let n_pastState = this.state.pastStates;
-            n_pastState.push(backup);
+            let backup = JSON.stringify(stateCopy);
 
             this.setState({
               // Would you add something here, add it above
@@ -464,7 +462,7 @@ class Board extends React.Component {
               hasPilotFlownThisTurn : false,
               whatIsExpectedNext : "CharacterActionButtonClick" ,
               mainUserMessage : newMessage,
-              pastStates : n_pastState
+              pastStates : [backup]
               });
               // tiles: n_tiles });
           } else {
@@ -481,8 +479,8 @@ class Board extends React.Component {
                 stateCopy.possibleActions = psblactn;
                 stateCopy.whatIsExpectedNext = "CharacterActionButtonClick";
                 stateCopy.mainUserMessage = newMessage;
-            let backup = Object.assign({}, stateCopy);
-            let n_pastState = backup;
+            let backup = JSON.stringify(stateCopy);
+            let n_pastState = [backup];
             // n_pastState.push(stateCopy);
 
             this.setState({
@@ -507,15 +505,15 @@ class Board extends React.Component {
               stateCopy.possibleActions = psblactn;
               stateCopy.whatIsExpectedNext = "CharacterActionButtonClick";
               stateCopy.mainUserMessage = newMessage;
-          let backup = Object.assign({}, stateCopy);
-          let n_pastState = this.state.pastStates;
-          n_pastState = n_pastState.push(backup);
+          let backup = JSON.stringify(stateCopy);
+          let n_pastState01 = this.state.pastStates;
+          let zarma = n_pastState01.push(backup);
           //
           this.setState({
             // Would you add something here, add it above
             currentStep : nextStep,
             possibleActions : psblactn,
-            pastStates: n_pastState,
+            pastStates: n_pastState01,
             whatIsExpectedNext : "CharacterActionButtonClick" ,
             mainUserMessage : newMessage});
         }
@@ -531,7 +529,7 @@ class Board extends React.Component {
           this.setState(tempState);
       }
       else if (input === "PlayerFlood"){
-        this.doFloodATile(1, this.state.floodMeter.howManyCards(this.state.floodMeter.level));
+        this.doFloodATile(1, this.howManyCards(this.state.floodMeter.level));
       }
   }
   // end of Controller
@@ -579,14 +577,11 @@ class Board extends React.Component {
             this.graphicallyDoDrawnATile(j);
             tileHasDrawned = true;
             if (n_Tiles[j].name === "helipad"){
-              message = message + '<br/>' +lng.explorersCantLeaveTheIsland;
-              // gameOver = true;
               // alert("The helipad is drawned. GAMEOVER")
+              message = message + '<br/>' +lng.explorersCantLeaveTheIsland;
               gameOver = true;
               gameOverMsg = lng.explorersCantLeaveTheIsland;
               gameOverCode = 4; // helipad disapeared
-
-              // this.launchGameOver(false, true, lng.explorersCantLeaveTheIsland);
             }
             // rescue some players ?
             guysToEvacuate = n_Tiles[j].playerOn;
@@ -610,7 +605,6 @@ class Board extends React.Component {
                          gameOver = true;
                          gameOverMsg = lng.allTheTemplesAreDrawned.format(this.getTreasureNameById(n_Tiles[j].templeFor));
                          gameOverCode = 3; // all the temples for one undiscovered treasure disapeared
-                        // this.launchGameOver(false, true, lng.allTheTemplesAreDrawned.format(this.getTreasureNameById(n_Tiles[j].templeFor)));
                       }
                       break;
                     }
@@ -648,7 +642,6 @@ class Board extends React.Component {
     }
     else if (number === outOf){
       // floodings are finished
-      //message = message + "<br/> Floodings are over.... for now.</div>";
       message = message + lng.floodingsAreOver;
       n_userMessage = new UserMessage(null, message , false, [0]);
     }
@@ -702,13 +695,9 @@ class Board extends React.Component {
       if (tilesToLight.length === 0){
         // let newMessage = new UserMessage("Oh my God. There's nowhere he can go. " + drawningGuy.name+ " is drawning. Noooooooo. GAME OVER.", false, []);
         newMessage = new UserMessage(null, lng.nowhereHeCanGo.format(drawningGuy.name), false, []);
-
         gameIsLost = true;
         gameOverMsg = lng.nowhereHeCanGo.format(drawningGuy.name);
         gameOverCode = 1; // guy drawned
-
-        // this.launchGameOver(false, true, lng.nowhereHeCanGo.format(drawningGuy.name));
-        // gameIsLost = true;
       } else {
         this.lightTheTiles(tilesToLight, drawningGuy.color);
         newMessage = new UserMessage('chooseADestinationToEvacuate', null, false, []);
@@ -769,17 +758,13 @@ class Board extends React.Component {
 
           // upgrade the Flood Level
           newFloodMeter.level = newFloodMeter.level + 1;
-          newFloodMeter.floodFactor = newFloodMeter.howManyCards(newFloodMeter.level);
+          newFloodMeter.floodFactor = this.howManyCards(newFloodMeter.level);
 
           this.doMoveFloodOmeterCursor();
 
           // alert("Flood Riiiiise ! New Flood level is " + newFloodMeter.level + "(pick " +  newFloodMeter.floodFactor + " at each flood)");
           if (newFloodMeter.level >= newFloodMeter.topLevel){
             // alert (" Top level reached. The Island is submerged. Game Over");
-            // alert (lng.topLevelReached);
-
-            // this.launchGameOver(false, true, lng.topLevelReached);
-
             gameIsLost = true;
             gameOverMsg = lng.topLevelReached;
             gameOverCode = 2; // guy drawned
@@ -855,7 +840,7 @@ class Board extends React.Component {
                         whatIsExpectedNext_toRestore: null,
                         mainUserMessage: this.state.mainUserMessage_toRestore,
                         mainUserMessage_toRestore: null,
-                        messageBoardState: "default"}); // was Default ;)
+                        messageBoardState: "default"});
       }
 
       this.controller("ActionIsDone");
@@ -988,6 +973,20 @@ class Board extends React.Component {
                    });
   }
 
+  howManyCards(level){
+    // flood scale :  |12|345|67|89|
+    //                    |2 |3  |4 |5 |
+    if (level < 3){
+        return 2;
+    } else if (level < 6) {
+        return 3;
+    } else if (level < 8) {
+        return 4;
+    } else {
+        return 5;
+    }
+  }
+
   checkCardState(){
     // flood Cards
     let nbrOfFloodCardsInDiscard = this.state.floodCardsDiscard.length;
@@ -1027,7 +1026,6 @@ class Board extends React.Component {
             }
           }
           // is action possible ? Check the validity of an action and remove it
-
           if (isInitial && (action.name === "Give" || action.name === "Get a Treasure !")){
             // nothing happens. You can never give or find a treasure on the first action of the game
           } else if (!isInitial && action.name === "Give"){
@@ -1555,7 +1553,6 @@ handleTileClick(i) {
                   ){
                         n_possibleActions.splice(1, 0, playerDefaultActions[1]);
                   }
-                  // n_possibleActions.splice(y, 0, playerDefaultActions[2]);
               }
               else {
                 //
@@ -1714,13 +1711,39 @@ handleTileClick(i) {
       }
     }
 
-  handleRollBack(){
-    if (this.state.pastStates.length > 0 ){
+  handleRollBack(curstep){
+    // TODO refactor avoiding the pop and push
+    if (this.state.pastStates.length >= 1 ){
       let pastStates = this.state.pastStates;
-      let stateToThrow = pastStates.pop();
-      let stateToRestore = pastStates.pop();
-      stateToRestore.pastStates = pastStates;
-      return this.doStatePermutation(stateToRestore);
+      let stateToThrow = null;
+      let strStateToRestore = null;
+      if (curstep == 3 && pastStates.length === 3){
+        strStateToRestore = pastStates.pop();
+        pastStates.push(strStateToRestore);
+      } else if (curstep == 3 && pastStates.length != 3) {
+        // case of sleep , it should be the same behaviour
+        strStateToRestore = pastStates.pop();
+        pastStates.push(strStateToRestore);
+      } else if (curstep == 2){
+        if (pastStates.length != 3){
+          alert ("CONCEPTUAL ERROR, on step 2 , pastStates should be 3 long");
+        }
+        stateToThrow = pastStates.pop();
+        strStateToRestore = pastStates.pop();
+        pastStates.push(strStateToRestore);
+      } else if (curstep == 1) {
+        if (pastStates.length != 2){
+          alert ("CONCEPTUAL ERROR, on step 1 , pastStates should be 2 long");
+        }
+        stateToThrow = pastStates.pop();
+        strStateToRestore = pastStates.pop();
+        pastStates.push(strStateToRestore);
+      }
+
+      let objStateToRestore = JSON.parse(strStateToRestore);
+      objStateToRestore.pastStates = pastStates;
+
+      return this.doStatePermutation(objStateToRestore);
     } else {
       alert("CONCEPTUAL ERROR : No state to restore");
     }
@@ -1882,12 +1905,6 @@ handleTileClick(i) {
   }
 
   doStatePermutation(newState){
-/*
-    for (let i = 0; i < this.state.length; i++){
-      let key = this.state.keys(i);
-      this.setState({key : newState.key});
-    }*/
-
       this.setState({
         tiles: newState.tiles,
         playerCardsLeap: newState.playerCardsLeap,
@@ -1931,7 +1948,6 @@ handleTileClick(i) {
         guysToEvacuate : newState.guysToEvacuate,
         floodingSequence : newState.floodingSequence
       });
-
   }
 
   renderSquare(i) {
@@ -2021,7 +2037,7 @@ handleTileClick(i) {
     let str_currentStep = this.getStringInTheCatalog(lng, playerSteps[this.state.currentStep].name);
     let langToggleImg = this.state.selectedLanguage === "FR" ? "img/toggle_right.png" : "img/toggle_left.png";
 
-    // Either we're in action  or 3 or before picking the first player card :
+    // Either we're in action or before picking the first player card :
     let showBackButton = (this.state.currentStep > 0 && this.state.currentStep < 3) || ( this.state.mainUserMessage.buttons.indexOf(2) >= 0);
 
     return (
@@ -2038,7 +2054,7 @@ handleTileClick(i) {
         <div className="actionPanel">
           <div className="panelInfo" id="UserActions">
             { showBackButton ?
-                <span className="rollBackButton"><img src="../img/backButton.png" onClick= {() => this.handleRollBack()}/></span>
+                <span className="rollBackButton"><img src="../img/backButton.png" onClick= {() => this.handleRollBack(this.state.currentStep)}/></span>
                 : <span></span>
             }
             <ul>
@@ -2661,8 +2677,7 @@ class Game extends React.Component {
      }
 
   render() {
-    //
-/*
+    /*
     let difficultyLevel = 0;
     let language = "FR";
     let nbrOfPlayers = 4;
@@ -2770,11 +2785,11 @@ class FloodMeter {
   constructor(startLevel) {
     this.level = startLevel;
     this.topLevel = 10;
-    this.floodFactor = this.howManyCards(startLevel);
+    this.floodFactor = this.internalHowManyCards(startLevel);
   }
 
-  howManyCards(level){
-    // fix flood scale :  |12|345|67|89|
+  internalHowManyCards(level){
+    // flood scale :  |12|345|67|89|
     //                    |2 |3  |4 |5 |
     if (level < 3){
         return 2;
