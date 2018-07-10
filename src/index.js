@@ -350,7 +350,7 @@ class Board extends React.Component {
 ////////////////////////////////////////////////////////////////////////////////////
   componentDidMount() {
       // Perform the initial Flooding of 6 tiles
-      let initialFlood = 6,
+      let initialFlood = 6;
       let n_FloodCardsLeap = this.state.floodCardsLeap;
       let n_Tiles = this.state.tiles;
       let n_FloodCardsDiscard = this.state.floodCardsDiscard;
