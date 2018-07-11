@@ -82,6 +82,7 @@ export const stringsCatalog = {
    ah_dryAround: "Dry any tile around. Orthogonally and diagonally",
    ah_fly: "Fly to any tile on the map. You cannot emboard anybody with you.",
    ah_MoveDive: "Dive through any flooded or immersed tile.",
+   ah_rollback: "Cancel the previous action",
    // buttons
    btn_yes: "Yes",
    btn_no: "No",
@@ -268,6 +269,7 @@ export const stringsCatalog = {
    ah_dryAround: "Assécher une case alentour. Orthogonalement ou diagonalement.",
    ah_fly: "S'envoler sur n'importe quelle autre case. Le pilote ne peux pas emmener d'autres aventuriers avec lui.",
    ah_MoveDive: "Se déplacer en nageant à travers n'importe quelle case innondée ou coulée.",
+   ah_rollback: "Annuler l'action précédente.",
    // buttons
    btn_yes: "Oui",
    btn_no: "Non",

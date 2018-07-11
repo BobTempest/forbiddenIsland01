@@ -299,8 +299,14 @@ list-style:none;
 
 .rollBackButton {
   position: absolute;
-  top: 256px;
-  left: 307px;
+  top: 237px;
+  left: 301px;
+}
+
+.rollBackButtonImg {
+  -webkit-box-shadow: 1px 1px 3px #666666;
+  -moz-box-shadow: 1px 1px 3px #666666;
+  box-shadow: 1px 1px 3px #666666;
 }
 
 .game-lost-panel {
@@ -519,17 +525,16 @@ list-style:none;
 }
 
 .inToolTipsText {
-  /*display: inline-block;*/
   text-align: left;
   font-size: 12px;
   line-height: 12px;
   padding: 10px 20px 10px 20px;
   text-shadow: none;
-  /*
+}
+
+a.actionTooltipsForRollback {
   position: relative;
-  line-height: 9px;
-  top: -20px;
-  */
+  display: inline;
 }
 
 a.tooltips {

@@ -390,15 +390,17 @@ class Board extends React.Component {
       }
 
       // save the state before the first action
-      let stateCopy = this.state;
+      var stateCopy = JSON.parse(JSON.stringify(this.state));
+      // let stateCopy = this.state;
           // reproduce what will be setted in the next setState
           stateCopy.floodCardsLeap = n_FloodCardsLeap;
           stateCopy.floodCardsDiscard = n_FloodCardsDiscard;
           stateCopy.tiles = n_Tiles;
           stateCopy.difficultyLevelString = difficultyLevelString;
           stateCopy.mainUserMessage = n_userMessage;
-      let n_pastState = JSON.stringify(stateCopy);
 
+      let n_pastState = JSON.stringify(stateCopy);
+      console.log('****** state copy Size at init ' + n_pastState.length);
       this.setState({
         floodCardsLeap: n_FloodCardsLeap,
         floodCardsDiscard: n_FloodCardsDiscard,
@@ -442,7 +444,8 @@ class Board extends React.Component {
             let nextPlayer = this.state.players[0].id;
             let psblactn = this.getPossibleActions(this.state.players[0], false, false);
             // save the state before an action
-            let stateCopy = this.state;
+            var stateCopy = JSON.parse(JSON.stringify(this.state));
+            // let stateCopy = this.state;
                 // reproduce what will be setted in the next setState
                 stateCopy.currentStep = 0;
                 stateCopy.turn = nextTurn;
@@ -452,6 +455,8 @@ class Board extends React.Component {
                 stateCopy.whatIsExpectedNext = "CharacterActionButtonClick";
                 stateCopy.mainUserMessage = newMessage;
             let backup = JSON.stringify(stateCopy);
+            console.log('****** state copy Size at Next Turn ' + backup.length);
+            let n_pastState = [backup];
 
             this.setState({
               // Would you add something here, add it above
@@ -462,7 +467,7 @@ class Board extends React.Component {
               hasPilotFlownThisTurn : false,
               whatIsExpectedNext : "CharacterActionButtonClick" ,
               mainUserMessage : newMessage,
-              pastStates : [backup]
+              pastStates : n_pastState
               });
               // tiles: n_tiles });
           } else {
@@ -472,7 +477,8 @@ class Board extends React.Component {
             let psblactn = this.getPossibleActions(this.state.players[nextPlayer], false, false);
 
             // save the state before an action
-            let stateCopy = this.state;
+            var stateCopy = JSON.parse(JSON.stringify(this.state));
+            // let stateCopy = this.state;
                 // reproduce what will be setted in the next setState
                 stateCopy.currentStep = 0;
                 stateCopy.currentPlayerPlaying = nextPlayer;
@@ -480,6 +486,7 @@ class Board extends React.Component {
                 stateCopy.whatIsExpectedNext = "CharacterActionButtonClick";
                 stateCopy.mainUserMessage = newMessage;
             let backup = JSON.stringify(stateCopy);
+            console.log('****** state copy Size at Next player' + backup.length);
             let n_pastState = [backup];
             // n_pastState.push(stateCopy);
 
@@ -499,21 +506,22 @@ class Board extends React.Component {
           let newMessage = new UserMessage('chooseAnAction_msg', null, false, []);
           let psblactn = this.getPossibleActions(this.state.players[this.state.currentPlayerPlaying], this.state.hasPilotFlownThisTurn, false);
           // save the state before an action
-          let stateCopy = this.state;
+          var stateCopy = JSON.parse(JSON.stringify(this.state));
+          // let stateCopy = this.state;
               // reproduce what will be setted in the next setState
               stateCopy.currentStep = nextStep;
               stateCopy.possibleActions = psblactn;
               stateCopy.whatIsExpectedNext = "CharacterActionButtonClick";
               stateCopy.mainUserMessage = newMessage;
           let backup = JSON.stringify(stateCopy);
-          let n_pastState01 = this.state.pastStates;
-          let zarma = n_pastState01.push(backup);
-          //
+          let n_pastState = this.state.pastStates;
+          let zarma = n_pastState.push(backup);
+          console.log('****** state copy Size at Next action ' + backup.length);
           this.setState({
             // Would you add something here, add it above
             currentStep : nextStep,
             possibleActions : psblactn,
-            pastStates: n_pastState01,
+            pastStates: n_pastState,
             whatIsExpectedNext : "CharacterActionButtonClick" ,
             mainUserMessage : newMessage});
         }
@@ -804,6 +812,8 @@ class Board extends React.Component {
       tempState.gameIsLost = gameIsLost;
       tempState.endMessage = gameOverMsg;
       tempState.gameOverCode = gameOverCode;
+
+      tempState.pastStates = [];
 
       return tempState;
   }
@@ -2054,7 +2064,12 @@ handleTileClick(i) {
         <div className="actionPanel">
           <div className="panelInfo" id="UserActions">
             { showBackButton ?
-                <span className="rollBackButton"><img src="../img/backButton.png" onClick= {() => this.handleRollBack(this.state.currentStep)}/></span>
+                <span className="rollBackButton">
+                  <a className="actionTooltips" href="#">
+                    <img className="rollBackButtonImg" src="../img/backButton.png" width="15" height="15" onClick= {() => this.handleRollBack(this.state.currentStep)}/>
+                    <span className="actionTooltipsForRollback inToolTipsText">{this.getStringInTheCatalog(lng, 'ah_rollback')}</span>
+                  </a>
+                </span>
                 : <span></span>
             }
             <ul>
