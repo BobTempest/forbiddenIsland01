@@ -229,7 +229,7 @@ list-style:none;
   padding: 10;
   height: 215px;
   width: 300px;
-  box-shadow: 1px 1px 3px #333333;
+  /* box-shadow: 1px 1px 3px #333333;*/
 }
 
 .actionPanel {
@@ -245,7 +245,7 @@ list-style:none;
   padding: 10;
   height: 244px;
   width: 300px;
-  box-shadow: 1px 1px 3px #333333;
+  /* box-shadow: 1px 1px 3px #333333; */
 }
 
 .game-start-panel {
