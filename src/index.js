@@ -1823,6 +1823,10 @@ handleTileClick(i) {
 
   doMoveSomeOne(puppet) {
     let lng = this.state.languageDistributor;
+    if (isNaN(puppet) || puppet == null) {
+        alert(lng.chooseAnExplorerToMove);
+        return null;
+    }
     let whereCanHeMove = this.whereNavigatorCanMoveHim(this.state.players[puppet].position);
     this.state.players[puppet].whereCanHeMove = whereCanHeMove;
     let n_players = this.state.players;
@@ -2374,6 +2378,14 @@ handleTileClick(i) {
                   ( /(?:^|\s)blink(?!\S)/g , '' )
           }
         }
+  }
+
+  blinkAPlayer(playerId) {
+    return null;
+  }
+
+  unblinkAPlayer(playerId) {
+    return null;
   }
 
   graphicallyDoDrawnATile(i){

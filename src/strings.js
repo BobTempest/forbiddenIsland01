@@ -185,6 +185,7 @@ export const stringsCatalog = {
    moveThisCharacter: "Move this character",
    hasMoreThan5Card: "has more than 5 cards in Hand.",
    letsGetRidOvIt: "Let's get rid Ov it : ",
+   chooseAnExplorerToMove : "Choose an explorer to move",
  },
  fr:{
    currentLanguage: "FR",
@@ -372,5 +373,6 @@ export const stringsCatalog = {
    moveThisCharacter: "Déplacer",
    hasMoreThan5Card: " a plus de 5 cartes en main.",
    letsGetRidOvIt: "Il faut s'en débarasser : ",
+   chooseAnExplorerToMove : "Choisissez un aventurier à déplacer.",
  }
 }

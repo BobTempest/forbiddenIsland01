@@ -5,12 +5,10 @@ NOW : test the endings
 
 **** BUGS *****
 
--> reload crashes
+
 -> tiles do not disapear when drawning on EDGE
 -> FIREFOX crashes on 'you got a treasure !' // not always ... sometimes, chrome crashes too
 
-
-if use H card on third action (with someone), the give action appears after the flight)
 
 
 BUGS :
@@ -25,11 +23,11 @@ after clicking an unwanted tile, actions menu re appears. It may be unnapropriat
 *********************
 **** NOW *****
 
-TODO : Welcome boardBoard, how many players + set difficulty + set Language
-TODO : GameOver Board
 TODO : over on cards
+TODO : Blink the current player
+TODO : fancy message box to replace the alerts
 
-TODO : affiché la difficulté choisie sur le panel
+
 
 *********************
 **** SHORT TERM *****
