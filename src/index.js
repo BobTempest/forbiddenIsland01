@@ -215,53 +215,79 @@ function DrawEmptySquareWithTreasure(props) {
 function DrawPlayerPawn(props){
   if (props.pawns && props.pawns.length === 1){
     return (
-      <div className={props.players[props.pawns[0]].id === props.blinkPlayer ? "playerPawn singlePP blink2" : "playerPawn singlePP"}
-        style={{color: props.players[props.pawns[0]].color}}
-          id={'player'+ props.players[props.pawns[0]].id}>P</div>
+      <div className="playerPawn singlePP">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="22" viewBox="0 0 384 512">
+        <path d="M120 72c0-39.765 32.235-72 72-72s72 32.235 72 72c0 39.764-32.235 72-72 72s-72-32.236-72-72zm254.627 1.373c-12.496-12.497-32.758-12.497-45.254 0L242.745 160H141.254L54.627 73.373c-12.496-12.497-32.758-12.497-45.254 0-12.497 12.497-12.497 32.758 0 45.255L104 213.254V480c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V368h16v112c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V213.254l94.627-94.627c12.497-12.497 12.497-32.757 0-45.254z"
+        style={{stroke: '#000000', strokeWidth: '2px', fill: props.players[props.pawns[0]].color}}
+      className={props.players[props.pawns[0]].id === props.blinkPlayer ? "blink2" : ""}/>
+      </svg>
+      </div>
     );
   }
   else if(props.pawns && props.pawns.length === 2){
     return (
       <div className="playerPawn twoPP">
-        <span className={props.players[props.pawns[0]].id === props.blinkPlayer ? "blink2" : ""}
-              style={{color: props.players[props.pawns[0]].color}}
-                id={'player'+ props.players[props.pawns[0]].id}>P</span>&nbsp;
-        <span className={props.players[props.pawns[1]].id === props.blinkPlayer ? "blink2" : ""}
-                style={{color: props.players[props.pawns[1]].color}}
-                id={'player'+ props.players[props.pawns[1]].id}>P</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="22" viewBox="0 0 384 512">
+          <path d="M120 72c0-39.765 32.235-72 72-72s72 32.235 72 72c0 39.764-32.235 72-72 72s-72-32.236-72-72zm254.627 1.373c-12.496-12.497-32.758-12.497-45.254 0L242.745 160H141.254L54.627 73.373c-12.496-12.497-32.758-12.497-45.254 0-12.497 12.497-12.497 32.758 0 45.255L104 213.254V480c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V368h16v112c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V213.254l94.627-94.627c12.497-12.497 12.497-32.757 0-45.254z"
+          style={{stroke: '#000000', strokeWidth: '2px', fill: props.players[props.pawns[0]].color}}
+        className={props.players[props.pawns[0]].id === props.blinkPlayer ? "blink2" : ""}/>
+        </svg>
+        &nbsp;
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="22" viewBox="0 0 384 512">
+          <path d="M120 72c0-39.765 32.235-72 72-72s72 32.235 72 72c0 39.764-32.235 72-72 72s-72-32.236-72-72zm254.627 1.373c-12.496-12.497-32.758-12.497-45.254 0L242.745 160H141.254L54.627 73.373c-12.496-12.497-32.758-12.497-45.254 0-12.497 12.497-12.497 32.758 0 45.255L104 213.254V480c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V368h16v112c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V213.254l94.627-94.627c12.497-12.497 12.497-32.757 0-45.254z"
+          style={{stroke: '#000000', strokeWidth: '2px', fill: props.players[props.pawns[1]].color}}
+        className={props.players[props.pawns[1]].id === props.blinkPlayer ? "blink2" : ""}/>
+        </svg>
       </div>
     );
   }
   else if(props.pawns && props.pawns.length === 3){
     return (
       <div className="playerPawn multilinePP">
-          <span className={props.players[props.pawns[0]].id === props.blinkPlayer ? "blink2" : ""}
-            style={{color: props.players[props.pawns[0]].color}}
-            id={'player'+ props.players[props.pawns[0]].id}>P</span>&nbsp;
-          <span className={props.players[props.pawns[1]].id === props.blinkPlayer ? "blink2" : ""}
-            style={{color: props.players[props.pawns[1]].color}}
-            id={'player'+ props.players[props.pawns[1]].id}>P</span><br/>
-          <span className={props.players[props.pawns[2]].id === props.blinkPlayer ? "blink2" : ""}
-            style={{color: props.players[props.pawns[2]].color}}
-            id={'player'+ props.players[props.pawns[2]].id}>P</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="22" viewBox="0 0 384 512">
+          <path d="M120 72c0-39.765 32.235-72 72-72s72 32.235 72 72c0 39.764-32.235 72-72 72s-72-32.236-72-72zm254.627 1.373c-12.496-12.497-32.758-12.497-45.254 0L242.745 160H141.254L54.627 73.373c-12.496-12.497-32.758-12.497-45.254 0-12.497 12.497-12.497 32.758 0 45.255L104 213.254V480c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V368h16v112c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V213.254l94.627-94.627c12.497-12.497 12.497-32.757 0-45.254z"
+          style={{stroke: '#000000', strokeWidth: '2px', fill: props.players[props.pawns[0]].color}}
+        className={props.players[props.pawns[0]].id === props.blinkPlayer ? "blink2" : ""}/>
+        </svg>
+        &nbsp;
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="22" viewBox="0 0 384 512">
+          <path d="M120 72c0-39.765 32.235-72 72-72s72 32.235 72 72c0 39.764-32.235 72-72 72s-72-32.236-72-72zm254.627 1.373c-12.496-12.497-32.758-12.497-45.254 0L242.745 160H141.254L54.627 73.373c-12.496-12.497-32.758-12.497-45.254 0-12.497 12.497-12.497 32.758 0 45.255L104 213.254V480c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V368h16v112c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V213.254l94.627-94.627c12.497-12.497 12.497-32.757 0-45.254z"
+          style={{stroke: '#000000', strokeWidth: '2px', fill: props.players[props.pawns[1]].color}}
+        className={props.players[props.pawns[1]].id === props.blinkPlayer ? "blink2" : ""}/>
+        </svg><br/>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="22" viewBox="0 0 384 512">
+          <path d="M120 72c0-39.765 32.235-72 72-72s72 32.235 72 72c0 39.764-32.235 72-72 72s-72-32.236-72-72zm254.627 1.373c-12.496-12.497-32.758-12.497-45.254 0L242.745 160H141.254L54.627 73.373c-12.496-12.497-32.758-12.497-45.254 0-12.497 12.497-12.497 32.758 0 45.255L104 213.254V480c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V368h16v112c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V213.254l94.627-94.627c12.497-12.497 12.497-32.757 0-45.254z"
+          style={{stroke: '#000000', strokeWidth: '2px', fill: props.players[props.pawns[2]].color}}
+        className={props.players[props.pawns[2]].id === props.blinkPlayer ? "blink2" : ""}/>
+        </svg>
       </div>
     );
   }
   else if(props.pawns && props.pawns.length === 4){
     return (
       <div className="playerPawn multilinePP">
-          <span className={props.players[props.pawns[0]].id === props.blinkPlayer ? "blink2" : ""}
-            style={{color: props.players[props.pawns[0]].color}}
-            id={'player'+ props.players[props.pawns[0]].id}>P</span>&nbsp;
-          <span className={props.players[props.pawns[1]].id === props.blinkPlayer ? "blink2" : ""}
-            style={{color: props.players[props.pawns[1]].color}}
-            id={'player'+ props.players[props.pawns[1]].id}>P</span><br/>
-          <span className={props.players[props.pawns[2]].id === props.blinkPlayer ? "blink2" : ""}
-            style={{color: props.players[props.pawns[2]].color}}
-            id={'player'+ props.players[props.pawns[2]].id}>P</span>&nbsp;
-          <span className={props.players[props.pawns[3]].id === props.blinkPlayer ? "blink2" : ""}
-            style={{color: props.players[props.pawns[3]].color}}
-            id={'player'+ props.players[props.pawns[3]].id}>P</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="22" viewBox="0 0 384 512">
+          <path d="M120 72c0-39.765 32.235-72 72-72s72 32.235 72 72c0 39.764-32.235 72-72 72s-72-32.236-72-72zm254.627 1.373c-12.496-12.497-32.758-12.497-45.254 0L242.745 160H141.254L54.627 73.373c-12.496-12.497-32.758-12.497-45.254 0-12.497 12.497-12.497 32.758 0 45.255L104 213.254V480c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V368h16v112c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V213.254l94.627-94.627c12.497-12.497 12.497-32.757 0-45.254z"
+          style={{stroke: '#000000', strokeWidth: '2px', fill: props.players[props.pawns[0]].color}}
+        className={props.players[props.pawns[0]].id === props.blinkPlayer ? "blink2" : ""}/>
+        </svg>
+        &nbsp;
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="22" viewBox="0 0 384 512">
+          <path d="M120 72c0-39.765 32.235-72 72-72s72 32.235 72 72c0 39.764-32.235 72-72 72s-72-32.236-72-72zm254.627 1.373c-12.496-12.497-32.758-12.497-45.254 0L242.745 160H141.254L54.627 73.373c-12.496-12.497-32.758-12.497-45.254 0-12.497 12.497-12.497 32.758 0 45.255L104 213.254V480c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V368h16v112c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V213.254l94.627-94.627c12.497-12.497 12.497-32.757 0-45.254z"
+          style={{stroke: '#000000', strokeWidth: '2px', fill: props.players[props.pawns[1]].color}}
+        className={props.players[props.pawns[1]].id === props.blinkPlayer ? "blink2" : ""}/>
+        </svg><br/>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="22" viewBox="0 0 384 512">
+          <path d="M120 72c0-39.765 32.235-72 72-72s72 32.235 72 72c0 39.764-32.235 72-72 72s-72-32.236-72-72zm254.627 1.373c-12.496-12.497-32.758-12.497-45.254 0L242.745 160H141.254L54.627 73.373c-12.496-12.497-32.758-12.497-45.254 0-12.497 12.497-12.497 32.758 0 45.255L104 213.254V480c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V368h16v112c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V213.254l94.627-94.627c12.497-12.497 12.497-32.757 0-45.254z"
+          style={{stroke: '#000000', strokeWidth: '2px', fill: props.players[props.pawns[2]].color}}
+        className={props.players[props.pawns[2]].id === props.blinkPlayer ? "blink2" : ""}/>
+        </svg>
+        &nbsp;
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="22" viewBox="0 0 384 512">
+          <path d="M120 72c0-39.765 32.235-72 72-72s72 32.235 72 72c0 39.764-32.235 72-72 72s-72-32.236-72-72zm254.627 1.373c-12.496-12.497-32.758-12.497-45.254 0L242.745 160H141.254L54.627 73.373c-12.496-12.497-32.758-12.497-45.254 0-12.497 12.497-12.497 32.758 0 45.255L104 213.254V480c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V368h16v112c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V213.254l94.627-94.627c12.497-12.497 12.497-32.757 0-45.254z"
+          style={{stroke: '#000000', strokeWidth: '2px', fill: props.players[props.pawns[3]].color}}
+        className={props.players[props.pawns[3]].id === props.blinkPlayer ? "blink2" : ""}/>
+        </svg>
       </div>
     );
   }
@@ -2644,6 +2670,13 @@ handleTileClick(i) {
           </div>
         </div>
       </div>
+      <div>
+            SVG attempts :<br/>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="22" viewBox="0 0 384 512">
+              <path d="M120 72c0-39.765 32.235-72 72-72s72 32.235 72 72c0 39.764-32.235 72-72 72s-72-32.236-72-72zm254.627 1.373c-12.496-12.497-32.758-12.497-45.254 0L242.745 160H141.254L54.627 73.373c-12.496-12.497-32.758-12.497-45.254 0-12.497 12.497-12.497 32.758 0 45.255L104 213.254V480c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V368h16v112c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V213.254l94.627-94.627c12.497-12.497 12.497-32.757 0-45.254z"
+              style={{stroke: '#000000', fill: '#00cc00'}} className='blink'/>
+            </svg>
+      </div>
     </div>
     );
   }
@@ -2885,7 +2918,7 @@ function riseTheIsland(){
     var tile02 = new Tile("doorBlack", 0, false, false, false, 3, "", [], "#6E6E6E", "", "");
     var tile03 = new Tile("doorRed", 0, false, false, false, 0, "", [], "#F78181", "", "");
     var tile04 = new Tile("doorGreen", 0, false, false, false, 4, "", [], "#9FF781", "", "");
-    var tile05 = new Tile("doorWhite", 0, false, false, false, 2, "", [], "#F2F2F2", "", "");
+    var tile05 = new Tile("doorWhite", 0, false, false, false, 2, "", [], "#D9D9D9", "", "");
     var tile06 = new Tile("doorYellow", 0, false, false, false, 1, "", [], "#F2F5A9", "", "");
     var tile07 = new Tile("temple0001", 0, false, false, false, "", "CR", [], "#bdc3c7", "", "TEMPLE CRYSTAL");
     var tile08 = new Tile("temple0002", 0, false, false, false, "", "CR", [], "#bdc3c7", "", "TEMPLE CRYSTAL");
