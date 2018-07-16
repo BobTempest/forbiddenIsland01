@@ -126,8 +126,7 @@ const diagonalPaths = {0 : [2, 4], 1 : [3, 5], 2 : [0, 6, 8], 3 : [1,7,9], 4 : [
    {id : 6, name : "Move/Dive", locName: "ac_MoveDive", forRole: "Diver", replacesAction: "0", locHelp: "ah_MoveDive", enabled : true, triggers : "Dive"  }, // a tile to dive to
  ];
 
- // QUESTIONS :
- //
+
 
 /*
  const playerCards = [
@@ -194,7 +193,7 @@ function DrawSquare(props) {
       <span className="inSquarePosition">{props.tile.position}</span><br/>
       <span className="inSquareText">{props.tile.TextToDisplay}</span><br/>
       <span className="inSquareLittleText">{props.tile.LittleTextToDisplay}</span>
-      <DrawPlayerPawn pawns={props.tile.playerOn} players={props.players}/>
+      <DrawPlayerPawn pawns={props.tile.playerOn} players={props.players} blinkPlayer={props.blinkPlayer}/>
     </div>
   );
 }
@@ -216,24 +215,54 @@ function DrawEmptySquareWithTreasure(props) {
 function DrawPlayerPawn(props){
   if (props.pawns && props.pawns.length === 1){
     return (
-      <div className="playerPawn singlePP" style={{color: props.players[props.pawns[0]].color}}>P</div>
+      <div className={props.players[props.pawns[0]].id === props.blinkPlayer ? "playerPawn singlePP blink2" : "playerPawn singlePP"}
+        style={{color: props.players[props.pawns[0]].color}}
+          id={'player'+ props.players[props.pawns[0]].id}>P</div>
     );
   }
   else if(props.pawns && props.pawns.length === 2){
     return (
-      <div className="playerPawn twoPP"><span style={{color: props.players[props.pawns[0]].color}}>P</span>&nbsp;<span style={{color: props.players[props.pawns[1]].color}}>P</span></div>
+      <div className="playerPawn twoPP">
+        <span className={props.players[props.pawns[0]].id === props.blinkPlayer ? "blink2" : ""}
+              style={{color: props.players[props.pawns[0]].color}}
+                id={'player'+ props.players[props.pawns[0]].id}>P</span>&nbsp;
+        <span className={props.players[props.pawns[1]].id === props.blinkPlayer ? "blink2" : ""}
+                style={{color: props.players[props.pawns[1]].color}}
+                id={'player'+ props.players[props.pawns[1]].id}>P</span>
+      </div>
     );
   }
   else if(props.pawns && props.pawns.length === 3){
     return (
-      <div className="playerPawn multilinePP"><span style={{color: props.players[props.pawns[0]].color}}>P</span>&nbsp;<span style={{color: props.players[props.pawns[1]].color}}>P</span><br/>
-      <span style={{color: props.players[props.pawns[2]].color}}>P</span></div>
+      <div className="playerPawn multilinePP">
+          <span className={props.players[props.pawns[0]].id === props.blinkPlayer ? "blink2" : ""}
+            style={{color: props.players[props.pawns[0]].color}}
+            id={'player'+ props.players[props.pawns[0]].id}>P</span>&nbsp;
+          <span className={props.players[props.pawns[1]].id === props.blinkPlayer ? "blink2" : ""}
+            style={{color: props.players[props.pawns[1]].color}}
+            id={'player'+ props.players[props.pawns[1]].id}>P</span><br/>
+          <span className={props.players[props.pawns[2]].id === props.blinkPlayer ? "blink2" : ""}
+            style={{color: props.players[props.pawns[2]].color}}
+            id={'player'+ props.players[props.pawns[2]].id}>P</span>
+      </div>
     );
   }
   else if(props.pawns && props.pawns.length === 4){
     return (
-      <div className="playerPawn multilinePP"><span style={{color: props.players[props.pawns[0]].color}}>P</span>&nbsp;<span style={{color: props.players[props.pawns[1]].color}}>P</span><br/>
-      <span style={{color: props.players[props.pawns[2]].color}}>P</span>&nbsp;<span style={{color: props.players[props.pawns[3]].color}}>P</span></div>
+      <div className="playerPawn multilinePP">
+          <span className={props.players[props.pawns[0]].id === props.blinkPlayer ? "blink2" : ""}
+            style={{color: props.players[props.pawns[0]].color}}
+            id={'player'+ props.players[props.pawns[0]].id}>P</span>&nbsp;
+          <span className={props.players[props.pawns[1]].id === props.blinkPlayer ? "blink2" : ""}
+            style={{color: props.players[props.pawns[1]].color}}
+            id={'player'+ props.players[props.pawns[1]].id}>P</span><br/>
+          <span className={props.players[props.pawns[2]].id === props.blinkPlayer ? "blink2" : ""}
+            style={{color: props.players[props.pawns[2]].color}}
+            id={'player'+ props.players[props.pawns[2]].id}>P</span>&nbsp;
+          <span className={props.players[props.pawns[3]].id === props.blinkPlayer ? "blink2" : ""}
+            style={{color: props.players[props.pawns[3]].color}}
+            id={'player'+ props.players[props.pawns[3]].id}>P</span>
+      </div>
     );
   }
   return null;
@@ -292,6 +321,7 @@ class Board extends React.Component {
       turn : 1,
       hasPilotFlownThisTurn : false,
       currentPlayerPlaying : 0,
+      blinkPlayer : 0,
       possibleActions : possibleActions,
       currentStep : 0,
       whatIsExpectedNext : "CharacterActionButtonClick",
@@ -371,6 +401,8 @@ class Board extends React.Component {
       // And add a localised welcome message
       let n_userMessage = new UserMessage('welcome_msg', null, false, []);
 
+      // this.blinkAPlayer(this.state.currentPlayerPlaying);
+
       let difficultyLevelString = "";
       switch (this.state.difficultyLevel) {
        case 1:
@@ -421,7 +453,7 @@ class Board extends React.Component {
         if (nextStep === 3){
           // draw player cards 01
           let newMessage = new UserMessage('letsDrawSomePlayerCards_msg', null, false, [2]);
-          this.setState({ currentStep : nextStep, possibleActions : [], mainUserMessage : newMessage});
+          this.setState({ currentStep : nextStep, possibleActions : [], blinkPlayer : 99, mainUserMessage : newMessage});
         } else if (nextStep === 4){
           // flood some tiles.
           this.setState({ currentStep : nextStep });
@@ -431,6 +463,7 @@ class Board extends React.Component {
         }
         else if (nextStep === 5){
           // next Turn, new Player 0
+
           /* CODE MORT DE GESTION DU BLINK ?
           let n_tiles = this.state.tiles;
           for (let i = 0; i< n_tiles.length; i++){
@@ -451,6 +484,7 @@ class Board extends React.Component {
                 stateCopy.turn = nextTurn;
                 stateCopy.currentPlayerPlaying = nextPlayer;
                 stateCopy.possibleActions = psblactn;
+                stateCopy.blinkPlayer = nextPlayer;
                 stateCopy.hasPilotFlownThisTurn = false;
                 stateCopy.whatIsExpectedNext = "CharacterActionButtonClick";
                 stateCopy.mainUserMessage = newMessage;
@@ -463,6 +497,7 @@ class Board extends React.Component {
               currentStep : 0,
               turn : nextTurn,
               currentPlayerPlaying : nextPlayer,
+              blinkPlayer : nextPlayer,
               possibleActions : psblactn,
               hasPilotFlownThisTurn : false,
               whatIsExpectedNext : "CharacterActionButtonClick" ,
@@ -482,6 +517,7 @@ class Board extends React.Component {
                 // reproduce what will be setted in the next setState
                 stateCopy.currentStep = 0;
                 stateCopy.currentPlayerPlaying = nextPlayer;
+                stateCopy.blinkPlayer = nextPlayer;
                 stateCopy.possibleActions = psblactn;
                 stateCopy.whatIsExpectedNext = "CharacterActionButtonClick";
                 stateCopy.mainUserMessage = newMessage;
@@ -494,6 +530,7 @@ class Board extends React.Component {
             // Would you add something here, add it above
               currentStep : 0,
               currentPlayerPlaying : nextPlayer,
+              blinkPlayer : nextPlayer,
               possibleActions : psblactn,
               whatIsExpectedNext : "CharacterActionButtonClick",
               mainUserMessage : newMessage,
@@ -1947,6 +1984,7 @@ handleTileClick(i) {
         turn : newState.turn,
         hasPilotFlownThisTurn : newState.hasPilotFlownThisTurn,
         currentPlayerPlaying : newState.currentPlayerPlaying,
+        blinkPlayer : newState.blinkPlayer,
         possibleActions : newState.possibleActions,
         currentStep : newState.currentStep,
         whatIsExpectedNext : newState.whatIsExpectedNext,
@@ -1967,7 +2005,7 @@ handleTileClick(i) {
   renderSquare(i) {
     return(
       <span>
-        <DrawSquare tile={this.state.tiles[i]} players={this.state.players} index={i} onClick={() => this.handleTileClick(i)}/>
+        <DrawSquare tile={this.state.tiles[i]} players={this.state.players} index={i} blinkPlayer={this.state.blinkPlayer} onClick={() => this.handleTileClick(i)}/>
       </span>
     );
   }
@@ -2374,18 +2412,19 @@ handleTileClick(i) {
         for (let i = 0; i < 24; i++){
           if ( document.getElementById("square" + i).classList.contains('blink') ){
             document.getElementById("square" + i).className =
-               document.getElementById("square" + i).className.replace
-                  ( /(?:^|\s)blink(?!\S)/g , '' )
+               document.getElementById("square" + i).className.replace( /(?:^|\s)blink(?!\S)/g , '' )
           }
         }
   }
 
   blinkAPlayer(playerId) {
-    return null;
+      document.getElementById("player" + playerId).classList.add('blink');
   }
 
   unblinkAPlayer(playerId) {
-    return null;
+      if ( document.getElementById("player" + playerId).classList.contains('blink') ){
+          document.getElementById("player" + playerId).className.replace( /(?:^|\s)blink(?!\S)/g , '' )
+       }
   }
 
   graphicallyDoDrawnATile(i){

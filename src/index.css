@@ -464,6 +464,10 @@ list-style:none;
   animation: blinker 2s linear infinite;
 }
 
+.blink2 {
+  animation: blinker 1s infinite;
+}
+
 @keyframes blinker {
   50% {
     opacity: 0;
