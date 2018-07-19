@@ -7,7 +7,7 @@ import {stringsCatalog} from './strings.js';
 const playerTypes = [
   {
     id : 0,
-    role : "Engineer", // dry two tiles for one action
+    role : "Engineer", // dry two tiles for one actions
     color : "#CC0000", // red
     ability : "ab_Engineer",
     name : "Natacha",
@@ -2127,7 +2127,9 @@ handleTileClick(i) {
           <div className="littlePanelInfo">{lng.treasuresFound} : {foundTreasures}/4 </div>
           <div className="littlePanelInfo"> {lng.floodLevel} {this.state.floodMeter.level} {lng.xCardsPerFlood.format(this.state.floodMeter.floodFactor)}</div>
           <div className="panelInfo"> {currentPlayer.name}&nbsp;{str_roleQualifier}&nbsp;<span style={{color: currentPlayer.color}}>{str_roleAttachedToName}</span>&nbsp;{lng.isPlaying}
-          <br/><span className="littlePanelInfo"> {str_currentStep} </span></div>
+          <br/><span className="superLittlePanelInfo"> {str_currentStep} </span>
+        <br/>{this.renderTurnStepsBoard()}
+      </div>
         </div>
         <div className="actionPanel">
           <div className="panelInfo" id="UserActions">
@@ -2414,6 +2416,40 @@ handleTileClick(i) {
       </div>
       )
     }
+  }
+
+  renderTurnStepsBoard(){
+    let curColor = this.state.players[this.state.currentPlayerPlaying].color;
+    let step = this.state.currentStep;
+
+    return(
+      <div>
+        <span className="lilsqr" style={step == 0 ? {color: curColor, borderColor: curColor} :  {color: curColor, borderColor: curColor, backgroundColor: curColor}}>
+        </span>
+        &nbsp;
+        <span className="lilsqr" style={step < 2 ? {color: curColor, borderColor: curColor} :  {color: curColor, borderColor: curColor, backgroundColor: curColor}}>
+        </span>
+        &nbsp;
+        <span className="lilsqr" style={step < 3 ? {color: curColor, borderColor: curColor} :  {color: curColor, borderColor: curColor, backgroundColor: curColor}}>
+        </span>
+        &nbsp;
+        <span className="lilcard">
+          <span className="inlilcard">1</span>
+          <span class="checkmark">
+              <div class="checkmark_stem"></div>
+              <div class="checkmark_kick"></div>
+          </span>
+        </span>
+        &nbsp;
+        <span className="lilcard">
+          <span className="inlilcard">2</span>
+          <span class="checkmark">
+              <div class="checkmark_stem"></div>
+              <div class="checkmark_kick"></div>
+          </span>
+        </span>
+      </div>
+    )
   }
 
   lightTheTiles(t, color){

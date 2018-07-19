@@ -229,7 +229,6 @@ list-style:none;
   padding: 10;
   height: 215px;
   width: 300px;
-  /* box-shadow: 1px 1px 3px #333333;*/
 }
 
 .actionPanel {
@@ -245,7 +244,6 @@ list-style:none;
   padding: 10;
   height: 244px;
   width: 300px;
-  /* box-shadow: 1px 1px 3px #333333; */
 }
 
 .game-start-panel {
@@ -280,6 +278,12 @@ list-style:none;
 .littlePanelInfo {
   margin-left: 10px;
   font-size: 12px;
+  line-height: 12px;
+}
+
+.superLittlePanelInfo {
+  margin-left: 3px;
+  font-size: 10px;
   line-height: 12px;
 }
 
@@ -374,7 +378,6 @@ list-style:none;
   padding: 10;
   height: 100px;
   width: 377px;
-  /* box-shadow: 1px 1px 3px #333333;*/
   list-style:none;
 }
 
@@ -402,7 +405,6 @@ list-style:none;
 
 .boardPlayerCards {
   float: left;
-  /*margin-left: 5px;*/
   width:50px;
 }
 
@@ -459,6 +461,64 @@ list-style:none;
   margin-left: 20px;
 }
 
+.lilsqr {
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  border: 3px solid;
+  background: #fff;
+  margin: 10px;
+  vertical-align: middle;
+  float: left;
+  margin-right: 2px;
+  margin-top: 4px;
+  margin-left: 2px;
+  margin-bottom: 2px;
+  border-radius: 15px;
+  padding: 0;
+  height: 20px;
+  width: 20px;
+  box-shadow: 1px 1px 3px #CCC;
+}
+
+.inlilsqr {
+  font-size: 12px;
+  text-shadow: none;
+  font-family: "Arial Black", Gadget, sans-serif;
+  position: relative;
+  top: -6px;
+  left: 3px;
+}
+
+.lilcard {
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  border: 2px solid #888888;
+  background: #fff;
+  margin: 10px;
+  vertical-align: middle;
+  float: left;
+  margin-right: 2px;
+  margin-top: 2px;
+  margin-left: 2px;
+  margin-bottom: 2px;
+  border-radius: 5px;
+  padding: 0;
+  height: 25px;
+  width: 17px;
+}
+
+.inlilcard{
+  font-size: 12px;
+  text-shadow: none;
+  color: #888888;
+  font-family: "Arial Black", Gadget, sans-serif;
+  position: relative;
+  top: -3px;
+  left: 2px;
+}
+
 /* Blink Animation*/
 .blink {
   animation: blinker 2s linear infinite;
@@ -473,20 +533,6 @@ list-style:none;
     opacity: 0;
   }
 }
-
-/*
-.lilGuy {
-  position:relative;
-  text-indent: -9999px;
-  z-index: 20px;
-  width: 35px;
-  height: 100px;
-  background: url(img/lilGuy.svgoverHand);
-  background-size: 50px 50px;
-  background-repeat: none;
-  fill: #FF0000;
-}
-*/
 
 .doRotate {
   animation: rototo 1s linear infinite;
@@ -615,4 +661,35 @@ a:hover.actionTooltips span {
   margin-top: -17px;
   margin-left: 15px;
   z-index: 999;
+}
+
+.checkmark {
+    display:inline-block;
+    position: relative;
+    width: 22px;
+    height:22px;
+    -ms-transform: rotate(45deg); /* IE 9 */
+    -webkit-transform: rotate(45deg); /* Chrome, Safari, Opera */
+    transform: rotate(45deg);
+    z-index: 5;
+    top: -30px;
+    left: -1px;
+}
+
+.checkmark_stem {
+    position: absolute;
+    width:5px;
+    height:15px;
+    background-color:#444;
+    left:11px;
+    top:4px;
+}
+
+.checkmark_kick {
+    position: absolute;
+    width:6px;
+    height:5px;
+    background-color:#444;
+    left:5px;
+    top:14px;
 }
