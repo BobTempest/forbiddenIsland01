@@ -680,7 +680,7 @@ a:hover.actionTooltips span {
     position: absolute;
     width:5px;
     height:15px;
-    background-color:#444;
+    background-color:#888;
     left:11px;
     top:4px;
 }
@@ -689,7 +689,7 @@ a:hover.actionTooltips span {
     position: absolute;
     width:6px;
     height:5px;
-    background-color:#444;
+    background-color:#888;
     left:5px;
     top:14px;
 }

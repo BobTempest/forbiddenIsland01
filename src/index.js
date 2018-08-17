@@ -82,11 +82,12 @@ const diagonalPaths = {0 : [2, 4], 1 : [3, 5], 2 : [0, 6, 8], 3 : [1,7,9], 4 : [
  const buttons = ["Next", "Cancel", "PickTwoCards 1st", "PickTwoCards 2nd", "Flood"];
 
  const playerSteps = [
-     {id : 0, name : "step_act1outOf3" },
-     {id : 1, name : "step_act2outOf3" },
-     {id : 2, name : "step_act3outOf3" },
-     {id : 3, name : "step_DrawPlayerCards" },
-     {id : 4, name : "step_DrawFloodCards" }
+     {id : 0, name : "act1outOf3", wording : "step_act1outOf3" },
+     {id : 1, name : "act2outOf3", wording : "step_act2outOf3" },
+     {id : 2, name : "act3outOf3", wording : "step_act3outOf3" },
+     {id : 3, name : "DrawPlayerCards01", wording : "step_DrawPlayerCards" },
+     {id : 4, name : "DrawPlayerCards02", wording : "step_DrawPlayerCards" },
+     {id : 5, name : "DrawFloodCards", wording : "step_DrawFloodCards" }
  ];
 
  const endings = [
@@ -476,18 +477,18 @@ class Board extends React.Component {
       this.unblinkTheTiles();
       if (input === "ActionIsDone"){
         let nextStep = this.state.currentStep + 1;
-        if (nextStep === 3){
+        if (nextStep === 3 /*|| nextStep === 4 Ne devrais pas être necessaire */){
           // draw player cards 01
           let newMessage = new UserMessage('letsDrawSomePlayerCards_msg', null, false, [2]);
           this.setState({ currentStep : nextStep, possibleActions : [], blinkPlayer : 99, mainUserMessage : newMessage});
-        } else if (nextStep === 4){
+        } else if (nextStep === 5){
           // flood some tiles.
           this.setState({ currentStep : nextStep });
           let howMuch = this.state.floodMeter.floodFactor;
           let newMessage = new UserMessage(null, lng.letsFloodSomeTiles_msg.format(howMuch) , false, [4]);
           this.setState({ currentStep : nextStep, possibleActions : [], mainUserMessage : newMessage});
         }
-        else if (nextStep === 5){
+        else if (nextStep === 6){
           // next Turn, new Player 0
 
           /* CODE MORT DE GESTION DU BLINK ?
@@ -804,6 +805,7 @@ class Board extends React.Component {
       let newFloodCardsDiscard = tempState.floodCardsDiscard;
       let newFloodCardsOutOfGame = tempState.floodCardsOutOfGame;
       let newFloodMeter = tempState.floodMeter;
+      let newCurrentStep = tempState.currentStep;
 
       let gameIsLost = false;
       let gameOverMsg = "";
@@ -858,6 +860,7 @@ class Board extends React.Component {
       let newMessage = "";
       if (cardNumber == 1){
             newMessage = new UserMessage(null, lng.firstCard_msg.format(this.getStringInTheCatalog(lng, card.loc_key)) + '. <br/><img src='  + card.url + ' width="30px" height="46px"/>', false, [3]);
+            newCurrentStep = 4;
       }else{
             let databag = {userId : this.state.currentPlayerPlaying}
             newMessage = new UserMessage(null, lng.secondCard_msg.format(this.getStringInTheCatalog(lng, card.loc_key)) + '. <br/><img src=' + card.url  + ' width="30px" height="46px"/>', false, [9], databag);
@@ -871,6 +874,7 @@ class Board extends React.Component {
       tempState.floodCardsDiscard = newFloodCardsDiscard;
       tempState.floodCardsOutOfGame = newFloodCardsOutOfGame;
       tempState.floodMeter = newFloodMeter;
+      tempState.currentStep = newCurrentStep;
 
       tempState.gameIsLost = gameIsLost;
       tempState.endMessage = gameOverMsg;
@@ -1449,7 +1453,7 @@ class Board extends React.Component {
       } else if (action === "SkipTurn"){ // skip the whole player turn, goes to next player
              let newMessage = new UserMessage('skipTurn', null, false, [0]);
              this.setState({ mainUserMessage: newMessage,
-                              currentStep: 4});
+                              currentStep: 5});
       } else if (action === "DoSleep"){ // finish the actions, go to card picking
              let newMessage = new UserMessage('sleep', null, false, [0]);
              this.setState({ mainUserMessage: newMessage,
@@ -2112,7 +2116,7 @@ handleTileClick(i) {
     let currentPlayer = this.state.players[this.state.currentPlayerPlaying];
     let str_roleQualifier = this.getStringInTheCatalog(lng, currentPlayer.roleQualifier);
     let str_roleAttachedToName = this.getStringInTheCatalog(lng, currentPlayer.roleAttachedToName);
-    let str_currentStep = this.getStringInTheCatalog(lng, playerSteps[this.state.currentStep].name);
+    let str_currentStep = this.getStringInTheCatalog(lng, playerSteps[this.state.currentStep].wording);
     let langToggleImg = this.state.selectedLanguage === "FR" ? "img/toggle_right.png" : "img/toggle_left.png";
 
     // Either we're in action or before picking the first player card :
@@ -2462,6 +2466,13 @@ handleTileClick(i) {
             ):<span></span>
           }
         </span>
+        &nbsp;
+        {
+          step >= 5 ?
+          <span>F</span> SET A STYLE AND / OR an ICON here
+          :
+          <span>F</span>
+        }
       </div>
     )
   }
