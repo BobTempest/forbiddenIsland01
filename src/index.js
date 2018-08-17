@@ -165,7 +165,7 @@ function DrawSquare(props) {
   if (props.tile.isImmersed){
       squareStyle = ({background: '#01A9DB' });
   }else if (props.tile.isDrawned) {
-      squareStyle = ({background: '#FFF0' });
+      squareStyle = ({background: 'transparent' });
   }else if (props.tile.imgpath.length > 0 && props.tile.name === "helipad") {
       squareStyle = ({background: 'url(' + props.tile.imgpath + ')' });
   } else {
@@ -2420,6 +2420,10 @@ handleTileClick(i) {
 
   renderTurnStepsBoard(){
     let curColor = this.state.players[this.state.currentPlayerPlaying].color;
+    if (this.state.players[this.state.currentPlayerPlaying].role === "Messenger"){
+      curColor = "#CCCCCC";
+    }
+
     let step = this.state.currentStep;
 
     return(
@@ -2435,18 +2439,28 @@ handleTileClick(i) {
         &nbsp;
         <span className="lilcard">
           <span className="inlilcard">1</span>
-          <span class="checkmark">
-              <div class="checkmark_stem"></div>
-              <div class="checkmark_kick"></div>
-          </span>
+          {
+            step >= 4 ?
+              (
+                <span class="checkmark">
+                  <div class="checkmark_stem"></div>
+                  <div class="checkmark_kick"></div>
+                </span>
+            ):<span></span>
+          }
         </span>
         &nbsp;
         <span className="lilcard">
           <span className="inlilcard">2</span>
-          <span class="checkmark">
-              <div class="checkmark_stem"></div>
-              <div class="checkmark_kick"></div>
-          </span>
+          {
+            step >= 5 ?
+              (
+                <span class="checkmark">
+                  <div class="checkmark_stem"></div>
+                  <div class="checkmark_kick"></div>
+                </span>
+            ):<span></span>
+          }
         </span>
       </div>
     )
@@ -2464,7 +2478,7 @@ handleTileClick(i) {
       if (this.state.tiles[i].isDrawned === false){
         document.getElementById("square" + i).style.border = "1px solid #222";
       } else {
-        document.getElementById("square" + i).style.border = "1px solid #FFF0";
+        document.getElementById("square" + i).style.border = "1px solid transparent";// transparent
       }
     }
     return true;
@@ -2490,7 +2504,7 @@ handleTileClick(i) {
   }
 
   graphicallyDoDrawnATile(i){
-    document.getElementById("square" + i).style.border = "1px solid #FFF0";
+    document.getElementById("square" + i).style.border = "1px solid transparent";
   }
 
   retry(){
