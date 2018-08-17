@@ -151,7 +151,7 @@ list-style:none;
 }
 
 .emptySquare {
-  background: #fff0;
+  background: transparent;
   border: 1px solid rgba(0,0,0,0);
   float: left;
   margin-right: 4px;
