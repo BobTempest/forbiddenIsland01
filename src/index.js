@@ -2469,7 +2469,7 @@ handleTileClick(i) {
         &nbsp;
         {
           step >= 5 ?
-          <span>F</span> SET A STYLE AND / OR an ICON here
+          <span>F</span> // SET A STYLE AND / OR an ICON here
           :
           <span>F</span>
         }
