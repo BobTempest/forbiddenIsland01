@@ -301,6 +301,7 @@ class Board extends React.Component {
 
     var nbrOfPlayers = props.nbrOfPlayers;
     var difficultyLevel = props.difficultyLevel;
+    var versionNumber = props.versionNumber;
 
     var tiles = riseTheIsland();
     var playerCardsLeap = generatePlayerCardsLeap();
@@ -333,6 +334,7 @@ class Board extends React.Component {
       floodMeter: floodMeter,
       difficultyLevel: difficultyLevel,
       difficultyLevelString: "",
+      versionNumber: versionNumber,
       //
       pastStates: [],
       //
@@ -362,7 +364,8 @@ class Board extends React.Component {
       cardFlyWith : [],
       inAGetRidOfACardContext : false,
       guysToEvacuate : null,
-      floodingSequence : null
+      floodingSequence : null,
+      showActionableCards : true // TODO report
       // IF ADDING ANYTHING, PLEASE FIX doStatePermutation
     };
 
@@ -2088,12 +2091,12 @@ handleTileClick(i) {
           {
             this.state.players[i].cards.map((card, index) => {
               if (card){
-                return card.name === "helicopter" ?
+                return card.name === "helicopter" && this.state.showActionableCards ?
                     <span key={index} className="activableBoardPlayerCards">
                       <img src={card.url} width="45px" height="70px" onClick={() => this.handleCardClick("helicopterCard", this.state.players[i].id, false)}/>
                       <span className="spanOverHand"><img id={"actionCard:" + index + "::" + i} className="overHand doRotate" src="img/hand.png"/></span>
                     </span>
-                  : card.name === "sandBag" ?
+                  : card.name === "sandBag" && this.state.showActionableCards ?
                       <span key={index} className="activableBoardPlayerCards">
                         <img src={card.url} width="45px" height="70px" onClick={() => this.handleCardClick("sandBagCard", this.state.players[i].id, false)}/>
                         <span className="spanOverHand"><img id={"actionCard:" + index + "::" + i} className="overHand doRotate" src="img/hand.png"/></span>
@@ -2125,7 +2128,7 @@ handleTileClick(i) {
     return (
       <span>
         <div className="messagePanel">
-          <div className="panelTitle"> {lng.mainTitle01}<br/>::ReactJS::<br/>{lng.mainTitle02} <span className="littlePanelInfo">v.0.5.1</span></div>
+          <div className="panelTitle"> {lng.mainTitle01}<br/>::ReactJS::<br/>{lng.mainTitle02} <span className="littlePanelInfo">{this.state.versionNumber}</span></div>
           <div className="littlePanelInfo">English <img id="langToggle" src={langToggleImg} onClick={() => this.doChangeLang()} /> Français</div>
           <div className="littlePanelInfo">{lng.turn} {this.state.turn} | {lng.level} {this.state.difficultyLevelString}</div>
           <div className="littlePanelInfo">{lng.treasuresFound} : {foundTreasures}/4 </div>
@@ -2792,7 +2795,8 @@ class Game extends React.Component {
       languageDistributor: stringsCatalog.fr,
       difficultyLevel: 2, // INIT
       language: "FR",
-      nbrOfPlayers: 4 // INIT
+      nbrOfPlayers: 4,
+      versionNumber: "v0.8" // INIT
     };
    }
 
@@ -2820,12 +2824,13 @@ class Game extends React.Component {
      launchBoard(){
         this.setState(
           { difficultyLevel: this.state.difficultyLevel,
+            versionNumber: this.state.versionNumber,
             nbrOfPlayers: this.state.nbrOfPlayers,
             showStartPanel: false,
             showBoardPanel: true });
 
           ReactDOM.render(
-            <Board nbrOfPlayers={this.state.nbrOfPlayers} difficultyLevel={this.state.difficultyLevel} language={this.state.language}/>,
+            <Board nbrOfPlayers={this.state.nbrOfPlayers} difficultyLevel={this.state.difficultyLevel} language={this.state.language} versionNumber={this.state.versionNumber}/>,
             document.getElementById('game-board'));
      }
 
@@ -2859,7 +2864,7 @@ class Game extends React.Component {
         <div className="game-board" id="game-board" style={showHideBoardPanel}></div>
         <div id="start-panel" className="game-start-panel" style={showHideStartPanel}>
           <div></div>
-          <div className="panelTitle"> {lng.mainTitle01}<br/>::ReactJS::<br/>{lng.mainTitle02} <span className="littlePanelInfo">v.0.5.1</span></div>
+          <div className="panelTitle"> {lng.mainTitle01}<br/>::ReactJS::<br/>{lng.mainTitle02}<br/><span className="littlePanelInfo">{this.state.versionNumber}</span></div>
           <div className="introChoices">
             <div>{lng.welcomeIntro}</div>
             <div>{lng.howManyAdventurers}
