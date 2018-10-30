@@ -181,7 +181,7 @@ list-style:none;
 }
 
 .islandBoard {
-  background-image: url("img/sea04.png");
+  background-image: url("./img/sea04.png");
   float: left;
   margin-left: 10px;
 }
@@ -692,4 +692,26 @@ a:hover.actionTooltips span {
     background-color:#888;
     left:5px;
     top:14px;
+}
+
+.floodIndicatorOff {
+    position: absolute;
+    top: 258px;
+    left: 161px;
+    text-decoration:none;
+    font-size: 20px;
+    line-height: 12px;
+    color: #CCC;
+    text-shadow: none;
+}
+
+.floodIndicatorOn {
+    position: absolute;
+    top: 258px;
+    left: 161px;
+    text-decoration:none;
+    font-size: 20px;
+    line-height: 12px;
+    color: #3399ff;
+    text-shadow: 1px 1px 3px #3399ff;
 }

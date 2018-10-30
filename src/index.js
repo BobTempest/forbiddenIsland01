@@ -1610,7 +1610,7 @@ handleTileClick(i) {
                 && this.state.tiles[i].playerOn.length > 0
                 && this.state.currentStep <= 2)
               {
-                if (!this.actionIsInThePosibleActionsListAlready("Give")){
+                if (!this.actionIsInThePossibleActionsListAlready("Give")){
                   let y = n_possibleActions.length - 1;
                   n_possibleActions.splice(y, 0, playerDefaultActions[2]);
                 }
@@ -1626,7 +1626,7 @@ handleTileClick(i) {
               {
                   let dryableTiles = this.whereCanHeDry(i, this.state.players[this.state.cardUser].role);
                   if (dryableTiles.length > 0
-                  && !this.actionIsInThePosibleActionsListAlready("Dry") && !this.actionIsInThePosibleActionsListAlready("Dry two tiles")
+                  && !this.actionIsInThePossibleActionsListAlready("Dry") && !this.actionIsInThePossibleActionsListAlready("Dry two tiles")
                   ){
                         n_possibleActions.splice(1, 0, playerDefaultActions[1]);
                   }
@@ -1641,7 +1641,7 @@ handleTileClick(i) {
                   && this.state.currentStep <= 2)
               {
                   if (this.state.tiles[i].templeFor.length > 0
-                    && !this.actionIsInThePosibleActionsListAlready("Get a Treasure !")){
+                    && !this.actionIsInThePossibleActionsListAlready("Get a Treasure !")){
                     let y = n_possibleActions.length - 1;
                     n_possibleActions.splice(y, 0, playerDefaultActions[3]);
                   }
@@ -2140,7 +2140,7 @@ handleTileClick(i) {
             { showBackButton ?
                 <span className="rollBackButton">
                   <a className="actionTooltips" href="#">
-                    <img className="rollBackButtonImg" src="../img/backButton.png" width="15" height="15" onClick= {() => this.handleRollBack(this.state.currentStep)}/>
+                    <img className="rollBackButtonImg" src="img/backButton.png" width="15" height="15" onClick= {() => this.handleRollBack(this.state.currentStep)}/>
                     <span className="actionTooltipsForRollback inToolTipsText">{this.getStringInTheCatalog(lng, 'ah_rollback')}</span>
                   </a>
                 </span>
@@ -2469,9 +2469,9 @@ handleTileClick(i) {
         &nbsp;
         {
           step >= 5 ?
-          <span>F</span> // SET A STYLE AND / OR an ICON here
+          <span class="floodIndicatorOn blink2">Flood</span> // SET A STYLE AND / OR an ICON here
           :
-          <span>F</span>
+          <span class="floodIndicatorOff">Flood</span>
         }
       </div>
     )
@@ -2532,7 +2532,7 @@ handleTileClick(i) {
     return "** Unknown Treasure was " + id + "**";
   }
 
-  actionIsInThePosibleActionsListAlready(actionName){
+  actionIsInThePossibleActionsListAlready(actionName){
     for(let i = 0 ; i < this.state.possibleActions.length; i++){
       if (this.state.possibleActions[i].name === actionName){
         return true;
@@ -2790,7 +2790,7 @@ class Game extends React.Component {
       showBoardPanel: true,
       showGameOverPanel: false,
       languageDistributor: stringsCatalog.fr,
-      difficultyLevel: 4, // INIT
+      difficultyLevel: 2, // INIT
       language: "FR",
       nbrOfPlayers: 4 // INIT
     };
@@ -2830,13 +2830,7 @@ class Game extends React.Component {
      }
 
   render() {
-    /*
-    let difficultyLevel = 0;
-    let language = "FR";
-    let nbrOfPlayers = 4;
-    */
     let lng = this.state.languageDistributor;
-
 
     const showHideStartPanel = {
       'display': this.state.showStartPanel ? 'block' : 'none'
@@ -2882,11 +2876,6 @@ class Game extends React.Component {
             <div>{lng.language} English <img id="homeLangToggle" src="img/toggle_right.png" onClick={() => this.doChangeLangSelector()} /> Français</div>
             <div><button onClick={() => this.launchBoard()}>{lng.letsGo}</button></div>
           </div>
-        </div>
-
-        <div className="game-info">
-          <div>{/* status */}</div>
-          <ol>{/* TODO */}</ol>
         </div>
       </div>
     );
