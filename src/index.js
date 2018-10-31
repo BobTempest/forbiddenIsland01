@@ -483,23 +483,23 @@ class Board extends React.Component {
         if (nextStep === 3 /*|| nextStep === 4 Ne devrais pas être necessaire */){
           // draw player cards 01
           let newMessage = new UserMessage('letsDrawSomePlayerCards_msg', null, false, [2]);
-          this.setState({ currentStep : nextStep, possibleActions : [], blinkPlayer : 99, mainUserMessage : newMessage});
+          this.setState({ currentStep : nextStep,
+                          possibleActions : [],
+                          blinkPlayer : 99,
+                          mainUserMessage : newMessage,
+                          showActionableCards : true});
         } else if (nextStep === 5){
           // flood some tiles.
           this.setState({ currentStep : nextStep });
           let howMuch = this.state.floodMeter.floodFactor;
           let newMessage = new UserMessage(null, lng.letsFloodSomeTiles_msg.format(howMuch) , false, [4]);
-          this.setState({ currentStep : nextStep, possibleActions : [], mainUserMessage : newMessage});
+          this.setState({ currentStep : nextStep,
+                          possibleActions : [],
+                          mainUserMessage : newMessage,
+                          showActionableCards : true});
         }
         else if (nextStep === 6){
           // next Turn, new Player 0
-
-          /* CODE MORT DE GESTION DU BLINK ?
-          let n_tiles = this.state.tiles;
-          for (let i = 0; i< n_tiles.length; i++){
-              n_tiles[i].blink = false;
-          }*/
-
           if (this.state.currentPlayerPlaying === this.state.players[this.state.players.length -1].id){
             // let newMessage = new UserMessage("Next Turn ! Please " + this.state.players[0].name + ", Choose an action " , false, []);
             let newMessage = new UserMessage(null, lng.nextTurn_msg.format(this.state.players[0].name) , false, []);
@@ -518,6 +518,7 @@ class Board extends React.Component {
                 stateCopy.hasPilotFlownThisTurn = false;
                 stateCopy.whatIsExpectedNext = "CharacterActionButtonClick";
                 stateCopy.mainUserMessage = newMessage;
+                stateCopy.showActionableCards = true;
             let backup = JSON.stringify(stateCopy);
             console.log('****** state copy Size at Next Turn ' + backup.length);
             let n_pastState = [backup];
@@ -532,7 +533,8 @@ class Board extends React.Component {
               hasPilotFlownThisTurn : false,
               whatIsExpectedNext : "CharacterActionButtonClick" ,
               mainUserMessage : newMessage,
-              pastStates : n_pastState
+              pastStates : n_pastState,
+              showActionableCards : true
               });
               // tiles: n_tiles });
           } else {
@@ -551,6 +553,7 @@ class Board extends React.Component {
                 stateCopy.possibleActions = psblactn;
                 stateCopy.whatIsExpectedNext = "CharacterActionButtonClick";
                 stateCopy.mainUserMessage = newMessage;
+                stateCopy.showActionableCards = true;
             let backup = JSON.stringify(stateCopy);
             console.log('****** state copy Size at Next player' + backup.length);
             let n_pastState = [backup];
@@ -564,7 +567,8 @@ class Board extends React.Component {
               possibleActions : psblactn,
               whatIsExpectedNext : "CharacterActionButtonClick",
               mainUserMessage : newMessage,
-              pastStates : n_pastState
+              pastStates : n_pastState,
+              showActionableCards : true
             });
               // tiles: n_tiles
           }
@@ -580,6 +584,7 @@ class Board extends React.Component {
               stateCopy.possibleActions = psblactn;
               stateCopy.whatIsExpectedNext = "CharacterActionButtonClick";
               stateCopy.mainUserMessage = newMessage;
+              stateCopy.showActionableCards = true;
           let backup = JSON.stringify(stateCopy);
           let n_pastState = this.state.pastStates;
           let zarma = n_pastState.push(backup);
@@ -590,7 +595,8 @@ class Board extends React.Component {
             possibleActions : psblactn,
             pastStates: n_pastState,
             whatIsExpectedNext : "CharacterActionButtonClick" ,
-            mainUserMessage : newMessage});
+            mainUserMessage : newMessage,
+            showActionableCards : true});
         }
       }
       // user has to pick two cards from the leap
@@ -709,11 +715,14 @@ class Board extends React.Component {
     let n_userMessage = null;
     let floodingSequence = [number, outOf];
 
+    let showActionableCards = true;
+
     // BRANCHING : Soit on evacue des gars, soit on refais un flood, soit c'est fini
     if (guysToEvacuate.length > 0){
         //message = message + "<br/>!!! WE NEED TO EVACUATE THE TILE !!!</div>";
         message = message + lng.weNeedToEvacuateTheTile;
         n_userMessage = new UserMessage(null, message , false, [8]);
+        showActionableCards = false;
     }
     else if (number === outOf){
       // floodings are finished
@@ -726,7 +735,6 @@ class Board extends React.Component {
       message = message + "</div>";
       n_userMessage = new UserMessage(null, message , false, [5], databag);
     }
-
 
     if (gameOver === true){
       this.setState({
@@ -744,7 +752,8 @@ class Board extends React.Component {
         gameIsLost: gameOver,
         tiles: n_Tiles,
         guysToEvacuate: guysToEvacuate,
-        floodingSequence: floodingSequence});
+        floodingSequence: floodingSequence,
+        showActionableCards: showActionableCards});
     }
   }
 
@@ -942,14 +951,16 @@ class Board extends React.Component {
       let lng = this.state.languageDistributor;
       let n_message = new UserMessage('okWhatsNext', null, false, [10]);
       // ici set un state to recover à 'Voilà, on a utilisé une carte -> next doCheckIfMoreThan5CardsInHand'
-      this.setState({mainUserMessage: n_message, messageBoardState: "default"}, () => {
-        if (type === "H"){
-            this.clickedOnHelicopterCard(userId, true);
-        } else if (type === "SB"){
-            this.clickedOnSandBagCard(userId, true);
-        } else {
-          alert("CONCEPTUAL ERROR : WRONG CARD TYPE");
-        }
+      this.setState({mainUserMessage: n_message,
+                    messageBoardState: "default",
+                    showActionableCards: false }, () => {
+                    if (type === "H"){
+                        this.clickedOnHelicopterCard(userId, true);
+                    } else if (type === "SB"){
+                        this.clickedOnSandBagCard(userId, true);
+                    } else {
+                      alert("CONCEPTUAL ERROR : WRONG CARD TYPE");
+                    }
       });
   }
 
@@ -967,7 +978,8 @@ class Board extends React.Component {
                     messageBoardState_toRestore: n_messageBoardState_toRestore,
                     messageBoardState: "ChooseCoTravellers",
                     inAGetRidOfACardContext: inAGetRidOfACardContext,
-                    cardUser : playerId });
+                    cardUser : playerId,
+                    showActionableCards : false });
   }
 
   helicopterCardEnRoute(playerId, travellers){
@@ -986,6 +998,7 @@ class Board extends React.Component {
     // displays the possible destinations
     let tilesToLight = this.whereCanHeFly(this.state.players[playerId].position);
     this.state.players[playerId].whereCanHeFly = tilesToLight;
+    this.state.showActionableCards = false;
     let nada = this.lightTheTiles(tilesToLight, this.state.players[playerId].color);
     // set state
     let n_messageBoardState = "default";
@@ -1015,7 +1028,8 @@ class Board extends React.Component {
                     messageBoardState_toRestore: null,
                     inAGetRidOfACardContext: false,
                     // cardUser : null,
-                    coTravellers : null });
+                    coTravellers : null,
+                    showActionableCards: true });
   }
 
   clickedOnSandBagCard(playerId, inAGetRidOfACardContext) {
@@ -1035,7 +1049,8 @@ class Board extends React.Component {
                     mainUserMessage: newMessage,
                     messageBoardState_toRestore: this.state.messageBoardState,
                     inAGetRidOfACardContext: inAGetRidOfACardContext,
-                    cardUser : playerId });
+                    cardUser : playerId,
+                    showActionableCards: false });
     return null;
   }
 
@@ -1049,6 +1064,7 @@ class Board extends React.Component {
                     messageBoardState: this.state.messageBoardState_toRestore,
                     messageBoardState_toRestore: null,
                     inAGetRidOfACardContext: false,
+                    showActionableCards: true
                     // cardUser : null
                    });
   }
@@ -1327,15 +1343,18 @@ class Board extends React.Component {
               let nada = this.lightTheTiles(tilesToLight, this.state.players[id].color);
               // set a new Expected PlayerInput
               let newMessage = new UserMessage('chooseADestination', null, false, [1]);
-              this.setState({ whatIsExpectedNext: "TileButtonClickForMove" ,
-                              mainUserMessage: newMessage });
+              this.setState({ whatIsExpectedNext : "TileButtonClickForMove" ,
+                              mainUserMessage : newMessage,
+                              showActionableCards : false });
             }
       } if (action === "Fly"){
           let tilesToLight = this.whereCanHeFly(this.state.players[id].position);
           this.state.players[id].whereCanHeFly = tilesToLight;
           let nada = this.lightTheTiles(tilesToLight, this.state.players[id].color);
           let newMessage = new UserMessage('chooseALandingDestination', null, false, [1]);
-          this.setState({ whatIsExpectedNext: "TileButtonClickForFly" , mainUserMessage: newMessage });
+          this.setState({ whatIsExpectedNext: "TileButtonClickForFly" ,
+                          mainUserMessage: newMessage ,
+                          showActionableCards : false });
       } else if (action === "Dry" || action === "DryAround"){
             let tilesToLight = this.whereCanHeDry(this.state.players[id].position, this.state.players[id].role);
             if (tilesToLight.length === 0 ){
@@ -1346,7 +1365,8 @@ class Board extends React.Component {
               let nada = this.lightTheTiles(tilesToLight, this.state.players[id].color);
               let newMessage = new UserMessage('nowChooseATileToDry', null, false, [1]);
               this.setState({ whatIsExpectedNext: "TileButtonClickForDry",
-                              mainUserMessage: newMessage});
+                              mainUserMessage: newMessage,
+                              showActionableCards : false });
             }
       } else if (action === "DryTwoTiles"){
             let tilesToLight = this.whereCanHeDry(this.state.players[id].position, this.state.players[id].role);
@@ -1358,13 +1378,15 @@ class Board extends React.Component {
               let nada = this.lightTheTiles(tilesToLight, this.state.players[id].color);
               let newMessage = new UserMessage('onlyOneTileToDry', null, false, [1]);
               this.setState({ whatIsExpectedNext: "TileButtonClickForDry" ,
-                              mainUserMessage: newMessage});
+                              mainUserMessage: newMessage,
+                              showActionableCards : false });
             } else {
               this.state.players[id].whereCanHeDry = tilesToLight;
               let nada = this.lightTheTiles(tilesToLight, this.state.players[id].color);
               let newMessage = new UserMessage('nowChooseTwoTilesToDry', null, false, [1]);
               this.setState({ whatIsExpectedNext: "TileButtonClickForDryTwoTimes" ,
-                              mainUserMessage: newMessage});
+                              mainUserMessage: newMessage,
+                              showActionableCards : false });
             }
       } else if (action === "Give") {
               let playersAround = this.getPlayersOnTheSameTileExceptMe();
@@ -1376,7 +1398,8 @@ class Board extends React.Component {
                   this.showActionButtons();
               } else {
                 this.setState({ whatIsExpectedNext: "ResolveUserDialogSequence" ,
-                                messageBoardState: "giveACardSequence"});
+                                messageBoardState: "giveACardSequence",
+                                showActionableCards : false });
               }
       } else if (action === "SendACard") {
             if (this.state.players[id].cards.length < 1 ){
@@ -1384,7 +1407,8 @@ class Board extends React.Component {
               this.showActionButtons();
             } else {
               this.setState({ whatIsExpectedNext: "ResolveUserDialogSequence" ,
-                              messageBoardState: "sendACardSequence"});
+                              messageBoardState: "sendACardSequence",
+                              showActionableCards : false });
             }
       } else if (action === "GetATreasure") {
               let treasureId = this.state.tiles[this.state.players[id].position].templeFor;
@@ -1444,12 +1468,13 @@ class Board extends React.Component {
                       this.setState({ mainUserMessage: newMessage,
                                       posessedTreasures: n_posessedTreasures,
                                       players: n_players,
-                                      playerCardsDiscard: n_playerCardsDiscard
+                                      playerCardsDiscard: n_playerCardsDiscard,
+                                      showActionableCards : false
                                     });
               }
           }
       } else if (action === "MoveSomeone") {
-              this.setState({ whatIsExpectedNext: "ResolveUserDialogSequence" , messageBoardState: "moveSomeOneSequence"});
+              this.setState({ whatIsExpectedNext: "ResolveUserDialogSequence" , messageBoardState: "moveSomeOneSequence", showActionableCards : false });
       } else if (action === "DoNothing"){ // skip one action
               let newMessage = new UserMessage('doingNothing', null, false, [0]);
               this.setState({ mainUserMessage: newMessage});
@@ -1712,7 +1737,8 @@ handleTileClick(i) {
                           messageBoardState_toRestore: null,
                           whatIsExpectedNext_toRestore: null,
                           mainUserMessage_toRestore: null,
-                          inAGetRidOfACardContext: false });
+                          inAGetRidOfACardContext: false,
+                          showActionableCards: true });
           let nada = this.unlightTheTiles();
         }
         else {
