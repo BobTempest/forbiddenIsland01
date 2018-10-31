@@ -2031,7 +2031,8 @@ handleTileClick(i) {
         cardFlyWith : newState.cardFlyWith,
         inAGetRidOfACardContext : newState.inAGetRidOfACardContext,
         guysToEvacuate : newState.guysToEvacuate,
-        floodingSequence : newState.floodingSequence
+        floodingSequence : newState.floodingSequence,
+        showActionableCards : newState.showActionableCards
       });
   }
 
