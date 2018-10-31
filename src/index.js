@@ -1697,7 +1697,8 @@ handleTileClick(i) {
                             playerCardsDiscard: n_PlayerCardsDiscard,
                             messageBoardState_toRestore: null,
                             whatIsExpectedNext_toRestore: null,
-                            inAGetRidOfACardContext: false });
+                            inAGetRidOfACardContext: false,
+                            showActionableCards: true });
             let nada = this.unlightTheTiles();
         } else {
           alert(lng.cantFlyThereWithHisHCard);
