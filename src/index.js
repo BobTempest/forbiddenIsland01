@@ -70,7 +70,7 @@ const diagonalPaths = {0 : [2, 4], 1 : [3, 5], 2 : [0, 6, 8], 3 : [1,7,9], 4 : [
    14 : [7,9,18,20], 15 : [8,10,19,21], 16 : [9,11,20], 17 : [10,21], 18 : [12,14,22], 19 : [13,15,23], 20 : [14,16,22],
    21 : [15,17,23], 22 : [18,20], 23 : [19,21]};
 
- const gameSteps = ["init", "startTurn", "playerActionOne", "playerActionTwo", "playerActionThree", "playerPickACard", "floodRise", "endTurn", "final"];
+ // const gameSteps = ["init", "startTurn", "playerActionOne", "playerActionTwo", "playerActionThree", "playerPickACard", "floodRise", "endTurn", "final"];
 
  const treasures = [
      { id : "CR" , name : "crystal", loc_key : "tr_crystal", trophyImg : "img/wonCrystal.png" },
@@ -79,7 +79,7 @@ const diagonalPaths = {0 : [2, 4], 1 : [3, 5], 2 : [0, 6, 8], 3 : [1,7,9], 4 : [
      { id : "ST" , name : "statue", loc_key : "tr_statue", trophyImg : "img/wonStatue.png"}
  ];
 
- const buttons = ["Next", "Cancel", "PickTwoCards 1st", "PickTwoCards 2nd", "Flood"];
+ // const buttons = ["Next", "Cancel", "PickTwoCards 1st", "PickTwoCards 2nd", "Flood"];
 
  const playerSteps = [
      {id : 0, name : "act1outOf3", wording : "step_act1outOf3" },
@@ -90,6 +90,7 @@ const diagonalPaths = {0 : [2, 4], 1 : [3, 5], 2 : [0, 6, 8], 3 : [1,7,9], 4 : [
      {id : 5, name : "DrawFloodCards", wording : "step_DrawFloodCards" }
  ];
 
+/*
  const endings = [
     {id : 0, name : "gameNotFinished", loc_key : "" },
     {id : 1, name : "aventurerIsDrawned", loc_key : "end_aventurerIsDrawned" },
@@ -98,13 +99,16 @@ const diagonalPaths = {0 : [2, 4], 1 : [3, 5], 2 : [0, 6, 8], 3 : [1,7,9], 4 : [
     {id : 4, name : "heliportDisapeared", loc_key : "end_heliportDisapeared" },
     {id : 9, name : "victory", loc_key : "end_victory" }
  ];
+ */
 
+/*
   const levels = [
     {id : 0, loc_key : "novice" },
     {id : 1, loc_key : "normal" },
     {id : 2, loc_key : "elite" },
     {id : 3, loc_key : "legendary" },
   ];
+  */
 
  const playerDefaultActions = [
       {id : 0, name : "Move", locName: "ac_move", locHelp: "ah_move", enabled : true, triggers : "Move" }, //has an adjacent tile around ?
@@ -321,6 +325,9 @@ class Board extends React.Component {
 
     var possibleActions = this.getPossibleActions(players[0], false, true);
 
+    var gameID = generateGUID();
+    var userAgent = navigator.userAgent;
+
     this.state = {
       tiles: tiles,
       playerCardsLeap: playerCardsLeap,
@@ -342,6 +349,8 @@ class Board extends React.Component {
       gameIsWon: false,
       gameIsOver: false,
       endMessage: "",
+      gameID: gameID,
+      userAgent: userAgent,
       //
       languageDistributor: props.language === "FR" ? stringsCatalog.fr : stringsCatalog.en,
       selectedLanguage: props.language === "FR" ? "FR" : "EN",
@@ -372,7 +381,6 @@ class Board extends React.Component {
     function getInitialPlayerPosition(player, y, z){
       //start hack
       // tiles[14].playerOn.push(player.id);
-
       for (let i = 0; i < tiles.length; i++){
         if (tiles[i].startBase === player.type){
           player.position = tiles[i].position;
@@ -462,14 +470,16 @@ class Board extends React.Component {
           stateCopy.mainUserMessage = n_userMessage;
 
       let n_pastState = JSON.stringify(stateCopy);
-      console.log('****** state copy Size at init ' + n_pastState.length);
+      // console.log('****** state copy Size at init ' + n_pastState.length);
       this.setState({
         floodCardsLeap: n_FloodCardsLeap,
         floodCardsDiscard: n_FloodCardsDiscard,
         tiles: n_Tiles,
         mainUserMessage: n_userMessage,
         difficultyLevelString: difficultyLevelString,
-        pastStates: [n_pastState]});
+        pastStates: [n_pastState]}, () => {
+            doLog("START", this.state, 1);
+        });
   }
 
   controller(input, data){
@@ -2036,6 +2046,8 @@ handleTileClick(i) {
         gameIsWon: newState.gameIsWon,
         gameIsOver: newState.gameIsOver,
         endMessage: newState.endMessage,
+        gameID: newState.gameID,
+        userAgent: newState.userAgent,
         //
         languageDistributor: newState.languageDistributor,
         selectedLanguage: newState.selectedLanguage,
@@ -2364,7 +2376,7 @@ handleTileClick(i) {
       let userId = this.state.cardUser;
       let color = this.state.players[userId].color;
       let name = this.state.players[userId].name;
-      let cardsInHand = this.state.players[userId].cards;
+      // let cardsInHand = this.state.players[userId].cards;
       // console.log("user is : " + user + ". His cards : " + cardsInHand);
 
       return(
@@ -2928,7 +2940,7 @@ class Tile {
     this.backgroundColor = backgroundColor; // string
     this.TextToDisplay = TextToDisplay; // string
     this.LittleTextToDisplay = LittleTextToDisplay; // string
-    this.imgpath = "/img/" + name + "Tile.png"; // string
+    this.imgpath = "./img/" + name + "Tile.png"; // string
   }
 }
 
@@ -2950,9 +2962,11 @@ class Player {
     this.whereCanHeDry = null;
     this.imgpath = "/images/char" + role + ".png"; // string
 
+    /*
     printIntroduction: {
         console.log(`My name is ${this.name}. Im an ${this.role} and my color is ${this.color}`);
     }
+    */
   }
 }
 
@@ -3096,6 +3110,40 @@ function shuffleArray(a) {
     }
     return a;
 }
+
+function generateGUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+    });
+  }
+
+  function doLog(msg, state, startUp){
+    var nbrOfDrawnTiles = 0;
+    for(var i = 0; i < state.tiles.length; i++){
+      if (state.tiles[i].isDrawned){
+        nbrOfDrawnTiles++;
+      }
+    }
+
+    var logString = Date.now() + "|";
+    // game
+    logString += state.gameID + "|";
+    logString += msg + "|";
+    logString += state.nbrOfPlayers + "|";
+    logString += state.difficultyLevel + "|";
+    logString += state.selectedLanguage + "|";
+    logString += state.versionNumber + "|";
+    // current state
+    logString += state.turn + "|";
+    logString += state.currentPlayerPlaying + "|";
+    logString += state.posessedTreasures.length + "|";
+    logString += state.floodMeter.level + "|";
+    logString += nbrOfDrawnTiles + "|";
+    logString += state.userAgent;
+
+    console.log(logString);
+  }
 
 // ========================================
 
