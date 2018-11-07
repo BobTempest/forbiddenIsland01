@@ -3148,9 +3148,9 @@ function generateGUID() {
     logString += nbrOfDrawnTiles;
 
     console.log(logString);
-    var logUrl = logHost + "?" + encodeURI(logString);
+    var logUrl = logHost + "?stf=" + logString;
      // WORKS ! UNCOMMENT TO MAKE IT LIVE :
-     // httpGetAsync(logUrl);
+     httpGetAsync(logUrl);
   }
 
 function httpGetAsync(logUrl)
