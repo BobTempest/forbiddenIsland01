@@ -4,6 +4,8 @@ import './index.css';
 
 import {stringsCatalog} from './strings.js';
 
+const logHost = "http://www.boulezrepublic.com/lileinterdite/logs/receiver.php";
+
 const playerTypes = [
   {
     id : 0,
@@ -326,7 +328,6 @@ class Board extends React.Component {
     var possibleActions = this.getPossibleActions(players[0], false, true);
 
     var gameID = generateGUID();
-    var userAgent = navigator.userAgent;
 
     this.state = {
       tiles: tiles,
@@ -350,7 +351,6 @@ class Board extends React.Component {
       gameIsOver: false,
       endMessage: "",
       gameID: gameID,
-      userAgent: userAgent,
       //
       languageDistributor: props.language === "FR" ? stringsCatalog.fr : stringsCatalog.en,
       selectedLanguage: props.language === "FR" ? "FR" : "EN",
@@ -478,7 +478,7 @@ class Board extends React.Component {
         mainUserMessage: n_userMessage,
         difficultyLevelString: difficultyLevelString,
         pastStates: [n_pastState]}, () => {
-            doLog("START", this.state, 1);
+            doLog("START", "","", this.state);
         });
   }
 
@@ -673,6 +673,7 @@ class Board extends React.Component {
               gameOver = true;
               gameOverMsg = lng.explorersCantLeaveTheIsland;
               gameOverCode = 4; // helipad disapeared
+              doLog("GAMEOVER", "helipadIsDrawned", "", this.state);
             }
             // rescue some players ?
             guysToEvacuate = n_Tiles[j].playerOn;
@@ -696,6 +697,7 @@ class Board extends React.Component {
                          gameOver = true;
                          gameOverMsg = lng.allTheTemplesAreDrawned.format(this.getTreasureNameById(n_Tiles[j].templeFor));
                          gameOverCode = 3; // all the temples for one undiscovered treasure disapeared
+                         doLog("GAMEOVER", "twoTemplesAreDrawned", "", this.state);
                       }
                       break;
                     }
@@ -792,6 +794,7 @@ class Board extends React.Component {
         gameIsLost = true;
         gameOverMsg = lng.nowhereHeCanGo.format(drawningGuy.name);
         gameOverCode = 1; // guy drawned
+        doLog("GAMEOVER", "guyIsDrawned", "", this.state);
       } else {
         this.lightTheTiles(tilesToLight, drawningGuy.color);
         newMessage = new UserMessage('chooseADestinationToEvacuate', null, false, []);
@@ -863,6 +866,7 @@ class Board extends React.Component {
             gameIsLost = true;
             gameOverMsg = lng.topLevelReached;
             gameOverCode = 2; // guy drawned
+            doLog("GAMEOVER", "islandIsDrawned", "", this.state);
           }
 
           // put the flood card in the discards
@@ -1014,6 +1018,7 @@ class Board extends React.Component {
     let n_messageBoardState = "default";
 
     if (victory === true){
+        doLog("GAME_WON","","", this.state);
         this.setState({
             mainUserMessage: new UserMessage(null, lng.youWonMsg.format(this.state.nbrOfPlayers), false, []),
             gameIsOver: true,
@@ -1081,7 +1086,7 @@ class Board extends React.Component {
 
   howManyCards(level){
     // flood scale :  |12|345|67|89|
-    //                    |2 |3  |4 |5 |
+    //                   |2 |3  |4 |5 |
     if (level < 3){
         return 2;
     } else if (level < 6) {
@@ -2047,7 +2052,6 @@ handleTileClick(i) {
         gameIsOver: newState.gameIsOver,
         endMessage: newState.endMessage,
         gameID: newState.gameID,
-        userAgent: newState.userAgent,
         //
         languageDistributor: newState.languageDistributor,
         selectedLanguage: newState.selectedLanguage,
@@ -2489,9 +2493,9 @@ handleTileClick(i) {
           {
             step >= 4 ?
               (
-                <span class="checkmark">
-                  <div class="checkmark_stem"></div>
-                  <div class="checkmark_kick"></div>
+                <span className ="checkmark">
+                  <div className ="checkmark_stem"></div>
+                  <div className ="checkmark_kick"></div>
                 </span>
             ):<span></span>
           }
@@ -2502,9 +2506,9 @@ handleTileClick(i) {
           {
             step >= 5 ?
               (
-                <span class="checkmark">
-                  <div class="checkmark_stem"></div>
-                  <div class="checkmark_kick"></div>
+                <span className ="checkmark">
+                  <div className ="checkmark_stem"></div>
+                  <div className ="checkmark_kick"></div>
                 </span>
             ):<span></span>
           }
@@ -2512,9 +2516,9 @@ handleTileClick(i) {
         &nbsp;
         {
           step >= 5 ?
-          <span class="floodIndicatorOn blink2">Flood</span> // SET A STYLE AND / OR an ICON here
+          <span className ="floodIndicatorOn blink2">Flood</span>
           :
-          <span class="floodIndicatorOff">Flood</span>
+          <span className ="floodIndicatorOff">Flood</span>
         }
       </div>
     )
@@ -2836,7 +2840,7 @@ class Game extends React.Component {
       difficultyLevel: 2, // INIT
       language: "FR",
       nbrOfPlayers: 4,
-      versionNumber: "v0.8" // INIT
+      versionNumber: "v0.8.1 BETA" // INIT
     };
    }
 
@@ -3118,7 +3122,7 @@ function generateGUID() {
     });
   }
 
-  function doLog(msg, state, startUp){
+  function doLog(msg, msg2, msg3, state){
     var nbrOfDrawnTiles = 0;
     for(var i = 0; i < state.tiles.length; i++){
       if (state.tiles[i].isDrawned){
@@ -3130,6 +3134,8 @@ function generateGUID() {
     // game
     logString += state.gameID + "|";
     logString += msg + "|";
+    logString += msg2 + "|";
+    logString += msg3 + "|";
     logString += state.nbrOfPlayers + "|";
     logString += state.difficultyLevel + "|";
     logString += state.selectedLanguage + "|";
@@ -3139,11 +3145,27 @@ function generateGUID() {
     logString += state.currentPlayerPlaying + "|";
     logString += state.posessedTreasures.length + "|";
     logString += state.floodMeter.level + "|";
-    logString += nbrOfDrawnTiles + "|";
-    logString += state.userAgent;
+    logString += nbrOfDrawnTiles;
 
     console.log(logString);
+    var logUrl = logHost + "?" + encodeURI(logString);
+     // WORKS ! UNCOMMENT TO MAKE IT LIVE :
+     // httpGetAsync(logUrl);
   }
+
+function httpGetAsync(logUrl)
+{
+    var xmlHttp = new XMLHttpRequest();
+    /*
+    NOT USED
+    xmlHttp.onreadystatechange = function() {
+        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+            callback(xmlHttp.responseText);
+    }
+    */
+    xmlHttp.open("GET", logUrl, true); // true for asynchronous
+    xmlHttp.send(null);
+}
 
 // ========================================
 
