@@ -1680,11 +1680,9 @@ handleTileClick(i) {
 
               // Same. if after a fly, one lands on a temple and is currently playing,
               // Check if it's not in possibleActions already and let's add the Get A Treasure action
-              if (this.state.currentPlayerPlaying === this.state.cardUser
-                  && this.state.currentStep <= 2)
+              if (this.state.tiles[i].templeFor.length > 0 && this.state.currentStep <= 2)
               {
-                  if (this.state.tiles[i].templeFor.length > 0
-                    && !this.actionIsInThePossibleActionsListAlready("Get a Treasure !")){
+                  if (!this.actionIsInThePossibleActionsListAlready("Get a Treasure !")){
                     let y = n_possibleActions.length - 1;
                     n_possibleActions.splice(y, 0, playerDefaultActions[3]);
                   }
