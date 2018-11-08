@@ -1643,13 +1643,13 @@ handleTileClick(i) {
             player.whereCanHeFly = [];
             n_Players[player.id] = player;
 
-            // If the currently active is the flyer or if the current player is on the reception ISLAND
+            // If the currently active is the flyer or in the flight or if the current player is on the reception ISLAND
             // and destination tile has a guy on it and he's not the messanger,
             // recalculate the current active player possible actions to include the 'give' action unless he is the messenger
-
             let n_possibleActions = this.state.possibleActions;
             if ((this.state.currentPlayerPlaying === this.state.cardUser
-                || this.state.tiles[i].playerOn.indexOf(this.state.currentPlayerPlaying) >= 0)
+                || this.state.tiles[i].playerOn.indexOf(this.state.currentPlayerPlaying) >= 0
+                || this.state.coTravellers.indexOf(this.state.currentPlayerPlaying) >= 0)
                 && this.state.tiles[i].playerOn.length > 0
                 && this.state.currentStep <= 2)
               {
@@ -1664,8 +1664,7 @@ handleTileClick(i) {
 
               // Same. if after a fly, one lands on a flooded or surrounded by flooded tiles and is currently playing,
               // Check if it's not in possibleActions already and let's add the DRY action
-              if (this.state.currentPlayerPlaying === this.state.cardUser
-                  && this.state.currentStep <= 2)
+              if (this.state.currentStep <= 2)
               {
                   let dryableTiles = this.whereCanHeDry(i, this.state.players[this.state.cardUser].role);
                   if (dryableTiles.length > 0
