@@ -673,7 +673,7 @@ class Board extends React.Component {
               gameOver = true;
               gameOverMsg = lng.explorersCantLeaveTheIsland;
               gameOverCode = 4; // helipad disapeared
-              doLog("GAMEOVER", "helipadIsDrawned", "", this.state);
+              doLog("GAME_LOST", "helipadIsDrawned", "", this.state);
             }
             // rescue some players ?
             guysToEvacuate = n_Tiles[j].playerOn;
@@ -697,7 +697,7 @@ class Board extends React.Component {
                          gameOver = true;
                          gameOverMsg = lng.allTheTemplesAreDrawned.format(this.getTreasureNameById(n_Tiles[j].templeFor));
                          gameOverCode = 3; // all the temples for one undiscovered treasure disapeared
-                         doLog("GAMEOVER", "twoTemplesAreDrawned", "", this.state);
+                         doLog("GAME_LOST", "twoTemplesAreDrawned", "", this.state);
                       }
                       break;
                     }
@@ -794,7 +794,7 @@ class Board extends React.Component {
         gameIsLost = true;
         gameOverMsg = lng.nowhereHeCanGo.format(drawningGuy.name);
         gameOverCode = 1; // guy drawned
-        doLog("GAMEOVER", "guyIsDrawned", "", this.state);
+        doLog("GAME_LOST", "guyIsDrawned", "", this.state);
       } else {
         this.lightTheTiles(tilesToLight, drawningGuy.color);
         newMessage = new UserMessage('chooseADestinationToEvacuate', null, false, []);
@@ -866,7 +866,7 @@ class Board extends React.Component {
             gameIsLost = true;
             gameOverMsg = lng.topLevelReached;
             gameOverCode = 2; // guy drawned
-            doLog("GAMEOVER", "islandIsDrawned", "", this.state);
+            doLog("GAME_LOST", "islandIsDrawned", "", this.state);
           }
 
           // put the flood card in the discards
