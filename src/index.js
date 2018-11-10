@@ -4,7 +4,7 @@ import './index.css';
 
 import {stringsCatalog} from './strings.js';
 
-const logHost = "http://www.boulezrepublic.com/lileinterdite/logs/receiver.php";
+const logHost = "https://www.boulezrepublic.com/lileinterdite/logs/receiver.php";
 
 const playerTypes = [
   {
