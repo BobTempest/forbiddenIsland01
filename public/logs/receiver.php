@@ -15,7 +15,7 @@
 
    if ($inputLength < 30
       || $inputLength > 200
-      || $numberOfPipes != 13 ){
+      || $numberOfPipes != 14 ){
         $logLine = substr($logLine, 0, 200);
         $logLine = "ERROR:::$logLine";
         $error = true;
@@ -72,6 +72,7 @@ $CurrentPlayerPlay = $elements[10];
 $PosessedTreasures = $elements[11];
 $FloodMeterLevel = $elements[12];
 $NumberOfDrawnedTiles = $elements[13];
+$TeamIsComposedOf = $elements[14];
 // $UserIP = $userIP
 // $UserAgent = $userAgent
 
@@ -87,12 +88,12 @@ if (!$conn) {
 $sql = "INSERT INTO $table (ServerDateTime, ClientTimeStamp, GameId,
   Message01, Message02, Message03, NumberOfPlayers, DifficultyLevel,
   SelectedLanguage, VersionNumber, Turn, CurrentPlayerPlaying, PosessedTreasures,
-  FloodMeterLevel, NumberOfDrawnedTiles, UserIP, UserAgent)
+  FloodMeterLevel, NumberOfDrawnedTiles, TeamIsComposedOf, UserIP, UserAgent)
 VALUES ('$longDate', '$ClientTimeStamp', '$GameId', '$Message01',
   '$Message02', '$Message03', '$NumberOfPlayers', '$DifficultyLevel',
   '$SelectedLanguage', '$VersionNumber', '$Turn', '$CurrentPlayerPlay',
-  '$PosessedTreasures', '$FloodMeterLevel', '$NumberOfDrawnedTiles', '$userIP',
-  '$userAgent')";
+  '$PosessedTreasures', '$FloodMeterLevel', '$NumberOfDrawnedTiles',
+  '$TeamIsComposedOf', '$userIP', '$userAgent')";
 
 echo "$sql";
 mysql_select_db($dbname);

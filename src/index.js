@@ -10,6 +10,7 @@ const playerTypes = [
   {
     id : 0,
     role : "Engineer", // dry two tiles for one actions
+    shortRole : "Engr",
     color : "#CC0000", // red
     ability : "ab_Engineer",
     name : "Natacha",
@@ -19,6 +20,7 @@ const playerTypes = [
   {
     id : 1,
     role : "Navigator", // move another player from one or two tiles (straight ?) for one action
+    shortRole : "Nav",
     color : "#FFF200", //yellow
     ability : "ab_Navigator",
     name : "Boris",
@@ -28,6 +30,7 @@ const playerTypes = [
   {
     id : 2,
     role : "Messenger", // can give one card for one action to anyone
+    shortRole : "Msgr",
     color : "#FFFFFF", //white
     ability : "ab_Messenger",
     name : "Francois",
@@ -37,6 +40,7 @@ const playerTypes = [
   {
     id : 3,
     role : "Diver", // can move one wet case and one other case
+    shortRole : "Divr",
     color : "#000000", // black
     ability : "ab_Diver",
     name : "Gina",
@@ -46,6 +50,7 @@ const playerTypes = [
   {
     id : 4,
     role : "Explorer", // can move and dry orth and diagonaly
+    shortRole : "Expl",
     color : "#0AB300", //green
     ability : "ab_Explorer",
     name : "Brian",
@@ -55,6 +60,7 @@ const playerTypes = [
   {
     id : 5,
     role : "Pilot", // once per turn, fly where you want for 1 action
+    shortRole : "Pilot",
     color : "#0064b3", //blue
     ability : "ab_Pilot",
     name : "Bob",
@@ -2237,6 +2243,7 @@ handleTileClick(i) {
               </tr>
               :
               this.state.players[giverId].cards.map((card, index) =>
+              // dedoublonner
               <tr>
                 <td><span key={'card'+index}/><input type="radio" name="chosenCard" key={index} value={card.id} onChange={() => chosenCard = card.id} /></td>
                 <td><img src= {card.url}  width="20px" height="32px"/></td>
@@ -3127,6 +3134,15 @@ function generateGUID() {
       }
     }
 
+    var rolesString = "";
+    for (var j = 0; j < state.players.length; j ++){
+      var type = state.players[j].type;
+      rolesString += playerTypes[type].shortRole;
+      if (j < state.players.length - 1){
+        rolesString += "+";
+      }
+    }
+
     var logString = Date.now() + "|";
     // game
     logString += state.gameID + "|";
@@ -3142,7 +3158,8 @@ function generateGUID() {
     logString += state.currentPlayerPlaying + "|";
     logString += state.posessedTreasures.length + "|";
     logString += state.floodMeter.level + "|";
-    logString += nbrOfDrawnTiles;
+    logString += nbrOfDrawnTiles + "|";
+    logString += rolesString;
 
     console.log(logString);
     var logUrl = logHost + "?stf=" + logString;
