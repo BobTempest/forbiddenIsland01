@@ -81,10 +81,10 @@ const diagonalPaths = {0 : [2, 4], 1 : [3, 5], 2 : [0, 6, 8], 3 : [1,7,9], 4 : [
  // const gameSteps = ["init", "startTurn", "playerActionOne", "playerActionTwo", "playerActionThree", "playerPickACard", "floodRise", "endTurn", "final"];
 
  const treasures = [
-     { id : "CR" , name : "crystal", loc_key : "tr_crystal", trophyImg : "img/wonCrystal.png" },
-     { id : "CU" , name : "cup", loc_key : "tr_cup", trophyImg : "img/wonCup.png" },
-     { id : "SC" , name : "sceptre", loc_key : "tr_sceptre", trophyImg : "img/wonSceptre.png"},
-     { id : "ST" , name : "statue", loc_key : "tr_statue", trophyImg : "img/wonStatue.png"}
+     { id : "CR" , name : "crystal", loc_key : "tr_crystal", trophyImg : "img/wonCrystal.png", litTempleImg : "img/tower_crystal.png" },
+     { id : "CU" , name : "cup", loc_key : "tr_cup", trophyImg : "img/wonCup.png", litTempleImg : "img/tower_cup.png"  },
+     { id : "SC" , name : "sceptre", loc_key : "tr_sceptre", trophyImg : "img/wonSceptre.png", litTempleImg : "img/tower_sceptre.png" },
+     { id : "ST" , name : "statue", loc_key : "tr_statue", trophyImg : "img/wonStatue.png", litTempleImg : "img/tower_statue.png" }
  ];
 
  // const buttons = ["Next", "Cancel", "PickTwoCards 1st", "PickTwoCards 2nd", "Flood"];
@@ -307,6 +307,21 @@ function DrawPlayerPawn(props){
   return null;
 }
 
+function DrawLittleTemple(props){
+  if (props.temple.length > 0){
+    let litTempleImgPath = "";
+    for (let i = 0 ; i < treasures.length; i++){
+      if (treasures[i].id === props.temple)
+      {
+        litTempleImgPath = treasures[i].litTempleImg;
+        break;
+      }
+    }
+    return (<span><img className="littleTemple" src={litTempleImgPath} /></span>)
+  }
+  return null;
+}
+
 class Board extends React.Component {
   constructor(props) {
     super(props);
@@ -466,7 +481,7 @@ class Board extends React.Component {
       }
 
       // save the state before the first action
-      var stateCopy = JSON.parse(JSON.stringify(this.state));
+      var stateCopy = JSON.parse(JSON.stringify(this.state)); // ?????? stringify puis parse ?
       // let stateCopy = this.state;
           // reproduce what will be setted in the next setState
           stateCopy.floodCardsLeap = n_FloodCardsLeap;
@@ -2092,7 +2107,7 @@ handleTileClick(i) {
 
   renderEmptySquare() {
     return (
-      <DrawEmptySquare  onClick={() => this.launchGameOver(false, true, "Yolo")} />
+      <DrawEmptySquare /*onClick={() => this.launchGameOver(false, true, "Yolo")} *//>
     );
   }
 
@@ -2242,8 +2257,8 @@ handleTileClick(i) {
                 <td><img src= {this.state.players[giverId].cards[0].url}  width="20px" height="32px"/></td>
               </tr>
               :
-              this.state.players[giverId].cards.map((card, index) =>
               // dedoublonner
+              this.doDedoubleCards(this.state.players[giverId].cards).map((card, index) =>
               <tr>
                 <td><span key={'card'+index}/><input type="radio" name="chosenCard" key={index} value={card.id} onChange={() => chosenCard = card.id} /></td>
                 <td><img src= {card.url}  width="20px" height="32px"/></td>
@@ -2295,7 +2310,7 @@ handleTileClick(i) {
                 <td>{ this.getStringInTheCatalog(lng, this.state.players[giverId].cards[0].loc_key) } </td>
               </tr>
               :
-              this.state.players[giverId].cards.map((card, index) =>
+              this.doDedoubleCards(this.state.players[giverId].cards).map((card, index) =>
               <tr>
                 <td><span key={'card'+index}/><input type="radio" name="chosenCard" key={index} value={card.id} onChange={() => chosenCard = card.id} /></td>
                 <td><img src= {card.url}  width="20px" height="32px"/></td>
@@ -2394,7 +2409,7 @@ handleTileClick(i) {
           <table className="throwTable">
             <tbody>
           {
-            (this.state.players[userId].cards.map((card, index) => {
+            (this.doDedoubleCards(this.state.players[userId].cards).map((card, index) => {
               return (card.type === "H" || card.type === "SB") ?
                   (<tr>
                     <td><span key={index}/>{card.name}</td>
@@ -2602,6 +2617,24 @@ handleTileClick(i) {
 
   showActionButtons() {
       document.getElementById("UserActions").style.display = "block";
+  }
+
+  doDedoubleCards(arrayOfCards) {
+      let output = [];
+      let alreadyIn = [];
+      if (arrayOfCards.length > 0) {
+          alreadyIn.push(arrayOfCards[0].type);
+          output.push(arrayOfCards[0]);
+          if (arrayOfCards.length > 1){
+            for (let i = 1; i < arrayOfCards.length; i ++){
+              if (!alreadyIn.includes(arrayOfCards[i].type)) {
+                output.push(arrayOfCards[i]);
+                alreadyIn.push(arrayOfCards[i].type);
+              }
+            }
+          }
+      }
+      return output;
   }
 
   doChangeLang(){
@@ -2936,7 +2969,7 @@ class Game extends React.Component {
 }
 
 class Tile {
-  constructor(name, position, isImmersed, isDrawned, blink, startBase, templeFor, playerOn, backgroundColor, TextToDisplay, LittleTextToDisplay) {
+  constructor(name, position, isImmersed, isDrawned, blink, startBase, templeFor, playerOn, backgroundColor, textToDisplay, littleTextToDisplay) {
     this.name = name; // string
     this.position = position; // int
     this.isImmersed = isImmersed; // bool
@@ -2946,8 +2979,8 @@ class Tile {
     this.templeFor = templeFor; // string
     this.playerOn = playerOn; // int[]
     this.backgroundColor = backgroundColor; // string
-    this.TextToDisplay = TextToDisplay; // string
-    this.LittleTextToDisplay = LittleTextToDisplay; // string
+    this.TextToDisplay = textToDisplay; // string
+    this.LittleTextToDisplay = littleTextToDisplay; // string
     this.imgpath = "./img/" + name + "Tile.png"; // string
   }
 }
@@ -3164,7 +3197,6 @@ function generateGUID() {
     console.log(logString);
     var logUrl = logHost + "?stf=" + logString;
      // WORKS ! UNCOMMENT TO MAKE IT LIVE :
-     httpGetAsync(logUrl);
   }
 
 function httpGetAsync(logUrl)

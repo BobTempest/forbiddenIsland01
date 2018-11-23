@@ -164,6 +164,13 @@ list-style:none;
   width: 50px;
 }
 
+.littleTemple {
+  position: relative;
+  z-index:8;
+  top: -32px;
+  left: 32px;
+}
+
 .messageBoard-column {
     float: left;
     width: 330px;
