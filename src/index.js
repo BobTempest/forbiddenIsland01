@@ -423,7 +423,7 @@ class Board extends React.Component {
         */
         //end of helicopter Hack
 
-        for (let i = 0; i < 2; i++){ // 2
+        for (let i = 0; i < 2; i++){ // must be 2
        //for (let i = 0; i < 5; i++){ // HACK OF 5 Cards in the beg
             let card = playerCardsLeap.pop();
             while (card.name === "floodRise"){
@@ -953,6 +953,7 @@ class Board extends React.Component {
         this.setState({ whatIsExpectedNext_toRestore : n_whatIsExpectedNext_toRestore,
                         whatIsExpectedNext: "ResolveOver5Cards" ,
                         mainUserMessage_toRestore: this.state.mainUserMessage,
+                        showActionableCards: false,
                         messageBoardState_toRestore: n_messageBoardState_toRestore,
                         messageBoardState: "SolveOver5Cards",
                         cardUser : userId });
@@ -960,6 +961,7 @@ class Board extends React.Component {
         this.setState({
                         whatIsExpectedNext: "ResolveOver5Cards" ,
                         messageBoardState: "SolveOver5Cards",
+                        showActionableCards: false,
                         cardUser : userId });
       }
       return null;
@@ -972,6 +974,7 @@ class Board extends React.Component {
                         whatIsExpectedNext_toRestore: null,
                         mainUserMessage: this.state.mainUserMessage_toRestore,
                         mainUserMessage_toRestore: null,
+                        showActionableCards: true,
                         messageBoardState: "default"});
       }
 
@@ -2490,7 +2493,7 @@ handleTileClick(i) {
                 <button style={showCheckIfMoreThan5SecondTimeStyle} onClick ={() => this.doCheckIfMoreThan5CardsInHand(1, this.state.cardUser)}>{lng.btn_next}</button>
               </div>)
               :
-              (<div><button onClick ={() => this.retry()}>{lng.btn_retry}</button></div>)
+              (<div></div>)
         }
       </div>
       )
