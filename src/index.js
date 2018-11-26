@@ -195,7 +195,8 @@ function DrawSquare(props) {
     squareClass = 'square';
   }
 
-  if (props.tile.blink){
+
+  if (props.doBlink){
     squareClass = squareClass + ' blink';
   }
 
@@ -381,6 +382,7 @@ class Board extends React.Component {
       hasPilotFlownThisTurn : false,
       currentPlayerPlaying : 0,
       blinkPlayer : 0,
+      blinkingTile : -1,
       possibleActions : possibleActions,
       currentStep : 0,
       whatIsExpectedNext : "CharacterActionButtonClick",
@@ -546,6 +548,7 @@ class Board extends React.Component {
                 stateCopy.currentPlayerPlaying = nextPlayer;
                 stateCopy.possibleActions = psblactn;
                 stateCopy.blinkPlayer = nextPlayer;
+                stateCopy.blinkingTile = -1;
                 stateCopy.hasPilotFlownThisTurn = false;
                 stateCopy.whatIsExpectedNext = "CharacterActionButtonClick";
                 stateCopy.mainUserMessage = newMessage;
@@ -560,6 +563,7 @@ class Board extends React.Component {
               turn : nextTurn,
               currentPlayerPlaying : nextPlayer,
               blinkPlayer : nextPlayer,
+              blinkingTile : -1,
               possibleActions : psblactn,
               hasPilotFlownThisTurn : false,
               whatIsExpectedNext : "CharacterActionButtonClick" ,
@@ -581,6 +585,7 @@ class Board extends React.Component {
                 stateCopy.currentStep = 0;
                 stateCopy.currentPlayerPlaying = nextPlayer;
                 stateCopy.blinkPlayer = nextPlayer;
+                stateCopy.blinkingTile = -1;
                 stateCopy.possibleActions = psblactn;
                 stateCopy.whatIsExpectedNext = "CharacterActionButtonClick";
                 stateCopy.mainUserMessage = newMessage;
@@ -588,13 +593,13 @@ class Board extends React.Component {
             let backup = JSON.stringify(stateCopy);
             console.log('****** state copy Size at Next player' + backup.length);
             let n_pastState = [backup];
-            // n_pastState.push(stateCopy);
 
             this.setState({
             // Would you add something here, add it above
               currentStep : 0,
               currentPlayerPlaying : nextPlayer,
               blinkPlayer : nextPlayer,
+              blinkingTile : -1,
               possibleActions : psblactn,
               whatIsExpectedNext : "CharacterActionButtonClick",
               mainUserMessage : newMessage,
@@ -655,6 +660,7 @@ class Board extends React.Component {
     let n_FloodCardsDiscard = this.state.floodCardsDiscard;
     let n_FloodCardsOutOfGame = this.state.floodCardsOutOfGame;
     let floodedTileId = "";
+    let blinkingTile = -1;
 
     //let message = "<div>immersion " + number + " out of " + outOf + ".<br/>";
     let message = lng.immersionXoutofY.format(number, outOf);
@@ -685,8 +691,9 @@ class Board extends React.Component {
             message = message + lng.tileDrawning.format(n_Tiles[j].name, j);
             n_Tiles[j].isImmersed = false;
             n_Tiles[j].isDrawned = true;
-            n_Tiles[j].blink = true;
             this.graphicallyDoDrawnATile(j);
+            blinkingTile = j;
+
             tileHasDrawned = true;
             if (n_Tiles[j].name === "helipad"){
               // alert("The helipad is drawned. GAMEOVER")
@@ -733,7 +740,7 @@ class Board extends React.Component {
             //message = message + n_Tiles[j].name + " at " + j + " is flooded ! ";
             message = message + lng.tileIsFlooded.format(n_Tiles[j].name, j);
             n_Tiles[j].isImmersed = true;
-            n_Tiles[j].blink = true;
+            blinkingTile = j;
         }
 
         break;
@@ -784,6 +791,7 @@ class Board extends React.Component {
         floodCardsDiscard: n_FloodCardsDiscard,
         gameIsLost: gameOver,
         tiles: n_Tiles,
+        blinkingTile: blinkingTile,
         guysToEvacuate: guysToEvacuate,
         floodingSequence: floodingSequence,
         showActionableCards: showActionableCards});
@@ -2079,6 +2087,7 @@ handleTileClick(i) {
         hasPilotFlownThisTurn : newState.hasPilotFlownThisTurn,
         currentPlayerPlaying : newState.currentPlayerPlaying,
         blinkPlayer : newState.blinkPlayer,
+        blinkingTile : newState.blinkingTile,
         possibleActions : newState.possibleActions,
         currentStep : newState.currentStep,
         whatIsExpectedNext : newState.whatIsExpectedNext,
@@ -2100,7 +2109,7 @@ handleTileClick(i) {
   renderSquare(i) {
     return(
       <span>
-        <DrawSquare tile={this.state.tiles[i]} players={this.state.players} index={i} blinkPlayer={this.state.blinkPlayer} onClick={() => this.handleTileClick(i)}/>
+        <DrawSquare tile={this.state.tiles[i]} players={this.state.players} index={i} blinkPlayer={this.state.blinkPlayer} doBlink={this.state.blinkingTile == i} onClick={() => this.handleTileClick(i)}/>
       </span>
     );
   }
@@ -2561,6 +2570,11 @@ handleTileClick(i) {
     return true;
   }
 
+  blinkATile(tileId) {// never called
+      alert("blikATile is Called for tile " + tileId);
+      document.getElementById("square" + tileId).classList.add('blink');
+  }
+
   unblinkTheTiles() {
         for (let i = 0; i < 24; i++){
           if ( document.getElementById("square" + i).classList.contains('blink') ){
@@ -2969,12 +2983,11 @@ class Game extends React.Component {
 }
 
 class Tile {
-  constructor(name, position, isImmersed, isDrawned, blink, startBase, templeFor, playerOn, backgroundColor, textToDisplay, littleTextToDisplay) {
+  constructor(name, position, isImmersed, isDrawned, startBase, templeFor, playerOn, backgroundColor, textToDisplay, littleTextToDisplay) {
     this.name = name; // string
     this.position = position; // int
     this.isImmersed = isImmersed; // bool
     this.isDrawned = isDrawned; // bool
-    this.blink = blink; // bool
     this.startBase = startBase; // int [0-5]
     this.templeFor = templeFor; // string
     this.playerOn = playerOn; // int[]
@@ -3045,30 +3058,30 @@ String.prototype.format = function() {
 };
 
 function riseTheIsland(){
-    var tile01 = new Tile("helipad", 0, false, false, false, 5, "", [], "#A9D0F5", "", "HELIPORT");
-    var tile02 = new Tile("doorBlack", 0, false, false, false, 3, "", [], "#6E6E6E", "", "");
-    var tile03 = new Tile("doorRed", 0, false, false, false, 0, "", [], "#F78181", "", "");
-    var tile04 = new Tile("doorGreen", 0, false, false, false, 4, "", [], "#9FF781", "", "");
-    var tile05 = new Tile("doorWhite", 0, false, false, false, 2, "", [], "#D9D9D9", "", "");
-    var tile06 = new Tile("doorYellow", 0, false, false, false, 1, "", [], "#F2F5A9", "", "");
-    var tile07 = new Tile("temple0001", 0, false, false, false, "", "CR", [], "#bdc3c7", "", "TEMPLE CRYSTAL");
-    var tile08 = new Tile("temple0002", 0, false, false, false, "", "CR", [], "#bdc3c7", "", "TEMPLE CRYSTAL");
-    var tile09 = new Tile("temple0101", 0, false, false, false, "", "CU", [], "#bdc3c7", "", "TEMPLE CUP");
-    var tile10 = new Tile("temple0102", 0, false, false, false, "", "CU", [], "#bdc3c7", "", "TEMPLE CUP");
-    var tile11 = new Tile("temple0201", 0, false, false, false, "", "SC", [], "#bdc3c7", "", "TEMPLE SCEPTRE");
-    var tile12 = new Tile("temple0202", 0, false, false, false, "", "SC", [], "#bdc3c7", "", "TEMPLE SCEPTRE");
-    var tile13 = new Tile("temple0301", 0, false, false, false, "", "ST", [], "#bdc3c7", "", "TEMPLE STATUE");
-    var tile14 = new Tile("temple0302", 0, false, false, false, "", "ST", [], "#bdc3c7", "", "TEMPLE STATUE");
-    var tile15 = new Tile("coast01", 0, false, false, false, "", "", [], "#825a2c", "", "");
-    var tile16 = new Tile("coast02", 0, false, false, false, "", "", [], "#825a2c", "", "");
-    var tile17 = new Tile("coast03", 0, false, false, false, "", "", [], "#825a2c", "", "");
-    var tile18 = new Tile("desert01", 0, false, false, false, "", "", [], "#ffd480", "", "");
-    var tile19 = new Tile("desert02", 0, false, false, false, "", "", [], "#ffd480", "", "");
-    var tile20 = new Tile("desert03", 0, false, false, false, "", "", [], "#ffd480", "", "");
-    var tile21 = new Tile("swamp01", 0, false, false, false, "", "", [], "#bcf0d2", "", "");
-    var tile22 = new Tile("swamp02", 0, false, false, false, "", "", [], "#bcf0d2", "", "");
-    var tile23 = new Tile("swamp03", 0, false, false, false, "", "", [], "#bcf0d2", "", "");
-    var tile24 = new Tile("swamp04", 0, false, false, false, "", "", [], "#bcf0d2", "", "");
+    var tile01 = new Tile("helipad", 0, false, false, 5, "", [], "#A9D0F5", "", "HELIPORT");
+    var tile02 = new Tile("doorBlack", 0, false, false, 3, "", [], "#6E6E6E", "", "");
+    var tile03 = new Tile("doorRed", 0, false, false, 0, "", [], "#F78181", "", "");
+    var tile04 = new Tile("doorGreen", 0, false, false, 4, "", [], "#9FF781", "", "");
+    var tile05 = new Tile("doorWhite", 0, false, false, 2, "", [], "#D9D9D9", "", "");
+    var tile06 = new Tile("doorYellow", 0, false, false, 1, "", [], "#F2F5A9", "", "");
+    var tile07 = new Tile("temple0001", 0, false, false, "", "CR", [], "#bdc3c7", "", "TEMPLE CRYSTAL");
+    var tile08 = new Tile("temple0002", 0, false, false, "", "CR", [], "#bdc3c7", "", "TEMPLE CRYSTAL");
+    var tile09 = new Tile("temple0101", 0, false, false, "", "CU", [], "#bdc3c7", "", "TEMPLE CUP");
+    var tile10 = new Tile("temple0102", 0, false, false, "", "CU", [], "#bdc3c7", "", "TEMPLE CUP");
+    var tile11 = new Tile("temple0201", 0, false, false, "", "SC", [], "#bdc3c7", "", "TEMPLE SCEPTRE");
+    var tile12 = new Tile("temple0202", 0, false, false, "", "SC", [], "#bdc3c7", "", "TEMPLE SCEPTRE");
+    var tile13 = new Tile("temple0301", 0, false, false, "", "ST", [], "#bdc3c7", "", "TEMPLE STATUE");
+    var tile14 = new Tile("temple0302", 0, false, false, "", "ST", [], "#bdc3c7", "", "TEMPLE STATUE");
+    var tile15 = new Tile("coast01", 0, false, false, "", "", [], "#825a2c", "", "");
+    var tile16 = new Tile("coast02", 0, false, false, "", "", [], "#825a2c", "", "");
+    var tile17 = new Tile("coast03", 0, false, false, "", "", [], "#825a2c", "", "");
+    var tile18 = new Tile("desert01", 0, false, false, "", "", [], "#ffd480", "", "");
+    var tile19 = new Tile("desert02", 0, false, false, "", "", [], "#ffd480", "", "");
+    var tile20 = new Tile("desert03", 0, false, false, "", "", [], "#ffd480", "", "");
+    var tile21 = new Tile("swamp01", 0, false, false, "", "", [], "#bcf0d2", "", "");
+    var tile22 = new Tile("swamp02", 0, false, false, "", "", [], "#bcf0d2", "", "");
+    var tile23 = new Tile("swamp03", 0, false, false, "", "", [], "#bcf0d2", "", "");
+    var tile24 = new Tile("swamp04", 0, false, false, "", "", [], "#bcf0d2", "", "");
     // create a 24 array
     let tiles = [tile01,tile02,tile03,tile04,tile05,tile06,tile07,tile08,tile09,tile10,
       tile11,tile12,tile13,tile14,tile15,tile16,tile17,tile18,tile19,tile20,
@@ -3197,6 +3210,7 @@ function generateGUID() {
     console.log(logString);
     var logUrl = logHost + "?stf=" + logString;
      // WORKS ! UNCOMMENT TO MAKE IT LIVE :
+     // TODO RESET the http stuff :)
   }
 
 function httpGetAsync(logUrl)
