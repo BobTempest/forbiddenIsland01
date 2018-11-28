@@ -205,7 +205,6 @@ list-style:none;
 .cardsPilesTable , th, td {
   border: 1px solid #BBB;
   border-collapse: collapse;
-  border-radius: 5px;
   /*width: 346px;*/
 }
 
