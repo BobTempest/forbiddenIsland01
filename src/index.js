@@ -2274,7 +2274,8 @@ handleTileClick(i) {
               <tr>
                 <td><span key={'card'+index}/><input type="radio" name="chosenCard" key={index} value={card.id} onChange={() => chosenCard = card.id} /></td>
                 <td><img src= {card.url}  width="20px" height="32px"/></td>
-                <td>{this.getStringInTheCatalog(lng, card.loc_key)}</td>
+                <td>{this.getStringInTheCatalog(lng, card.loc_key)} <span className="superSmall">x{card.howMany}</span></td>
+
               </tr>
               )
             }
@@ -2326,7 +2327,7 @@ handleTileClick(i) {
               <tr>
                 <td><span key={'card'+index}/><input type="radio" name="chosenCard" key={index} value={card.id} onChange={() => chosenCard = card.id} /></td>
                 <td><img src= {card.url}  width="20px" height="32px"/></td>
-                <td>{ this.getStringInTheCatalog(lng, card.loc_key)}</td>
+                <td>{ this.getStringInTheCatalog(lng, card.loc_key)} <span className="superSmall">x{card.howMany}</span></td>
               </tr>
               )
             }
@@ -2424,17 +2425,17 @@ handleTileClick(i) {
             (this.doDedoubleCards(this.state.players[userId].cards).map((card, index) => {
               return (card.type === "H" || card.type === "SB") ?
                   (<tr>
-                    <td><span key={index}/>{card.name}</td>
+                    <td><span key={index}/>{card.name} <span className="superSmall">x{card.howMany}</span></td>
                     <td> <img src= {card.url}  width="20px" height="32px"/></td>
                     <td><button onClick={() => this.throwCard(card.type, index, userId)}>{lng.btn_throw}</button></td>
                     <td><button onClick={() => this.useACardToGetRidOfIt(card.type, index, userId)}>{lng.btn_use}</button></td>
                   </tr>)
                   :
                   (<tr>
-                    <td><span key={index}/>{card.name}</td>
+                    <td><span key={index}/>{card.name} <span className="superSmall">x{card.howMany}</span></td>
                     <td> <img src= {card.url}  width="20px" height="32px"/></td>
                     <td><button onClick={() => this.throwCard(card.type, index, userId)}>{lng.btn_throw}</button></td>
-                    <td>&nbsp;</td>
+                    <td></td>
                   </tr>)
             }))
           }
@@ -2640,13 +2641,25 @@ handleTileClick(i) {
       let output = [];
       let alreadyIn = [];
       if (arrayOfCards.length > 0) {
+        // 1st card
           alreadyIn.push(arrayOfCards[0].type);
           output.push(arrayOfCards[0]);
+          output[0].howMany = 1;
+          // next cards
           if (arrayOfCards.length > 1){
             for (let i = 1; i < arrayOfCards.length; i ++){
               if (!alreadyIn.includes(arrayOfCards[i].type)) {
+                arrayOfCards[i].howMany = 1;
                 output.push(arrayOfCards[i]);
                 alreadyIn.push(arrayOfCards[i].type);
+              }
+              else {
+                for (let k = 0; k < output.length; k ++){
+                  if (output[k].type === arrayOfCards[i].type){
+                    output[k].howMany ++;
+                    break;
+                  }
+                }
               }
             }
           }
@@ -3104,31 +3117,31 @@ function riseTheIsland(){
 function generatePlayerCardsLeap(){
     let cards = [];
     for (let i = 0; i < 5; i++){
-        let card = { id : i, name : "crystal", loc_key: "ca_crytal", type : "CR", url : "img/crystalCard.png"};
+        let card = { id : i, name : "crystal", loc_key: "ca_crytal", type : "CR", url : "img/crystalCard.png", howMany : 0};
         cards.push(card);
     }
     for (let i = 0; i < 5; i++){
-        let card = { id : i + 5, name : "cup", loc_key: "ca_cup", type : "CU", url : "img/cupCard.png"};
+        let card = { id : i + 5, name : "cup", loc_key: "ca_cup", type : "CU", url : "img/cupCard.png", howMany : 0};
         cards.push(card);
     }
     for (let i = 0; i < 5; i++){
-        let card = { id : i + 10, name : "sceptre", loc_key: "ca_sceptre", type : "SC", url : "img/sceptreCard.png"};
+        let card = { id : i + 10, name : "sceptre", loc_key: "ca_sceptre", type : "SC", url : "img/sceptreCard.png", howMany : 0};
         cards.push(card);
     }
     for (let i = 0; i < 5; i++){
-        let card = {id : i + 15, name : "statue", loc_key: "ca_statue", type : "ST", url : "img/statueCard.png"};
+        let card = {id : i + 15, name : "statue", loc_key: "ca_statue", type : "ST", url : "img/statueCard.png", howMany : 0};
         cards.push(card);
     }
     for (let i = 0; i < 3; i++){
-        let card = { id : i + 20, name : "helicopter", loc_key: "ca_helicopter", type : "H", url : "img/helicopterCard.png"};
+        let card = { id : i + 20, name : "helicopter", loc_key: "ca_helicopter", type : "H", url : "img/helicopterCard.png", howMany : 0};
         cards.push(card);
     }
     for (let i = 0; i < 2; i++){ // 2 cards
-        let card = { id : i + 23, name : "sandBag", loc_key: "ca_sandBag", type : "SB", url : "img/sandBagCard.png"};
+        let card = { id : i + 23, name : "sandBag", loc_key: "ca_sandBag", type : "SB", url : "img/sandBagCard.png", howMany : 0};
         cards.push(card);
     }
     for (let i = 0; i < 3; i++){ // 3 cards
-        let card = { id : i + 25, name : "floodRise", loc_key: "ca_floodRise", type : 5, url : "img/floodRise.png"};
+        let card = { id : i + 25, name : "floodRise", loc_key: "ca_floodRise", type : 5, url : "img/floodRise.png", howMany : 0};
         cards.push(card);
     }
     cards = shuffleArray(cards);
@@ -3213,7 +3226,7 @@ function generateGUID() {
     console.log(logString);
     var logUrl = logHost + "?stf=" + logString;
      // WORKS ! UNCOMMENT TO MAKE IT LIVE :
-     // TODO RESET the http stuff :)
+     // httpGetAsync(logUrl);
   }
 
 function httpGetAsync(logUrl)
