@@ -2202,27 +2202,33 @@ handleTileClick(i) {
     return (
       <span>
         <div className="messagePanel">
-          <div className="panelTitle"> {lng.mainTitle01}<br/>::ReactJS::<br/>{lng.mainTitle02} <span className="littlePanelInfo">{this.state.versionNumber}</span></div>
+          <div className="panelTitle"> {lng.mainTitle01}<br/>{lng.mainTitle02}</div>
+          <div className="panelSubTitle"><b>{this.state.versionNumber}</b></div>
           <div className="littlePanelInfo">English <img id="langToggle" src={langToggleImg} onClick={() => this.doChangeLang()} /> Français</div>
           <div className="littlePanelInfo">{lng.turn} {this.state.turn} | {lng.level} {this.state.difficultyLevelString}</div>
           <div className="littlePanelInfo">{lng.treasuresFound} : {foundTreasures}/4 </div>
           <div className="littlePanelInfo"> {lng.floodLevel} {this.state.floodMeter.level} {lng.xCardsPerFlood.format(this.state.floodMeter.floodFactor)}</div>
+        </div>
+        <div className="messagePanel02">
           <div className="panelInfo"> {currentPlayer.name}&nbsp;{str_roleQualifier}&nbsp;<span style={{color: currentPlayer.color}}>{str_roleAttachedToName}</span>&nbsp;{lng.isPlaying}
-          <br/><span className="superLittlePanelInfo"> {str_currentStep} </span>
-        <br/>{this.renderTurnStepsBoard()}
-      </div>
+            <br/>
+            <span className="superLittlePanelInfo"> {str_currentStep} </span>
+            <br/>
+            {this.renderTurnStepsBoard()}
+          </div>
         </div>
         <div className="actionPanel">
+          { showBackButton ?
+              <span className="rollBackButton">
+                <a className="actionTooltips" href="#">
+                  <img className="rollBackButtonImg" src="img/backButton.png" width="15" height="15" onClick= {() => this.handleRollBack(this.state.currentStep)}/>
+                  <span className="actionTooltipsForRollback inToolTipsText">{this.getStringInTheCatalog(lng, 'ah_rollback')}</span>
+                </a>
+              </span>
+              : <span></span>
+          }
+          {this.renderMessageBoard()}
           <div className="panelInfo" id="UserActions">
-            { showBackButton ?
-                <span className="rollBackButton">
-                  <a className="actionTooltips" href="#">
-                    <img className="rollBackButtonImg" src="img/backButton.png" width="15" height="15" onClick= {() => this.handleRollBack(this.state.currentStep)}/>
-                    <span className="actionTooltipsForRollback inToolTipsText">{this.getStringInTheCatalog(lng, 'ah_rollback')}</span>
-                  </a>
-                </span>
-                : <span></span>
-            }
             <ul>
               {this.state.possibleActions.map((action, index) =>
                 <li key={action.name}>
@@ -2233,9 +2239,6 @@ handleTileClick(i) {
                   </li>
               )}
             </ul>
-          </div>
-          <div className="panelInfo" id="UserDialog">
-              {this.renderMessageBoard()}
           </div>
         </div>
       </span>
@@ -2252,7 +2255,7 @@ handleTileClick(i) {
       let receiver = playersOnTheSameTileExceptMe.length === 1 ? playersOnTheSameTileExceptMe[0] : null;
 
       return (
-          <div>
+          <div className="panelInfo" id="UserDialog">
             {lng.whichCardDoYouWantToGive}
                 { playersOnTheSameTileExceptMe.length === 1 ?
                   (<span> {lng.to} <span style={{color: this.state.players[playersOnTheSameTileExceptMe[0]].color}}>{ this.state.players[playersOnTheSameTileExceptMe[0]].name} </span></span> )
@@ -2306,7 +2309,7 @@ handleTileClick(i) {
       let receiver = otherPlayers.length === 1 ? otherPlayers[0] : null;
 
       return (
-          <div>
+          <div className="panelInfo" id="UserDialog">
             {lng.whichCardDoYouWantToSend}
                     { otherPlayers.length === 1 ?
                       (<span> {lng.to} <span style={{color: this.state.players[otherPlayers[0]].color}}> {this.state.players[otherPlayers[0]].name} </span></span> )
@@ -2369,7 +2372,7 @@ handleTileClick(i) {
         }
 
         return (
-          <div>
+          <div className="panelInfo" id="UserDialog">
             {
                   playersOnTheSameTileExceptMe.length === 0 ? // Ok
                      (<div> <span style={{color: this.state.players[flyerId].color}}>{this.state.players[flyerId].name}</span>{lng.playerChooseALandingDestination}</div>)
@@ -2393,7 +2396,7 @@ handleTileClick(i) {
     } else if (this.state.messageBoardState === "moveSomeOneSequence") {
       let puppet = null;
           return (
-            <div>
+            <div className="panelInfo" id="UserDialog">
               {lng.whoDoYouWantToMove} <br/>
               {
               (this.state.players.map((player, index) => {
@@ -2416,7 +2419,7 @@ handleTileClick(i) {
       // console.log("user is : " + user + ". His cards : " + cardsInHand);
 
       return(
-        <div>
+        <div className="panelInfo" id="UserDialog">
           <span  style={{color: color}}>{name}</span> {lng.hasMoreThan5Card}<br/>
           {lng.letsGetRidOvIt} <br/>
           <table className="throwTable">
@@ -2476,8 +2479,8 @@ handleTileClick(i) {
       }
 
       return(
-          <div><span id="mainMessage" dangerouslySetInnerHTML={{__html: translatedString}} />
-
+          <div className="panelInfo" id="UserDialog">
+          <span id="mainMessage" dangerouslySetInnerHTML={{__html: translatedString}} />
           {
             !gameIsOver ?
               (<div>
@@ -3226,7 +3229,10 @@ function generateGUID() {
     console.log(logString);
     var logUrl = logHost + "?stf=" + logString;
      // WORKS ! UNCOMMENT TO MAKE IT LIVE :
-     // httpGetAsync(logUrl);
+     if (document.URL.indexOf("localhost") < 0){
+            console.log("Logged");
+            httpGetAsync(logUrl);
+     }
   }
 
 function httpGetAsync(logUrl)
