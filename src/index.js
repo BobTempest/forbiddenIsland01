@@ -1559,11 +1559,12 @@ handleCardClick(card, playerId, toThrowIt){
 // Handles a click on a tile
 handleTileClick(i) {
     let lng = this.state.languageDistributor;
-    this.showActionButtons();
+    // this.showActionButtons(); Done : dispatched on each succeeded actions
     if (this.state.whatIsExpectedNext === "TileButtonClickForMove") {
         let player = this.state.players[this.state.currentPlayerPlaying];
         if (player.whereCanHeMove.indexOf(i) >= 0){
             // Move
+            this.showActionButtons();
             let returnPack = this.moveAPlayer(player, i, this.state.players);
             let nada = this.unlightTheTiles();
             if (nada){
@@ -1581,20 +1582,20 @@ handleTileClick(i) {
           let player = this.state.players[this.state.currentPlayerPlaying];
           if (player.whereCanHeFly.indexOf(i) >= 0){
               // Move
-                let returnPack = this.moveAPlayer(player, i, this.state.players);
-                this.setState({ whatIsExpectedNext: "" ,
-                                hasPilotFlownThisTurn: true,
-                                tiles: returnPack.tiles,
-                                players: returnPack.players}, () => {
-                                  this.unlightTheTiles();
-                                  this.controller("ActionIsDone");
-                });
+              this.showActionButtons();
+              let returnPack = this.moveAPlayer(player, i, this.state.players);
+              this.setState({ whatIsExpectedNext: "" ,
+                              hasPilotFlownThisTurn: true,
+                              tiles: returnPack.tiles,
+                              players: returnPack.players}, () => {
+                                this.unlightTheTiles();
+                                this.controller("ActionIsDone");
+              });
           }
           else{
             alert (lng.heCantMoveThere);
           }
       } else if (this.state.whatIsExpectedNext === "TileButtonClickForMoveSomeone") {
-
         let puppet = null;
         for (let i = 0; i < this.state.players.length; i++){
           if (this.state.players[i].isPuppet === true){
@@ -1608,7 +1609,8 @@ handleTileClick(i) {
         }
 
         if (this.puppet.whereCanHeMove.indexOf(i) >= 0){
-            // Move
+              this.showActionButtons();
+              // Move
               let returnPack = this.moveAPlayer(this.puppet, i, this.state.players);
               // virer le puppet flag
               for (let j = 0; j < returnPack.players.length; j++){
@@ -1628,7 +1630,8 @@ handleTileClick(i) {
         let newplayers = this.state.players;
         let newplayer = this.state.players[this.state.currentPlayerPlaying];
         if (newplayer.whereCanHeDry.indexOf(i) >= 0){
-            // Move
+            // Dry
+            this.showActionButtons();
             this.dryATile(i);
             let nada = this.unlightTheTiles();
             if (nada){
@@ -1646,6 +1649,7 @@ handleTileClick(i) {
         let newplayer = this.state.players[this.state.currentPlayerPlaying];
         if (newplayer.whereCanHeDry.indexOf(i) >= 0){
             // Dry
+            this.showActionButtons();
             this.dryATile(i);
             this.unlightATile(i);
             let newMessage = new UserMessage('nowChooseASecondOneToDry', null, false, []);
@@ -1724,11 +1728,15 @@ handleTileClick(i) {
             // Move
             let returnPack = this.moveAGroupOfPlayers(player.id, this.state.coTravellers, i, n_Players, this.state.tiles);
             //
-
+/*
             if (this.state.inAGetRidOfACardContext){
                 // hide the actionbuttons
                 this.hideActionButtons();
+            } else {
+                this.showActionButtons();
             }
+*/
+            this.state.inAGetRidOfACardContext?this.hideActionButtons():this.showActionButtons();
 
             this.setState({ whatIsExpectedNext: this.state.whatIsExpectedNext_toRestore,
                             messageBoardState: this.state.messageBoardState_toRestore,
@@ -1769,9 +1777,15 @@ handleTileClick(i) {
           // Dry
           this.dryATile(i);
 
-          if (this.state.inAGetRidOfACardContext){
-              this.hideActionButtons();
-          }
+          /*
+                      if (this.state.inAGetRidOfACardContext){
+                          // hide the actionbuttons
+                          this.hideActionButtons();
+                      } else {
+                          this.showActionButtons();
+                      }
+          */
+          this.state.inAGetRidOfACardContext?this.hideActionButtons():this.showActionButtons();
 
           this.setState({ whatIsExpectedNext: this.state.whatIsExpectedNext_toRestore,
                           messageBoardState: this.state.messageBoardState_toRestore,
@@ -1792,6 +1806,7 @@ handleTileClick(i) {
       }
       else if (this.state.whatIsExpectedNext === "TileButtonClickForEvacuate") {
         // get player : first of To Evacuate
+        this.showActionButtons(); // not sure about this one
         let n_players = this.state.players;
         let n_guysToEvacuate = this.state.guysToEvacuate;
 
