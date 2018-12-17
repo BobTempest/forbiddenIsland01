@@ -423,7 +423,7 @@ class Board extends React.Component {
         */
         //end of helicopter Hack
 
-        for (let i = 0; i < 2; i++){ // must be 2
+        for (let i = 0; i < 5; i++){ // must be 2
        //for (let i = 0; i < 5; i++){ // HACK OF 5 Cards in the beg
             let card = playerCardsLeap.pop();
             while (card.name === "floodRise"){
@@ -983,11 +983,22 @@ class Board extends React.Component {
   }
 
   throwCard(cardtype, index, userId){
+      // index is wrong. Please trust cardType
       let n_players = this.state.players;
       let n_playerCardsDiscard = this.state.playerCardsDiscard;
 
-      n_playerCardsDiscard.push(n_players[userId].cards[index]);
-      n_players[userId].cards.splice(index, 1);
+      var trueIndex = -1;
+      for (var i = n_players[userId].cards.length -1; i >= 0; i--){
+        if (n_players[userId].cards[i].type == cardtype){
+          trueIndex = i;
+          break;
+        }
+      }
+      alert ("true index is : " + trueIndex + " , was looking for " + cardtype );
+      if (trueIndex >= 0){
+        n_playerCardsDiscard.push(n_players[userId].cards[trueIndex]);
+        n_players[userId].cards.splice(trueIndex, 1);
+      }
 
       this.setState({ players: n_players });
       this.doCheckIfMoreThan5CardsInHand(1, userId); // 1 means : we've been there already, we may want to close the check if more than five cards process.
@@ -2293,7 +2304,6 @@ handleTileClick(i) {
                 <td><span key={'card'+index}/><input type="radio" name="chosenCard" key={index} value={card.id} onChange={() => chosenCard = card.id} /></td>
                 <td><img src= {card.url}  width="20px" height="32px"/></td>
                 <td>{this.getStringInTheCatalog(lng, card.loc_key)} <span className="superSmall">x{card.howMany}</span></td>
-
               </tr>
               )
             }
@@ -2462,7 +2472,9 @@ handleTileClick(i) {
         </div>
       )
     } else if (this.state.messageBoardState === "empty"){
-          <div>++ empty ++</div>
+          return (
+            <div>++ empty ++</div>
+          )
     } else {
       let lng = this.state.languageDistributor;
       // classic message  with one button
