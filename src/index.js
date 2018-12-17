@@ -1559,11 +1559,12 @@ handleCardClick(card, playerId, toThrowIt){
 // Handles a click on a tile
 handleTileClick(i) {
     let lng = this.state.languageDistributor;
-    this.showActionButtons();
+    // this.showActionButtons(); Done : dispatched on each succeeded actions
     if (this.state.whatIsExpectedNext === "TileButtonClickForMove") {
         let player = this.state.players[this.state.currentPlayerPlaying];
         if (player.whereCanHeMove.indexOf(i) >= 0){
             // Move
+            this.showActionButtons();
             let returnPack = this.moveAPlayer(player, i, this.state.players);
             let nada = this.unlightTheTiles();
             if (nada){
@@ -1581,20 +1582,20 @@ handleTileClick(i) {
           let player = this.state.players[this.state.currentPlayerPlaying];
           if (player.whereCanHeFly.indexOf(i) >= 0){
               // Move
-                let returnPack = this.moveAPlayer(player, i, this.state.players);
-                this.setState({ whatIsExpectedNext: "" ,
-                                hasPilotFlownThisTurn: true,
-                                tiles: returnPack.tiles,
-                                players: returnPack.players}, () => {
-                                  this.unlightTheTiles();
-                                  this.controller("ActionIsDone");
-                });
+              this.showActionButtons();
+              let returnPack = this.moveAPlayer(player, i, this.state.players);
+              this.setState({ whatIsExpectedNext: "" ,
+                              hasPilotFlownThisTurn: true,
+                              tiles: returnPack.tiles,
+                              players: returnPack.players}, () => {
+                                this.unlightTheTiles();
+                                this.controller("ActionIsDone");
+              });
           }
           else{
             alert (lng.heCantMoveThere);
           }
       } else if (this.state.whatIsExpectedNext === "TileButtonClickForMoveSomeone") {
-
         let puppet = null;
         for (let i = 0; i < this.state.players.length; i++){
           if (this.state.players[i].isPuppet === true){
@@ -1608,7 +1609,8 @@ handleTileClick(i) {
         }
 
         if (this.puppet.whereCanHeMove.indexOf(i) >= 0){
-            // Move
+              this.showActionButtons();
+              // Move
               let returnPack = this.moveAPlayer(this.puppet, i, this.state.players);
               // virer le puppet flag
               for (let j = 0; j < returnPack.players.length; j++){
@@ -1628,7 +1630,8 @@ handleTileClick(i) {
         let newplayers = this.state.players;
         let newplayer = this.state.players[this.state.currentPlayerPlaying];
         if (newplayer.whereCanHeDry.indexOf(i) >= 0){
-            // Move
+            // Dry
+            this.showActionButtons();
             this.dryATile(i);
             let nada = this.unlightTheTiles();
             if (nada){
@@ -1646,6 +1649,7 @@ handleTileClick(i) {
         let newplayer = this.state.players[this.state.currentPlayerPlaying];
         if (newplayer.whereCanHeDry.indexOf(i) >= 0){
             // Dry
+            this.showActionButtons();
             this.dryATile(i);
             this.unlightATile(i);
             let newMessage = new UserMessage('nowChooseASecondOneToDry', null, false, []);
@@ -1724,11 +1728,15 @@ handleTileClick(i) {
             // Move
             let returnPack = this.moveAGroupOfPlayers(player.id, this.state.coTravellers, i, n_Players, this.state.tiles);
             //
-
+/*
             if (this.state.inAGetRidOfACardContext){
                 // hide the actionbuttons
                 this.hideActionButtons();
+            } else {
+                this.showActionButtons();
             }
+*/
+            this.state.inAGetRidOfACardContext?this.hideActionButtons():this.showActionButtons();
 
             this.setState({ whatIsExpectedNext: this.state.whatIsExpectedNext_toRestore,
                             messageBoardState: this.state.messageBoardState_toRestore,
@@ -1769,9 +1777,15 @@ handleTileClick(i) {
           // Dry
           this.dryATile(i);
 
-          if (this.state.inAGetRidOfACardContext){
-              this.hideActionButtons();
-          }
+          /*
+                      if (this.state.inAGetRidOfACardContext){
+                          // hide the actionbuttons
+                          this.hideActionButtons();
+                      } else {
+                          this.showActionButtons();
+                      }
+          */
+          this.state.inAGetRidOfACardContext?this.hideActionButtons():this.showActionButtons();
 
           this.setState({ whatIsExpectedNext: this.state.whatIsExpectedNext_toRestore,
                           messageBoardState: this.state.messageBoardState_toRestore,
@@ -1792,6 +1806,7 @@ handleTileClick(i) {
       }
       else if (this.state.whatIsExpectedNext === "TileButtonClickForEvacuate") {
         // get player : first of To Evacuate
+        this.showActionButtons(); // not sure about this one
         let n_players = this.state.players;
         let n_guysToEvacuate = this.state.guysToEvacuate;
 
@@ -2202,27 +2217,33 @@ handleTileClick(i) {
     return (
       <span>
         <div className="messagePanel">
-          <div className="panelTitle"> {lng.mainTitle01}<br/>::ReactJS::<br/>{lng.mainTitle02} <span className="littlePanelInfo">{this.state.versionNumber}</span></div>
+          <div className="panelTitle"> {lng.mainTitle01}<br/>{lng.mainTitle02}</div>
+          <div className="panelSubTitle"><b>{this.state.versionNumber}</b></div>
           <div className="littlePanelInfo">English <img id="langToggle" src={langToggleImg} onClick={() => this.doChangeLang()} /> Français</div>
           <div className="littlePanelInfo">{lng.turn} {this.state.turn} | {lng.level} {this.state.difficultyLevelString}</div>
           <div className="littlePanelInfo">{lng.treasuresFound} : {foundTreasures}/4 </div>
           <div className="littlePanelInfo"> {lng.floodLevel} {this.state.floodMeter.level} {lng.xCardsPerFlood.format(this.state.floodMeter.floodFactor)}</div>
+        </div>
+        <div className="messagePanel02">
           <div className="panelInfo"> {currentPlayer.name}&nbsp;{str_roleQualifier}&nbsp;<span style={{color: currentPlayer.color}}>{str_roleAttachedToName}</span>&nbsp;{lng.isPlaying}
-          <br/><span className="superLittlePanelInfo"> {str_currentStep} </span>
-        <br/>{this.renderTurnStepsBoard()}
-      </div>
+            <br/>
+            <span className="superLittlePanelInfo"> {str_currentStep} </span>
+            <br/>
+            {this.renderTurnStepsBoard()}
+          </div>
         </div>
         <div className="actionPanel">
+          { showBackButton ?
+              <span className="rollBackButton">
+                <a className="actionTooltips" href="#">
+                  <img className="rollBackButtonImg" src="img/backButton.png" width="15" height="15" onClick= {() => this.handleRollBack(this.state.currentStep)}/>
+                  <span className="actionTooltipsForRollback inToolTipsText">{this.getStringInTheCatalog(lng, 'ah_rollback')}</span>
+                </a>
+              </span>
+              : <span></span>
+          }
+          {this.renderMessageBoard()}
           <div className="panelInfo" id="UserActions">
-            { showBackButton ?
-                <span className="rollBackButton">
-                  <a className="actionTooltips" href="#">
-                    <img className="rollBackButtonImg" src="img/backButton.png" width="15" height="15" onClick= {() => this.handleRollBack(this.state.currentStep)}/>
-                    <span className="actionTooltipsForRollback inToolTipsText">{this.getStringInTheCatalog(lng, 'ah_rollback')}</span>
-                  </a>
-                </span>
-                : <span></span>
-            }
             <ul>
               {this.state.possibleActions.map((action, index) =>
                 <li key={action.name}>
@@ -2233,9 +2254,6 @@ handleTileClick(i) {
                   </li>
               )}
             </ul>
-          </div>
-          <div className="panelInfo" id="UserDialog">
-              {this.renderMessageBoard()}
           </div>
         </div>
       </span>
@@ -2252,7 +2270,7 @@ handleTileClick(i) {
       let receiver = playersOnTheSameTileExceptMe.length === 1 ? playersOnTheSameTileExceptMe[0] : null;
 
       return (
-          <div>
+          <div className="panelInfo" id="UserDialog">
             {lng.whichCardDoYouWantToGive}
                 { playersOnTheSameTileExceptMe.length === 1 ?
                   (<span> {lng.to} <span style={{color: this.state.players[playersOnTheSameTileExceptMe[0]].color}}>{ this.state.players[playersOnTheSameTileExceptMe[0]].name} </span></span> )
@@ -2274,7 +2292,8 @@ handleTileClick(i) {
               <tr>
                 <td><span key={'card'+index}/><input type="radio" name="chosenCard" key={index} value={card.id} onChange={() => chosenCard = card.id} /></td>
                 <td><img src= {card.url}  width="20px" height="32px"/></td>
-                <td>{this.getStringInTheCatalog(lng, card.loc_key)}</td>
+                <td>{this.getStringInTheCatalog(lng, card.loc_key)} <span className="superSmall">x{card.howMany}</span></td>
+
               </tr>
               )
             }
@@ -2305,7 +2324,7 @@ handleTileClick(i) {
       let receiver = otherPlayers.length === 1 ? otherPlayers[0] : null;
 
       return (
-          <div>
+          <div className="panelInfo" id="UserDialog">
             {lng.whichCardDoYouWantToSend}
                     { otherPlayers.length === 1 ?
                       (<span> {lng.to} <span style={{color: this.state.players[otherPlayers[0]].color}}> {this.state.players[otherPlayers[0]].name} </span></span> )
@@ -2326,7 +2345,7 @@ handleTileClick(i) {
               <tr>
                 <td><span key={'card'+index}/><input type="radio" name="chosenCard" key={index} value={card.id} onChange={() => chosenCard = card.id} /></td>
                 <td><img src= {card.url}  width="20px" height="32px"/></td>
-                <td>{ this.getStringInTheCatalog(lng, card.loc_key)}</td>
+                <td>{ this.getStringInTheCatalog(lng, card.loc_key)} <span className="superSmall">x{card.howMany}</span></td>
               </tr>
               )
             }
@@ -2368,7 +2387,7 @@ handleTileClick(i) {
         }
 
         return (
-          <div>
+          <div className="panelInfo" id="UserDialog">
             {
                   playersOnTheSameTileExceptMe.length === 0 ? // Ok
                      (<div> <span style={{color: this.state.players[flyerId].color}}>{this.state.players[flyerId].name}</span>{lng.playerChooseALandingDestination}</div>)
@@ -2392,7 +2411,7 @@ handleTileClick(i) {
     } else if (this.state.messageBoardState === "moveSomeOneSequence") {
       let puppet = null;
           return (
-            <div>
+            <div className="panelInfo" id="UserDialog">
               {lng.whoDoYouWantToMove} <br/>
               {
               (this.state.players.map((player, index) => {
@@ -2415,7 +2434,7 @@ handleTileClick(i) {
       // console.log("user is : " + user + ". His cards : " + cardsInHand);
 
       return(
-        <div>
+        <div className="panelInfo" id="UserDialog">
           <span  style={{color: color}}>{name}</span> {lng.hasMoreThan5Card}<br/>
           {lng.letsGetRidOvIt} <br/>
           <table className="throwTable">
@@ -2424,17 +2443,17 @@ handleTileClick(i) {
             (this.doDedoubleCards(this.state.players[userId].cards).map((card, index) => {
               return (card.type === "H" || card.type === "SB") ?
                   (<tr>
-                    <td><span key={index}/>{card.name}</td>
+                    <td><span key={index}/>{card.name} <span className="superSmall">x{card.howMany}</span></td>
                     <td> <img src= {card.url}  width="20px" height="32px"/></td>
                     <td><button onClick={() => this.throwCard(card.type, index, userId)}>{lng.btn_throw}</button></td>
                     <td><button onClick={() => this.useACardToGetRidOfIt(card.type, index, userId)}>{lng.btn_use}</button></td>
                   </tr>)
                   :
                   (<tr>
-                    <td><span key={index}/>{card.name}</td>
+                    <td><span key={index}/>{card.name} <span className="superSmall">x{card.howMany}</span></td>
                     <td> <img src= {card.url}  width="20px" height="32px"/></td>
                     <td><button onClick={() => this.throwCard(card.type, index, userId)}>{lng.btn_throw}</button></td>
-                    <td>&nbsp;</td>
+                    <td></td>
                   </tr>)
             }))
           }
@@ -2443,7 +2462,7 @@ handleTileClick(i) {
         </div>
       )
     } else if (this.state.messageBoardState === "empty"){
-                return(<div>++ empty ++</div>)
+          <div>++ empty ++</div>
     } else {
       let lng = this.state.languageDistributor;
       // classic message  with one button
@@ -2475,8 +2494,8 @@ handleTileClick(i) {
       }
 
       return(
-          <div><span id="mainMessage" dangerouslySetInnerHTML={{__html: translatedString}} />
-
+          <div className="panelInfo" id="UserDialog">
+          <span id="mainMessage" dangerouslySetInnerHTML={{__html: translatedString}} />
           {
             !gameIsOver ?
               (<div>
@@ -2640,13 +2659,25 @@ handleTileClick(i) {
       let output = [];
       let alreadyIn = [];
       if (arrayOfCards.length > 0) {
+        // 1st card
           alreadyIn.push(arrayOfCards[0].type);
           output.push(arrayOfCards[0]);
+          output[0].howMany = 1;
+          // next cards
           if (arrayOfCards.length > 1){
             for (let i = 1; i < arrayOfCards.length; i ++){
               if (!alreadyIn.includes(arrayOfCards[i].type)) {
+                arrayOfCards[i].howMany = 1;
                 output.push(arrayOfCards[i]);
                 alreadyIn.push(arrayOfCards[i].type);
+              }
+              else {
+                for (let k = 0; k < output.length; k ++){
+                  if (output[k].type === arrayOfCards[i].type){
+                    output[k].howMany ++;
+                    break;
+                  }
+                }
               }
             }
           }
@@ -3104,31 +3135,31 @@ function riseTheIsland(){
 function generatePlayerCardsLeap(){
     let cards = [];
     for (let i = 0; i < 5; i++){
-        let card = { id : i, name : "crystal", loc_key: "ca_crytal", type : "CR", url : "img/crystalCard.png"};
+        let card = { id : i, name : "crystal", loc_key: "ca_crytal", type : "CR", url : "img/crystalCard.png", howMany : 0};
         cards.push(card);
     }
     for (let i = 0; i < 5; i++){
-        let card = { id : i + 5, name : "cup", loc_key: "ca_cup", type : "CU", url : "img/cupCard.png"};
+        let card = { id : i + 5, name : "cup", loc_key: "ca_cup", type : "CU", url : "img/cupCard.png", howMany : 0};
         cards.push(card);
     }
     for (let i = 0; i < 5; i++){
-        let card = { id : i + 10, name : "sceptre", loc_key: "ca_sceptre", type : "SC", url : "img/sceptreCard.png"};
+        let card = { id : i + 10, name : "sceptre", loc_key: "ca_sceptre", type : "SC", url : "img/sceptreCard.png", howMany : 0};
         cards.push(card);
     }
     for (let i = 0; i < 5; i++){
-        let card = {id : i + 15, name : "statue", loc_key: "ca_statue", type : "ST", url : "img/statueCard.png"};
+        let card = {id : i + 15, name : "statue", loc_key: "ca_statue", type : "ST", url : "img/statueCard.png", howMany : 0};
         cards.push(card);
     }
     for (let i = 0; i < 3; i++){
-        let card = { id : i + 20, name : "helicopter", loc_key: "ca_helicopter", type : "H", url : "img/helicopterCard.png"};
+        let card = { id : i + 20, name : "helicopter", loc_key: "ca_helicopter", type : "H", url : "img/helicopterCard.png", howMany : 0};
         cards.push(card);
     }
     for (let i = 0; i < 2; i++){ // 2 cards
-        let card = { id : i + 23, name : "sandBag", loc_key: "ca_sandBag", type : "SB", url : "img/sandBagCard.png"};
+        let card = { id : i + 23, name : "sandBag", loc_key: "ca_sandBag", type : "SB", url : "img/sandBagCard.png", howMany : 0};
         cards.push(card);
     }
     for (let i = 0; i < 3; i++){ // 3 cards
-        let card = { id : i + 25, name : "floodRise", loc_key: "ca_floodRise", type : 5, url : "img/floodRise.png"};
+        let card = { id : i + 25, name : "floodRise", loc_key: "ca_floodRise", type : 5, url : "img/floodRise.png", howMany : 0};
         cards.push(card);
     }
     cards = shuffleArray(cards);
@@ -3213,7 +3244,10 @@ function generateGUID() {
     console.log(logString);
     var logUrl = logHost + "?stf=" + logString;
      // WORKS ! UNCOMMENT TO MAKE IT LIVE :
-     // TODO RESET the http stuff :)
+     if (document.URL.indexOf("localhost") < 0){
+            console.log("Logged");
+            httpGetAsync(logUrl);
+     }
   }
 
 function httpGetAsync(logUrl)
