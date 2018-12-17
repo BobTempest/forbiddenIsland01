@@ -423,7 +423,7 @@ class Board extends React.Component {
         */
         //end of helicopter Hack
 
-        for (let i = 0; i < 5; i++){ // must be 2
+        for (let i = 0; i < 2; i++){ // must be 2
        //for (let i = 0; i < 5; i++){ // HACK OF 5 Cards in the beg
             let card = playerCardsLeap.pop();
             while (card.name === "floodRise"){
@@ -994,7 +994,7 @@ class Board extends React.Component {
           break;
         }
       }
-      alert ("true index is : " + trueIndex + " , was looking for " + cardtype );
+      // alert ("true index is : " + trueIndex + " , was looking for " + cardtype );
       if (trueIndex >= 0){
         n_playerCardsDiscard.push(n_players[userId].cards[trueIndex]);
         n_players[userId].cards.splice(trueIndex, 1);
