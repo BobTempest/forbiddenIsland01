@@ -1,0 +1,48 @@
+// TODO :
+*********************
+NOW : test the endings
+Hide the floating hands when necessary
+Nice Alert messages
+
+**** BUGS *****
+
+
+-> tiles do not disapear when drawning on EDGE
+-> FIREFOX crashes on 'you got a treasure !' // not always ... sometimes, chrome crashes too
+
+
+
+BUGS :
+=======
+
+if no cards : hide donner une carte
+after clicking an unwanted tile, actions menu re appears. It may be unnapropriate ::: FIXED ???
+
+*********************
+
+
+*********************
+**** NOW *****
+
+TODO : over on cards
+TODO : fancy message box to replace the alerts
+TODO : nice, with icons, turn board
+
+
+*********************
+**** SHORT TERM *****
+
+
+*********************
+***** LONG TERM *****
+
+- canvas and clickable ?
+- losange pic ? clickable losange pic ?
+- story telling : Diary of events
+ bar des aventuriers et cimetière dans la ville
+- animations
+
+*********************
+******** BUGS *******
+
+Diver can finish on a drawned tile ! ::: REALLY ?

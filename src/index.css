@@ -1,0 +1,724 @@
+body {
+  font: 14px "Century Gothic", Futura, sans-serif;
+  margin: 20px;
+}
+
+ol, ul {
+  /* padding-left: 30px;*/
+  list-style-type: none;
+}
+
+list-style:none;
+
+.board-row:after {
+  clear: both;
+  content: "";
+  display: table;
+}
+
+.status {
+  margin-bottom: 10px;
+}
+
+.red {
+  color: '#DC143C';
+}
+
+.square {
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  border: 1px solid #222;
+  background: #fff;
+  margin: 10px;
+
+  float: left;
+  margin-right: 2px;
+  margin-top: 2px;
+  margin-left: 2px;
+  margin-bottom: 2px;
+  border-radius: 5px;
+  padding: 0;
+  height: 50px;
+  width: 50px;
+}
+
+.immersedSquare {
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  background: #01A9DB;
+  border: 1px solid #222;
+  margin: 10px;
+
+  float: left;
+  margin-right: 2px;
+  margin-top: 2px;
+  margin-left: 2px;
+  margin-bottom: 2px;
+  border-radius: 5px;
+  padding: 0;
+  height: 50px;
+  width: 50px;
+}
+
+.drawnedSquare {
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  background: #fff;
+  margin: 10px;
+
+  float: left;
+  margin-right: 2px;
+  margin-top: 2px;
+  margin-left: 2px;
+  margin-bottom: 2px;
+  border-radius: 5px;
+
+  padding: 0;
+  height: 50px;
+  width: 50px;
+}
+
+.inSquarePosition {
+  text-align: center;
+  font-size: 10px;
+  position: relative;
+  z-index:1;
+  top: -3px;
+  left: 3px;
+}
+
+.inSquareText {
+  text-align: center;
+  font-size: 24px;
+  font-weight: bolder;
+  z-index:2;
+  position: relative;
+  top: -8px;
+  left: 16px;
+}
+
+.jaugePlayer {
+    height:10px;
+    background: brown;
+}
+
+.jaugeFlood {
+    height:10px;
+    background: blue;
+}
+
+.stuckBehind {
+    float: right;
+}
+
+.superSmall {
+  font-size: 10px;
+}
+
+.inSquareLittleText {
+  display: inline-block;
+  text-align: center;
+  font-size: 9px;
+  z-index:3;
+  position: relative;
+  line-height: 9px;
+  top: -20px;
+}
+
+.playerPawn {
+  text-align: center;
+  font-size: 22px;
+  font-weight: bold;
+  position: relative;
+  z-index:10;
+  text-shadow: 1px 1px 3px #333333;
+}
+
+.singlePP {
+  top: -52px;
+}
+
+.twoPP {
+  top: -53px;
+}
+
+.multilinePP {
+  line-height: 19px;
+  top: -64px;
+}
+
+.emptySquare {
+  background: transparent;
+  border: 1px solid rgba(0,0,0,0);
+  float: left;
+  margin-right: 4px;
+  margin-top: 2px;
+  margin-left: 2px;
+  margin-bottom: 2px;
+  border-radius: 5px;
+  padding: 0;
+  height: 50px;
+  width: 50px;
+}
+
+.littleTemple {
+  position: relative;
+  z-index:8;
+  top: -32px;
+  left: 32px;
+}
+
+.messageBoard-column {
+    float: left;
+    width: 330px;
+}
+
+.playerBoard-column {
+  float:right;
+  width: 330px;
+}
+
+.board-column {
+    float: left;
+    margin-left: 10px;
+    width: 350px;
+}
+
+.islandBoard {
+  background-image: url("./img/sea04.png");
+  float: left;
+  margin-left: 10px;
+}
+
+.floodOmeterCursor {
+  z-index:10;
+}
+
+.floodOmeter {
+    float: left;
+    height: 86px;
+}
+
+.cardsPilesTable , th, td {
+  border: 1px solid #BBB;
+  border-collapse: collapse;
+  /*width: 346px;*/
+}
+
+.throwTable, th, tr, td  {
+  border: 0px solid white;
+  border-collapse: collapse;
+}
+
+.invisiTable {
+  border: 0px solid white;
+  border-collapse: collapse;
+}
+
+.trophyImage {
+  z-index: 10;
+  position: relative;
+}
+
+.messagePanel {
+  background: #fff;
+  border: 1px solid #BBB;
+
+  line-height: 24px;
+  margin-right: 2px;
+  margin-top: 2px;
+  margin-left: 10px;
+  margin-bottom: 2px;
+  border-radius: 5px;
+  padding: 10;
+  height: 215px;
+  width: 300px;
+}
+
+.actionPanel {
+  background: #fff;
+  border: 1px solid #BBB;
+
+  line-height: 24px;
+  margin-right: 2px;
+  margin-top: 2px;
+  margin-left: 10px;
+  margin-bottom: 2px;
+  border-radius: 5px;
+  padding: 10;
+  height: 244px;
+  width: 300px;
+}
+
+.game-start-panel {
+  position: absolute;
+  top: 50px;
+  left: 232px;
+  background: #fff;
+  border: 1px solid #BBB;
+  height: 380px;
+  width: 700px;
+  z-index: 50;
+  box-shadow: 1px 1px 3px #333333;
+}
+
+.panelTitle {
+  /*float: left;*/
+  margin-left: 10px;
+  font-size: 34px;
+  font-weight: bold;
+  text-shadow: 1px 1px 3px #333333;
+  line-height: 39px;
+  width: 280px
+}
+
+.panelInfo {
+  float: left;
+  margin-left: 10px;
+  font-size: 18px;
+  text-shadow: 1px 1px 3px #333333;
+}
+
+.littlePanelInfo {
+  margin-left: 10px;
+  font-size: 12px;
+  line-height: 12px;
+}
+
+.superLittlePanelInfo {
+  margin-left: 3px;
+  font-size: 10px;
+  line-height: 12px;
+}
+
+.littleCopyrightLine{
+  margin-left: 10px;
+  font-size: 10px;
+}
+
+.introChoices {
+  display: block;
+  position: relative;
+  top: 110px;
+  margin-left: 10px;
+  font-size: 14px;
+  line-height: 21px;
+}
+
+.rollBackButton {
+  position: absolute;
+  top: 237px;
+  left: 301px;
+}
+
+.rollBackButtonImg {
+  -webkit-box-shadow: 1px 1px 3px #666666;
+  -moz-box-shadow: 1px 1px 3px #666666;
+  box-shadow: 1px 1px 3px #666666;
+}
+
+.game-lost-panel {
+  position: absolute;
+  top: 424px;
+  left: 118px;
+  background: #012651;
+  border: 1px solid #012651;
+  height: 160px;
+  width: 900px;
+  z-index: 50;
+  box-shadow: 5px 5px 3px #777;
+  border-radius: 5px;
+}
+
+.game-won-panel {
+  position: absolute;
+  top: 424px;
+  left: 118px;
+  background: #1ebdfc;
+  border: 1px solid #1ebdfc;
+  height: 160px;
+  width: 900px;
+  z-index: 50;
+  box-shadow: 5px 5px 3px #777;
+  border-radius: 5px;
+}
+
+.game-over-title {
+  position: relative;
+  top: 25px;
+  text-align: center;
+  font-size: 40px;
+  line-height: 12px;
+  color:#eaf4ff;
+}
+
+.game-over-msg {
+  position: relative;
+  top: -9px;
+  text-align: center;
+  font-size: 16px;
+  line-height: 24px;
+  padding: 50px;
+  color:#eaf4ff;
+}
+
+.game-over-btn {
+  position: relative;
+  top: -10px;
+  text-align: center;
+}
+
+.playerBoard {
+  background: #fff;
+  border: 1px solid #BBB;
+  font-size: 20px;
+  float: left;
+  line-height: 24px;
+  margin-right: 2px;
+  margin-top: 2px;
+  margin-left: 10px;
+  margin-bottom: 2px;
+  border-radius: 5px;
+  padding: 10;
+  height: 100px;
+  width: 377px;
+  list-style:none;
+}
+
+.playerBoardPlaying {
+  border: 1px solid #BBB;
+  box-shadow: 2px 2px 3px #000;
+}
+
+.inBoardName {
+  color: #000;
+  font-size: 20px;
+}
+
+.inBoardRole {
+  font-size: 24px;
+  font-weight: bold;
+  text-shadow: 1px 1px 3px #333333;
+  margin-top: 10px;
+}
+
+.inBoardCards {
+  font-size: 12px;
+  margin-left: 7px;
+}
+
+.boardPlayerCards {
+  float: left;
+  width:50px;
+}
+
+.activableBoardPlayerCards{
+  float: left;
+  width:50px;
+}
+
+.actionButton {
+  -webkit-border-radius: 8;
+  -moz-border-radius: 8;
+  border-radius: 8px;
+  -webkit-box-shadow: 1px 1px 3px #666666;
+  -moz-box-shadow: 1px 1px 3px #666666;
+  box-shadow: 1px 1px 3px #666666;
+  font-family: Arial;
+  color: #050505;
+  font-size: 15px;
+  background: #ffffff;
+  padding: 5px 20px 5px 20px;
+  border: solid #cccccc 1px;
+  text-decoration: none;
+}
+
+.actionButton:hover {
+  background: #ffffff;
+  background-image: -webkit-linear-gradient(top, #ffffff, #d1d1d1);
+  background-image: -moz-linear-gradient(top, #ffffff, #d1d1d1);
+  background-image: -ms-linear-gradient(top, #ffffff, #d1d1d1);
+  background-image: -o-linear-gradient(top, #ffffff, #d1d1d1);
+  background-image: linear-gradient(to bottom, #ffffff, #d1d1d1);
+  text-decoration: none;
+}
+
+.actionButton:disabled {
+  box-shadow: none;
+  color: #EEE;
+}
+
+.square:focus {
+  outline: none;
+}
+
+.kbd-navigation .square:focus {
+  background: #ddd;
+}
+
+.game {
+  display: flex;
+  flex-direction: row;
+}
+
+.game-info {
+  margin-left: 20px;
+}
+
+.lilsqr {
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  border: 3px solid;
+  background: #fff;
+  margin: 10px;
+  vertical-align: middle;
+  float: left;
+  margin-right: 2px;
+  margin-top: 4px;
+  margin-left: 2px;
+  margin-bottom: 2px;
+  border-radius: 15px;
+  padding: 0;
+  height: 20px;
+  width: 20px;
+  box-shadow: 1px 1px 3px #CCC;
+}
+
+.inlilsqr {
+  font-size: 12px;
+  text-shadow: none;
+  font-family: "Arial Black", Gadget, sans-serif;
+  position: relative;
+  top: -6px;
+  left: 3px;
+}
+
+.lilcard {
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  border: 2px solid #888888;
+  background: #fff;
+  margin: 10px;
+  vertical-align: middle;
+  float: left;
+  margin-right: 2px;
+  margin-top: 2px;
+  margin-left: 2px;
+  margin-bottom: 2px;
+  border-radius: 5px;
+  padding: 0;
+  height: 25px;
+  width: 17px;
+}
+
+.inlilcard{
+  font-size: 12px;
+  text-shadow: none;
+  color: #888888;
+  font-family: "Arial Black", Gadget, sans-serif;
+  position: relative;
+  top: -3px;
+  left: 2px;
+}
+
+/* Blink Animation*/
+.blink {
+  animation: blinker 2s linear infinite;
+}
+
+.blink2 {
+  animation: blinker 1s infinite;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
+}
+
+.doRotate {
+  animation: rototo 1s linear infinite;
+  animation-direction: alternate;
+}
+
+@keyframes rototo {
+
+  0% {
+    top: 5px;
+    left: 0px;
+  }
+  100% {
+    top: 0px;
+    left: -5px;
+  }
+}
+
+.spanOverHand {
+  position: relative;
+  display: inline;
+  top: -43px;
+  left: 21px;
+}
+
+.overHand {
+  position: relative;
+  z-index: 5;
+  width:20px;
+  height:26px;
+}
+
+.helpCharacterIcon {
+    float: right;
+    text-decoration:none;
+    font-size: 12px;
+    line-height: 12px;
+    color: black;
+    text-shadow: 1px 1px 3px #333333;
+}
+
+.inToolTipsText {
+  text-align: left;
+  font-size: 12px;
+  line-height: 12px;
+  padding: 10px 20px 10px 20px;
+  text-shadow: none;
+}
+
+a.actionTooltipsForRollback {
+  position: relative;
+  display: inline;
+}
+
+a.tooltips {
+  position: relative;
+  display: inline;
+}
+a.tooltips span {
+  position: absolute;
+  width:140px;
+  color: #000000;
+  background: #CFCFCF;
+  /*height: 34px;
+  line-height: 34px;
+  text-align: center;*/
+  visibility: hidden;
+  border-radius: 6px;
+}
+a.tooltips span:after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  margin-top: -8px;
+  width: 0; height: 0;
+  border-left: 8px solid #CFCFCF;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+}
+a:hover.tooltips span {
+  visibility: visible;
+  opacity: 0.9;
+  right: 100%;
+  top: 50%;
+  margin-top: -17px;
+  margin-right: 15px;
+  z-index: 999;
+}
+
+a.actionTooltips {
+  position: relative;
+  left: 10px;
+  top: 17px;
+  display: inline;
+}
+
+a.actionTooltips span {
+  position: absolute;
+  width:140px;
+  color: #000000;
+  background: #CFCFCF;
+  /*
+  height: 34px;
+  line-height: 34px;
+  text-align: center;*/
+  visibility: hidden;
+  border-radius: 6px;
+}
+a.actionTooltips span:after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  margin-top: -8px;
+  width: 0; height: 0;
+  border-right: 8px solid #CFCFCF;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+}
+a:hover.actionTooltips span {
+  visibility: visible;
+  opacity: 0.9;
+  left: 100%;
+  top: 50%;
+  margin-top: -17px;
+  margin-left: 15px;
+  z-index: 999;
+}
+
+.checkmark {
+    display:inline-block;
+    position: relative;
+    width: 22px;
+    height:22px;
+    -ms-transform: rotate(45deg); /* IE 9 */
+    -webkit-transform: rotate(45deg); /* Chrome, Safari, Opera */
+    transform: rotate(45deg);
+    z-index: 5;
+    top: -30px;
+    left: -1px;
+}
+
+.checkmark_stem {
+    position: absolute;
+    width:5px;
+    height:15px;
+    background-color:#888;
+    left:11px;
+    top:4px;
+}
+
+.checkmark_kick {
+    position: absolute;
+    width:6px;
+    height:5px;
+    background-color:#888;
+    left:5px;
+    top:14px;
+}
+
+.floodIndicatorOff {
+    position: absolute;
+    top: 258px;
+    left: 161px;
+    text-decoration:none;
+    font-size: 20px;
+    line-height: 12px;
+    color: #CCC;
+    text-shadow: none;
+}
+
+.floodIndicatorOn {
+    position: absolute;
+    top: 258px;
+    left: 161px;
+    text-decoration:none;
+    font-size: 20px;
+    line-height: 12px;
+    color: #3399ff;
+    text-shadow: 1px 1px 3px #3399ff;
+}
