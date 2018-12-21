@@ -397,7 +397,8 @@ class Board extends React.Component {
       inAGetRidOfACardContext : false,
       guysToEvacuate : null,
       floodingSequence : null,
-      showActionableCards : true // TODO report
+      showActionableCards : true,
+      showRollBackButton : true // TODO report
       // IF ADDING ANYTHING, PLEASE FIX doStatePermutation
     };
 
@@ -520,7 +521,8 @@ class Board extends React.Component {
                           possibleActions : [],
                           blinkPlayer : 99,
                           mainUserMessage : newMessage,
-                          showActionableCards : true});
+                          showActionableCards : true,
+                          showRollBackButton : true});
         } else if (nextStep === 5){
           // flood some tiles.
           this.setState({ currentStep : nextStep });
@@ -529,7 +531,8 @@ class Board extends React.Component {
           this.setState({ currentStep : nextStep,
                           possibleActions : [],
                           mainUserMessage : newMessage,
-                          showActionableCards : true});
+                          showActionableCards : true,
+                          showRollBackButton : true});
         }
         else if (nextStep === 6){
           // next Turn, new Player 0
@@ -553,6 +556,7 @@ class Board extends React.Component {
                 stateCopy.whatIsExpectedNext = "CharacterActionButtonClick";
                 stateCopy.mainUserMessage = newMessage;
                 stateCopy.showActionableCards = true;
+                stateCopy.showRollBackButton = false;
             let backup = JSON.stringify(stateCopy);
             console.log('****** state copy Size at Next Turn ' + backup.length);
             let n_pastState = [backup];
@@ -569,7 +573,8 @@ class Board extends React.Component {
               whatIsExpectedNext : "CharacterActionButtonClick" ,
               mainUserMessage : newMessage,
               pastStates : n_pastState,
-              showActionableCards : true
+              showActionableCards : true,
+              showRollBackButton : false
               });
               // tiles: n_tiles });
           } else {
@@ -590,6 +595,7 @@ class Board extends React.Component {
                 stateCopy.whatIsExpectedNext = "CharacterActionButtonClick";
                 stateCopy.mainUserMessage = newMessage;
                 stateCopy.showActionableCards = true;
+                stateCopy.showRollBackButton = false;
             let backup = JSON.stringify(stateCopy);
             console.log('****** state copy Size at Next player' + backup.length);
             let n_pastState = [backup];
@@ -604,7 +610,8 @@ class Board extends React.Component {
               whatIsExpectedNext : "CharacterActionButtonClick",
               mainUserMessage : newMessage,
               pastStates : n_pastState,
-              showActionableCards : true
+              showActionableCards : true,
+              showRollBackButton : false
             });
               // tiles: n_tiles
           }
@@ -621,6 +628,7 @@ class Board extends React.Component {
               stateCopy.whatIsExpectedNext = "CharacterActionButtonClick";
               stateCopy.mainUserMessage = newMessage;
               stateCopy.showActionableCards = true;
+              stateCopy.showRollBackButton = true;
           let backup = JSON.stringify(stateCopy);
           let n_pastState = this.state.pastStates;
           let zarma = n_pastState.push(backup);
@@ -632,7 +640,8 @@ class Board extends React.Component {
             pastStates: n_pastState,
             whatIsExpectedNext : "CharacterActionButtonClick" ,
             mainUserMessage : newMessage,
-            showActionableCards : true});
+            showActionableCards : true,
+            showRollBackButton : true});
         }
       }
       // user has to pick two cards from the leap
@@ -1403,7 +1412,8 @@ class Board extends React.Component {
               let newMessage = new UserMessage('chooseADestination', null, false, [1]);
               this.setState({ whatIsExpectedNext : "TileButtonClickForMove" ,
                               mainUserMessage : newMessage,
-                              showActionableCards : false });
+                              showActionableCards : false,
+                              showRollBackButton : false});
             }
       } if (action === "Fly"){
           let tilesToLight = this.whereCanHeFly(this.state.players[id].position);
@@ -1412,7 +1422,8 @@ class Board extends React.Component {
           let newMessage = new UserMessage('chooseALandingDestination', null, false, [1]);
           this.setState({ whatIsExpectedNext: "TileButtonClickForFly" ,
                           mainUserMessage: newMessage ,
-                          showActionableCards : false });
+                          showActionableCards : false,
+                          showRollBackButton : false });
       } else if (action === "Dry" || action === "DryAround"){
             let tilesToLight = this.whereCanHeDry(this.state.players[id].position, this.state.players[id].role);
             if (tilesToLight.length === 0 ){
@@ -1424,7 +1435,8 @@ class Board extends React.Component {
               let newMessage = new UserMessage('nowChooseATileToDry', null, false, [1]);
               this.setState({ whatIsExpectedNext: "TileButtonClickForDry",
                               mainUserMessage: newMessage,
-                              showActionableCards : false });
+                              showActionableCards : false,
+                              showRollBackButton : false });
             }
       } else if (action === "DryTwoTiles"){
             let tilesToLight = this.whereCanHeDry(this.state.players[id].position, this.state.players[id].role);
@@ -1437,14 +1449,16 @@ class Board extends React.Component {
               let newMessage = new UserMessage('onlyOneTileToDry', null, false, [1]);
               this.setState({ whatIsExpectedNext: "TileButtonClickForDry" ,
                               mainUserMessage: newMessage,
-                              showActionableCards : false });
+                              showActionableCards : false,
+                              showRollBackButton : false });
             } else {
               this.state.players[id].whereCanHeDry = tilesToLight;
               let nada = this.lightTheTiles(tilesToLight, this.state.players[id].color);
               let newMessage = new UserMessage('nowChooseTwoTilesToDry', null, false, [1]);
               this.setState({ whatIsExpectedNext: "TileButtonClickForDryTwoTimes" ,
                               mainUserMessage: newMessage,
-                              showActionableCards : false });
+                              showActionableCards : false,
+                              showRollBackButton : false });
             }
       } else if (action === "Give") {
               let playersAround = this.getPlayersOnTheSameTileExceptMe();
@@ -1457,7 +1471,8 @@ class Board extends React.Component {
               } else {
                 this.setState({ whatIsExpectedNext: "ResolveUserDialogSequence" ,
                                 messageBoardState: "giveACardSequence",
-                                showActionableCards : false });
+                                showActionableCards : false,
+                                showRollBackButton : false });
               }
       } else if (action === "SendACard") {
             if (this.state.players[id].cards.length < 1 ){
@@ -1466,7 +1481,8 @@ class Board extends React.Component {
             } else {
               this.setState({ whatIsExpectedNext: "ResolveUserDialogSequence" ,
                               messageBoardState: "sendACardSequence",
-                              showActionableCards : false });
+                              showActionableCards : false,
+                              showRollBackButton : false });
             }
       } else if (action === "GetATreasure") {
               let treasureId = this.state.tiles[this.state.players[id].position].templeFor;
@@ -1527,15 +1543,20 @@ class Board extends React.Component {
                                       posessedTreasures: n_posessedTreasures,
                                       players: n_players,
                                       playerCardsDiscard: n_playerCardsDiscard,
-                                      showActionableCards : false
+                                      showActionableCards : false,
+                                      showRollBackButton : false
                                     });
               }
           }
       } else if (action === "MoveSomeone") {
-              this.setState({ whatIsExpectedNext: "ResolveUserDialogSequence" , messageBoardState: "moveSomeOneSequence", showActionableCards : false });
+              this.setState({ whatIsExpectedNext: "ResolveUserDialogSequence" ,
+                              messageBoardState: "moveSomeOneSequence",
+                              showActionableCards : false,
+                              showRollBackButton : false });
       } else if (action === "DoNothing"){ // skip one action
               let newMessage = new UserMessage('doingNothing', null, false, [0]);
-              this.setState({ mainUserMessage: newMessage});
+              this.setState({ mainUserMessage: newMessage,
+                              showRollBackButton : false});
       } else if (action === "SkipTurn"){ // skip the whole player turn, goes to next player
              let newMessage = new UserMessage('skipTurn', null, false, [0]);
              this.setState({ mainUserMessage: newMessage,
@@ -2131,7 +2152,8 @@ handleTileClick(i) {
         inAGetRidOfACardContext : newState.inAGetRidOfACardContext,
         guysToEvacuate : newState.guysToEvacuate,
         floodingSequence : newState.floodingSequence,
-        showActionableCards : newState.showActionableCards
+        showActionableCards : newState.showActionableCards,
+        showRollBackButton : newState.showRollBackButton
       });
   }
 
@@ -2223,7 +2245,7 @@ handleTileClick(i) {
     let langToggleImg = this.state.selectedLanguage === "FR" ? "img/toggle_right.png" : "img/toggle_left.png";
 
     // Either we're in action or before picking the first player card :
-    let showBackButton = (this.state.currentStep > 0 && this.state.currentStep < 3) || ( this.state.mainUserMessage.buttons.indexOf(2) >= 0);
+    let showBackButton = this.state.showRollBackButton && ((this.state.currentStep > 0 && this.state.currentStep < 3) || ( this.state.mainUserMessage.buttons.indexOf(2) >= 0));
 
     return (
       <span>
@@ -2666,6 +2688,15 @@ handleTileClick(i) {
   showActionButtons() {
       document.getElementById("UserActions").style.display = "block";
   }
+
+  /*
+  switchRollbackButtonVisibility(state) {
+      ( state == "on" && document.getElementById("rollBackButton")) ?
+        document.getElementById("rollBackButton").style.display = "block"
+        :
+        document.getElementById("rollBackButton").style.display = "none"
+        ;
+  }*/
 
   doDedoubleCards(arrayOfCards) {
       let output = [];
