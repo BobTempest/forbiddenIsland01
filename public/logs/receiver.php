@@ -46,6 +46,9 @@
 
    fclose($handle);
 
+if ($error){
+  die("Wrong data input");
+}
 
 // MySQL STUFF
 $servername = "boulezrepublicdb.mysql.db";
