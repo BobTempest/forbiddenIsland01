@@ -2820,7 +2820,7 @@ handleTileClick(i) {
           {this.renderPlayerMessagePanel()}
         </div>
         <div className="board-column">
-          <div className="islandBoard" style={{ backgroundimage: './img/sea05.png'}}>
+          <div className="islandBoard" style={{ backgroundImage: "url('img/sea05.png')"}}>
             <div className="board-row">
               {this.renderTreasureSquare("ST")}
               {this.renderEmptySquare()}
@@ -2890,7 +2890,6 @@ handleTileClick(i) {
         </div>
         <div className="playerBoard-column">
           <div>
-
               {this.renderPlayerBoard(0)}
               {this.renderPlayerBoard(1)}
               {this.state.nbrOfPlayers > 2 ?
@@ -2968,7 +2967,7 @@ class Game extends React.Component {
       difficultyLevel: 2, // INIT
       language: "FR",
       nbrOfPlayers: 4,
-      versionNumber: "v0.8.1 BETA" // INIT
+      versionNumber: "v0.8.2 BETA" // INIT
     };
    }
 
