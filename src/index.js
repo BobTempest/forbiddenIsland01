@@ -2820,7 +2820,7 @@ handleTileClick(i) {
           {this.renderPlayerMessagePanel()}
         </div>
         <div className="board-column">
-          <div className="islandBoard" style={{ backgroundimage: './img/sea04.png'}}>
+          <div className="islandBoard" style={{ backgroundimage: './img/sea05.png'}}>
             <div className="board-row">
               {this.renderTreasureSquare("ST")}
               {this.renderEmptySquare()}

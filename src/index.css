@@ -188,7 +188,7 @@ list-style:none;
 }
 
 .islandBoard {
-  background-image: url("./img/sea04.png");
+  /* background-image: url("./img/sea04.png"); */
   float: left;
   margin-left: 10px;
 }
