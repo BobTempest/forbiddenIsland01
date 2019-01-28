@@ -743,7 +743,7 @@ class Board extends React.Component {
             }
         }
         else if(n_Tiles[j].isDrawned){
-          alert ("CONCEPTUAL ERROR : " + n_Tiles[j].name + " is already drawned. it shouldn't be in the Leap !");
+          this.customAlert("CONCEPTUAL ERROR : " + n_Tiles[j].name + " is already drawned. it shouldn't be in the Leap !");
         }
         else{
             //message = message + n_Tiles[j].name + " at " + j + " is flooded ! ";
@@ -1025,7 +1025,7 @@ class Board extends React.Component {
                     } else if (type === "SB"){
                         this.clickedOnSandBagCard(userId, true);
                     } else {
-                      alert("CONCEPTUAL ERROR : WRONG CARD TYPE");
+                      this.customAlert("CONCEPTUAL ERROR : WRONG CARD TYPE");
                     }
       });
   }
@@ -1103,7 +1103,7 @@ class Board extends React.Component {
     let lng = this.state.languageDistributor;
     let tilesToLight = this.getImmersedTiles();
     if (tilesToLight.length === 0){
-      alert(lng.noTileToDry);
+      this.customAlert(lng.noTileToDry);
       return null;
     }
 
@@ -1160,7 +1160,7 @@ class Board extends React.Component {
     console.log("FLOOD CARDS : total = " + nbrOfFloodCards+ " (24 expected), out of game = " + nbrOfFloodCardsOutOfGame + ", in Discard = " + nbrOfFloodCardsInDiscard + ", in Leap = " + nbrOfFloodCardsInLeap);
 
     if (nbrOfFloodCards != 24){
-      alert("ALERT : We loose some Flood cards in the process.");
+      this.customAlert("ALERT : We loose some Flood cards in the process.");
     }
 
     // playerCards
@@ -1174,7 +1174,7 @@ class Board extends React.Component {
     console.log("PLAYER CARDS : total = " + nbrOfPlayerCards+ " (28 expected), in players hands = " + nbrOfPlayerCardsInPLayersHands + ", in Discard = " + nbrOfPlayerCardsInDiscard + ", in Leap = " + nbrOfPlayerCardsInLeap);
 
     if (nbrOfPlayerCards != 28){
-      alert("ALERT : We loose some Player cards in the process.");
+      this.customAlert("ALERT : We loose some Player cards in the process.");
     }
   }
 
@@ -1403,7 +1403,7 @@ class Board extends React.Component {
       if (action === "Move" || action === "Dive" || action === "MoveAround"){
             let tilesToLight = this.whereCanHeMove(this.state.players[id].position, this.state.players[id].role);
             if (tilesToLight.length === 0 ){
-              alert (lng.nowhereToGo);
+              this.customAlert(lng.nowhereToGo);
               this.showActionButtons();
             } else  {
               this.state.players[id].whereCanHeMove = tilesToLight;
@@ -1427,7 +1427,7 @@ class Board extends React.Component {
       } else if (action === "Dry" || action === "DryAround"){
             let tilesToLight = this.whereCanHeDry(this.state.players[id].position, this.state.players[id].role);
             if (tilesToLight.length === 0 ){
-              alert (lng.noTilesToDry);
+              this.customAlert(lng.noTilesToDry);
               this.showActionButtons();
             } else {
               this.state.players[id].whereCanHeDry = tilesToLight;
@@ -1441,7 +1441,7 @@ class Board extends React.Component {
       } else if (action === "DryTwoTiles"){
             let tilesToLight = this.whereCanHeDry(this.state.players[id].position, this.state.players[id].role);
             if (tilesToLight.length === 0 ){
-              alert (lng.noTilesToDry);
+              this.customAlert(lng.noTilesToDry);
               this.showActionButtons();
             } else if (tilesToLight.length === 1 ){
               this.state.players[id].whereCanHeDry = tilesToLight;
@@ -1463,10 +1463,10 @@ class Board extends React.Component {
       } else if (action === "Give") {
               let playersAround = this.getPlayersOnTheSameTileExceptMe();
               if (this.state.players[id].cards.length < 1 ){
-                alert(lng.noCardToGive);
+                this.customAlert(lng.noCardToGive);
                 this.showActionButtons();
               } else if ( action === "Give" && playersAround.length < 1) {
-                  alert(lng.noOtherPlayerOnYourTile);
+                  this.customAlert(lng.noOtherPlayerOnYourTile);
                   this.showActionButtons();
               } else {
                 this.setState({ whatIsExpectedNext: "ResolveUserDialogSequence" ,
@@ -1476,7 +1476,7 @@ class Board extends React.Component {
               }
       } else if (action === "SendACard") {
             if (this.state.players[id].cards.length < 1 ){
-              alert(lng.noCardToSend);
+              this.customAlert(lng.noCardToSend);
               this.showActionButtons();
             } else {
               this.setState({ whatIsExpectedNext: "ResolveUserDialogSequence" ,
@@ -1487,7 +1487,7 @@ class Board extends React.Component {
       } else if (action === "GetATreasure") {
               let treasureId = this.state.tiles[this.state.players[id].position].templeFor;
               if (treasureId === ""){
-                alert(lng.thisTileIsNotATemple);
+                this.customAlert(lng.thisTileIsNotATemple);
                 this.showActionButtons();
               }
               else {
@@ -1499,23 +1499,23 @@ class Board extends React.Component {
                   }
 
                   if (this.state.posessedTreasures.includes(treasureId)){
-                    alert(lng.thisTreasureHasBeenFoundAlready);
+                    this.customAlert(lng.thisTreasureHasBeenFoundAlready);
                     this.showActionButtons();
                   }
                   else if (cardsIndexes.length < 4){
                     // alert("You do not have enough " + this.getTreasureNameById(treasureId) + " cards to get the treasure... you need 4 , you have " + cardsIndexes.length);
-                    alert(lng.notEnoughCards4Treasure.format(this.getTreasureNameById(treasureId), cardsIndexes.length));
+                    this.customAlert(lng.notEnoughCards4Treasure.format(this.getTreasureNameById(treasureId), cardsIndexes.length));
                     this.showActionButtons();
                   } else {
                       if (this.state.posessedTreasures.length === 3 ){
                         //alert("You found the 4th treasure ! Now, go to the heliport and leave the Island with an Helicopter card !");
-                        alert(lng.youFoundThe4th);
+                        this.customAlert(lng.youFoundThe4th);
                       } else if (this.state.posessedTreasures.length === 1) {
-                        alert(lng.youFoundThe2nd);
+                        this.customAlert(lng.youFoundThe2nd);
                       } else if (this.state.posessedTreasures.length === 2) {
-                        alert(lng.youFoundThe3rd);
+                        this.customAlert(lng.youFoundThe3rd);
                       }else {
-                        alert(lng.youFoundThe1st);
+                        this.customAlert(lng.youFoundThe1st);
                       }
                       // PICK A TREASURE
                       let n_playerCardsDiscard = this.state.playerCardsDiscard;
@@ -1568,7 +1568,7 @@ class Board extends React.Component {
       }
     }
     else{
-      alert (lng.unexpectedClickOnActionButton);
+      this.customAlert(lng.unexpectedClickOnActionButton);
     }
     return null;
 }
@@ -1584,7 +1584,7 @@ handleCardClick(card, playerId, toThrowIt){
           this.clickedOnSandBagCard(playerId)
     }
   } else {
-    alert(lng.pleaseFinishYourActionFirst);
+    this.customAlert(lng.pleaseFinishYourActionFirst);
   }
 }
 
@@ -1607,7 +1607,7 @@ handleTileClick(i) {
             }
         }
         else{
-          alert (lng.heCantMoveThere);
+          this.customAlert(lng.heCantMoveThere);
         }
       }
       else if (this.state.whatIsExpectedNext === "TileButtonClickForFly") {
@@ -1625,7 +1625,7 @@ handleTileClick(i) {
               });
           }
           else{
-            alert (lng.heCantMoveThere);
+            this.customAlert(lng.heCantMoveThere);
           }
       } else if (this.state.whatIsExpectedNext === "TileButtonClickForMoveSomeone") {
         let puppet = null;
@@ -1637,7 +1637,7 @@ handleTileClick(i) {
         }
 
         if (this.puppet === null) {
-          alert("CONCEPTUAL ERROR : CAN't FIND PUPPET !");
+          this.customAlert("CONCEPTUAL ERROR : CAN't FIND PUPPET !");
         }
 
         if (this.puppet.whereCanHeMove.indexOf(i) >= 0){
@@ -1656,7 +1656,7 @@ handleTileClick(i) {
               });
         }
         else{
-          alert (lng.heCantMoveThere);
+          this.customAlert(lng.heCantMoveThere);
         }
       } else if (this.state.whatIsExpectedNext === "TileButtonClickForDry"){
         let newplayers = this.state.players;
@@ -1674,7 +1674,7 @@ handleTileClick(i) {
             }
         }
         else {
-          alert (lng.heCantDryThere);
+          this.customAlert(lng.heCantDryThere);
         }
       } else if (this.state.whatIsExpectedNext === "TileButtonClickForDryTwoTimes") {
         let newplayers = this.state.players;
@@ -1690,7 +1690,7 @@ handleTileClick(i) {
                             mainUserMessage: newMessage});
         }
         else {
-          alert (lng.heCantDryThere);
+          this.customAlert(lng.heCantDryThere);
         }
       } else if (this.state.whatIsExpectedNext === "TileButtonClickForFlyWithACard") {
         let player = this.state.players[this.state.cardUser];
@@ -1785,7 +1785,7 @@ handleTileClick(i) {
                             showActionableCards: true });
             let nada = this.unlightTheTiles();
         } else {
-          alert(lng.cantFlyThereWithHisHCard);
+          this.customAlert(lng.cantFlyThereWithHisHCard);
         }
       }
       else if (this.state.whatIsExpectedNext === "TileButtonClickForDryWithACard") {
@@ -1833,7 +1833,7 @@ handleTileClick(i) {
           let nada = this.unlightTheTiles();
         }
         else {
-          alert(lng.cantDryThereWithHisCard);
+          this.customAlert(lng.cantDryThereWithHisCard);
         }
       }
       else if (this.state.whatIsExpectedNext === "TileButtonClickForEvacuate") {
@@ -1902,10 +1902,11 @@ handleTileClick(i) {
             this.unlightTheTiles();
         }
         else{
-          alert (lng.heCantMoveThere);
+          this.customAlert(lng.heCantMoveThere);
         }
       } else {
-        alert (lng.unexpectedClickOnATile);
+        this.customAlert(lng.unexpectedClickOnATile);
+        // alert (lng.unexpectedClickOnATile);
       }
     }
 
@@ -1924,14 +1925,14 @@ handleTileClick(i) {
         pastStates.push(strStateToRestore);
       } else if (curstep == 2){
         if (pastStates.length != 3){
-          alert ("CONCEPTUAL ERROR, on step 2 , pastStates should be 3 long");
+          this.customAlert("CONCEPTUAL ERROR, on step 2 , pastStates should be 3 long");
         }
         stateToThrow = pastStates.pop();
         strStateToRestore = pastStates.pop();
         pastStates.push(strStateToRestore);
       } else if (curstep == 1) {
         if (pastStates.length != 2){
-          alert ("CONCEPTUAL ERROR, on step 1 , pastStates should be 2 long");
+          this.customAlert("CONCEPTUAL ERROR, on step 1 , pastStates should be 2 long");
         }
         stateToThrow = pastStates.pop();
         strStateToRestore = pastStates.pop();
@@ -1943,7 +1944,8 @@ handleTileClick(i) {
 
       return this.doStatePermutation(objStateToRestore);
     } else {
-      alert("CONCEPTUAL ERROR : No state to restore");
+      this.customAlert("CONCEPTUAL ERROR : No state to restore");
+      // alert("CONCEPTUAL ERROR : No state to restore");
     }
   }
 
@@ -1989,7 +1991,8 @@ handleTileClick(i) {
   dryATile(tile){
         let NewTiles = this.state.tiles;
         if (NewTiles[tile].isDrawned){
-          alert("CONCEPTUAL ERROR : can't dry a drawned tile");
+          this.customAlert("CONCEPTUAL ERROR : can't dry a drawned tile");
+          // alert("CONCEPTUAL ERROR : can't dry a drawned tile");
         }
         NewTiles[tile].isImmersed = false;
         this.setState({ tiles: NewTiles});
@@ -2012,7 +2015,8 @@ handleTileClick(i) {
   doMoveSomeOne(puppet) {
     let lng = this.state.languageDistributor;
     if (isNaN(puppet) || puppet == null) {
-        alert(lng.chooseAnExplorerToMove);
+        // alert(lng.chooseAnExplorerToMove);
+        this.customAlert(lng.chooseAnExplorerToMove);
         return null;
     }
     let whereCanHeMove = this.whereNavigatorCanMoveHim(this.state.players[puppet].position);
@@ -2032,9 +2036,10 @@ handleTileClick(i) {
     // alert("GIVE A CARD : " + giver + " will give the " + card + " to " + receiver);
     console.log("PRE  Given : " + card + " to " + receiver);
     if (card == null){
-      alert(lng.pleaseSelectACardToGive);
+      this.customAlert(lng.pleaseSelectACardToGive);
+      // alert(lng.pleaseSelectACardToGive);
     } else if (receiver == null){
-      alert(lng.pleaseSelectARecipientForTheCard);
+      this.customAlert(lng.pleaseSelectARecipientForTheCard);
     } else {
       // remove from player
       let n_players = this.state.players;
@@ -2049,7 +2054,7 @@ handleTileClick(i) {
       }
 
       if (index == null){
-        alert("CONCEPTUAL ERROR: Couldn't find the card");
+        this.customAlert("CONCEPTUAL ERROR: Couldn't find the card");
       }
       n_players[giver].cards.splice(index, 1);
 
@@ -2627,7 +2632,7 @@ handleTileClick(i) {
   }
 
   blinkATile(tileId) {// never called
-      alert("blikATile is Called for tile " + tileId);
+      this.customAlert("blikATile is Called for tile " + tileId);
       document.getElementById("square" + tileId).classList.add('blink');
   }
 
@@ -2689,14 +2694,16 @@ handleTileClick(i) {
       document.getElementById("UserActions").style.display = "block";
   }
 
-  /*
-  switchRollbackButtonVisibility(state) {
-      ( state == "on" && document.getElementById("rollBackButton")) ?
-        document.getElementById("rollBackButton").style.display = "block"
-        :
-        document.getElementById("rollBackButton").style.display = "none"
-        ;
-  }*/
+  customAlert(msg) {
+    document.getElementById("blockAll").classList.add('blockAll');
+    document.getElementById('alertText').innerHTML = msg;
+    document.getElementById("customAlert").style.display = "block";
+  }
+
+  clearCustomAlert(){
+    document.getElementById("blockAll").classList.remove('blockAll');
+    document.getElementById("customAlert").style.display = "none";
+  }
 
   doDedoubleCards(arrayOfCards) {
       let output = [];
@@ -2760,7 +2767,7 @@ handleTileClick(i) {
   }
 
   launchGameOver(gameIsWon, gameIsLost, msg){
-    alert ("Mow SHOULDN't BE USED ANY MORE");
+    this.customAlert("Mow SHOULDN't BE USED ANY MORE");
     this.setState({
       gameIsOver: true,
       gameIsLost: gameIsLost,
@@ -2781,7 +2788,6 @@ handleTileClick(i) {
   }
 
   renderVictoryPanel(i) {
-
     let lng = this.state.languageDistributor;
     let msg = lng.youWonMsg.format(this.state.nbrOfPlayers);
     // alert("pow");
@@ -2797,13 +2803,18 @@ handleTileClick(i) {
   // rendering de Board
   render() {
       // Flood-O-meter values for the needle
-      let position_value = "relative";
-      let left_value = 5 + ((this.state.floodMeter.level - 1) * 33);
-      let top_value = -70;
+      let fOm_position_value = "relative";
+      let fOm_left_value = 5 + ((this.state.floodMeter.level - 1) * 33);
+      let fOm_top_value = -70;
       let lng = this.state.languageDistributor;
 
     return (
       <div>
+      <div id="customAlert" className="custom-alert-panel">
+            <div id="alertText" className="alertText">MowMow Mange tes morts first petit cochonou</div>
+            <div id="alertCloseButton" className="alertCloseButton" onClick={() => this.clearCustomAlert()}>{lng.btn_understood}</div>
+      </div>
+      <div id="blockAll">
       <div className="littleCopyrightLine">{lng.copyright}</div>
       <div>
         {this.state.gameIsLost ?
@@ -2872,7 +2883,7 @@ handleTileClick(i) {
           </div>
           <div className="floodOmeter">
               <img src="img/FloodOmeter.png"/>
-              <span className="floodOmeterCursor" id="floodOmeterCursor" style={{position: position_value, left: left_value+'px', top: top_value+'px'}}><img src="img/FloodOmeterCursor.png"/></span>
+              <span className="floodOmeterCursor" id="floodOmeterCursor" style={{position: fOm_position_value, left: fOm_left_value+'px', top: fOm_top_value+'px'}}><img src="img/FloodOmeterCursor.png"/></span>
           </div>
           <table className="cardsPilesTable">
             <tbody>
@@ -2904,6 +2915,7 @@ handleTileClick(i) {
               }
           </div>
         </div>
+      </div>
       </div>
     </div>
     );
@@ -3216,7 +3228,7 @@ function generateFloodCardsLeap(){
 
 function generatePlayers(howMany){
     if (howMany > 4 || howMany < 2){
-      alert ("CONCEPTUAL ERROR : Too many player requested");
+      this.customAlert("CONCEPTUAL ERROR : Too many player requested");
     }
     // Diver hack off
     let roles = [0,1,2,3,4,5];

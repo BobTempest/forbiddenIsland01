@@ -99,6 +99,7 @@ export const stringsCatalog = {
    btn_cancelTheFlight: "Cancel the flight",
    btn_evacuate: "Evacuate !",
    btn_retry: "Retry ?",
+   btn_understood: "Understood",
    // opening panel
    welcomeIntro: "Hola Comrade",
    howManyAdventurers: "How many adventurers ?",
@@ -286,6 +287,7 @@ export const stringsCatalog = {
    btn_cancelTheFlight: "Annuler le vol",
    btn_evacuate: "Evacuez !",
    btn_retry: "Recommencer ?",
+   btn_understood: "Compris",
    // opening panel
    welcomeIntro: "Hola Camarade.",
    howManyAdventurers: "Combien d'aventuriers ?",

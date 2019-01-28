@@ -177,7 +177,7 @@ list-style:none;
 }
 
 .playerBoard-column {
-  float:right;
+  float: left;
   width: 330px;
 }
 
@@ -652,7 +652,7 @@ a:hover.tooltips span {
   top: 50%;
   margin-top: -17px;
   margin-right: 15px;
-  z-index: 999;
+  z-index: 60;
 }
 
 a.actionTooltips {
@@ -692,7 +692,7 @@ a:hover.actionTooltips span {
   top: 50%;
   margin-top: -17px;
   margin-left: 15px;
-  z-index: 999;
+  z-index: 60;
 }
 
 .checkmark {
@@ -746,4 +746,56 @@ a:hover.actionTooltips span {
     line-height: 12px;
     color: #3399ff;
     text-shadow: 1px 1px 3px #3399ff;
+}
+
+.blockAll {
+    /*position: absolute;*/
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: grey;
+    z-index: 70;
+    opacity: 0.3;
+    filter: alpha(opacity = 50);
+    pointer-events: none;
+}
+
+.custom-alert-panel {
+    position: absolute;
+    display: none;
+    top: 200px;
+    left: 300px;
+    width: 500px;
+    /* height: 120px; */
+    background-color: #eee;
+    z-index: 75;
+    box-shadow: 5px 5px 3px #777;
+    border-radius: 5px;
+    padding-bottom: 20px;
+}
+
+.alertText {
+    position: relative;
+    font-weight: bold;
+    margin: 20px;
+    font-size: 17px;
+    text-align: center;
+}
+
+.alertCloseButton {
+    position: relative;
+    left: 40%;
+    padding: 9px 18px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    font-size: 15px;
+    border: 1px solid #000;
+    border-radius: 4px;
+}
+
+.alertCloseButton:hover {
+    opacity: 0.2;
 }
