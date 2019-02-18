@@ -1,22 +1,13 @@
 // TODO :
 *********************
-NOW : test the endings
-Hide the floating hands when necessary
-Nice Alert messages
+- set english per default
+- when replay, repass the parameters
+- add an e mail contact /page
 
 **** BUGS *****
 
 
--> tiles do not disapear when drawning on EDGE
--> FIREFOX crashes on 'you got a treasure !' // not always ... sometimes, chrome crashes too
 
-
-
-BUGS :
-=======
-
-if no cards : hide donner une carte
-after clicking an unwanted tile, actions menu re appears. It may be unnapropriate ::: FIXED ???
 
 *********************
 
@@ -24,9 +15,7 @@ after clicking an unwanted tile, actions menu re appears. It may be unnapropriat
 *********************
 **** NOW *****
 
-TODO : over on cards
-TODO : fancy message box to replace the alerts
-TODO : nice, with icons, turn board
+
 
 
 *********************

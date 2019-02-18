@@ -30,13 +30,9 @@ list-style:none;
   -webkit-box-sizing: border-box;
   border: 1px solid #222;
   background: #fff;
-  margin: 10px;
+  margin: 2px;
 
   float: left;
-  margin-right: 2px;
-  margin-top: 2px;
-  margin-left: 2px;
-  margin-bottom: 2px;
   border-radius: 5px;
   padding: 0;
   height: 50px;
@@ -49,13 +45,9 @@ list-style:none;
   -webkit-box-sizing: border-box;
   background: #01A9DB;
   border: 1px solid #222;
-  margin: 10px;
+  margin: 2px;
 
   float: left;
-  margin-right: 2px;
-  margin-top: 2px;
-  margin-left: 2px;
-  margin-bottom: 2px;
   border-radius: 5px;
   padding: 0;
   height: 50px;
@@ -67,18 +59,48 @@ list-style:none;
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
   background: #fff;
-  margin: 10px;
+  margin: 2px;
+
+  float: left;
+  border-radius: 5px;
+
+  padding: 0;
+  height: 50px;
+  width: 50px;
+}
+
+.drawningSquare {
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  background-image: url("/img/drawning03.png");
+  /*margin: 10px;*/
 
   float: left;
   margin-right: 2px;
   margin-top: 2px;
   margin-left: 2px;
   margin-bottom: 2px;
-  border-radius: 5px;
+  /*border-radius: 5px;*/
 
   padding: 0;
   height: 50px;
   width: 50px;
+}
+
+.selfRotate {
+		-webkit-animation: selfRotation 4s infinite linear;
+}
+
+@-webkit-keyframes selfRotation {
+		from {
+				-webkit-transform: rotate(0deg);
+        transform-origin: center;
+		}
+		to {
+				-webkit-transform: rotate(359deg);
+        transform-origin: center;
+		}
 }
 
 .inSquarePosition {
