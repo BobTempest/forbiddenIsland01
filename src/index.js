@@ -2689,7 +2689,11 @@ handleTileClick(i) {
   }
 
   retry(){
-    window.location.reload();
+    // window.location.reload();
+    if (!window.location.hash)
+    {
+        window.location.replace(window.location.href + "?lang=" + this.state.selectedLanguage + "&difficulty=" + this.state.difficultyLevel + "&nbrOfPlayers=" + this.state.nbrOfPlayers)
+    }
   }
 
   getTreasureNameById(id){
@@ -3000,15 +3004,57 @@ class Game extends React.Component {
    constructor(props) {
     super(props);
 
+    // DEFAULT ENTRIES :::INIT
+    let difficulty = 2;
+    let language = "EN";
+    let nbrOfPlayers = 4;
+
+    // lets' try to get params from GET
+    let propagatedDifficulty = null;
+    let propagatedLanguage = null;
+    let propagatedNbrOfPlayers = null;
+
+    let current_url = window.location.href;
+    let rue = current_url.split('?');
+    // let params = new URLSearchParams(current_url.search.slice(1));
+    //let params = rue[1];
+
+    let params = new URLSearchParams(rue[1]);
+
+    if (params){
+      if (params.has('difficulty')){
+        propagatedDifficulty = parseInt(params.get('difficulty'));
+        if (!propagatedDifficulty.isNan && propagatedDifficulty < 5 && propagatedDifficulty > 0){
+          difficulty = propagatedDifficulty;
+        }
+      }
+
+      if (params.has('nbrOfPlayers')){
+        propagatedNbrOfPlayers = parseInt(params.get('nbrOfPlayers'));
+        if (!propagatedNbrOfPlayers.isNan && propagatedNbrOfPlayers > 0 && propagatedNbrOfPlayers < 5){
+          nbrOfPlayers = propagatedNbrOfPlayers;
+        }
+      }
+
+      if (params.has('lang')){
+        propagatedLanguage = params.get('lang');
+        if (propagatedLanguage === 'FR' || propagatedLanguage === 'EN'){
+          language = propagatedLanguage;
+        }
+      }
+    }
+
+    let stringcat = language === "EN" ? stringsCatalog.en : stringsCatalog.fr;
+
     this.state = {
       showStartPanel: true,
       showBoardPanel: true,
       showGameOverPanel: false,
-      languageDistributor: stringsCatalog.fr,
-      difficultyLevel: 2, // INIT
-      language: "FR",
-      nbrOfPlayers: 4,
-      versionNumber: "v0.8.2 BETA" // INIT
+      languageDistributor: stringcat,
+      difficultyLevel: difficulty,
+      language: language,
+      nbrOfPlayers: nbrOfPlayers,
+      versionNumber: "v0.8.2 BETA"
     };
    }
 
@@ -3021,7 +3067,6 @@ class Game extends React.Component {
            document.getElementById("homeLangToggle").src = "img/toggle_right.png";
            this.setState({language: "FR",
                           languageDistributor: stringsCatalog.fr});
-           // TODO : reload the Panel with proper language
        }
      }
 
@@ -3090,7 +3135,12 @@ class Game extends React.Component {
                     {lng.elite} <input type="radio" name="WhichDifficulty" key="WhichDifficulty3" checked={radioDifficulty3} value='3' onChange={() => this.doChangeDifficulty(3)}/> |
                     {lng.legendary} <input type="radio" name="WhichDifficulty" key="WhichDifficulty4" checked={radioDifficulty4} value='4' onChange={() => this.doChangeDifficulty(4)}/> |
               </div>
-            <div>{lng.language} English <img id="homeLangToggle" src="img/toggle_right.png" onClick={() => this.doChangeLangSelector()} /> Français</div>
+              {this.state.language === "FR" ?
+                <div>{lng.language} English <img id="homeLangToggle" src="img/toggle_right.png" onClick={() => this.doChangeLangSelector()} /> Français</div>
+                :
+                <div>{lng.language} English <img id="homeLangToggle" src="img/toggle_left.png" onClick={() => this.doChangeLangSelector()} /> Français</div>
+              }
+
             <div><button onClick={() => this.launchBoard()}>{lng.letsGo}</button></div>
           </div>
         </div>
