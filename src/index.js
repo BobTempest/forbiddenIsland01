@@ -2323,6 +2323,9 @@ handleTileClick(i) {
             </ul>
           </div>
         </div>
+        <div className="mailMessage">
+          {lng.mailMessage} <a href={lng.mailAdress} className="write2me">{lng.mailLink}</a>
+        </div>
       </span>
     )
   }
@@ -2692,7 +2695,7 @@ handleTileClick(i) {
     // window.location.reload();
     if (!window.location.hash)
     {
-        window.location.replace(window.location.href + "?lang=" + this.state.selectedLanguage + "&difficulty=" + this.state.difficultyLevel + "&nbrOfPlayers=" + this.state.nbrOfPlayers)
+        window.location.replace(window.location.hostname + "?lang=" + this.state.selectedLanguage + "&difficulty=" + this.state.difficultyLevel + "&nbrOfPlayers=" + this.state.nbrOfPlayers)
     }
   }
 
@@ -2842,11 +2845,11 @@ handleTileClick(i) {
       let lng = this.state.languageDistributor;
 
     return (
-      <div>
-      <div id="customAlert" className="custom-alert-panel">
-            <div id="alertText" className="alertText">MowMow Mange tes morts first petit cochonou</div>
-            <div id="alertCloseButton" className="alertCloseButton" onClick={() => this.clearCustomAlert()}>{lng.btn_understood}</div>
-      </div>
+      <div  className="littleCopyrightLine">
+        <div id="customAlert" className="custom-alert-panel">
+              <div id="alertText" className="alertText">Ce message ne devrais jamais s'afficher.</div>
+              <div id="alertCloseButton" className="alertCloseButton" onClick={() => this.clearCustomAlert()}>{lng.btn_understood}</div>
+        </div>
       <div id="blockAll">
       <div className="littleCopyrightLine">{lng.copyright}</div>
       <div>
@@ -3120,7 +3123,6 @@ class Game extends React.Component {
       <div className="game">
         <div className="game-board" id="game-board" style={showHideBoardPanel}></div>
         <div id="start-panel" className="game-start-panel" style={showHideStartPanel}>
-          <div></div>
           <div className="panelTitle"> {lng.mainTitle01}<br/>::ReactJS::<br/>{lng.mainTitle02}<br/><span className="littlePanelInfo">{this.state.versionNumber}</span></div>
           <div className="introChoices">
             <div>{lng.welcomeIntro}</div>

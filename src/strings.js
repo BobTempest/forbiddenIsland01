@@ -12,6 +12,9 @@ export const stringsCatalog = {
    leap: "leap",
    discard: "discard",
    copyright: "Forbidden Island is a game created by Matt Leacock and published by Gamewright.",
+   mailMessage: "Thanks for playing. Comments ?, Bugs ?",
+   mailLink: "Write to me !",
+   mailAdress: "mailto:info@boulezrepublic.com",
    // roles
    ro_Diver: "Diver",
    ro_Pilot: "Pilot",
@@ -200,6 +203,9 @@ export const stringsCatalog = {
    leap: "Pioche",
    discard: "Défausse",
    copyright: "Forbidden Island est un jeu crée par Matt Leacock et publié par Gamewright.",
+   mailMessage: "Commentaires ?, bugs ?",
+   mailLink: "Ecrivez moi !",
+   mailAdress: "mailto:info@boulezrepublic.com",
    // roles
    ro_Diver: "Plongeuse",
    ro_Pilot: "Pilote",
