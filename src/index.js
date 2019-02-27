@@ -2813,6 +2813,7 @@ handleTileClick(i) {
   }
 
   renderGameOverPanel(msg) {
+    document.getElementById("blockAll").classList.add('blockAll');
     let lng = this.state.languageDistributor;
     return (
         <span>
@@ -2824,6 +2825,7 @@ handleTileClick(i) {
   }
 
   renderVictoryPanel(i) {
+    document.getElementById("blockAll").classList.add('blockAll');
     let lng = this.state.languageDistributor;
     let msg = lng.youWonMsg.format(this.state.nbrOfPlayers);
     // alert("pow");
@@ -2850,109 +2852,110 @@ handleTileClick(i) {
               <div id="alertText" className="alertText">Ce message ne devrais jamais s'afficher.</div>
               <div id="alertCloseButton" className="alertCloseButton" onClick={() => this.clearCustomAlert()}>{lng.btn_understood}</div>
         </div>
-      <div id="blockAll">
-      <div className="littleCopyrightLine">{lng.copyright}</div>
-      <div>
-        {this.state.gameIsLost ?
-          <div id="game-over-panel" className="game-lost-panel">
-            {this.renderGameOverPanel(this.state.endMessage)}
-          </div> : <div></div>
-        }
-        {this.state.gameIsWon ?
-          <div id="game-over-panel" className="game-won-panel">
-            {this.renderGameOverPanel(this.state.endMessage)}
-          </div> : <div></div>
-        }
-        <div className="messageBoard-column">
-          {this.renderPlayerMessagePanel()}
-        </div>
-        <div className="board-column">
-          <div className="islandBoard" style={{ backgroundImage: "url('img/sea05.png')"}}>
-            <div className="board-row">
-              {this.renderTreasureSquare("ST")}
-              {this.renderEmptySquare()}
-              {this.renderSquare(0)}
-              {this.renderSquare(1)}
-              {this.renderEmptySquare()}
-              {this.renderTreasureSquare("SC")}
+
+        <div className="littleCopyrightLine">{lng.copyright}</div>
+        <div>
+          {this.state.gameIsLost ?
+            <div id="game-over-panel" className="game-lost-panel">
+              {this.renderGameOverPanel(this.state.endMessage)}
+            </div> : <div></div>
+          }
+          {this.state.gameIsWon ?
+            <div id="game-over-panel" className="game-won-panel">
+              {this.renderGameOverPanel(this.state.endMessage)}
+            </div> : <div></div>
+          }
+          <div id="blockAll">
+          <div className="messageBoard-column">
+            {this.renderPlayerMessagePanel()}
+          </div>
+          <div className="board-column">
+            <div className="islandBoard" style={{ backgroundImage: "url('img/sea05.png')"}}>
+              <div className="board-row">
+                {this.renderTreasureSquare("ST")}
+                {this.renderEmptySquare()}
+                {this.renderSquare(0)}
+                {this.renderSquare(1)}
+                {this.renderEmptySquare()}
+                {this.renderTreasureSquare("SC")}
+              </div>
+              <div className="board-row">
+                {this.renderEmptySquare()}
+                {this.renderSquare(2)}
+                {this.renderSquare(3)}
+                {this.renderSquare(4)}
+                {this.renderSquare(5)}
+                {this.renderEmptySquare()}
+              </div>
+              <div className="board-row">
+                {this.renderSquare(6)}
+                {this.renderSquare(7)}
+                {this.renderSquare(8)}
+                {this.renderSquare(9)}
+                {this.renderSquare(10)}
+                {this.renderSquare(11)}
+              </div>
+              <div className="board-row">
+                {this.renderSquare(12)}
+                {this.renderSquare(13)}
+                {this.renderSquare(14)}
+                {this.renderSquare(15)}
+                {this.renderSquare(16)}
+                {this.renderSquare(17)}
+              </div>
+              <div className="board-row">
+                {this.renderEmptySquare()}
+                {this.renderSquare(18)}
+                {this.renderSquare(19)}
+                {this.renderSquare(20)}
+                {this.renderSquare(21)}
+                {this.renderEmptySquare()}
+              </div>
+              <div className="board-row">
+                {this.renderTreasureSquare("CU")}
+                {this.renderEmptySquare()}
+                {this.renderSquare(22)}
+                {this.renderSquare(23)}
+                {this.renderEmptySquare()}
+                {this.renderTreasureSquare("CR")}
+              </div>
             </div>
-            <div className="board-row">
-              {this.renderEmptySquare()}
-              {this.renderSquare(2)}
-              {this.renderSquare(3)}
-              {this.renderSquare(4)}
-              {this.renderSquare(5)}
-              {this.renderEmptySquare()}
+            <div className="floodOmeter">
+                <img src="img/FloodOmeter.png"/>
+                <span className="floodOmeterCursor" id="floodOmeterCursor" style={{position: fOm_position_value, left: fOm_left_value+'px', top: fOm_top_value+'px'}}><img src="img/FloodOmeterCursor.png"/></span>
             </div>
-            <div className="board-row">
-              {this.renderSquare(6)}
-              {this.renderSquare(7)}
-              {this.renderSquare(8)}
-              {this.renderSquare(9)}
-              {this.renderSquare(10)}
-              {this.renderSquare(11)}
-            </div>
-            <div className="board-row">
-              {this.renderSquare(12)}
-              {this.renderSquare(13)}
-              {this.renderSquare(14)}
-              {this.renderSquare(15)}
-              {this.renderSquare(16)}
-              {this.renderSquare(17)}
-            </div>
-            <div className="board-row">
-              {this.renderEmptySquare()}
-              {this.renderSquare(18)}
-              {this.renderSquare(19)}
-              {this.renderSquare(20)}
-              {this.renderSquare(21)}
-              {this.renderEmptySquare()}
-            </div>
-            <div className="board-row">
-              {this.renderTreasureSquare("CU")}
-              {this.renderEmptySquare()}
-              {this.renderSquare(22)}
-              {this.renderSquare(23)}
-              {this.renderEmptySquare()}
-              {this.renderTreasureSquare("CR")}
+            <table className="cardsPilesTable">
+              <tbody>
+              <tr><th colSpan="2" width="173px">{this.state.languageDistributor.playerCards}</th><th colSpan="2" width="150px">{this.state.languageDistributor.floodCards}</th></tr>
+              <tr style={{height: '18px'}}>
+                <td width="60px">{this.state.languageDistributor.leap}</td><td width="113px"><table className="invisiTable"><tbody><tr className="invisiTable"><td className="jaugePlayer invisiTable" style={{width: this.state.playerCardsLeap.length *2}}></td><td className="superSmall invisiTable">{this.state.playerCardsLeap.length}</td></tr></tbody></table></td>
+                <td width="60px">{this.state.languageDistributor.leap}</td><td width="113px"><table className="invisiTable"><tbody><tr className="invisiTable"><td className="jaugeFlood invisiTable" style={{width: this.state.floodCardsLeap.length *2}}></td><td className="superSmall invisiTable">{this.state.floodCardsLeap.length}</td></tr></tbody></table></td>
+              </tr>
+              <tr>
+                <td width="60px">{this.state.languageDistributor.discard}</td><td width="113px"><table className="invisiTable"><tbody><tr className="invisiTable"><td className="jaugePlayer invisiTable" style={{width: this.state.playerCardsDiscard.length *2}}></td><td className="superSmall invisiTable">{this.state.playerCardsDiscard.length}</td></tr></tbody></table></td>
+                <td width="60px">{this.state.languageDistributor.discard}</td><td width="113px"><table className="invisiTable"><tbody><tr className="invisiTable"><td className="jaugeFlood invisiTable" style={{width: this.state.floodCardsDiscard.length *2}}></td><td className="superSmall invisiTable">{this.state.floodCardsDiscard.length}</td></tr></tbody></table></td>
+              </tr>
+            </tbody>
+            </table>
+          </div>
+          <div className="playerBoard-column">
+            <div>
+                {this.renderPlayerBoard(0)}
+                {this.renderPlayerBoard(1)}
+                {this.state.nbrOfPlayers > 2 ?
+                  this.renderPlayerBoard(2)
+                  :
+                  <span></span>
+                }
+                {this.state.nbrOfPlayers > 3 ?
+                  this.renderPlayerBoard(3)
+                  :
+                  <span></span>
+                }
             </div>
           </div>
-          <div className="floodOmeter">
-              <img src="img/FloodOmeter.png"/>
-              <span className="floodOmeterCursor" id="floodOmeterCursor" style={{position: fOm_position_value, left: fOm_left_value+'px', top: fOm_top_value+'px'}}><img src="img/FloodOmeterCursor.png"/></span>
-          </div>
-          <table className="cardsPilesTable">
-            <tbody>
-            <tr><th colSpan="2" width="173px">{this.state.languageDistributor.playerCards}</th><th colSpan="2" width="150px">{this.state.languageDistributor.floodCards}</th></tr>
-            <tr style={{height: '18px'}}>
-              <td width="60px">{this.state.languageDistributor.leap}</td><td width="113px"><table className="invisiTable"><tbody><tr className="invisiTable"><td className="jaugePlayer invisiTable" style={{width: this.state.playerCardsLeap.length *2}}></td><td className="superSmall invisiTable">{this.state.playerCardsLeap.length}</td></tr></tbody></table></td>
-              <td width="60px">{this.state.languageDistributor.leap}</td><td width="113px"><table className="invisiTable"><tbody><tr className="invisiTable"><td className="jaugeFlood invisiTable" style={{width: this.state.floodCardsLeap.length *2}}></td><td className="superSmall invisiTable">{this.state.floodCardsLeap.length}</td></tr></tbody></table></td>
-            </tr>
-            <tr>
-              <td width="60px">{this.state.languageDistributor.discard}</td><td width="113px"><table className="invisiTable"><tbody><tr className="invisiTable"><td className="jaugePlayer invisiTable" style={{width: this.state.playerCardsDiscard.length *2}}></td><td className="superSmall invisiTable">{this.state.playerCardsDiscard.length}</td></tr></tbody></table></td>
-              <td width="60px">{this.state.languageDistributor.discard}</td><td width="113px"><table className="invisiTable"><tbody><tr className="invisiTable"><td className="jaugeFlood invisiTable" style={{width: this.state.floodCardsDiscard.length *2}}></td><td className="superSmall invisiTable">{this.state.floodCardsDiscard.length}</td></tr></tbody></table></td>
-            </tr>
-          </tbody>
-          </table>
         </div>
-        <div className="playerBoard-column">
-          <div>
-              {this.renderPlayerBoard(0)}
-              {this.renderPlayerBoard(1)}
-              {this.state.nbrOfPlayers > 2 ?
-                this.renderPlayerBoard(2)
-                :
-                <span></span>
-              }
-              {this.state.nbrOfPlayers > 3 ?
-                this.renderPlayerBoard(3)
-                :
-                <span></span>
-              }
-          </div>
         </div>
-      </div>
-      </div>
     </div>
     );
   }
