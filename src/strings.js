@@ -191,6 +191,10 @@ export const stringsCatalog = {
    hasMoreThan5Card: "has more than 5 cards in Hand.",
    letsGetRidOvIt: "Let's get rid Ov it : ",
    chooseAnExplorerToMove : "Choose an explorer to move",
+   found_crystal : "You found the Crystal.",
+   found_statue : "You found the Statue.",
+   found_cup : "You found the Cup.",
+   found_sceptre : "You found the Sceptre.",
  },
  fr:{
    currentLanguage: "FR",
@@ -384,5 +388,9 @@ export const stringsCatalog = {
    hasMoreThan5Card: " a plus de 5 cartes en main.",
    letsGetRidOvIt: "Il faut s'en débarasser : ",
    chooseAnExplorerToMove : "Choisissez un aventurier à déplacer.",
+   found_crystal : "Vous avez découvert le Cristal.",
+   found_statue : "Vous avez découvert la Statue.",
+   found_cup : "Vous avez découvert la Coupe.",
+   found_sceptre : "Vous avez découvert le Sceptre.",
  }
 }

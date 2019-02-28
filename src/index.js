@@ -81,10 +81,10 @@ const diagonalPaths = {0 : [2, 4], 1 : [3, 5], 2 : [0, 6, 8], 3 : [1,7,9], 4 : [
  // const gameSteps = ["init", "startTurn", "playerActionOne", "playerActionTwo", "playerActionThree", "playerPickACard", "floodRise", "endTurn", "final"];
 
  const treasures = [
-     { id : "CR" , name : "crystal", loc_key : "tr_crystal", trophyImg : "img/wonCrystal.png", litTempleImg : "img/tower_crystal.png" },
-     { id : "CU" , name : "cup", loc_key : "tr_cup", trophyImg : "img/wonCup.png", litTempleImg : "img/tower_cup.png"  },
-     { id : "SC" , name : "sceptre", loc_key : "tr_sceptre", trophyImg : "img/wonSceptre.png", litTempleImg : "img/tower_sceptre.png" },
-     { id : "ST" , name : "statue", loc_key : "tr_statue", trophyImg : "img/wonStatue.png", litTempleImg : "img/tower_statue.png" }
+     { id : "CR" , name : "crystal", loc_key : "tr_crystal", trophyImg : "img/wonCrystal.png", litTempleImg : "img/tower_crystal.png", loc_found_msg_key : "found_crystal" },
+     { id : "CU" , name : "cup", loc_key : "tr_cup", trophyImg : "img/wonCup.png", litTempleImg : "img/tower_cup.png", loc_found_msg_key : "found_cup"  },
+     { id : "SC" , name : "sceptre", loc_key : "tr_sceptre", trophyImg : "img/wonSceptre.png", litTempleImg : "img/tower_sceptre.png", loc_found_msg_key : "found_sceptre" },
+     { id : "ST" , name : "statue", loc_key : "tr_statue", trophyImg : "img/wonStatue.png", litTempleImg : "img/tower_statue.png", loc_found_msg_key : "found_statue" }
  ];
 
  const playerSteps = [
@@ -218,15 +218,16 @@ function DrawSquare(props) {
 
 function DrawEmptySquare(props) {
   return (
-    <button className="emptySquare" onClick={props.onClick}></button>
+    <div className="emptySquare" onClick={props.onClick}></div>
   );
 }
 
 function DrawEmptySquareWithTreasure(props) {
   return (
-    <button className="emptySquare">
-        <img className="trophyImage" src={props.imagePath}/>
-    </button>
+      <div className="emptySquare treasureTooltips" id={'tooltipTreasure' + props.id} >
+          <span className="inToolTipsText">{props.text}</span>
+          <img className="trophyImage" src={props.imagePath} />
+      </div>
   );
 }
 
@@ -2207,12 +2208,16 @@ handleTileClick(i) {
 
   renderTreasureSquare(treasureId) {
     // if le tresor a été trouvé draw it else Draw empty square
+    let lng = this.state.languageDistributor;
     let trophyPath = "";
+    let msg = "";
+
     if (this.state.posessedTreasures.indexOf(treasureId) >= 0){
       for (let i = 0 ; i < treasures.length; i++){
         if (treasures[i].id === treasureId)
         {
           trophyPath = treasures[i].trophyImg;
+          msg = this.getStringInTheCatalog(lng, treasures[i].loc_found_msg_key);
           break;
         }
       }
@@ -2222,7 +2227,7 @@ handleTileClick(i) {
       <span>
       {
         trophyPath.length > 0 ?
-          <DrawEmptySquareWithTreasure imagePath={trophyPath}/>
+          <DrawEmptySquareWithTreasure imagePath={trophyPath} text={msg} id={treasureId} />
             :
           <DrawEmptySquare />
       }
