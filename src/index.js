@@ -178,7 +178,7 @@ function DrawSquare(props) {
   } else if (props.tile.isDrawned) {
       squareStyle = ({background: 'transparent' });
   } else if (props.tile.isDrawning) {
-        squareStyle = ( {background: '', border: 'none' } );
+        squareStyle = ({background: 'url(img/drawning03.png)', border: 'none' });
   } else if (props.tile.imgpath.length > 0 && props.tile.name === "helipad") {
       squareStyle = ({background: 'url(' + props.tile.imgpath + ')' });
   } else {
@@ -730,7 +730,6 @@ class Board extends React.Component {
             n_Tiles[j].isImmersed = false;
             n_Tiles[j].isDrawning = true;
             n_Tiles[j].isDrawned = false;
-            // this.graphicallyDoDrawnATile(j);
             blinkingTile = j;
 
             tileHasDrawned = true;
@@ -2692,10 +2691,6 @@ handleTileClick(i) {
        }
   }
 
-  graphicallyDoDrawnATile(i){
-    document.getElementById("square" + i).style.background = "./img/drawning03.png";
-  }
-
   retry(){
     // window.location.reload();
     if (!window.location.hash)
@@ -3019,6 +3014,7 @@ class Game extends React.Component {
     let difficulty = 2;
     let language = "EN";
     let nbrOfPlayers = 4;
+    let versionNumber = "v0.8.2 BETA";
 
     // lets' try to get params from GET
     let propagatedDifficulty = null;
@@ -3065,7 +3061,7 @@ class Game extends React.Component {
       difficultyLevel: difficulty,
       language: language,
       nbrOfPlayers: nbrOfPlayers,
-      versionNumber: "v0.8.2 BETA"
+      versionNumber: versionNumber
     };
    }
 
@@ -3431,8 +3427,8 @@ function generateGUID() {
 
     console.log(logString);
     var logUrl = logHost + "?stf=" + logString;
-     // WORKS ! UNCOMMENT TO MAKE IT LIVE :
-     if (document.URL.indexOf("localhost") < 0){
+    // if test local ou test de build, do not log
+     if (document.URL.indexOf("localhost") < 0 && document.URL.indexOf("build") < 0 ){
             console.log("Logged");
             httpGetAsync(logUrl);
      }
