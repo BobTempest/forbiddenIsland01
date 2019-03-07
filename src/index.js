@@ -422,8 +422,9 @@ class Board extends React.Component {
     function giveTwoInitialCards(player, y , z){
        // helicopter card hack is off
        /*
-        let card = { id : 20, name : "helicopter", type : "H", url : "img/helicopterCard.png"};
-        let card2 = { id : 19, name : "helicopter", type : 4, url : "img/helicopterCard.png"};
+        let card = { id : 20, name : "helicopter", type : "H", loc_key: "ca_helicopter", url : "img/helicopterCard.png", howMany : 0};
+        let card2 = { id : 19, name : "helicopter", type : "H", loc_key: "ca_helicopter", url : "img/helicopterCard.png", howMany : 0};
+
         player.cards.push(card);
         player.cards.push(card2);
         */
@@ -1077,25 +1078,43 @@ class Board extends React.Component {
                     showActionableCards : false });
   }
 
-  helicopterCardEnRoute(playerId, travellers){
+  helicopterCardEnRoute(travellers){
     let lng = this.state.languageDistributor;
     let victory = false;
+    // Check if there are travellers
+    if (travellers.length < 1 )
+    {
+      this.customAlert(lng.thereIsNoOneInThisHelicopter);
+      return null;
+    }
+    // Check if travellers are on the same tile
+    if (travellers.length > 1 )
+    {
+      var startingTile = this.state.players[travellers[0]].position;
+      for (let i = 1; i < travellers.length; i++)
+      {
+        if (this.state.players[travellers[i]].position != startingTile){
+          this.customAlert(lng.helicopterRideShouldStartFromTheSameTile);
+          return null;
+        }
+      }
+    }
     // Check if the game is won :
     // on the helipad, 4 treasures found, all players on the tile
     if (this.state.posessedTreasures.length === 4 &&
-        this.state.tiles[this.state.players[playerId].position].name === "helipad" &&
+        this.state.tiles[this.state.players[travellers[0]].position].name === "helipad" &&
         //this.state.tiles[this.state.players[playerId].position].playerOn.length === this.state.nbrOfPlayers ) {
-        travellers.length === this.state.nbrOfPlayers /* - 1  */) {
+        travellers.length === this.state.nbrOfPlayers ) {
           // YOU WON // VICTORY
           // alert(lng.youWonMsg.format(this.state.nbrOfPlayers));
           victory = true;
         }
     // displays the possible destinations
-    let tilesToLight = this.whereCanHeFly(this.state.players[playerId].position);
-    this.state.players[playerId].whereCanHeFly = tilesToLight;
+    let tilesToLight = this.whereCanHeFly(this.state.players[travellers[0]].position);
+    this.state.players[travellers[0]].whereCanHeFly = tilesToLight;
     this.state.showActionableCards = false;
-    let nada = this.lightTheTiles(tilesToLight, this.state.players[playerId].color);
-    // set state
+    let nada = this.lightTheTiles(tilesToLight, this.state.players[travellers[0]].color);
+
     let n_messageBoardState = "default";
 
     if (victory === true){
@@ -1722,23 +1741,25 @@ handleTileClick(i) {
           this.customAlert(lng.heCantDryThere);
         }
       } else if (this.state.whatIsExpectedNext === "TileButtonClickForFlyWithACard") {
-        let player = this.state.players[this.state.cardUser];
+        // let player = this.state.players[this.state.cardUser];
+        let cardUser = this.state.players[this.state.cardUser];
+        let travellers = this.state.coTravellers;
         let n_Players = this.state.players;
         let n_PlayerCardsDiscard = this.state.playerCardsDiscard;
         let whatIsExpectedNext_toRestore = this.state.whatIsExpectedNext_toRestore;
 
-        if (player.whereCanHeFly.indexOf(i) >= 0){
+        //if (travellers[0].whereCanHeFly.indexOf(i) >= 0){
             // index of the card to remove
-            for (let i = 0; i < player.cards.length; i++){
-              if (player.cards[i].name === "helicopter"){
-                n_PlayerCardsDiscard.push(player.cards[i]);
-                player.cards.splice(i, 1);
+            for (let i = 0; i < cardUser.cards.length; i++){
+              if (cardUser.cards[i].name === "helicopter"){
+                n_PlayerCardsDiscard.push(cardUser.cards[i]);
+                cardUser.cards.splice(i, 1);
                 break;
               }
             }
 
-            player.whereCanHeFly = [];
-            n_Players[player.id] = player;
+            cardUser.whereCanHeFly = [];
+            n_Players[cardUser.id] = cardUser;
 
             // If the currently active is the flyer or in the flight or if the current player is on the reception ISLAND
             // and destination tile has a guy on it and he's not the messanger,
@@ -1787,7 +1808,7 @@ handleTileClick(i) {
               }
 
             // Move
-            let returnPack = this.moveAGroupOfPlayers(player.id, this.state.coTravellers, i, n_Players, this.state.tiles);
+            let returnPack = this.moveAGroupOfPlayers(this.state.coTravellers, i, n_Players, this.state.tiles);
             //
 /*
             if (this.state.inAGetRidOfACardContext){
@@ -1813,9 +1834,9 @@ handleTileClick(i) {
                             inAGetRidOfACardContext: false,
                             showActionableCards: true });
             let nada = this.unlightTheTiles();
-        } else {
-          this.customAlert(lng.cantFlyThereWithHisHCard);
-        }
+        //} else {
+        //  this.customAlert(lng.cantFlyThereWithHisHCard);
+        //}
       }
       else if (this.state.whatIsExpectedNext === "TileButtonClickForDryWithACard") {
         let player = this.state.players[this.state.cardUser];
@@ -1996,9 +2017,9 @@ handleTileClick(i) {
     return { players: n_players, tiles: n_Tiles};
   }
 
-  moveAGroupOfPlayers(leaderId, travellersIds, destination, players, tiles){
+  moveAGroupOfPlayers(travellersIds, destination, players, tiles){
     let n_Tiles = this.state.tiles;
-    let startingFrom = this.state.players[leaderId].position;
+    let startingFrom = this.state.players[travellersIds[0]].position;
     let n_Players = this.state.players;
 
     for (let i=0; i < travellersIds.length; i++){
@@ -2009,10 +2030,9 @@ handleTileClick(i) {
           // adding travellers to new tile
           n_Tiles[destination].playerOn.push(travellersIds[i]);
           n_Players[travellersIds[i]].position = destination;
+          n_Players[travellersIds[i]].whereCanHeMove = null;
+          n_Players[travellersIds[i]].whereCanHeFly = null;
     }
-
-    n_Players[leaderId].whereCanHeMove = null;
-    n_Players[leaderId].whereCanHeFly = null;
 
     return { players: n_Players, tiles: n_Tiles};
   }
@@ -2036,6 +2056,8 @@ handleTileClick(i) {
       this.showActionButtons();
     }
     this.setState({
+      // TODO show back handsOver Actionable cards
+      showActionableCards : true,
       whatIsExpectedNext: "CharacterActionButtonClick" ,
       messageBoardState: "default",
       mainUserMessage : newMessage});
@@ -2112,6 +2134,7 @@ handleTileClick(i) {
         playersOnTheSameTileExceptMe.push(this.state.players[i].id);
       }
     }
+    // alert("players on the same tile than me : Iam " +  id + " and I'm with" + playersOnTheSameTileExceptMe);
     return playersOnTheSameTileExceptMe;
   }
 
@@ -2201,7 +2224,7 @@ handleTileClick(i) {
 
   renderEmptySquare() {
     return (
-      <DrawEmptySquare /*onClick={() => this.launchGameOver(false, true, "Yolo")} *//>
+      <DrawEmptySquare /*HACK onClick={() => this.launchGameOver(false, true, "Yolo")} *//>
     );
   }
 
@@ -2342,7 +2365,7 @@ handleTileClick(i) {
       console.log('playersOnTheSameTileExceptMe = ' + playersOnTheSameTileExceptMe);// seems Ok
       let chosenCard = this.state.players[giverId].cards.length === 1 ? this.state.players[giverId].cards[0].id : null;
       let receiver = playersOnTheSameTileExceptMe.length === 1 ? playersOnTheSameTileExceptMe[0] : null;
-
+//alert("receiver = " + receiver + " giverId = " + giverId + " chosencard = " + chosenCard );
       return (
           <div className="panelInfo" id="UserDialog">
             {lng.whichCardDoYouWantToGive}
@@ -2446,22 +2469,38 @@ handleTileClick(i) {
           </div>
       )
     } else if (this.state.messageBoardState === "ChooseCoTravellers") {
-        let flyerId = this.state.cardUser;
-        let playersOnTheSameTileExceptMe = this.getPlayersOnTheSameTileExceptMe(flyerId);
-        let travellers = [flyerId];
+        //let flyerId = this.state.cardUser;
+        //let playersOnTheSameTileExceptMe = this.getPlayersOnTheSameTileExceptMe(flyerId);
+
+        let travellers = [];
+        let whereAndWho = [[]];
+
+        for (let i = 0 ; i < this.state.tiles.length; i++){
+          if (this.state.tiles[i].playerOn && this.state.tiles[i].playerOn.length > 0)
+          {
+            whereAndWho[i] = [];
+            whereAndWho[i] = this.state.tiles[i].playerOn;
+          }
+        }
+
+        console.log(JSON.stringify(whereAndWho));
 
         function Amadeus(id, element){
           if (document.getElementById(element).checked)
           {
+              // add to travellers
               travellers.push(id);
           } else {
+              // remove from travellers
               travellers.splice(travellers.indexOf(id), 1);
           }
         }
 
         return (
           <div className="panelInfo" id="UserDialog">
+          {lng.selectTheGuys}
             {
+              /*
                   playersOnTheSameTileExceptMe.length === 0 ? // Ok
                      (<div> <span style={{color: this.state.players[flyerId].color}}>{this.state.players[flyerId].name}</span>{lng.playerChooseALandingDestination}</div>)
                     : playersOnTheSameTileExceptMe.length === 1 ? // Ok
@@ -2477,8 +2516,29 @@ handleTileClick(i) {
                           })
                         }
                         </div>)
+                      }
+
+                    <br/>
+
+                    {*/
+                        (whereAndWho.map((playersOnT, indexTile) => {
+                          return (
+                            playersOnT.length > 0 ?
+                             (<div className="lilGreyFrame">
+                             {
+                                playersOnT.map((playerId, indexPlayer) => {
+                                  return <span key={playerId}><input type="checkBox" name="traveller" id={"checkBoxAmadeusFor"+playerId} key={playerId} value={playerId} onChange={() => Amadeus(playerId, "checkBoxAmadeusFor"+playerId)} /><span style={{color: this.state.players[playerId].color}}>{this.state.players[playerId].name}</span><br/></span>
+                                })
+                              }
+                              </div>)
+                              :
+                              <></>
+                            )
+                          }))
+
             }
-            <button className="actionButton" onClick={() => this.helicopterCardEnRoute(flyerId, travellers)}>{lng.hopIn}</button>
+            <br />
+            <button className="actionButton" onClick={() => this.helicopterCardEnRoute(travellers)}>{lng.hopIn}</button>
           </div>
         )
     } else if (this.state.messageBoardState === "moveSomeOneSequence") {
@@ -2962,6 +3022,7 @@ handleTileClick(i) {
 }
 
 /* VOIR DANS LA PLAYER LEAP / DISCARD
+
 <div className="playerBoard-column">
   <table border="1">
       <tr><th>Leap</th><th>Discard</th></tr>
@@ -2977,9 +3038,7 @@ handleTileClick(i) {
       }</td></tr>
   </table>
 </div>
-*/
 
-/*
 VOIR DANS LE Flood Leap
 <div className="playerBoard-column">
   <table border="1">
@@ -3003,6 +3062,7 @@ VOIR DANS LE Flood Leap
     </td></tr>
   </table>
 </div>
+</span>
 */
 ////// END OF Board Class
 
@@ -3014,7 +3074,7 @@ class Game extends React.Component {
     let difficulty = 2;
     let language = "EN";
     let nbrOfPlayers = 4;
-    let versionNumber = "v0.8.2 BETA";
+    let versionNumber = "v0.8.4 BETA";
 
     // lets' try to get params from GET
     let propagatedDifficulty = null;
