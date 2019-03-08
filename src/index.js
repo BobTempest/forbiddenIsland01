@@ -2755,7 +2755,8 @@ handleTileClick(i) {
     // window.location.reload();
     if (!window.location.hash)
     {
-        window.location.replace(window.location.hostname + "?lang=" + this.state.selectedLanguage + "&difficulty=" + this.state.difficultyLevel + "&nbrOfPlayers=" + this.state.nbrOfPlayers)
+        window.location.search = "?lang=" + this.state.selectedLanguage + "&difficulty=" + this.state.difficultyLevel + "&nbrOfPlayers=" + this.state.nbrOfPlayers;
+        // window.location.replace(window.location.hostname + "?lang=" + this.state.selectedLanguage + "&difficulty=" + this.state.difficultyLevel + "&nbrOfPlayers=" + this.state.nbrOfPlayers)
     }
   }
 
