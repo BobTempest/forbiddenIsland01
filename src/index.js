@@ -1697,6 +1697,7 @@ handleTileClick(i) {
                 returnPack.players[j].isPuppet = false;
               }
               this.setState({ whatIsExpectedNext: "" ,
+                              messageBoardState : "default",
                               tiles: returnPack.tiles,
                               players: returnPack.players}, () => {
                                 this.unlightTheTiles();
@@ -2073,12 +2074,21 @@ handleTileClick(i) {
     let whereCanHeMove = this.whereNavigatorCanMoveHim(this.state.players[puppet].position);
     this.state.players[puppet].whereCanHeMove = whereCanHeMove;
     let n_players = this.state.players;
-    n_players[puppet].isPuppet = true;
+    for (let i = 0; i < n_players.length; i++){
+      if (i == puppet){
+        n_players[i].isPuppet = true;
+      }
+      else {
+        n_players[i].isPuppet = false;
+      }
+    }
+
+    this.unlightTheTiles();
     this.lightTheTiles(whereCanHeMove, this.state.players[puppet].color);
     let newMessage = new UserMessage('chooseADestination', null, false, []); // TODO : SET a cancel
     this.setState({ whatIsExpectedNext: "TileButtonClickForMoveSomeone" ,
                     mainUserMessage: newMessage,
-                    messageBoardState : "default",
+                    messageBoardState : "moveSomeOneSequence",
                     players : n_players });
   }
 
@@ -2500,42 +2510,20 @@ handleTileClick(i) {
           <div className="panelInfo" id="UserDialog">
           {lng.selectTheGuys}
             {
-              /*
-                  playersOnTheSameTileExceptMe.length === 0 ? // Ok
-                     (<div> <span style={{color: this.state.players[flyerId].color}}>{this.state.players[flyerId].name}</span>{lng.playerChooseALandingDestination}</div>)
-                    : playersOnTheSameTileExceptMe.length === 1 ? // Ok
-                       (<div> <span style={{color: this.state.players[flyerId].color}}>{this.state.players[flyerId].name}</span>{lng.doYouWantToTake}<span style={{color: this.state.players[playersOnTheSameTileExceptMe[0]].color}}>{this.state.players[playersOnTheSameTileExceptMe[0]].name}</span>{lng.withYou} <br/>
-                         <input type="radio" name="coTraveller" key="yes" value="yes" onChange={() => travellers = [flyerId, playersOnTheSameTileExceptMe[0]]}/> {lng.btn_yes}<br/>
-                         <input type="radio" name="coTraveller" key="no" value="no" onChange={() => travellers = [flyerId]}/>{lng.btn_no}<br/>
-                       </div>)
-                      :
-                        (<div><span style={{color: this.state.players[flyerId].color}}>{this.state.players[flyerId].name}</span>{lng.selectTheGuys}<br/>
-                        {
-                          playersOnTheSameTileExceptMe.map((playerId, index) => {
-                             return <span key={index}><input type="checkBox" name="traveller" id={"checkBoxAmadeusFor"+playerId} key={index} value={playerId} onChange={() => Amadeus(playerId, "checkBoxAmadeusFor"+playerId)} /><span style={{color: this.state.players[playerId].color}}>{this.state.players[playerId].name}</span><br/></span>
-                          })
-                        }
-                        </div>)
+                (whereAndWho.map((playersOnT, indexTile) => {
+                  return (
+                    playersOnT.length > 0 ?
+                     (<div className="lilGreyFrame">
+                     {
+                        playersOnT.map((playerId, indexPlayer) => {
+                          return <span key={playerId}><input type="checkBox" name="traveller" id={"checkBoxAmadeusFor"+playerId} key={playerId} value={playerId} onChange={() => Amadeus(playerId, "checkBoxAmadeusFor"+playerId)} /><span style={{color: this.state.players[playerId].color}}>{this.state.players[playerId].name}</span><br/></span>
+                        })
                       }
-
-                    <br/>
-
-                    {*/
-                        (whereAndWho.map((playersOnT, indexTile) => {
-                          return (
-                            playersOnT.length > 0 ?
-                             (<div className="lilGreyFrame">
-                             {
-                                playersOnT.map((playerId, indexPlayer) => {
-                                  return <span key={playerId}><input type="checkBox" name="traveller" id={"checkBoxAmadeusFor"+playerId} key={playerId} value={playerId} onChange={() => Amadeus(playerId, "checkBoxAmadeusFor"+playerId)} /><span style={{color: this.state.players[playerId].color}}>{this.state.players[playerId].name}</span><br/></span>
-                                })
-                              }
-                              </div>)
-                              :
-                              <></>
-                            )
-                          }))
-
+                      </div>)
+                      :
+                      <></>
+                    )
+                  }))
             }
             <br />
             <button className="actionButton" onClick={() => this.helicopterCardEnRoute(travellers)}>{lng.hopIn}</button>
@@ -2549,12 +2537,12 @@ handleTileClick(i) {
               {
               (this.state.players.map((player, index) => {
                 return (player.role != "Navigator") ?
-                  (<span key={index}><input type="radio" name="puppet" key={index} value={player.id} onChange={() => puppet = player.id}/><span style={{color: player.color}}>{player.name}</span><br/></span>)
+                  (<span key={index}><input type="radio" name="puppet" key={index} value={player.id} onChange={() => this.doMoveSomeOne(player.id)}/><span style={{color: player.color}}>{player.name}</span><br/></span>)
                   :
                   (<span key={index}></span>)
                 }))
               }
-              <button className="actionButton" value="Give" onClick={() => this.doMoveSomeOne(puppet)}>{lng.moveThisCharacter} </button>
+              <div>{lng.andMoveHimUpToTwoTiles}</div>
             </div>
           )
     } else if (this.state.messageBoardState === "SolveOver5Cards") {
@@ -3421,10 +3409,10 @@ function generatePlayers(howMany){
     if (howMany > 4 || howMany < 2){
       this.customAlert("CONCEPTUAL ERROR : Too many player requested");
     }
+    // let roles = [0,1,2,3,4,5];
+    // roles = shuffleArray(roles);
     // Diver hack off
-    let roles = [0,1,2,3,4,5];
-    roles = shuffleArray(roles);
-    // let roles = [3,5,2,1,4,0];
+    let roles = [1,5,2,3,4,0];
     let players = [];
     for (let i = 0; i < howMany; i++){
       let type = roles[i];
