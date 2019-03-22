@@ -42,24 +42,25 @@
     $req_repartitionOfFails = mysql_query($sql_repartitionOfFails) or die('Erreur SQL sur sql_repartitionOfFails !<br />'.$sql_repartitionOfFails.'<br />'.mysql_error());
 
     // ******** display
-    $data_globalCountFail = mysql_fetch_row($req_globalCountFail));
+    $data_globalCountFail = mysql_fetch_row($req_globalCountFail);
     echo 'globalCountFail : '.$data_globalCountFail[0].'<br />';
     //
-    $data_globalCountWin = mysql_fetch_row($req_globalCountWin));
+    $data_globalCountWin = mysql_fetch_row($req_globalCountWin);
     echo 'globalCountWin : '.$data_globalCountWin[0].'<br />';
     //
-    $data_globalUnfinishedGames = mysql_fetch_row($req_globalUnfinishedGames));
+    $data_globalUnfinishedGames = mysql_fetch_row($req_globalUnfinishedGames);
     echo 'globalUnfinishedGames : '.$data_globalUnfinishedGames[0].'<br />';
     //
-    $data_globalFinishedGames = mysql_fetch_row($req_globalFinishedGames)) ;
+    $data_globalFinishedGames = mysql_fetch_row($req_globalFinishedGames) ;
     echo 'globalFinishedGames : '.$data_globalFinishedGames[0].'<br />';
     //
     echo 'Repartition of failures:<br />';
     echo '<table>';
-    while ($data_globalFinishedGames = mysql_fetch_array($req_repartitionOfFails)) {
-        echo '<tr><td>'.$data[0].'</td>';
-        echo '<td>'.$data[1].'</td></tr>';
+    while ($data_repartitionOfFails = mysql_fetch_array($req_repartitionOfFails)) {
+        echo '<tr><td>'.$data_repartitionOfFails[0].'</td>';
+        echo '<td>'.$data_repartitionOfFails[1].'</td></tr>';
     }
+    echo '<tr><td>unfinished games</td><td>'.$data_globalUnfinishedGames[0].'</td></tr>';
     echo '</table>';
 
 
