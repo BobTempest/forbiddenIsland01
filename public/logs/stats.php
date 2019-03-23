@@ -18,10 +18,13 @@
     <body>
     <?php
     // ******* requêtes
-    // Global Count fail : 
+    // Global Count started :
+    $sql_globalCountStarted = 'SELECT COUNT(*) FROM Games WHERE Message01 = "START"';
+
+    // Global Count fail :
     $sql_globalCountFail = 'SELECT COUNT(*) FROM Games WHERE Message01 = "GAME_LOST"';
 
-    // Global Count win : 
+    // Global Count win :
     $sql_globalCountWin = 'SELECT COUNT(*) FROM Games WHERE Message01 = "GAME_WON"';
 
     // Global Unfinished games
@@ -35,6 +38,7 @@
 
 
     // ******* executions
+    $req_globalCountStarted = mysql_query($sql_globalCountStarted) or die('Erreur SQL sur sql_globalCountStarted !<br />'.$sql_globalCountStarted.'<br />'.mysql_error());
     $req_globalCountFail = mysql_query($sql_globalCountFail) or die('Erreur SQL sur sql_globalCountFail !<br />'.$sql_globalCountFail.'<br />'.mysql_error());
     $req_globalCountWin = mysql_query($sql_globalCountWin) or die('Erreur SQL sur sql_globalCountWin !<br />'.$sql_globalCountWin.'<br />'.mysql_error());
     $req_globalUnfinishedGames = mysql_query($sql_globalUnfinishedGames) or die('Erreur SQL sur sql_globalUnfinishedGames !<br />'.$sql_globalUnfinishedGames.'<br />'.mysql_error());
@@ -42,6 +46,9 @@
     $req_repartitionOfFails = mysql_query($sql_repartitionOfFails) or die('Erreur SQL sur sql_repartitionOfFails !<br />'.$sql_repartitionOfFails.'<br />'.mysql_error());
 
     // ******** display
+    $data_globalCountStarted = mysql_fetch_row($req_globalCountStarted);
+    echo 'globalCountStarted : '.$data_globalCountStarted[0].'<br />';
+    //
     $data_globalCountFail = mysql_fetch_row($req_globalCountFail);
     echo 'globalCountFail : '.$data_globalCountFail[0].'<br />';
     //
