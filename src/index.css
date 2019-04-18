@@ -312,13 +312,11 @@ list-style:none;
 }
 
 .panelTitle {
-  /*float: left;*/
   margin-left: 10px;
   font-size: 34px;
   font-weight: bold;
   text-shadow: 1px 1px 3px #333333;
   line-height: 39px;
-  /*width: 280px*/
 }
 
 .panelSubTitle {
@@ -334,6 +332,7 @@ list-style:none;
   margin-top: 4px;
   font-size: 15px;
   text-shadow: 1px 1px 3px #333333;
+  display: inline-block;
 }
 
 .littlePanelInfo {
@@ -484,9 +483,9 @@ list-style:none;
 }
 
 .actionButton {
-  -webkit-border-radius: 8;
-  -moz-border-radius: 8;
-  border-radius: 8px;
+  -webkit-border-radius: 5;
+  -moz-border-radius: 5;
+  border-radius: 5px;
   -webkit-box-shadow: 1px 1px 3px #666666;
   -moz-box-shadow: 1px 1px 3px #666666;
   box-shadow: 1px 1px 3px #666666;
@@ -494,9 +493,17 @@ list-style:none;
   color: #050505;
   font-size: 15px;
   background: #ffffff;
-  padding: 5px 20px 5px 20px;
+  padding: 5px 15px 5px 15px;
   border: solid #cccccc 1px;
   text-decoration: none;
+  margin-top: 5px;
+  margin-left: 10px;
+}
+
+.fullButton {
+  display: block;
+  width: 100%;
+  margin-left: 20px;
 }
 
 .actionButton:hover {
@@ -697,8 +704,8 @@ a:hover.tooltips span {
 /* ACTION Tooltips */
 a.actionTooltips {
   position: relative;
-  left: 10px;
-  top: 17px;
+  left: 17px;
+  top: -15px;
   display: inline;
 }
 

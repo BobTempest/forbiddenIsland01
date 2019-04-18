@@ -35,7 +35,7 @@ export const stringsCatalog = {
    ca_helicopter: "Helicopter",
    ca_sandBag: "Sand Bag",
    ca_floodRise: "Flood",
-   ca_help_helicopter: "Helicopter card : Play it whenever you want. Move one or more explorers where you want.",
+   ca_help_helicopter: "Helicopter card : Play it whenever you want. Move one or more explorers from a tile where you want.",
    ca_help_sandBag: "Sand bag card : Play it whenever you want. Dry any tile you want.",
    //
    fullFormattedNameAndRoleDiver: "Gina the {0}diver{1}",
@@ -235,7 +235,7 @@ export const stringsCatalog = {
    ca_helicopter: "Hélicoptère",
    ca_sandBag: "Sac de sable",
    ca_floodRise: "Inondation",
-   ca_help_helicopter: "Carte Hélicoptère : Jouez la quand vous voulez. Déplacez un ou tous les explorateurs de la case où vous voulez.",
+   ca_help_helicopter: "Carte Hélicoptère : Jouez la quand vous voulez. Déplacez un ou tous les explorateurs d'une même case où vous voulez.",
    ca_help_sandBag: "Carte Sac de sable : Jouez la quand vous voulez. Asséchez une case de votre choix.",
    //
    fullFormattedNameAndRoleDiver: "Gina la {0}plongeuse{1}",

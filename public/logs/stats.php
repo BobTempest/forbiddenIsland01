@@ -36,6 +36,11 @@
     // Global Repartition of fails
     $sql_repartitionOfFails = 'SELECT Message02, COUNT(*) FROM Games WHERE Message01 = "GAME_LOST" GROUP BY Message02';
 
+    // Games per months
+    $sql_gamesPerMonths = 'SELECT DATE_FORMAT(ServerDateTime, "%M %Y") AS MyDATE, COUNT(*) FROM Games WHERE Message01 = "START" GROUP BY MONTH(ServerDateTime) ORDER BY ServerDateTime ASC';
+
+    // Last game played
+    $sql_lastGamePlayed = 'SELECT DATE_FORMAT(ServerDateTime, "%d %M %Y %T") FROM `Games` WHERE 1 ORDER BY `ServerDateTime` DESC LIMIT 1';
 
     // ******* executions
     $req_globalCountStarted = mysql_query($sql_globalCountStarted) or die('Erreur SQL sur sql_globalCountStarted !<br />'.$sql_globalCountStarted.'<br />'.mysql_error());
@@ -44,8 +49,13 @@
     $req_globalUnfinishedGames = mysql_query($sql_globalUnfinishedGames) or die('Erreur SQL sur sql_globalUnfinishedGames !<br />'.$sql_globalUnfinishedGames.'<br />'.mysql_error());
     $req_globalFinishedGames = mysql_query($sql_globalFinishedGames) or die('Erreur SQL sur sql_globalFinishedGames !<br />'.$sql_globalFinishedGames.'<br />'.mysql_error());
     $req_repartitionOfFails = mysql_query($sql_repartitionOfFails) or die('Erreur SQL sur sql_repartitionOfFails !<br />'.$sql_repartitionOfFails.'<br />'.mysql_error());
+    $req_gamesPerMonths = mysql_query($sql_gamesPerMonths) or die('Erreur SQL sur sql_gamesPerMonths !<br />'.$sql_gamesPerMonths.'<br />'.mysql_error());
+    $req_lastGamePlayed = mysql_query($sql_lastGamePlayed) or die('Erreur SQL sur sql_lastGamePlayed !<br />'.$sql_lastGamePlayed.'<br />'.mysql_error());
 
     // ******** display
+    $data_lastGamePlayed = mysql_fetch_row($req_lastGamePlayed);
+    echo 'Last game played : '.$data_lastGamePlayed[0].'<br />';
+
     $data_globalCountStarted = mysql_fetch_row($req_globalCountStarted);
     echo 'globalCountStarted : '.$data_globalCountStarted[0].'<br />';
     //
@@ -61,7 +71,8 @@
     $data_globalFinishedGames = mysql_fetch_row($req_globalFinishedGames) ;
     echo 'globalFinishedGames : '.$data_globalFinishedGames[0].'<br />';
     //
-    echo 'Repartition of failures:<br />';
+    echo '<div>';
+    echo '<b>Repartition of failures:</b><br />';
     echo '<table>';
     while ($data_repartitionOfFails = mysql_fetch_array($req_repartitionOfFails)) {
         echo '<tr><td>'.$data_repartitionOfFails[0].'</td>';
@@ -69,13 +80,25 @@
     }
     echo '<tr><td>unfinished games</td><td>'.$data_globalUnfinishedGames[0].'</td></tr>';
     echo '</table>';
+    echo '</div>';
+    echo '<div>';
+    echo '<b>Games per Months:</b><br />';
+    echo '<table>';
+    while ($data_gamesPerMonths = mysql_fetch_array($req_gamesPerMonths)) {
+        echo '<tr><td>'.$data_gamesPerMonths[0].'</td>';
+        echo '<td>'.$data_gamesPerMonths[1].'</td></tr>';
+    }
+    echo '</table>';
+    echo '</div>';
 
-
+    //
     mysql_free_result ($req_globalCountFail);
     mysql_free_result ($req_globalCountWin);
     mysql_free_result ($req_globalUnfinishedGames);
     mysql_free_result ($req_globalFinishedGames);
     mysql_free_result ($req_repartitionOfFails);
+    mysql_free_result ($req_gamesPerMonths);
+    mysql_free_result ($req_lastGamePlayed);
     mysql_close ();
     ?>
     </body>

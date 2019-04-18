@@ -1,6 +1,7 @@
+import './index.css';
+
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
 
 import {stringsCatalog} from './strings.js';
 
@@ -357,6 +358,7 @@ class Board extends React.Component {
     var gameID = generateGUID();
 
     this.state = {
+      // IF ADDING ANYTHING, PLEASE FIX doStatePermutation
       tiles: tiles,
       playerCardsLeap: playerCardsLeap,
       playerCardsDiscard: playerCardsDiscard,
@@ -381,7 +383,7 @@ class Board extends React.Component {
       //
       languageDistributor: props.language === "FR" ? stringsCatalog.fr : stringsCatalog.en,
       selectedLanguage: props.language === "FR" ? "FR" : "EN",
-      //
+      //       // IF ADDING ANYTHING, PLEASE FIX doStatePermutation
       posessedTreasures : [],
       turn : 1,
       hasPilotFlownThisTurn : false,
@@ -2187,6 +2189,7 @@ handleTileClick(i) {
         floodMeter: newState.floodMeter,
         difficultyLevel: newState.difficultyLevel,
         difficultyLevelString: newState.difficultyLevelString,
+        versionNumber: newState.versionNumber,
         //
         pastStates: newState.pastStates,
         //
@@ -2348,16 +2351,16 @@ handleTileClick(i) {
           }
           {this.renderMessageBoard()}
           <div className="panelInfo" id="UserActions">
-            <ul>
+            
               {this.state.possibleActions.map((action, index) =>
-                <li key={action.name}>
-                    <button className="actionButton" onClick={() => this.handleActionClick(action.triggers)} >
+                <>
+                    <button className="actionButton fullButton" onClick={() => this.handleActionClick(action.triggers)} >
                       {this.getStringInTheCatalog(lng, action.locName)}
                     </button>
                     <a className="actionTooltips helpCharacterIcon" id={'tooltipAction' + index} href="#">?<span className="inToolTipsText">{this.getStringInTheCatalog(lng, action.locHelp)}</span></a>
-                  </li>
+                 </>
               )}
-            </ul>
+            
           </div>
         </div>
         <div className="mailMessage">
@@ -3408,10 +3411,10 @@ function generatePlayers(howMany){
     if (howMany > 4 || howMany < 2){
       this.customAlert("CONCEPTUAL ERROR : Too many player requested");
     }
-    // let roles = [0,1,2,3,4,5];
-    // roles = shuffleArray(roles);
+    let roles = [0,1,2,3,4,5];
+    roles = shuffleArray(roles);
     // Diver hack off
-    let roles = [1,5,2,3,4,0];
+    // let roles = [1,5,2,3,4,0];
     let players = [];
     for (let i = 0; i < howMany; i++){
       let type = roles[i];
