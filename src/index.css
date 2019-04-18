@@ -235,7 +235,8 @@ list-style:none;
 .cardsPilesTable , th, td {
   border: 1px solid #BBB;
   border-collapse: collapse;
-  /*width: 346px;*/
+  width: 324px;
+  margin-left: 10px;
 }
 
 .throwTable, th, tr, td  {
@@ -246,6 +247,14 @@ list-style:none;
 .invisiTable {
   border: 0px solid white;
   border-collapse: collapse;
+}
+
+.cellTitle {
+  width: 40px;
+}
+
+.cellJauge {
+  width: 117px;
 }
 
 .trophyImage {
