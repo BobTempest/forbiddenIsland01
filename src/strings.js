@@ -15,6 +15,7 @@ export const stringsCatalog = {
    mailMessage: "Thanks for playing. Comments ?, Bugs ?",
    mailLink: "Write to me !",
    mailAdress: "mailto:info@boulezrepublic.com",
+   initialisation: "... Initialisation...",
    // roles
    ro_Diver: "Diver",
    ro_Pilot: "Pilot",
@@ -215,6 +216,7 @@ export const stringsCatalog = {
    mailMessage: "Commentaires ?, bugs ?",
    mailLink: "Ecrivez moi !",
    mailAdress: "mailto:info@boulezrepublic.com",
+   initialisation: "... Initialisation...",
    // roles
    ro_Diver: "Plongeuse",
    ro_Pilot: "Pilote",

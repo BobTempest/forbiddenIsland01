@@ -232,7 +232,7 @@ list-style:none;
     height: 86px;
 }
 
-.cardsPilesTable , th, td {
+.cardsPilesTable, th, tr, td {
   border: 1px solid #BBB;
   border-collapse: collapse;
   width: 324px;
@@ -242,6 +242,8 @@ list-style:none;
 .throwTable, th, tr, td  {
   border: 0px solid white;
   border-collapse: collapse;
+  width: inherit;
+  padding-right: 5px;
 }
 
 .invisiTable {

@@ -122,7 +122,7 @@ const diagonalPaths = {0 : [2, 4], 1 : [3, 5], 2 : [0, 6, 8], 3 : [1,7,9], 4 : [
       {id : 1, name : "Dry", locName: "ac_dry", locHelp: "ah_dry", enabled : true, triggers : "Dry"  }, //has an adjacent immersed tile around ?
       {id : 2, name : "Give", locName: "ac_give", locHelp: "ah_give", enabled : true, triggers : "Give" }, //has a player on his tile ?
       {id : 3, name : "Get a Treasure !", locName: "ac_getATreasure", locHelp: "ah_getATreasure", enabled : true, triggers : "GetATreasure"  }, // has 4 cards and is on the right temple
-      /*{id : 4, name : "DoNothing", text: "Simply do nothing.", enabled : true, triggers : "DoNothing"  }, // -
+      /* {id : 4, name : "DoNothing", text: "Simply do nothing.", enabled : true, triggers : "DoNothing"  }, // -
       /* {id : 5, name : "Skip Turn", text: "Skip the player'sTurn.", enabled : true, triggers : "SkipTurn"  } // -*/
       {id : 6, name : "Sleep", locName: "ac_sleep", locHelp: "ah_sleep", enabled : true, triggers : "DoSleep"  }
  ];
@@ -344,7 +344,7 @@ class Board extends React.Component {
     var floodCardsDiscard = [];
     var floodMeter = new FloodMeter(props.difficultyLevel);
 
-    let mainUserMessage = new UserMessage("... INITIALIZATION... ", null, false, []);
+    let mainUserMessage = new UserMessage('initialisation', null, false, []);
 
     // generer les joueurs
     var players = generatePlayers(nbrOfPlayers);
@@ -778,7 +778,6 @@ class Board extends React.Component {
           this.customAlert("CONCEPTUAL ERROR : " + n_Tiles[j].name + " is already drawned. it shouldn't be in the Leap !");
         }
         else{
-            //message = message + n_Tiles[j].name + " at " + j + " is flooded ! ";
             message = message + lng.tileIsFlooded.format(n_Tiles[j].name, j);
             n_Tiles[j].isImmersed = true;
             blinkingTile = j;
@@ -942,7 +941,7 @@ class Board extends React.Component {
           // put the flood card in the discards
           newPlayerCardsDiscard.push(card);
       }
-      else{
+      else {
         cardToPushToPlayer = card;
       }
 
@@ -1105,10 +1104,8 @@ class Board extends React.Component {
     // on the helipad, 4 treasures found, all players on the tile
     if (this.state.posessedTreasures.length === 4 &&
         this.state.tiles[this.state.players[travellers[0]].position].name === "helipad" &&
-        //this.state.tiles[this.state.players[playerId].position].playerOn.length === this.state.nbrOfPlayers ) {
         travellers.length === this.state.nbrOfPlayers ) {
           // YOU WON // VICTORY
-          // alert(lng.youWonMsg.format(this.state.nbrOfPlayers));
           victory = true;
         }
     // displays the possible destinations
@@ -1134,7 +1131,7 @@ class Board extends React.Component {
     }
   };
 
-  cancelHelicopterCardPick(){
+  cancelHelicopterCardPick() {
     this.unlightTheTiles();
     this.showActionButtons();
     this.setState({ whatIsExpectedNext: this.state.whatIsExpectedNext_toRestore,
@@ -1171,7 +1168,7 @@ class Board extends React.Component {
     return null;
   }
 
-  cancelSandBagCardPick(){
+  cancelSandBagCardPick() {
     this.unlightTheTiles();
     this.showActionButtons();
     this.setState({ whatIsExpectedNext: this.state.whatIsExpectedNext_toRestore,
@@ -1188,7 +1185,7 @@ class Board extends React.Component {
 
   howManyCards(level){
     // flood scale :  |12|345|67|89|
-    //                   |2 |3  |4 |5 |
+    //                |2 |3  |4 |5 |
     if (level < 3){
         return 2;
     } else if (level < 6) {
@@ -1268,7 +1265,7 @@ class Board extends React.Component {
       if (player.role === "Pilot"){
         // remove the first action which is move (if it is)
         if (actions[0].name === "Move"){
-                  let nada = actions.shift();
+            let nada = actions.shift();
         }
         let pilotActions = [];
         pilotActions.push(playerDefaultActions[0]); // move
@@ -1281,7 +1278,7 @@ class Board extends React.Component {
       if (player.role === "Navigator"){
         // remove the first action which is move (if it is)
         if (actions[0].name === "Move"){
-                  let nada = actions.shift();
+            let nada = actions.shift();
         }
         let navigatorActions = [];
         navigatorActions.push(playerDefaultActions[0]); // move
@@ -2724,12 +2721,12 @@ handleTileClick(i) {
   }
 
   unblinkTheTiles() {
-        for (let i = 0; i < 24; i++){
-          if ( document.getElementById("square" + i).classList.contains('blink') ){
-            document.getElementById("square" + i).className =
-               document.getElementById("square" + i).className.replace( /(?:^|\s)blink(?!\S)/g , '' )
-          }
+      for (let i = 0; i < 24; i++){
+        if ( document.getElementById("square" + i).classList.contains('blink') ){
+          document.getElementById("square" + i).className =
+              document.getElementById("square" + i).className.replace( /(?:^|\s)blink(?!\S)/g , '' )
         }
+      }
   }
 
   blinkAPlayer(playerId) {
@@ -2752,21 +2749,37 @@ handleTileClick(i) {
 
   getTreasureNameById(id){
     console.log("In getTreasureById with : " + id);
+    /*
     for (let i = 0; i < treasures.length; i ++){
       if (treasures[i].id === id){
         return this.getStringInTheCatalog(this.state.languageDistributor, treasures[i].loc_key);
       }
     }
     return "** Unknown Treasure was " + id + "**";
+    */
+
+    let t = treasures.filter( treasure => {
+        return treasure.id === id;
+    })
+
+    return this.getStringInTheCatalog(this.state.languageDistributor, t[0].loc_key);
   }
 
   actionIsInThePossibleActionsListAlready(actionName){
+    /*
     for(let i = 0 ; i < this.state.possibleActions.length; i++){
       if (this.state.possibleActions[i].name === actionName){
         return true;
       }
     }
     return false;
+    */
+
+    let a = this.state.possibleActions.filter( possibleAction => {
+      return possibleAction.name === actionName ;
+    });
+
+    return a.length > 0;
   }
 
   unlightATile(i) {
@@ -2826,11 +2839,9 @@ handleTileClick(i) {
     if (this.state.languageDistributor.currentLanguage === "FR"){
         document.getElementById("langToggle").src = "img/toggle_left.png";
         this.setState({languageDistributor: stringsCatalog.en});
-        // TODO : reload the MainMessage
     } else {
         document.getElementById("langToggle").src = "img/toggle_right.png";
         this.setState({languageDistributor: stringsCatalog.fr});
-        // TODO : reload the MainMessage
     }
   }
 
@@ -2843,14 +2854,26 @@ handleTileClick(i) {
   }
 
   getStringInTheCatalog(distributor, input){
-      var catalog = Object.entries(distributor);
-      var stringInput = input.toString();
-      for (let i = 0 ; i < catalog.length; i++){
-          if (catalog[i][0] == stringInput){
-            return catalog[i][1];
-          }
+
+      let catalog = Object.entries(distributor); // TODO : Object is created everytime
+      let stringInput = input.toString();
+      // alert ("stringInput is : " + stringInput);
+      let s = catalog.filter( couple => {
+          return couple[0] === stringInput;
+      });
+      //alert (typeof s);
+      // alert ("asked for " + stringInput + " creates " + s /*+ " and gives " + s[0][1]*/);
+      return s[0][1];
+      
+      /*
+     for (let i = 0 ; i < catalog.length; i++){
+        if (catalog[i][0] == stringInput){
+          return catalog[i][1];
+        }
       }
-      return "YYYYY FIX ME YYYYY";
+      */
+
+      //return "YYYYY FIX ME YYYYY";
   }
 
   launchGameOver(gameIsWon, gameIsLost, msg){
@@ -2879,7 +2902,7 @@ handleTileClick(i) {
     document.getElementById("blockAll").classList.add('blockAll');
     let lng = this.state.languageDistributor;
     let msg = lng.youWonMsg.format(this.state.nbrOfPlayers);
-    // alert("pow");
+
     return (
         <span>
           <div className="game-over-title">[ congratulations ]</div>
@@ -3073,11 +3096,9 @@ class Game extends React.Component {
     let propagatedNbrOfPlayers = null;
 
     let current_url = window.location.href;
-    let rue = current_url.split('?');
-    // let params = new URLSearchParams(current_url.search.slice(1));
-    //let params = rue[1];
+    let splittedUrl = current_url.split('?');
 
-    let params = new URLSearchParams(rue[1]);
+    let params = new URLSearchParams(splittedUrl[1]);
 
     if (params){
       if (params.has('difficulty')){
@@ -3258,7 +3279,7 @@ class FloodMeter {
 
   internalHowManyCards(level){
     // flood scale :  |12|345|67|89|
-    //                    |2 |3  |4 |5 |
+    //                |2 |3  |4 |5 |
     if (level < 3){
         return 2;
     } else if (level < 6) {
@@ -3283,6 +3304,7 @@ String.prototype.format = function() {
 };
 
 /*
+TOUT EST INNONDé
 function riseTheIsland(){
     var tile01 = new Tile("helipad", 0, true, false, false, 5, "", [], "#A9D0F5", "", "HELIPORT");
     var tile02 = new Tile("doorBlack", 0, true, false, false, 3, "", [], "#6E6E6E", "", "");
@@ -3356,12 +3378,12 @@ function riseTheIsland(){
       tile21,tile22,tile23,tile24];
     // shuffleIt
     tiles = shuffleArray(tiles);
-    // foreach tile : make its index position
-    for(let i = 0; i<24; i++){
-      let tile = tiles[i];
-      tile.position = i;
-      tiles[i] = tile;
-    }
+
+    // foreach tile : make its index its position
+    tiles.map((tile,index) => 
+    {
+      tile.position = index;
+    });
 
     return tiles;
 }
