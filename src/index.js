@@ -134,7 +134,7 @@ const diagonalPaths = {0 : [2, 4], 1 : [3, 5], 2 : [0, 6, 8], 3 : [1,7,9], 4 : [
    {id : 2, name : "Dry two tiles", locName: "ac_dry2Tiles", forRole: "Engineer", replacesAction: "1", locHelp: "ah_dry2Tiles", enabled : true, triggers : "DryTwoTiles"  }, // has two immersed adjacent tiles around
    {id : 3, name : "Move around", locName: "ac_moveAround", forRole: "Explorer", replacesAction: "0", locHelp: "ah_moveAround", enabled : true, triggers : "MoveAround"  },//has an tile around ?
    {id : 4, name : "Dry around", locName: "ac_dryAround", forRole: "Explorer", replacesAction: "1", locHelp: "ah_dryAround" , enabled : true, triggers : "DryAround" },// has an immersed tile around
-   {id : 5, name : "Fly", locName: "ac_fly", forRole: "Pilot", replacesAction: "-", locHelp: "ah_fly", enabled : true, triggers : "Fly"  },// any other non dranwned tile
+   {id : 5, name : "Fly", locName: "ac_fly", forRole: "Pilot", replacesAction: "-", locHelp: "ah_fly", enabled : true, triggers : "Fly"  },// any other non drawned tile
    {id : 6, name : "Move/Dive", locName: "ac_MoveDive", forRole: "Diver", replacesAction: "0", locHelp: "ah_MoveDive", enabled : true, triggers : "Dive"  }, // a tile to dive to
  ];
 
@@ -212,7 +212,12 @@ function DrawSquare(props) {
       <span className="inSquarePosition">{props.tile.position}</span><br/>
       <span className="inSquareText">{props.tile.TextToDisplay}</span><br/>
       <span className="inSquareLittleText">{props.tile.LittleTextToDisplay}</span>
-      <DrawPlayerPawn pawns={props.tile.playerOn} players={props.players} blinkPlayer={props.blinkPlayer}/>
+      {
+        props.tile.playerOn.length > 0 ?
+        <DrawPlayerPawns pawns={props.tile.playerOn} players={props.players} blinkPlayer={props.blinkPlayer}/>
+        :
+        null
+      }
     </div>
   );
 }
@@ -232,86 +237,79 @@ function DrawEmptySquareWithTreasure(props) {
   );
 }
 
-function DrawPlayerPawn(props){
+function DrawPlayerPawns(props){
   if (props.pawns && props.pawns.length === 1){
     return (
       <div className="playerPawn singlePP">
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="22" viewBox="0 0 384 512">
-        <path d="M120 72c0-39.765 32.235-72 72-72s72 32.235 72 72c0 39.764-32.235 72-72 72s-72-32.236-72-72zm254.627 1.373c-12.496-12.497-32.758-12.497-45.254 0L242.745 160H141.254L54.627 73.373c-12.496-12.497-32.758-12.497-45.254 0-12.497 12.497-12.497 32.758 0 45.255L104 213.254V480c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V368h16v112c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V213.254l94.627-94.627c12.497-12.497 12.497-32.757 0-45.254z"
-        style={{stroke: '#000000', strokeWidth: '2px', fill: props.players[props.pawns[0]].color}}
-      className={props.players[props.pawns[0]].id === props.blinkPlayer ? "blink2" : ""}/>
-      </svg>
+      {
+        <DrawOnePlayerPawn className={props.players[props.pawns[0]].id === props.blinkPlayer ? "blink2" : ""} color={props.players[props.pawns[0]].color} />
+      }
       </div>
     );
   }
   else if(props.pawns && props.pawns.length === 2){
     return (
       <div className="playerPawn twoPP">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="22" viewBox="0 0 384 512">
-          <path d="M120 72c0-39.765 32.235-72 72-72s72 32.235 72 72c0 39.764-32.235 72-72 72s-72-32.236-72-72zm254.627 1.373c-12.496-12.497-32.758-12.497-45.254 0L242.745 160H141.254L54.627 73.373c-12.496-12.497-32.758-12.497-45.254 0-12.497 12.497-12.497 32.758 0 45.255L104 213.254V480c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V368h16v112c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V213.254l94.627-94.627c12.497-12.497 12.497-32.757 0-45.254z"
-          style={{stroke: '#000000', strokeWidth: '2px', fill: props.players[props.pawns[0]].color}}
-        className={props.players[props.pawns[0]].id === props.blinkPlayer ? "blink2" : ""}/>
-        </svg>
-        &nbsp;
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="22" viewBox="0 0 384 512">
-          <path d="M120 72c0-39.765 32.235-72 72-72s72 32.235 72 72c0 39.764-32.235 72-72 72s-72-32.236-72-72zm254.627 1.373c-12.496-12.497-32.758-12.497-45.254 0L242.745 160H141.254L54.627 73.373c-12.496-12.497-32.758-12.497-45.254 0-12.497 12.497-12.497 32.758 0 45.255L104 213.254V480c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V368h16v112c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V213.254l94.627-94.627c12.497-12.497 12.497-32.757 0-45.254z"
-          style={{stroke: '#000000', strokeWidth: '2px', fill: props.players[props.pawns[1]].color}}
-        className={props.players[props.pawns[1]].id === props.blinkPlayer ? "blink2" : ""}/>
-        </svg>
+      {
+        <DrawOnePlayerPawn className={props.players[props.pawns[0]].id === props.blinkPlayer ? "blink2" : ""} color={props.players[props.pawns[0]].color} />
+      }
+      &nbsp;
+      {
+        <DrawOnePlayerPawn className={props.players[props.pawns[1]].id === props.blinkPlayer ? "blink2" : ""} color={props.players[props.pawns[1]].color} />
+      }
       </div>
     );
   }
   else if(props.pawns && props.pawns.length === 3){
     return (
       <div className="playerPawn multilinePP">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="22" viewBox="0 0 384 512">
-          <path d="M120 72c0-39.765 32.235-72 72-72s72 32.235 72 72c0 39.764-32.235 72-72 72s-72-32.236-72-72zm254.627 1.373c-12.496-12.497-32.758-12.497-45.254 0L242.745 160H141.254L54.627 73.373c-12.496-12.497-32.758-12.497-45.254 0-12.497 12.497-12.497 32.758 0 45.255L104 213.254V480c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V368h16v112c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V213.254l94.627-94.627c12.497-12.497 12.497-32.757 0-45.254z"
-          style={{stroke: '#000000', strokeWidth: '2px', fill: props.players[props.pawns[0]].color}}
-        className={props.players[props.pawns[0]].id === props.blinkPlayer ? "blink2" : ""}/>
-        </svg>
-        &nbsp;
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="22" viewBox="0 0 384 512">
-          <path d="M120 72c0-39.765 32.235-72 72-72s72 32.235 72 72c0 39.764-32.235 72-72 72s-72-32.236-72-72zm254.627 1.373c-12.496-12.497-32.758-12.497-45.254 0L242.745 160H141.254L54.627 73.373c-12.496-12.497-32.758-12.497-45.254 0-12.497 12.497-12.497 32.758 0 45.255L104 213.254V480c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V368h16v112c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V213.254l94.627-94.627c12.497-12.497 12.497-32.757 0-45.254z"
-          style={{stroke: '#000000', strokeWidth: '2px', fill: props.players[props.pawns[1]].color}}
-        className={props.players[props.pawns[1]].id === props.blinkPlayer ? "blink2" : ""}/>
-        </svg><br/>
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="22" viewBox="0 0 384 512">
-          <path d="M120 72c0-39.765 32.235-72 72-72s72 32.235 72 72c0 39.764-32.235 72-72 72s-72-32.236-72-72zm254.627 1.373c-12.496-12.497-32.758-12.497-45.254 0L242.745 160H141.254L54.627 73.373c-12.496-12.497-32.758-12.497-45.254 0-12.497 12.497-12.497 32.758 0 45.255L104 213.254V480c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V368h16v112c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V213.254l94.627-94.627c12.497-12.497 12.497-32.757 0-45.254z"
-          style={{stroke: '#000000', strokeWidth: '2px', fill: props.players[props.pawns[2]].color}}
-        className={props.players[props.pawns[2]].id === props.blinkPlayer ? "blink2" : ""}/>
-        </svg>
+      {
+        <DrawOnePlayerPawn className={props.players[props.pawns[0]].id === props.blinkPlayer ? "blink2" : ""} color={props.players[props.pawns[0]].color} />
+      }
+      &nbsp;
+      {
+        <DrawOnePlayerPawn className={props.players[props.pawns[1]].id === props.blinkPlayer ? "blink2" : ""} color={props.players[props.pawns[1]].color} />
+      }
+      <br/>
+      {
+        <DrawOnePlayerPawn className={props.players[props.pawns[2]].id === props.blinkPlayer ? "blink2" : ""} color={props.players[props.pawns[2]].color} />
+      }
       </div>
     );
   }
   else if(props.pawns && props.pawns.length === 4){
     return (
       <div className="playerPawn multilinePP">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="22" viewBox="0 0 384 512">
-          <path d="M120 72c0-39.765 32.235-72 72-72s72 32.235 72 72c0 39.764-32.235 72-72 72s-72-32.236-72-72zm254.627 1.373c-12.496-12.497-32.758-12.497-45.254 0L242.745 160H141.254L54.627 73.373c-12.496-12.497-32.758-12.497-45.254 0-12.497 12.497-12.497 32.758 0 45.255L104 213.254V480c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V368h16v112c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V213.254l94.627-94.627c12.497-12.497 12.497-32.757 0-45.254z"
-          style={{stroke: '#000000', strokeWidth: '2px', fill: props.players[props.pawns[0]].color}}
-        className={props.players[props.pawns[0]].id === props.blinkPlayer ? "blink2" : ""}/>
-        </svg>
-        &nbsp;
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="22" viewBox="0 0 384 512">
-          <path d="M120 72c0-39.765 32.235-72 72-72s72 32.235 72 72c0 39.764-32.235 72-72 72s-72-32.236-72-72zm254.627 1.373c-12.496-12.497-32.758-12.497-45.254 0L242.745 160H141.254L54.627 73.373c-12.496-12.497-32.758-12.497-45.254 0-12.497 12.497-12.497 32.758 0 45.255L104 213.254V480c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V368h16v112c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V213.254l94.627-94.627c12.497-12.497 12.497-32.757 0-45.254z"
-          style={{stroke: '#000000', strokeWidth: '2px', fill: props.players[props.pawns[1]].color}}
-        className={props.players[props.pawns[1]].id === props.blinkPlayer ? "blink2" : ""}/>
-        </svg><br/>
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="22" viewBox="0 0 384 512">
-          <path d="M120 72c0-39.765 32.235-72 72-72s72 32.235 72 72c0 39.764-32.235 72-72 72s-72-32.236-72-72zm254.627 1.373c-12.496-12.497-32.758-12.497-45.254 0L242.745 160H141.254L54.627 73.373c-12.496-12.497-32.758-12.497-45.254 0-12.497 12.497-12.497 32.758 0 45.255L104 213.254V480c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V368h16v112c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V213.254l94.627-94.627c12.497-12.497 12.497-32.757 0-45.254z"
-          style={{stroke: '#000000', strokeWidth: '2px', fill: props.players[props.pawns[2]].color}}
-        className={props.players[props.pawns[2]].id === props.blinkPlayer ? "blink2" : ""}/>
-        </svg>
-        &nbsp;
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="22" viewBox="0 0 384 512">
-          <path d="M120 72c0-39.765 32.235-72 72-72s72 32.235 72 72c0 39.764-32.235 72-72 72s-72-32.236-72-72zm254.627 1.373c-12.496-12.497-32.758-12.497-45.254 0L242.745 160H141.254L54.627 73.373c-12.496-12.497-32.758-12.497-45.254 0-12.497 12.497-12.497 32.758 0 45.255L104 213.254V480c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V368h16v112c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V213.254l94.627-94.627c12.497-12.497 12.497-32.757 0-45.254z"
-          style={{stroke: '#000000', strokeWidth: '2px', fill: props.players[props.pawns[3]].color}}
-        className={props.players[props.pawns[3]].id === props.blinkPlayer ? "blink2" : ""}/>
-        </svg>
+      {
+        <DrawOnePlayerPawn className={props.players[props.pawns[0]].id === props.blinkPlayer ? "blink2" : ""} color={props.players[props.pawns[0]].color} />
+      }
+      &nbsp;
+      {
+        <DrawOnePlayerPawn className={props.players[props.pawns[1]].id === props.blinkPlayer ? "blink2" : ""} color={props.players[props.pawns[1]].color} />
+      }
+      <br/>
+      {
+        <DrawOnePlayerPawn className={props.players[props.pawns[2]].id === props.blinkPlayer ? "blink2" : ""} color={props.players[props.pawns[2]].color} />
+      }
+      &nbsp;
+      {
+        <DrawOnePlayerPawn className={props.players[props.pawns[3]].id === props.blinkPlayer ? "blink2" : ""} color={props.players[props.pawns[3]].color} />
+      }
       </div>
     );
   }
   return null;
+}
+
+function DrawOnePlayerPawn(props)
+{
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="22" viewBox="0 0 384 512">
+      <path d="M120 72c0-39.765 32.235-72 72-72s72 32.235 72 72c0 39.764-32.235 72-72 72s-72-32.236-72-72zm254.627 1.373c-12.496-12.497-32.758-12.497-45.254 0L242.745 160H141.254L54.627 73.373c-12.496-12.497-32.758-12.497-45.254 0-12.497 12.497-12.497 32.758 0 45.255L104 213.254V480c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V368h16v112c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V213.254l94.627-94.627c12.497-12.497 12.497-32.757 0-45.254z"
+      style={{stroke: '#000000', strokeWidth: '2px', fill: props.color}}
+      className={props.className}/>
+    </svg>
+  );
 }
 
 function DrawLittleTemple(props){
@@ -823,7 +821,7 @@ class Board extends React.Component {
           gameIsLost: true,
           endMessage: gameOverMsg});
     }
-    else{
+    else {
       this.setState({
         mainUserMessage: n_userMessage,
         floodCardsLeap: n_FloodCardsLeap,
@@ -857,7 +855,8 @@ class Board extends React.Component {
       }
 
       let newMessage = "";
-      if (tilesToLight.length === 0){
+      if (tilesToLight.length === 0)
+      {
         // let newMessage = new UserMessage("Oh my God. There's nowhere he can go. " + drawningGuy.name+ " is drawning. Noooooooo. GAME OVER.", false, []);
         newMessage = new UserMessage(null, lng.nowhereHeCanGo.format(drawningGuy.name), false, []);
         gameIsLost = true;
@@ -869,14 +868,16 @@ class Board extends React.Component {
         newMessage = new UserMessage('chooseADestinationToEvacuate', null, false, []);
       }
 
-      if (gameIsLost === true){
+      if (gameIsLost === true)
+      {
           this.setState({
             mainUserMessage: newMessage,
             gameIsOver: true,
             gameIsLost: true,
             endMessage: gameOverMsg});
       }
-      else{
+      else
+      {
         this.setState({ whatIsExpectedNext: "TileButtonClickForEvacuate" ,
                         players : n_players,
                         gameIsLost : gameIsLost,
@@ -903,7 +904,7 @@ class Board extends React.Component {
 
       let gameIsLost = false;
       let gameOverMsg = "";
-      let gameOverCode = 0; // guy drawned
+      let gameOverCode = 0;
 
       let card = [];
       if (newPlayerCardsLeap.length < 1){
@@ -915,9 +916,11 @@ class Board extends React.Component {
 
       let cardToPushToPlayer = null;
 
-      if (card.name === "floodRise"){
+      if (card.name === "floodRise")
+      {
           // bring Discarded flood cards on the top of the flood Leap
-          if (newFloodCardsDiscard.length > 0){
+          if (newFloodCardsDiscard.length > 0)
+          {
               newFloodCardsDiscard = shuffleArray(newFloodCardsDiscard);
               newFloodCardsLeap = newFloodCardsLeap.concat(newFloodCardsDiscard);
               newFloodCardsDiscard = [];
@@ -930,33 +933,39 @@ class Board extends React.Component {
           this.doMoveFloodOmeterCursor();
 
           // alert("Flood Riiiiise ! New Flood level is " + newFloodMeter.level + "(pick " +  newFloodMeter.floodFactor + " at each flood)");
-          if (newFloodMeter.level >= newFloodMeter.topLevel){
+          if (newFloodMeter.level >= newFloodMeter.topLevel)
+          {
             // alert (" Top level reached. The Island is submerged. Game Over");
             gameIsLost = true;
             gameOverMsg = lng.topLevelReached;
-            gameOverCode = 2; // guy drawned
+            gameOverCode = 2; // Top level reached. The Island is submerged.
             doLog("GAME_LOST", "islandIsDrawned", "", this.state);
           }
 
           // put the flood card in the discards
           newPlayerCardsDiscard.push(card);
       }
-      else {
+      else 
+      {
         cardToPushToPlayer = card;
       }
 
       // has Player too much cards ?
       let nbrOfCardsInHand = newPlayers[this.state.currentPlayerPlaying].cards.length + 1;
 
-      if (cardToPushToPlayer != null){
+      if (cardToPushToPlayer != null)
+      {
               newPlayers[this.state.currentPlayerPlaying].cards.push(cardToPushToPlayer);
       }
 
       let newMessage = "";
-      if (cardNumber == 1){
+      if (cardNumber == 1)
+      {
             newMessage = new UserMessage(null, lng.firstCard_msg.format(this.getStringInTheCatalog(lng, card.loc_key)) + '. <br/><img src='  + card.url + ' width="30px" height="46px"/>', false, [3]);
             newCurrentStep = 4;
-      }else{
+      }
+      else
+      {
             let databag = {userId : this.state.currentPlayerPlaying}
             newMessage = new UserMessage(null, lng.secondCard_msg.format(this.getStringInTheCatalog(lng, card.loc_key)) + '. <br/><img src=' + card.url  + ' width="30px" height="46px"/>', false, [9], databag);
       }
@@ -981,15 +990,18 @@ class Board extends React.Component {
   }
 
   // MUST BE DONE AT THE END OF AN ACTION -> embraye sur un ActionIsDone
-  doCheckIfMoreThan5CardsInHand(passages, userId) {
+  doCheckIfMoreThan5CardsInHand(passages, userId)
+  {
     let cardsInHand = this.state.players[userId].cards;
-    if (cardsInHand.length > 5){
+    if (cardsInHand.length > 5)
+    {
       // alert ("Oh no ! Over 5 cards in Hand ! : " + cardsInHand.length);
 
       let n_whatIsExpectedNext_toRestore = this.state.whatIsExpectedNext;
       let n_messageBoardState_toRestore = this.state.messageBoardState;
 
-      if (passages === 0){
+      if (passages === 0)
+      {
         this.setState({ whatIsExpectedNext_toRestore : n_whatIsExpectedNext_toRestore,
                         whatIsExpectedNext: "ResolveOver5Cards" ,
                         mainUserMessage_toRestore: this.state.mainUserMessage,
@@ -1006,9 +1018,11 @@ class Board extends React.Component {
       }
       return null;
     }
-    else {
+    else
+    {
       //TODO does not work in case of a 'give' or a 'send-a-card' -> à voir
-      if (passages > 0){
+      if (passages > 0)
+      {
         // passages > 0 means a throw or two have been made, let's restore the states
         this.setState({ whatIsExpectedNext: this.state.whatIsExpectedNext_toRestore,
                         whatIsExpectedNext_toRestore: null,
@@ -1022,7 +1036,8 @@ class Board extends React.Component {
     }
   }
 
-  throwCard(cardtype, index, userId){
+  throwCard(cardtype, index, userId)
+  {
       // index is wrong. Please trust cardType
       let n_players = this.state.players;
       let n_playerCardsDiscard = this.state.playerCardsDiscard;
@@ -1141,15 +1156,16 @@ class Board extends React.Component {
                     messageBoardState: this.state.messageBoardState_toRestore,
                     messageBoardState_toRestore: null,
                     inAGetRidOfACardContext: false,
-                    // cardUser : null,
                     coTravellers : null,
                     showActionableCards: true });
   }
 
-  clickedOnSandBagCard(playerId, inAGetRidOfACardContext) {
+  clickedOnSandBagCard(playerId, inAGetRidOfACardContext)
+  {
     let lng = this.state.languageDistributor;
     let tilesToLight = this.getImmersedTiles();
-    if (tilesToLight.length === 0){
+    if (tilesToLight.length === 0)
+    {
       this.customAlert(lng.noTileToDry);
       return null;
     }
@@ -1168,7 +1184,8 @@ class Board extends React.Component {
     return null;
   }
 
-  cancelSandBagCardPick() {
+  cancelSandBagCardPick()
+  {
     this.unlightTheTiles();
     this.showActionButtons();
     this.setState({ whatIsExpectedNext: this.state.whatIsExpectedNext_toRestore,
@@ -1179,7 +1196,6 @@ class Board extends React.Component {
                     messageBoardState_toRestore: null,
                     inAGetRidOfACardContext: false,
                     showActionableCards: true
-                    // cardUser : null
                    });
   }
 
@@ -2485,6 +2501,7 @@ handleTileClick(i) {
         let travellers = [];
         let whereAndWho = [[]];
 
+        /*
         for (let i = 0 ; i < this.state.tiles.length; i++){
           if (this.state.tiles[i].playerOn && this.state.tiles[i].playerOn.length > 0)
           {
@@ -2492,6 +2509,11 @@ handleTileClick(i) {
             whereAndWho[i] = this.state.tiles[i].playerOn;
           }
         }
+        */
+
+        this.state.players.map(p => {
+          whereAndWho[p.position] = this.state.tiles[p.position].playerOn; // may be redundant but.... who cares. Max of 4 iterations
+        });
 
         console.log(JSON.stringify(whereAndWho));
 
@@ -2516,7 +2538,8 @@ handleTileClick(i) {
                      (<div className="lilGreyFrame">
                      {
                         playersOnT.map((playerId, indexPlayer) => {
-                          return <span key={playerId}><input type="checkBox" name="traveller" id={"checkBoxAmadeusFor"+playerId} key={playerId} value={playerId} onChange={() => Amadeus(playerId, "checkBoxAmadeusFor"+playerId)} /><span style={{color: this.state.players[playerId].color}}>{this.state.players[playerId].name}</span><br/></span>
+                          return <span key={playerId}>
+                                  <input type="checkBox" name="traveller" id={"checkBoxAmadeusFor"+playerId} key={playerId} value={playerId} onChange={() => Amadeus(playerId, "checkBoxAmadeusFor"+playerId)} /><span style={{color: this.state.players[playerId].color}}>{this.state.players[playerId].name}</span><br/></span>
                         })
                       }
                       </div>)
@@ -2584,6 +2607,7 @@ handleTileClick(i) {
       )
     } else if (this.state.messageBoardState === "empty"){
           return (
+            // shouldn't happened.
             <div>++ empty ++</div>
           )
     } else {
@@ -2822,12 +2846,20 @@ handleTileClick(i) {
                 alreadyIn.push(arrayOfCards[i].type);
               }
               else {
+                /*
                 for (let k = 0; k < output.length; k ++){
                   if (output[k].type === arrayOfCards[i].type){
                     output[k].howMany ++;
                     break;
                   }
                 }
+                */
+
+                output.map((o => {
+                  if (o.type === arrayOfCards[i].type){
+                    o.howMany ++;
+                  }
+                }));
               }
             }
           }
@@ -3520,8 +3552,6 @@ function httpGetAsync(logUrl)
     xmlHttp.open("GET", logUrl, true); // true for asynchronous
     xmlHttp.send(null);
 }
-
-// ========================================
 
 ReactDOM.render(
   <Game />,
