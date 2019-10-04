@@ -106,6 +106,7 @@ export const stringsCatalog = {
    btn_evacuate: "Evacuate !",
    btn_retry: "Retry ?",
    btn_understood: "Understood",
+   btn_fate: "Face your fate.",
    // opening panel
    welcomeIntro: "Hola Comrade",
    howManyAdventurers: "How many adventurers ?",
@@ -307,6 +308,7 @@ export const stringsCatalog = {
    btn_evacuate: "Evacuez !",
    btn_retry: "Recommencer ?",
    btn_understood: "Compris",
+   btn_fate: "Cela devais finir ainsi.",
    // opening panel
    welcomeIntro: "Hola Camarade.",
    howManyAdventurers: "Combien d'aventuriers ?",

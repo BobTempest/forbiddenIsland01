@@ -725,8 +725,6 @@ class Board extends React.Component {
         floodedTileId = j;
         if (n_Tiles[j].isImmersed){
           // Let's DRAWN this tile
-          // alert (n_Tiles[j].name + " at " + j + " is drawning !");
-            // message = message + "<span style=\"color: #DC143C\">" + n_Tiles[j].name + " at " + j + " is drawning ! </span>";
             message = message + lng.tileDrawning.format(n_Tiles[j].name, j);
             n_Tiles[j].isImmersed = false;
             n_Tiles[j].isDrawning = true;
@@ -760,11 +758,11 @@ class Board extends React.Component {
                         //message = message + "<br/>Oh my God ! all the temples for " + this.getTreasureNameById(n_Tiles[j].templeFor) + " are drawned. You'll never get it. GAME OVER";
                         message = message + lng.allTheTemplesAreDrawned.format(this.getTreasureNameById(n_Tiles[j].templeFor));
                         // gameOver = true;
-                         console.log("Oh my God ! all the temples for " + this.getTreasureNameById(n_Tiles[j].templeFor) + " are drawned. You'll never get it. GAME OVER" );
-                         gameOver = true;
-                         gameOverMsg = lng.allTheTemplesAreDrawned.format(this.getTreasureNameById(n_Tiles[j].templeFor));
-                         gameOverCode = 3; // all the temples for one undiscovered treasure disapeared
-                         doLog("GAME_LOST", "twoTemplesAreDrawned", "", this.state);
+                        console.log("Oh my God ! all the temples for " + this.getTreasureNameById(n_Tiles[j].templeFor) + " are drawned. You'll never get it. GAME OVER" );
+                        gameOver = true;
+                        gameOverMsg = lng.allTheTemplesAreDrawned.format(this.getTreasureNameById(n_Tiles[j].templeFor));
+                        gameOverCode = 3; // all the temples for one undiscovered treasure disapeared
+                        doLog("GAME_LOST", "twoTemplesAreDrawned", "", this.state);
                       }
                       break;
                     }
@@ -796,7 +794,10 @@ class Board extends React.Component {
     let showActionableCards = true;
 
     // BRANCHING : Soit on evacue des gars, soit on refais un flood, soit c'est fini
-    if (guysToEvacuate.length > 0){
+    if (gameOver === true){
+        n_userMessage = new UserMessage(null, message , false, [11]);
+    }
+    else if (guysToEvacuate.length > 0){
         //message = message + "<br/>!!! WE NEED TO EVACUATE THE TILE !!!</div>";
         message = message + lng.weNeedToEvacuateTheTile;
         n_userMessage = new UserMessage(null, message , false, [8]);
@@ -858,7 +859,7 @@ class Board extends React.Component {
       if (tilesToLight.length === 0)
       {
         // let newMessage = new UserMessage("Oh my God. There's nowhere he can go. " + drawningGuy.name+ " is drawning. Noooooooo. GAME OVER.", false, []);
-        newMessage = new UserMessage(null, lng.nowhereHeCanGo.format(drawningGuy.name), false, []);
+        newMessage = new UserMessage(null, lng.nowhereHeCanGo.format(drawningGuy.name), false, [11]);
         gameIsLost = true;
         gameOverMsg = lng.nowhereHeCanGo.format(drawningGuy.name);
         gameOverCode = 1; // guy drawned
@@ -959,7 +960,10 @@ class Board extends React.Component {
       }
 
       let newMessage = "";
-      if (cardNumber == 1)
+      if (gameIsLost){
+            newMessage = new UserMessage(null, lng.topLevelReached , false, [11]);
+      }
+      else if (cardNumber == 1)
       {
             newMessage = new UserMessage(null, lng.firstCard_msg.format(this.getStringInTheCatalog(lng, card.loc_key)) + '. <br/><img src='  + card.url + ' width="30px" height="46px"/>', false, [3]);
             newCurrentStep = 4;
@@ -983,10 +987,21 @@ class Board extends React.Component {
       tempState.gameIsLost = gameIsLost;
       tempState.endMessage = gameOverMsg;
       tempState.gameOverCode = gameOverCode;
+      if (gameIsLost)
+      {
+        tempState.showActionableCards = false;
+      }
 
       tempState.pastStates = [];
 
       return tempState;
+  }
+
+  doShowGameIsLost()
+  {
+    this.setState({
+      showGameIsLost: true
+    });
   }
 
   // MUST BE DONE AT THE END OF AN ACTION -> embraye sur un ActionIsDone
@@ -2391,7 +2406,7 @@ handleTileClick(i) {
       console.log('playersOnTheSameTileExceptMe = ' + playersOnTheSameTileExceptMe);// seems Ok
       let chosenCard = this.state.players[giverId].cards.length === 1 ? this.state.players[giverId].cards[0].id : null;
       let receiver = playersOnTheSameTileExceptMe.length === 1 ? playersOnTheSameTileExceptMe[0] : null;
-//alert("receiver = " + receiver + " giverId = " + giverId + " chosencard = " + chosenCard );
+      //alert("receiver = " + receiver + " giverId = " + giverId + " chosencard = " + chosenCard );
       return (
           <div className="panelInfo" id="UserDialog">
             {lng.whichCardDoYouWantToGive}
@@ -2628,6 +2643,7 @@ handleTileClick(i) {
       let showEvacuateStyle = (buttons.indexOf(8) >= 0)?({display: 'block'}):({display: 'none'});
       let showCheckIfMoreThan5Style = (buttons.indexOf(9) >= 0)?({display: 'block'}):({display: 'none'});
       let showCheckIfMoreThan5SecondTimeStyle = (buttons.indexOf(10) >= 0)?({display: 'block'}):({display: 'none'});
+      let showThisIsTheEndMyFriend = (buttons.indexOf(11) >= 0)?({display: 'block'}):({display: 'none'});
 
       // complexMessages Are already translated.
       // let msgEts = this.state.mainUserMessage.complexMessage;
@@ -2644,7 +2660,7 @@ handleTileClick(i) {
           <div className="panelInfo" id="UserDialog">
           <span id="mainMessage" dangerouslySetInnerHTML={{__html: translatedString}} />
           {
-            !gameIsOver ?
+            //!gameIsOver ?
               (<div>
                 <button style={showNextBtnStyle} onClick ={() => this.controller("ActionIsDone")}>{lng.btn_next}</button>
                 <button style={showCancelBtnStyle} onClick ={() => this.cancelAnAction()}>{lng.btn_cancel}</button>
@@ -2657,9 +2673,12 @@ handleTileClick(i) {
                 <button style={showEvacuateStyle} onClick ={() => this.doEvacuate()}>{lng.btn_evacuate}</button>
                 <button style={showCheckIfMoreThan5Style} onClick ={() => this.doCheckIfMoreThan5CardsInHand(0, databag.userId)}>{lng.btn_next}</button>
                 <button style={showCheckIfMoreThan5SecondTimeStyle} onClick ={() => this.doCheckIfMoreThan5CardsInHand(1, this.state.cardUser)}>{lng.btn_next}</button>
+                <button style={showThisIsTheEndMyFriend} onClick ={() => this.doShowGameIsLost()}>{lng.btn_fate}</button>
               </div>)
-              :
-              (<div></div>)
+            //  :
+            //  (<div>
+            //    <button style={showThisIsTheEndMyFriend} onClick ={() => this.doShowGameIsLost()}>{lng.btn_fate}</button>
+            //  </div>)
         }
       </div>
       )
@@ -2961,7 +2980,7 @@ handleTileClick(i) {
 
         <div className="littleCopyrightLine">{lng.copyright}</div>
         <div>
-          {this.state.gameIsLost ?
+          {this.state.showGameIsLost ?
             <div id="game-over-panel" className="game-lost-panel">
               {this.renderGameOverPanel(this.state.endMessage)}
             </div> : <div></div>
@@ -3163,6 +3182,8 @@ class Game extends React.Component {
       showGameOverPanel: false,
       languageDistributor: stringcat,
       difficultyLevel: difficulty,
+      // HACK
+      // difficultyLevel: 9,
       language: language,
       nbrOfPlayers: nbrOfPlayers,
       versionNumber: versionNumber
@@ -3335,8 +3356,8 @@ String.prototype.format = function() {
   });
 };
 
-/*
-TOUT EST INNONDé
+
+// TOUT EST INNONDé
 function riseTheIsland(){
     var tile01 = new Tile("helipad", 0, true, false, false, 5, "", [], "#A9D0F5", "", "HELIPORT");
     var tile02 = new Tile("doorBlack", 0, true, false, false, 3, "", [], "#6E6E6E", "", "");
@@ -3377,8 +3398,8 @@ function riseTheIsland(){
 
     return tiles;
 }
-*/
 
+/*
 function riseTheIsland(){
     var tile01 = new Tile("helipad", 0, false, false, false, 5, "", [], "#A9D0F5", "", "HELIPORT");
     var tile02 = new Tile("doorBlack", 0, false, false, false, 3, "", [], "#6E6E6E", "", "");
@@ -3419,7 +3440,7 @@ function riseTheIsland(){
 
     return tiles;
 }
-
+*/
 
 function generatePlayerCardsLeap(){
     let cards = [];
