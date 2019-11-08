@@ -110,6 +110,7 @@ list-style:none;
   left: 3px;
 }
 
+/*
 .inSquareText {
   text-align: center;
   font-size: 24px;
@@ -119,24 +120,7 @@ list-style:none;
   top: -8px;
   left: 16px;
 }
-
-.jaugePlayer {
-    height:10px;
-    background: brown;
-}
-
-.jaugeFlood {
-    height:10px;
-    background: blue;
-}
-
-.stuckBehind {
-    float: right;
-}
-
-.superSmall {
-  font-size: 10px;
-}
+*/
 
 .inSquareLittleText {
   display: inline-block;
@@ -145,7 +129,25 @@ list-style:none;
   z-index:3;
   position: relative;
   line-height: 9px;
-  top: -14px;
+  top: 15px;
+}
+
+.jaugePlayer {
+    height:10px;
+    background: rgb(240, 134, 35);
+}
+
+.jaugeFlood {
+    height:10px;
+    background: rgb(77, 190, 77);
+}
+
+.stuckBehind {
+    float: right;
+}
+
+.superSmall {
+  font-size: 10px;
 }
 
 .playerPawn {
@@ -158,16 +160,16 @@ list-style:none;
 }
 
 .singlePP {
-  top: -40px;
+  top: -13px;
 }
 
 .twoPP {
-  top: -40px;
+  top: -13px;
 }
 
 .multilinePP {
   line-height: 19px;
-  top: -52px;
+  top: -24px;
 }
 
 .emptySquare {
@@ -243,7 +245,6 @@ list-style:none;
   border: 0px solid white;
   border-collapse: collapse;
   width: inherit;
-  padding-right: 5px;
 }
 
 .invisiTable {
@@ -507,7 +508,7 @@ list-style:none;
   padding: 5px 15px 5px 15px;
   border: solid #cccccc 1px;
   text-decoration: none;
-  margin-top: 5px;
+  margin-top: 3px;
   margin-left: 10px;
 }
 

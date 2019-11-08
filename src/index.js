@@ -210,7 +210,6 @@ function DrawSquare(props) {
   return (
     <div className={squareClass} style={squareStyle} id={squareId} onClick={props.onClick} >
       <span className="inSquarePosition">{props.tile.position}</span><br/>
-      <span className="inSquareText">{props.tile.TextToDisplay}</span><br/>
       <span className="inSquareLittleText">{props.tile.LittleTextToDisplay}</span>
       {
         props.tile.playerOn.length > 0 ?
@@ -2969,6 +2968,17 @@ handleTileClick(i) {
       let fOm_position_value = "relative";
       let fOm_left_value = 5 + ((this.state.floodMeter.level - 1) * 33);
       let fOm_top_value = -70;
+      // calculate length of the jauges in px
+      
+      let nbrOfPlayerCards = 28;
+      let nbrOfFloodCards = 24;
+      //117 is cellJauge px in css
+      let cellJaugepx = 117;
+      let floodCardsJaugeWidth = (this.state.floodCardsLeap.length * (cellJaugepx - 10)) / nbrOfFloodCards;
+      let playerCardsJaugeWidth = (this.state.playerCardsLeap.length * (cellJaugepx - 10)) / nbrOfPlayerCards;
+
+      let floodCardsDiscardJaugeWidth = (this.state.floodCardsDiscard.length * (cellJaugepx - 10)) / nbrOfFloodCards;
+      let playerCardsDiscardJaugeWidth = (this.state.playerCardsDiscard.length * (cellJaugepx - 10)) / nbrOfPlayerCards;
       let lng = this.state.languageDistributor;
 
     return (
@@ -3053,12 +3063,12 @@ handleTileClick(i) {
               <tbody>
               <tr><th colSpan="2">{this.state.languageDistributor.playerCards}</th><th colSpan="2">{this.state.languageDistributor.floodCards}</th></tr>
               <tr style={{height: '18px'}}>
-                <td className="cellTitle" >{this.state.languageDistributor.leap}</td><td className="cellJauge" ><table className="invisiTable"><tbody><tr className="invisiTable"><td className="jaugePlayer invisiTable" style={{width: this.state.playerCardsLeap.length *20}}></td><td className="superSmall invisiTable">{this.state.playerCardsLeap.length}</td></tr></tbody></table></td>
-                <td className="cellTitle">{this.state.languageDistributor.leap}</td><td className="cellJauge"><table className="invisiTable"><tbody><tr className="invisiTable"><td className="jaugeFlood invisiTable" style={{width: this.state.floodCardsLeap.length *20}}></td><td className="superSmall invisiTable">{this.state.floodCardsLeap.length}</td></tr></tbody></table></td>
+                <td className="cellTitle" >{this.state.languageDistributor.leap}</td><td className="cellJauge" ><table className="invisiTable"><tbody><tr className="invisiTable"><td className="jaugePlayer invisiTable" style={{width: playerCardsJaugeWidth}}></td><td className="superSmall invisiTable">{this.state.playerCardsLeap.length}</td></tr></tbody></table></td>
+                <td className="cellTitle">{this.state.languageDistributor.leap}</td><td className="cellJauge"><table className="invisiTable"><tbody><tr className="invisiTable"><td className="jaugeFlood invisiTable" style={{width: floodCardsJaugeWidth}}></td><td className="superSmall invisiTable">{this.state.floodCardsLeap.length}</td></tr></tbody></table></td>
               </tr>
               <tr>
-                <td className="cellTitle">{this.state.languageDistributor.discard}</td><td className="cellJauge"><table className="invisiTable"><tbody><tr className="invisiTable"><td className="jaugePlayer invisiTable" style={{width: this.state.playerCardsDiscard.length *20}}></td><td className="superSmall invisiTable">{this.state.playerCardsDiscard.length}</td></tr></tbody></table></td>
-                <td className="cellTitle">{this.state.languageDistributor.discard}</td><td wclassName="cellJauge"><table className="invisiTable"><tbody><tr className="invisiTable"><td className="jaugeFlood invisiTable" style={{width: this.state.floodCardsDiscard.length *20}}></td><td className="superSmall invisiTable">{this.state.floodCardsDiscard.length}</td></tr></tbody></table></td>
+                <td className="cellTitle">{this.state.languageDistributor.discard}</td><td className="cellJauge"><table className="invisiTable"><tbody><tr className="invisiTable"><td className="jaugePlayer invisiTable" style={{width: playerCardsDiscardJaugeWidth}}></td><td className="superSmall invisiTable">{this.state.playerCardsDiscard.length}</td></tr></tbody></table></td>
+                <td className="cellTitle">{this.state.languageDistributor.discard}</td><td className="cellJauge"><table className="invisiTable"><tbody><tr className="invisiTable"><td className="jaugeFlood invisiTable" style={{width: floodCardsDiscardJaugeWidth}}></td><td className="superSmall invisiTable">{this.state.floodCardsDiscard.length}</td></tr></tbody></table></td>
               </tr>
             </tbody>
             </table>
@@ -3139,7 +3149,7 @@ class Game extends React.Component {
     let difficulty = 2;
     let language = "EN";
     let nbrOfPlayers = 4;
-    let versionNumber = "v0.8.4 BETA";
+    let versionNumber = "v0.8.6 BETA";
 
     // lets' try to get params from GET
     let propagatedDifficulty = null;
@@ -3281,7 +3291,7 @@ class Game extends React.Component {
 }
 
 class Tile {
-  constructor(name, position, isImmersed, isDrawning, isDrawned, startBase, templeFor, playerOn, backgroundColor, textToDisplay, littleTextToDisplay) {
+  constructor(name, position, isImmersed, isDrawning, isDrawned, startBase, templeFor, playerOn, backgroundColor, littleTextToDisplay) {
     this.name = name; // string
     this.position = position; // int
     this.isImmersed = isImmersed; // bool
@@ -3291,7 +3301,6 @@ class Tile {
     this.templeFor = templeFor; // string
     this.playerOn = playerOn; // int[]
     this.backgroundColor = backgroundColor; // string
-    this.TextToDisplay = textToDisplay; // string
     this.LittleTextToDisplay = littleTextToDisplay; // string
     this.imgpath = "./img/" + name + "Tile.png"; // string
   }
@@ -3356,33 +3365,33 @@ String.prototype.format = function() {
   });
 };
 
-
+/*
 // TOUT EST INNONDé
 function riseTheIsland(){
-    var tile01 = new Tile("helipad", 0, true, false, false, 5, "", [], "#A9D0F5", "", "HELIPORT");
-    var tile02 = new Tile("doorBlack", 0, true, false, false, 3, "", [], "#6E6E6E", "", "");
-    var tile03 = new Tile("doorRed", 0, true, false, false, 0, "", [], "#F78181", "", "");
-    var tile04 = new Tile("doorGreen", 0, true, false, false, 4, "", [], "#9FF781", "", "");
-    var tile05 = new Tile("doorWhite", 0, true, false, false, 2, "", [], "#D9D9D9", "", "");
-    var tile06 = new Tile("doorYellow", 0, true, false, false, 1, "", [], "#F2F5A9", "", "");
-    var tile07 = new Tile("temple0001", 0, true, false, false, "", "CR", [], "#bdc3c7", "", "TEMPLE CRYSTAL");
-    var tile08 = new Tile("temple0002", 0, true, false, false, "", "CR", [], "#bdc3c7", "", "TEMPLE CRYSTAL");
-    var tile09 = new Tile("temple0101", 0, true, false, false, "", "CU", [], "#bdc3c7", "", "TEMPLE CUP");
-    var tile10 = new Tile("temple0102", 0, true, false, false, "", "CU", [], "#bdc3c7", "", "TEMPLE CUP");
-    var tile11 = new Tile("temple0201", 0, true, false, false, "", "SC", [], "#bdc3c7", "", "TEMPLE SCEPTRE");
-    var tile12 = new Tile("temple0202", 0, true, false, false, "", "SC", [], "#bdc3c7", "", "TEMPLE SCEPTRE");
-    var tile13 = new Tile("temple0301", 0, true, false, false, "", "ST", [], "#bdc3c7", "", "TEMPLE STATUE");
-    var tile14 = new Tile("temple0302", 0, true, false, false, "", "ST", [], "#bdc3c7", "", "TEMPLE STATUE");
-    var tile15 = new Tile("coast01", 0, true, false, false, "", "", [], "#825a2c", "", "");
-    var tile16 = new Tile("coast02", 0, true, false, false, "", "", [], "#825a2c", "", "");
-    var tile17 = new Tile("coast03", 0, true, false, false, "", "", [], "#825a2c", "", "");
-    var tile18 = new Tile("desert01", 0, true, false, false, "", "", [], "#ffd480", "", "");
-    var tile19 = new Tile("desert02", 0, true, false, false, "", "", [], "#ffd480", "", "");
-    var tile20 = new Tile("desert03", 0, true, false, false, "", "", [], "#ffd480", "", "");
-    var tile21 = new Tile("swamp01", 0, true, false, false, "", "", [], "#bcf0d2", "", "");
-    var tile22 = new Tile("swamp02", 0, true, false, false, "", "", [], "#bcf0d2", "", "");
-    var tile23 = new Tile("swamp03", 0, true, false, false, "", "", [], "#bcf0d2", "", "");
-    var tile24 = new Tile("swamp04", 0, true, false, false, "", "", [], "#bcf0d2", "", "");
+    var tile01 = new Tile("helipad", 0, true, false, false, 5, "", [], "#A9D0F5", "HELIPORT");
+    var tile02 = new Tile("doorBlack", 0, true, false, false, 3, "", [], "#6E6E6E", "");
+    var tile03 = new Tile("doorRed", 0, true, false, false, 0, "", [], "#F78181", "");
+    var tile04 = new Tile("doorGreen", 0, true, false, false, 4, "", [], "#9FF781", "");
+    var tile05 = new Tile("doorWhite", 0, true, false, false, 2, "", [], "#D9D9D9", "");
+    var tile06 = new Tile("doorYellow", 0, true, false, false, 1, "", [], "#F2F5A9", "");
+    var tile07 = new Tile("temple0001", 0, true, false, false, "", "CR", [], "#bdc3c7", "TEMPLE CRYSTAL");
+    var tile08 = new Tile("temple0002", 0, true, false, false, "", "CR", [], "#bdc3c7", "TEMPLE CRYSTAL");
+    var tile09 = new Tile("temple0101", 0, true, false, false, "", "CU", [], "#bdc3c7", "TEMPLE CUP");
+    var tile10 = new Tile("temple0102", 0, true, false, false, "", "CU", [], "#bdc3c7", "TEMPLE CUP");
+    var tile11 = new Tile("temple0201", 0, true, false, false, "", "SC", [], "#bdc3c7", "TEMPLE SCEPTRE");
+    var tile12 = new Tile("temple0202", 0, true, false, false, "", "SC", [], "#bdc3c7", "TEMPLE SCEPTRE");
+    var tile13 = new Tile("temple0301", 0, true, false, false, "", "ST", [], "#bdc3c7", "TEMPLE STATUE");
+    var tile14 = new Tile("temple0302", 0, true, false, false, "", "ST", [], "#bdc3c7", "TEMPLE STATUE");
+    var tile15 = new Tile("coast01", 0, true, false, false, "", "", [], "#825a2c", "");
+    var tile16 = new Tile("coast02", 0, true, false, false, "", "", [], "#825a2c", "");
+    var tile17 = new Tile("coast03", 0, true, false, false, "", "", [], "#825a2c", "");
+    var tile18 = new Tile("desert01", 0, true, false, false, "", "", [], "#ffd480", "");
+    var tile19 = new Tile("desert02", 0, true, false, false, "", "", [], "#ffd480", "");
+    var tile20 = new Tile("desert03", 0, true, false, false, "", "", [], "#ffd480", "");
+    var tile21 = new Tile("swamp01", 0, true, false, false, "", "", [], "#bcf0d2", "");
+    var tile22 = new Tile("swamp02", 0, true, false, false, "", "", [], "#bcf0d2", "");
+    var tile23 = new Tile("swamp03", 0, true, false, false, "", "", [], "#bcf0d2", "");
+    var tile24 = new Tile("swamp04", 0, true, false, false, "", "", [], "#bcf0d2", "");
     // create a 24 array
     let tiles = [tile01,tile02,tile03,tile04,tile05,tile06,tile07,tile08,tile09,tile10,
       tile11,tile12,tile13,tile14,tile15,tile16,tile17,tile18,tile19,tile20,
@@ -3397,34 +3406,33 @@ function riseTheIsland(){
     }
 
     return tiles;
-}
+}*/
 
-/*
 function riseTheIsland(){
-    var tile01 = new Tile("helipad", 0, false, false, false, 5, "", [], "#A9D0F5", "", "HELIPORT");
-    var tile02 = new Tile("doorBlack", 0, false, false, false, 3, "", [], "#6E6E6E", "", "");
-    var tile03 = new Tile("doorRed", 0, false, false, false, 0, "", [], "#F78181", "", "");
-    var tile04 = new Tile("doorGreen", 0, false, false, false, 4, "", [], "#9FF781", "", "");
-    var tile05 = new Tile("doorWhite", 0, false, false, false, 2, "", [], "#D9D9D9", "", "");
-    var tile06 = new Tile("doorYellow", 0, false, false, false, 1, "", [], "#F2F5A9", "", "");
-    var tile07 = new Tile("temple0001", 0, false, false, false, "", "CR", [], "#bdc3c7", "", "TEMPLE CRYSTAL");
-    var tile08 = new Tile("temple0002", 0, false, false, false, "", "CR", [], "#bdc3c7", "", "TEMPLE CRYSTAL");
-    var tile09 = new Tile("temple0101", 0, false, false, false, "", "CU", [], "#bdc3c7", "", "TEMPLE CUP");
-    var tile10 = new Tile("temple0102", 0, false, false, false, "", "CU", [], "#bdc3c7", "", "TEMPLE CUP");
-    var tile11 = new Tile("temple0201", 0, false, false, false, "", "SC", [], "#bdc3c7", "", "TEMPLE SCEPTRE");
-    var tile12 = new Tile("temple0202", 0, false, false, false, "", "SC", [], "#bdc3c7", "", "TEMPLE SCEPTRE");
-    var tile13 = new Tile("temple0301", 0, false, false, false, "", "ST", [], "#bdc3c7", "", "TEMPLE STATUE");
-    var tile14 = new Tile("temple0302", 0, false, false, false, "", "ST", [], "#bdc3c7", "", "TEMPLE STATUE");
-    var tile15 = new Tile("coast01", 0, false, false, false, "", "", [], "#825a2c", "", "");
-    var tile16 = new Tile("coast02", 0, false, false, false, "", "", [], "#825a2c", "", "");
-    var tile17 = new Tile("coast03", 0, false, false, false, "", "", [], "#825a2c", "", "");
-    var tile18 = new Tile("desert01", 0, false, false, false, "", "", [], "#ffd480", "", "");
-    var tile19 = new Tile("desert02", 0, false, false, false, "", "", [], "#ffd480", "", "");
-    var tile20 = new Tile("desert03", 0, false, false, false, "", "", [], "#ffd480", "", "");
-    var tile21 = new Tile("swamp01", 0, false, false, false, "", "", [], "#bcf0d2", "", "");
-    var tile22 = new Tile("swamp02", 0, false, false, false, "", "", [], "#bcf0d2", "", "");
-    var tile23 = new Tile("swamp03", 0, false, false, false, "", "", [], "#bcf0d2", "", "");
-    var tile24 = new Tile("swamp04", 0, false, false, false, "", "", [], "#bcf0d2", "", "");
+    var tile01 = new Tile("helipad", 0, false, false, false, 5, "", [], "#A9D0F5", "HELIPORT");
+    var tile02 = new Tile("doorBlack", 0, false, false, false, 3, "", [], "#6E6E6E", "");
+    var tile03 = new Tile("doorRed", 0, false, false, false, 0, "", [], "#F78181", "");
+    var tile04 = new Tile("doorGreen", 0, false, false, false, 4, "", [], "#9FF781", "");
+    var tile05 = new Tile("doorWhite", 0, false, false, false, 2, "", [], "#D9D9D9", "");
+    var tile06 = new Tile("doorYellow", 0, false, false, false, 1, "", [], "#F2F5A9", "");
+    var tile07 = new Tile("temple0001", 0, false, false, false, "", "CR", [], "#bdc3c7", "TEMPLE CRYSTAL");
+    var tile08 = new Tile("temple0002", 0, false, false, false, "", "CR", [], "#bdc3c7", "TEMPLE CRYSTAL");
+    var tile09 = new Tile("temple0101", 0, false, false, false, "", "CU", [], "#bdc3c7", "TEMPLE CUP");
+    var tile10 = new Tile("temple0102", 0, false, false, false, "", "CU", [], "#bdc3c7", "TEMPLE CUP");
+    var tile11 = new Tile("temple0201", 0, false, false, false, "", "SC", [], "#bdc3c7", "TEMPLE SCEPTRE");
+    var tile12 = new Tile("temple0202", 0, false, false, false, "", "SC", [], "#bdc3c7", "TEMPLE SCEPTRE");
+    var tile13 = new Tile("temple0301", 0, false, false, false, "", "ST", [], "#bdc3c7", "TEMPLE STATUE");
+    var tile14 = new Tile("temple0302", 0, false, false, false, "", "ST", [], "#bdc3c7", "TEMPLE STATUE");
+    var tile15 = new Tile("coast01", 0, false, false, false, "", "", [], "#825a2c", "");
+    var tile16 = new Tile("coast02", 0, false, false, false, "", "", [], "#825a2c", "");
+    var tile17 = new Tile("coast03", 0, false, false, false, "", "", [], "#825a2c", "");
+    var tile18 = new Tile("desert01", 0, false, false, false, "", "", [], "#ffd480", "");
+    var tile19 = new Tile("desert02", 0, false, false, false, "", "", [], "#ffd480", "");
+    var tile20 = new Tile("desert03", 0, false, false, false, "", "", [], "#ffd480", "");
+    var tile21 = new Tile("swamp01", 0, false, false, false, "", "", [], "#bcf0d2", "");
+    var tile22 = new Tile("swamp02", 0, false, false, false, "", "", [], "#bcf0d2", "");
+    var tile23 = new Tile("swamp03", 0, false, false, false, "", "", [], "#bcf0d2", "");
+    var tile24 = new Tile("swamp04", 0, false, false, false, "", "", [], "#bcf0d2", "");
     // create a 24 array
     let tiles = [tile01,tile02,tile03,tile04,tile05,tile06,tile07,tile08,tile09,tile10,
       tile11,tile12,tile13,tile14,tile15,tile16,tile17,tile18,tile19,tile20,
@@ -3440,27 +3448,26 @@ function riseTheIsland(){
 
     return tiles;
 }
-*/
 
 function generatePlayerCardsLeap(){
     let cards = [];
-    for (let i = 0; i < 5; i++){
+    for (let i = 0; i < 5; i++){ // 5 cards
         let card = { id : i, name : "crystal", loc_key: "ca_crytal", type : "CR", url : "img/crystalCard.png", howMany : 0};
         cards.push(card);
     }
-    for (let i = 0; i < 5; i++){
+    for (let i = 0; i < 5; i++){ // 5 cards
         let card = { id : i + 5, name : "cup", loc_key: "ca_cup", type : "CU", url : "img/cupCard.png", howMany : 0};
         cards.push(card);
     }
-    for (let i = 0; i < 5; i++){
+    for (let i = 0; i < 5; i++){ // 5 cards
         let card = { id : i + 10, name : "sceptre", loc_key: "ca_sceptre", type : "SC", url : "img/sceptreCard.png", howMany : 0};
         cards.push(card);
     }
-    for (let i = 0; i < 5; i++){
+    for (let i = 0; i < 5; i++){ // 5 cards
         let card = {id : i + 15, name : "statue", loc_key: "ca_statue", type : "ST", url : "img/statueCard.png", howMany : 0};
         cards.push(card);
     }
-    for (let i = 0; i < 3; i++){
+    for (let i = 0; i < 3; i++){ // 3 cards
         let card = { id : i + 20, name : "helicopter", loc_key: "ca_helicopter", type : "H", url : "img/helicopterCard.png", howMany : 0};
         cards.push(card);
     }
@@ -3514,51 +3521,51 @@ function generateGUID() {
     var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
     return v.toString(16);
     });
+}
+
+function doLog(msg, msg2, msg3, state){
+  var nbrOfDrawnTiles = 0;
+  for(var i = 0; i < state.tiles.length; i++){
+    if (state.tiles[i].isDrawned){
+      nbrOfDrawnTiles++;
+    }
   }
 
-  function doLog(msg, msg2, msg3, state){
-    var nbrOfDrawnTiles = 0;
-    for(var i = 0; i < state.tiles.length; i++){
-      if (state.tiles[i].isDrawned){
-        nbrOfDrawnTiles++;
-      }
+  var rolesString = "";
+  for (var j = 0; j < state.players.length; j ++){
+    var type = state.players[j].type;
+    rolesString += playerTypes[type].shortRole;
+    if (j < state.players.length - 1){
+      rolesString += "+";
     }
-
-    var rolesString = "";
-    for (var j = 0; j < state.players.length; j ++){
-      var type = state.players[j].type;
-      rolesString += playerTypes[type].shortRole;
-      if (j < state.players.length - 1){
-        rolesString += "+";
-      }
-    }
-
-    var logString = Date.now() + "|";
-    // game
-    logString += state.gameID + "|";
-    logString += msg + "|";
-    logString += msg2 + "|";
-    logString += msg3 + "|";
-    logString += state.nbrOfPlayers + "|";
-    logString += state.difficultyLevel + "|";
-    logString += state.selectedLanguage + "|";
-    logString += state.versionNumber + "|";
-    // current state
-    logString += state.turn + "|";
-    logString += state.currentPlayerPlaying + "|";
-    logString += state.posessedTreasures.length + "|";
-    logString += state.floodMeter.level + "|";
-    logString += nbrOfDrawnTiles + "|";
-    logString += rolesString;
-
-    console.log(logString);
-    var logUrl = logHost + "?stf=" + logString;
-    // if test local ou test de build, do not log
-     if (document.URL.indexOf("localhost") < 0 && document.URL.indexOf("build") < 0 ){
-            console.log("Logged");
-            httpGetAsync(logUrl);
-     }
   }
+
+  var logString = Date.now() + "|";
+  // game
+  logString += state.gameID + "|";
+  logString += msg + "|";
+  logString += msg2 + "|";
+  logString += msg3 + "|";
+  logString += state.nbrOfPlayers + "|";
+  logString += state.difficultyLevel + "|";
+  logString += state.selectedLanguage + "|";
+  logString += state.versionNumber + "|";
+  // current state
+  logString += state.turn + "|";
+  logString += state.currentPlayerPlaying + "|";
+  logString += state.posessedTreasures.length + "|";
+  logString += state.floodMeter.level + "|";
+  logString += nbrOfDrawnTiles + "|";
+  logString += rolesString;
+
+  console.log(logString);
+  var logUrl = logHost + "?stf=" + logString;
+  // if test local ou test de build, do not log
+    if (document.URL.indexOf("localhost") < 0 && document.URL.indexOf("build") < 0 ){
+          console.log("Logged");
+          httpGetAsync(logUrl);
+    }
+}
 
 function httpGetAsync(logUrl)
 {
