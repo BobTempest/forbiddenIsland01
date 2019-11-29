@@ -209,7 +209,7 @@ function DrawSquare(props) {
 
   return (
     <div className={squareClass} style={squareStyle} id={squareId} onClick={props.onClick} >
-      <span className="inSquarePosition">{props.tile.position}</span><br/>
+      {/*<span className="inSquarePosition">{props.tile.position}</span>*/}<br/>
       <span className="inSquareLittleText">{props.tile.LittleTextToDisplay}</span>
       {
         props.tile.playerOn.length > 0 ?
@@ -514,7 +514,7 @@ class Board extends React.Component {
   controller(input, data){
       console.log("InController turn :" + this.state.currentStep);
       let lng = this.state.languageDistributor;
-      this.checkCardState();
+      // this.checkCardState(); TO RE ESTABLISH !
       this.showActionButtons();
       this.unblinkTheTiles();
 
@@ -720,11 +720,12 @@ class Board extends React.Component {
 
     for (let j = 0; j < n_Tiles.length; j++){
       if (n_Tiles[j].name === card.name){
-        console.log('****** TILE To flood IS ' + n_Tiles[j].name);
+        console.log('****** TILE To flood IS ' + n_Tiles[j].name + ' number : ' + j);
         floodedTileId = j;
         if (n_Tiles[j].isImmersed){
           // Let's DRAWN this tile
-            message = message + lng.tileDrawning.format(n_Tiles[j].name, j);
+            // message = message + lng.formatTileDrawning.format(n_Tiles[j].name, j);
+            message = message + lng.tileDrawning;
             n_Tiles[j].isImmersed = false;
             n_Tiles[j].isDrawning = true;
             n_Tiles[j].isDrawned = false;
@@ -773,7 +774,8 @@ class Board extends React.Component {
           this.customAlert("CONCEPTUAL ERROR : " + n_Tiles[j].name + " is already drawned. it shouldn't be in the Leap !");
         }
         else{
-            message = message + lng.tileIsFlooded.format(n_Tiles[j].name, j);
+            // message = message + lng.formatTileIsFlooded.format(n_Tiles[j].name, j);
+            message = message + lng.tileIsFlooded;
             n_Tiles[j].isImmersed = true;
             blinkingTile = j;
         }
@@ -886,9 +888,11 @@ class Board extends React.Component {
   }
 
   doMoveFloodOmeterCursor(){
-    let newValue = document.getElementById('floodOmeterCursor').style.left;
-    newValue = parseInt(newValue.slice(0, newValue.indexOf('px')), 10) + 33;
-    document.getElementById("floodOmeterCursor").style.left = newValue + "px";
+    let cursorImage = document.getElementById("floodOmeterCursorImg");
+    cursorImage.classList.add('doMoveFloodCursor');
+    cursorImage.addEventListener('webkitAnimationEnd', function (e) {
+      cursorImage.classList.remove('doMoveFloodCursor');
+    });
   }
 
   doPickOnePlayerCard(cardNumber, tempState){
@@ -1374,7 +1378,6 @@ class Board extends React.Component {
 
   // remove Drawned And Origin Tiles from a where-can-he-go selection
   removeDrawnedAndOriginTiles(moves, position){
-    // console.log("entering RD&O with " + moves + " from " + position);
     let output = [];
     if (moves.length > 0) {
       for (let k = 0; k < moves.length; k++)
@@ -2114,7 +2117,7 @@ handleTileClick(i) {
 
     this.unlightTheTiles();
     this.lightTheTiles(whereCanHeMove, this.state.players[puppet].color);
-    let newMessage = new UserMessage('chooseADestination', null, false, []); // TODO : SET a cancel
+    let newMessage = new UserMessage('chooseADestination', null, false, []); // TODO : SET a cancel. See bug.
     this.setState({ whatIsExpectedNext: "TileButtonClickForMoveSomeone" ,
                     mainUserMessage: newMessage,
                     messageBoardState : "moveSomeOneSequence",
@@ -2580,6 +2583,7 @@ handleTileClick(i) {
                 }))
               }
               <div>{lng.andMoveHimUpToTwoTiles}</div>
+              <button className="actionButton" value="Cancel" onClick={() => this.cancelAnAction()}>{lng.btn_cancel}</button>
             </div>
           )
     } else if (this.state.messageBoardState === "SolveOver5Cards") {
@@ -2968,8 +2972,8 @@ handleTileClick(i) {
       let fOm_position_value = "relative";
       let fOm_left_value = 5 + ((this.state.floodMeter.level - 1) * 33);
       let fOm_top_value = -70;
+
       // calculate length of the jauges in px
-      
       let nbrOfPlayerCards = 28;
       let nbrOfFloodCards = 24;
       //117 is cellJauge px in css
@@ -3057,7 +3061,7 @@ handleTileClick(i) {
             </div>
             <div className="floodOmeter">
                 <img src="img/FloodOmeter.png"/>
-                <span className="floodOmeterCursor" id="floodOmeterCursor" style={{position: fOm_position_value, left: fOm_left_value+'px', top: fOm_top_value+'px'}}><img src="img/FloodOmeterCursor.png"/></span>
+                <span className="floodOmeterCursorSpan" id="floodOmeterCursor" style={{position: fOm_position_value, left: fOm_left_value+'px', top: fOm_top_value+'px'}}><img src="img/FloodOmeterCursor.png" id="floodOmeterCursorImg" className="floodOmeterCursorImg"/></span>
             </div>
             <table className="cardsPilesTable">
               <tbody>
@@ -3408,6 +3412,8 @@ function riseTheIsland(){
     return tiles;
 }*/
 
+
+// Regular playground
 function riseTheIsland(){
     var tile01 = new Tile("helipad", 0, false, false, false, 5, "", [], "#A9D0F5", "HELIPORT");
     var tile02 = new Tile("doorBlack", 0, false, false, false, 3, "", [], "#6E6E6E", "");
@@ -3450,7 +3456,7 @@ function riseTheIsland(){
 }
 
 function generatePlayerCardsLeap(){
-    let cards = [];
+    let cards = []; 
     for (let i = 0; i < 5; i++){ // 5 cards
         let card = { id : i, name : "crystal", loc_key: "ca_crytal", type : "CR", url : "img/crystalCard.png", howMany : 0};
         cards.push(card);
@@ -3482,6 +3488,22 @@ function generatePlayerCardsLeap(){
     cards = shuffleArray(cards);
     return cards;
 }
+
+
+// HACK to pick only floodCards.use it with 4 players
+/*
+function generatePlayerCardsLeap(){
+  let cards = []; 
+  for (let i = 0; i < 8; i++){ // 8 cards
+      let card = { id : i, name : "crystal", loc_key: "ca_crytal", type : "CR", url : "img/crystalCard.png", howMany : 0};
+      cards.push(card);
+  }
+  for (let i = 0; i < 10; i++){ // 20 cards
+    let card = { id : i + 25, name : "floodRise", loc_key: "ca_floodRise", type : 5, url : "img/floodRise.png", howMany : 0};
+    cards.push(card);
+  }
+  return cards;
+}*/
 
 function generateFloodCardsLeap(){
     let cards = floodCards;

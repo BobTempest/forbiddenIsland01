@@ -3,7 +3,8 @@
 07/10/19 : 
 css bonhommes trop vers le bas : fixed
 css jauges : fixed
-animation for player gauge
+animation for player gauge : done
+fixed bug : Move someone (yellow) if nowhere to go ? Stuck ! 
 
 **** BUGS *****
 
@@ -22,6 +23,7 @@ animation for player gauge
 *********************
 **** SHORT TERM *****
 
+screen size : 1334 x 750
 
 *********************
 ***** LONG TERM *****

@@ -1,3 +1,9 @@
+
+
+:root {
+  --alorsondanse: 0px;
+}
+
 body {
   font: 14px "Century Gothic", Futura, sans-serif;
   margin: 20px;
@@ -69,17 +75,24 @@ list-style:none;
   width: 50px;
 }
 
+.emptySquare {
+  background: transparent;
+  border: 1px solid rgba(0,0,0,0);
+  float: left;
+  margin: 2px;
+  border-radius: 5px;
+  padding: 0;
+  height: 48px;
+  width: 48px;
+}
+
 .drawningSquare {
   box-sizing: border-box;
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
-  /*background-image: url("./img/drawning03.png");*/
 
   float: left;
-  margin-right: 2px;
-  margin-top: 2px;
-  margin-left: 2px;
-  margin-bottom: 2px;
+  margin: 2px;
 
   padding: 0;
   height: 50px;
@@ -172,19 +185,7 @@ list-style:none;
   top: -24px;
 }
 
-.emptySquare {
-  background: transparent;
-  border: 1px solid rgba(0,0,0,0);
-  float: left;
-  margin-right: 4px;
-  margin-top: 2px;
-  margin-left: 2px;
-  margin-bottom: 2px;
-  border-radius: 5px;
-  padding: 0;
-  height: 48px;
-  width: 46px;
-}
+
 
 .lilGreyFrame {
   background-color: #CCC;
@@ -225,7 +226,14 @@ list-style:none;
   margin-left: 10px;
 }
 
-.floodOmeterCursor {
+.floodOmeterCursorSpan {
+  position: relative;
+  display: inline;
+  top: left;
+}
+
+.floodOmeterCursorImg {
+  position: relative;
   z-index:10;
 }
 
@@ -640,6 +648,22 @@ list-style:none;
   }
 }
 
+.doMoveFloodCursor {
+  animation-name: moveRight;
+  animation-duration: 1s;
+  animation-timing-function: ease-in-out;
+}
+
+/* I don't understand why I need to do this in reverse.... */
+@keyframes moveRight {
+  0% {
+    left: -33px;
+  }
+  100% {
+    left: 0px;
+  }
+}
+
 .spanOverHand {
   position: relative;
   display: inline;
@@ -657,10 +681,9 @@ list-style:none;
 .helpCharacterIcon {
     float: right;
     text-decoration:none;
-    font-size: 12px;
+    font-size: 10px;
     line-height: 12px;
     color: black;
-    text-shadow: 1px 1px 3px #333333;
 }
 
 .inToolTipsText {
@@ -759,8 +782,6 @@ a:hover.actionTooltips span {
 div.treasureTooltips {
   position: relative;
   display: inline;
-  /*left: 10px;*/
-  /*top: 17px;*/
 }
 
 div.treasureTooltips span {
@@ -768,9 +789,6 @@ div.treasureTooltips span {
   width:140px;
   color: #000000;
   background: #CFCFCF;
-  /*height: 34px;
-  line-height: 34px;
-  text-align: center;*/
   visibility: hidden;
   border-radius: 6px;
 }
@@ -861,7 +879,6 @@ a.write2me {
 }
 
 .blockAll {
-    /*position: absolute;*/
     top: 0;
     left: 0;
     width: 100%;
@@ -879,7 +896,6 @@ a.write2me {
     top: 200px;
     left: 300px;
     width: 500px;
-    /* height: 120px; */
     background-color: #eee;
     z-index: 75;
     box-shadow: 5px 5px 3px #777;
