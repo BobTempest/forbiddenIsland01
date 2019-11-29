@@ -49,10 +49,14 @@
     $req_globalUnfinishedGames = mysql_query($sql_globalUnfinishedGames) or die('Erreur SQL sur sql_globalUnfinishedGames !<br />'.$sql_globalUnfinishedGames.'<br />'.mysql_error());
     $req_globalFinishedGames = mysql_query($sql_globalFinishedGames) or die('Erreur SQL sur sql_globalFinishedGames !<br />'.$sql_globalFinishedGames.'<br />'.mysql_error());
     $req_repartitionOfFails = mysql_query($sql_repartitionOfFails) or die('Erreur SQL sur sql_repartitionOfFails !<br />'.$sql_repartitionOfFails.'<br />'.mysql_error());
+    $req_repartitionOfFails02 = mysql_query($sql_repartitionOfFails) or die('Erreur SQL sur sql_repartitionOfFails !<br />'.$sql_repartitionOfFails.'<br />'.mysql_error());
     $req_gamesPerMonths = mysql_query($sql_gamesPerMonths) or die('Erreur SQL sur sql_gamesPerMonths !<br />'.$sql_gamesPerMonths.'<br />'.mysql_error());
+    $req_gamesPerMonths02 = mysql_query($sql_gamesPerMonths) or die('Erreur SQL sur sql_gamesPerMonths !<br />'.$sql_gamesPerMonths.'<br />'.mysql_error());
     $req_lastGamePlayed = mysql_query($sql_lastGamePlayed) or die('Erreur SQL sur sql_lastGamePlayed !<br />'.$sql_lastGamePlayed.'<br />'.mysql_error());
 
     // ******** display
+
+
     $data_lastGamePlayed = mysql_fetch_row($req_lastGamePlayed);
     echo 'Last game played : '.$data_lastGamePlayed[0].'<br />';
 
@@ -92,14 +96,45 @@
     echo '</div>';
 
     //
-    mysql_free_result ($req_globalCountFail);
-    mysql_free_result ($req_globalCountWin);
-    mysql_free_result ($req_globalUnfinishedGames);
-    mysql_free_result ($req_globalFinishedGames);
-    mysql_free_result ($req_repartitionOfFails);
-    mysql_free_result ($req_gamesPerMonths);
-    mysql_free_result ($req_lastGamePlayed);
-    mysql_close ();
+
     ?>
+    <script>
+        var data_lastGamePlayed = "<?php echo $data_lastGamePlayed[0]; ?>";
+        var globalCountStarted = <?php echo $data_globalCountStarted[0]; ?>;
+        var data_globalCountFail = <?php echo $data_globalCountFail[0]; ?>;
+        var data_globalCountWin = <?php echo $data_globalCountWin[0]; ?>;
+        var data_globalUnfinishedGames = <?php echo $data_globalUnfinishedGames[0]; ?>;
+        var data_globalFinishedGames = <?php echo $data_globalFinishedGames[0]; ?>;
+
+        var failureTypeArray = [
+        <?php 
+            while ($data_repartitionOfFails02 = mysql_fetch_array($req_repartitionOfFails02)) {
+                echo '{ failCause: "'.$data_repartitionOfFails02[0].'", howMuch: '.$data_repartitionOfFails02[1].' },';
+            }
+        ?>
+        ];
+
+        var gamesPerMonth = [
+        <?php
+            while ($data_gamesPerMonths02 = mysql_fetch_array($req_gamesPerMonths02)) {
+                echo '{ when: "'.$data_gamesPerMonths02[0].'", howMuch: '.$data_gamesPerMonths02[1].' },';
+            }
+        ?>
+        ];
+
+    </script>
+
     </body>
     </html>
+    <?php
+        mysql_free_result ($req_globalCountFail);
+        mysql_free_result ($req_globalCountWin);
+        mysql_free_result ($req_globalUnfinishedGames);
+        mysql_free_result ($req_globalFinishedGames);
+        mysql_free_result ($req_repartitionOfFails);
+        mysql_free_result ($req_repartitionOfFails02);
+        mysql_free_result ($req_gamesPerMonths);
+        mysql_free_result ($req_gamesPerMonths02);
+        mysql_free_result ($req_lastGamePlayed);
+        mysql_close ();
+    ?>
