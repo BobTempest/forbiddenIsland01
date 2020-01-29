@@ -37,7 +37,7 @@
     $sql_repartitionOfFails = 'SELECT Message02, COUNT(*) FROM Games WHERE Message01 = "GAME_LOST" GROUP BY Message02';
 
     // Games per months
-    $sql_gamesPerMonths = 'SELECT DATE_FORMAT(ServerDateTime, "%M %Y") AS MyDATE, COUNT(*) FROM Games WHERE Message01 = "START" GROUP BY MONTH(ServerDateTime) ORDER BY ServerDateTime ASC';
+    $sql_gamesPerMonths = 'SELECT DATE_FORMAT(ServerDateTime, "%M %Y") AS MyDATE, COUNT(*) FROM Games WHERE Message01 = "START" GROUP BY YEAR (ServerDateTime), MONTH (ServerDateTime) ORDER BY ServerDateTime DESC';
 
     // Last game played
     $sql_lastGamePlayed = 'SELECT DATE_FORMAT(ServerDateTime, "%d %M %Y %T") FROM `Games` WHERE 1 ORDER BY `ServerDateTime` DESC LIMIT 1';
@@ -98,7 +98,14 @@
     //
 
     ?>
-    <script>
+
+
+    <canvas id="myChart" width="400" height="400"></canvas>
+
+    <script src="./libs/Chart.min.js"></script>
+    <script type="text/javascript">
+        
+        // Data gathering
         var data_lastGamePlayed = "<?php echo $data_lastGamePlayed[0]; ?>";
         var globalCountStarted = <?php echo $data_globalCountStarted[0]; ?>;
         var data_globalCountFail = <?php echo $data_globalCountFail[0]; ?>;
@@ -114,13 +121,55 @@
         ?>
         ];
 
-        var gamesPerMonth = [
+        var gamesPerMonthArray = [
         <?php
             while ($data_gamesPerMonths02 = mysql_fetch_array($req_gamesPerMonths02)) {
                 echo '{ when: "'.$data_gamesPerMonths02[0].'", howMuch: '.$data_gamesPerMonths02[1].' },';
             }
         ?>
         ];
+
+        // Data transformation
+        var sumOfFailures = 0;
+        failureTypeArray.map((val, i) => {
+             sumOfFailures += val.howMuch;
+        });
+
+        var datasetForTypesOfDeaths = failureTypeArray.map((val, i) => {
+            return ((val.howMuch*100)/sumOfFailures).toFixed(2);
+        });
+
+        var myLabels = failureTypeArray.map((val, i) => {
+            return val.failCause;
+        });
+
+        // charts building
+        // chart Types of Deaths
+        dataTypesOfDeaths = {
+            datasets: [{
+                label: "% repartition of Game over Type",
+                data: datasetForTypesOfDeaths,
+                backgroundColor: [
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)'
+                ]
+
+            }],
+
+            // These labels appear in the legend and in the tooltips when hovering different arcs
+            labels: myLabels
+        };
+
+        var ctx = document.getElementById('myChart');
+        var myDoughnutChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: dataTypesOfDeaths,
+            options: {}
+        });
 
     </script>
 

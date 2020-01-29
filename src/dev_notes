@@ -8,6 +8,7 @@ fixed bug : Move someone (yellow) if nowhere to go ? Stuck !
 
 **** BUGS *****
 
+when cancelling a give action, bad recount des cartes (du giver et/ou du receiver)
 
 
 

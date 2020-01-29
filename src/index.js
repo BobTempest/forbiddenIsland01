@@ -489,7 +489,7 @@ class Board extends React.Component {
       }
 
       // save the state before the first action
-      var stateCopy = JSON.parse(JSON.stringify(this.state)); // ?????? stringify puis parse ?
+      var stateCopy = JSON.parse(JSON.stringify(this.state)); // ?????? stringify puis parse ? => safe copie d'objet en javascript
       // let stateCopy = this.state;
           // reproduce what will be setted in the next setState
           stateCopy.floodCardsLeap = n_FloodCardsLeap;
@@ -2565,7 +2565,6 @@ handleTileClick(i) {
                     )
                   }))
             }
-            <br />
             <button className="actionButton" onClick={() => this.helicopterCardEnRoute(travellers)}>{lng.hopIn}</button>
           </div>
         )
