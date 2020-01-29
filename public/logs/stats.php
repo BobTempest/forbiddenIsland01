@@ -37,7 +37,7 @@
     $sql_repartitionOfFails = 'SELECT Message02, COUNT(*) FROM Games WHERE Message01 = "GAME_LOST" GROUP BY Message02';
 
     // Games per months
-    $sql_gamesPerMonths = 'SELECT DATE_FORMAT(ServerDateTime, "%M %Y") AS MyDATE, COUNT(*) FROM Games WHERE Message01 = "START" GROUP BY YEAR (ServerDateTime), MONTH (ServerDateTime) ORDER BY ServerDateTime DESC';
+    $sql_gamesPerMonths = 'SELECT DATE_FORMAT(ServerDateTime, "%M %Y") AS MyDATE, COUNT(*), COUNT(DISTINCT UserIP) FROM Games WHERE Message01 = "START" GROUP BY YEAR (ServerDateTime), MONTH (ServerDateTime) ORDER BY ServerDateTime DESC';
 
     // Last game played
     $sql_lastGamePlayed = 'SELECT DATE_FORMAT(ServerDateTime, "%d %M %Y %T") FROM `Games` WHERE 1 ORDER BY `ServerDateTime` DESC LIMIT 1';
@@ -51,7 +51,7 @@
     $req_repartitionOfFails = mysql_query($sql_repartitionOfFails) or die('Erreur SQL sur sql_repartitionOfFails !<br />'.$sql_repartitionOfFails.'<br />'.mysql_error());
     $req_repartitionOfFails02 = mysql_query($sql_repartitionOfFails) or die('Erreur SQL sur sql_repartitionOfFails !<br />'.$sql_repartitionOfFails.'<br />'.mysql_error());
     $req_gamesPerMonths = mysql_query($sql_gamesPerMonths) or die('Erreur SQL sur sql_gamesPerMonths !<br />'.$sql_gamesPerMonths.'<br />'.mysql_error());
-    $req_gamesPerMonths02 = mysql_query($sql_gamesPerMonths) or die('Erreur SQL sur sql_gamesPerMonths !<br />'.$sql_gamesPerMonths.'<br />'.mysql_error());
+    $req_gamesPerMonths02 = mysql_query($sql_gamesPerMonths) or die('Erreur SQL sur sql_gamesPerMonths !<br />'.$sql_gamesPerMonths02.'<br />'.mysql_error());
     $req_lastGamePlayed = mysql_query($sql_lastGamePlayed) or die('Erreur SQL sur sql_lastGamePlayed !<br />'.$sql_lastGamePlayed.'<br />'.mysql_error());
 
     // ******** display
@@ -88,9 +88,13 @@
     echo '<div>';
     echo '<b>Games per Months:</b><br />';
     echo '<table>';
+    echo '<tr><td> WHEN </td>';
+    echo '<td> GAMES LAUNCHED </td>';
+    echo '<td> DISTINCT IPs </td></tr>';
     while ($data_gamesPerMonths = mysql_fetch_array($req_gamesPerMonths)) {
         echo '<tr><td>'.$data_gamesPerMonths[0].'</td>';
-        echo '<td>'.$data_gamesPerMonths[1].'</td></tr>';
+        echo '<td>'.$data_gamesPerMonths[1].'</td>';
+        echo '<td>'.$data_gamesPerMonths[2].'</td></tr>';
     }
     echo '</table>';
     echo '</div>';
@@ -124,7 +128,7 @@
         var gamesPerMonthArray = [
         <?php
             while ($data_gamesPerMonths02 = mysql_fetch_array($req_gamesPerMonths02)) {
-                echo '{ when: "'.$data_gamesPerMonths02[0].'", howMuch: '.$data_gamesPerMonths02[1].' },';
+                echo '{ when: "'.$data_gamesPerMonths02[0].'", howMuchGames: "'.$data_gamesPerMonths02[1].'", howMuchIPs: "'.$data_gamesPerMonths02[2].'" },';
             }
         ?>
         ];
