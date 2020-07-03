@@ -124,7 +124,7 @@ export const stringsCatalog = {
    letsFloodSomeTiles_msg: "Let's flood {0} tiles",
    nextTurn_msg: "Next Turn ! Please {0}, Choose an action.",
    nextPlayer_msg: "Next player ! Please Choose an action ",
-   chooseAnAction_msg: "PLease, choose an action ",
+   chooseAnAction_msg: "Please, choose an action ",
    immersionXoutofY: "<div>immersion {0} out of {1}.<br/>",
    formatTileDrawning: "<span style=\"color: #DC143C\">{0} at {1} is drawning ! </span>",
    tileDrawning: "<span style=\"color: #DC143C\">Terrain is drawning ! </span>",

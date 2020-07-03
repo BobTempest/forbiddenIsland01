@@ -103,8 +103,7 @@
 
     ?>
 
-
-    <canvas id="myChart" width="400" height="400"></canvas>
+    <canvas id="myChart" style ="width: 200px height:200px"></canvas>
 
     <script src="./libs/Chart.min.js"></script>
     <script type="text/javascript">
