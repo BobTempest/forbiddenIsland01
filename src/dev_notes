@@ -10,6 +10,8 @@ fixed bug : Move someone (yellow) if nowhere to go ? Stuck !
 
 when cancelling a give action, bad recount des cartes (du giver et/ou du receiver)
 
+If use sandBagCard but nothing to dry : actions do not re apear after message
+
 
 
 *********************
@@ -37,3 +39,7 @@ screen size : 1334 x 750
 
 *********************
 ******** BUGS *******
+
+FIXED 001 : line 3032 : doChangeCardInFormGiveACard is not a Function
+002 : line 2118 : this.howActionButtons is not a function
+003 : When only one card -> 'give' -> the preselected card is not recognised as pre selected

@@ -1,6 +1,6 @@
 import './index.css';
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom';
 
 import {
@@ -176,9 +176,9 @@ function DrawLittleTemple(props){
   return null;
 }
 
-// class Board extends React.Component {
-function Board(props) {
-// start constructor
+class Board extends React.Component {
+  constructor(props) {
+    super(props);
 
     var nbrOfPlayers = props.nbrOfPlayers;
     var difficultyLevel = props.difficultyLevel;
@@ -200,10 +200,10 @@ function Board(props) {
     // assigner les positions de depart
     players.forEach(getInitialPlayerPosition);
 
-    var possibleActions = getPossibleActions(players[0], false, true);
+    var possibleActions = this.getPossibleActions(players[0], false, true);
 
     var gameID = generateGUID();
-
+    /*
     const [ boardState, setBoardState ] = useState({
         // IF ADDING ANYTHING, PLEASE FIX doStatePermutation
         tiles: tiles,
@@ -255,8 +255,8 @@ function Board(props) {
         showRollBackButton : true // TODO report
         // IF ADDING ANYTHING, PLEASE FIX doStatePermutation
     });
+    */
 
-    /*
     this.state = {
       // IF ADDING ANYTHING, PLEASE FIX doStatePermutation
       tiles: tiles,
@@ -308,7 +308,6 @@ function Board(props) {
       showRollBackButton : true // TODO report
       // IF ADDING ANYTHING, PLEASE FIX doStatePermutation
     };
-    */
 
     function getInitialPlayerPosition(player){
       //start HACK
@@ -344,12 +343,12 @@ function Board(props) {
             player.cards.push(card);
       }
     }
-  //} // end of Board constructor
+  } // end of Board constructor
 
 ///////////////////////////////////////////////////////////////////////////////////
 //        Out Of Board constructor
 ////////////////////////////////////////////////////////////////////////////////////
-
+/*
 //replaces componentDidMount
 useEffect(() => {
         // Perform the initial Flooding of 6 tiles
@@ -418,7 +417,7 @@ useEffect(() => {
               doLog("START", "","", this.state);
           });
           */
-
+/*
          setBoardState({ 
           ...boardState, 
           floodCardsLeap: n_FloodCardsLeap,
@@ -431,14 +430,15 @@ useEffect(() => {
 
          doLog("START", "","", boardState);
 }, []);
-/*
+*/
+
   componentDidMount() {
       // Perform the initial Flooding of 6 tiles
       let initialFlood = 6;
-      let n_FloodCardsLeap = this.boardState.floodCardsLeap;
-      let n_Tiles = boardState.tiles;
-      let n_FloodCardsDiscard = boardState.floodCardsDiscard;
-      let lng = boardState.languageDistributor;
+      let n_FloodCardsLeap = this.state.floodCardsLeap;
+      let n_Tiles = this.state.tiles;
+      let n_FloodCardsDiscard = this.state.floodCardsDiscard;
+      let lng = this.state.languageDistributor;
 
       for ( let i = 0; i < initialFlood; i++){
           let card = n_FloodCardsLeap.pop();
@@ -455,10 +455,10 @@ useEffect(() => {
       // And add a localised welcome message
       let n_userMessage = new UserMessage('welcome_msg', null, false, []);
 
-      // this.blinkAPlayer(boardState.currentPlayerPlaying);
+      // this.blinkAPlayer(this.state.currentPlayerPlaying);
 
       let difficultyLevelString = "";
-      switch (boardState.difficultyLevel) {
+      switch (this.state.difficultyLevel) {
        case 1:
             difficultyLevelString = lng.novice;
             break;
@@ -488,7 +488,7 @@ useEffect(() => {
       let n_pastState = JSON.stringify(stateCopy);
 
       // console.log('****** state copy Size at init ' + n_pastState.length);
-      /*
+      
       this.setState({
         floodCardsLeap: n_FloodCardsLeap,
         floodCardsDiscard: n_FloodCardsDiscard,
@@ -498,25 +498,18 @@ useEffect(() => {
         pastStates: [n_pastState]}, () => {
             doLog("START", "","", this.state);
         });
-        */
-       /*
-       this.ss_floodCardsLeap(n_FloodCardsLeap);
-       this.ss_floodCardsDiscard(n_FloodCardsDiscard);
-       this.ss_tiles(n_Tiles);
-       this.ss_mainUserMessage(n_userMessage);
-       this.ss_pastStates([n_pastState]);
-       doLog("START", "","", this.state);
-  }// end of did mount
-*/
-  function controller(input, data){
-      console.log("InController turn :" + boardState.currentStep);
-      let lng = boardState.languageDistributor;
+  }// fin de did mount
+
+  controller(input, data){
+      console.log("InController turn :" + this.state.currentStep);
+      let lng = this.state.languageDistributor;
+
       // this.checkCardState(); TO RE ESTABLISH !
-      showActionButtons();
-      unblinkTheTiles();
+      this.showActionButtons();
+      this.unblinkTheTiles();
 
       // set Drawning Tiles to Drawned if any
-      let n_tiles = boardState.tiles;
+      let n_tiles = this.state.tiles;
       for (let k = 0; k < n_tiles.length; k++){
         if (n_tiles[k].isDrawning){
           n_tiles[k].isDrawning = false;
@@ -525,22 +518,22 @@ useEffect(() => {
       }
 
       if (input === "ActionIsDone"){
-      let lng = boardState.languageDistributor;
-        let nextStep = boardState.currentStep + 1;
+      let lng = this.state.languageDistributor;
+        let nextStep = this.state.currentStep + 1;
         console.log("InController Action is Done, NextStep is " + nextStep);
         //
         if (nextStep === 3 /*|| nextStep === 4 Ne devrais pas être necessaire */){
           // draw player cards 01
           let newMessage = new UserMessage('letsDrawSomePlayerCards_msg', null, false, [2]);
-          /*
+          
           this.setState({ currentStep : nextStep,
                           possibleActions : [],
                           blinkPlayer : 99,
                           mainUserMessage : newMessage,
                           showActionableCards : true,
                           showRollBackButton : true});
-                          */
-
+                          
+              /*
             setBoardState({
               ...boardState,
               currentStep : nextStep,
@@ -550,20 +543,21 @@ useEffect(() => {
               showActionableCards : true,
               showRollBackButton : true
             });
+            */
 
         } else if (nextStep === 5){
           // flood some tiles.
           
-          let howMuch = boardState.floodMeter.floodFactor;
+          let howMuch = this.state.floodMeter.floodFactor;
           let newMessage = new UserMessage(null, lng.letsFloodSomeTiles_msg.format(howMuch) , false, [4]);
-          /*
+          
           this.setState({ currentStep : nextStep,
                           possibleActions : [],
                           mainUserMessage : newMessage,
                           showActionableCards : true,
                           showRollBackButton : true});
-                          */
-
+                          
+          /*
           setBoardState({ 
             ...boardState, 
             currentStep : nextStep,
@@ -572,17 +566,18 @@ useEffect(() => {
             showActionableCards : true,
             showRollBackButton : true
           });
+          */
         }
         else if (nextStep === 6){
           // next Turn, new Player 0
-          if (boardState.currentPlayerPlaying === boardState.players[boardState.players.length -1].id){
-            // let newMessage = new UserMessage("Next Turn ! Please " + boardState.players[0].name + ", Choose an action " , false, []);
-            let newMessage = new UserMessage(null, lng.nextTurn_msg.format(boardState.players[0].name) , false, []);
-            let nextTurn = boardState.turn + 1;
-            let nextPlayer = boardState.players[0].id;
-            let psblactn = getPossibleActions(boardState.players[0], false, false);
+          if (this.state.currentPlayerPlaying === this.state.players[this.state.players.length -1].id){
+            // let newMessage = new UserMessage("Next Turn ! Please " + this.state.players[0].name + ", Choose an action " , false, []);
+            let newMessage = new UserMessage(null, lng.nextTurn_msg.format(this.state.players[0].name) , false, []);
+            let nextTurn = this.state.turn + 1;
+            let nextPlayer = this.state.players[0].id;
+            let psblactn = this.getPossibleActions(this.state.players[0], false, false);
             // save the state before an action
-            var stateCopy = JSON.parse(JSON.stringify(boardState));
+            var stateCopy = JSON.parse(JSON.stringify(this.state));
             // let stateCopy = this.state;
                 // reproduce what will be setted in the next setState
                 stateCopy.currentStep = 0;
@@ -600,7 +595,7 @@ useEffect(() => {
             let backup = JSON.stringify(stateCopy);
             console.log('****** state copy Size at Next Turn ' + backup.length);
             let n_pastState = [backup];
-            /*
+            
             this.setState({
               // Would you add something here, add it above
               currentStep : 0,
@@ -617,9 +612,9 @@ useEffect(() => {
               showRollBackButton : false,
               tiles : n_tiles
               });
-              */
+              
              // Would you add something here, add it above
-
+              /*
              setBoardState({ 
               ...boardState, 
               currentStep : 0,
@@ -636,15 +631,16 @@ useEffect(() => {
               showRollBackButton : false,
               tiles : n_tiles // Would you add something here, add it above
             });
+            */
              
           } else {
             // next Player
             let newMessage = new UserMessage('nextPlayer_msg', null, false, []);
-            let nextPlayer = boardState.players[boardState.currentPlayerPlaying + 1].id;
-            let psblactn = getPossibleActions(boardState.players[nextPlayer], false, false);
+            let nextPlayer = this.state.players[this.state.currentPlayerPlaying + 1].id;
+            let psblactn = this.getPossibleActions(this.state.players[nextPlayer], false, false);
 
             // save the state before an action
-            var stateCopy = JSON.parse(JSON.stringify(boardState));
+            var stateCopy = JSON.parse(JSON.stringify(this.state));
             // let stateCopy = this.state;
                 // reproduce what will be setted in the next setState
                 stateCopy.currentStep = 0;
@@ -661,7 +657,7 @@ useEffect(() => {
             console.log('****** state copy Size at Next player' + backup.length);
             let n_pastState = [backup];
 
-            /*
+            
             this.setState({
             // Would you add something here, add it above
               currentStep : 0,
@@ -676,8 +672,8 @@ useEffect(() => {
               showRollBackButton : false,
               tiles : n_tiles
             });
-            */
-
+            
+              /*
            setBoardState({ 
             ...boardState, 
             // Would you add something here, add it above
@@ -693,13 +689,14 @@ useEffect(() => {
             showRollBackButton : false,
             tiles : n_tiles
           });
+          */
           }
         } else{
           // next action for the same player
           let newMessage = new UserMessage('chooseAnAction_msg', null, false, []);
-          let psblactn = getPossibleActions(boardState.players[boardState.currentPlayerPlaying], boardState.hasPilotFlownThisTurn, false);
+          let psblactn = this.getPossibleActions(this.state.players[this.state.currentPlayerPlaying], this.state.hasPilotFlownThisTurn, false);
           // save the state before an action
-          var stateCopy = JSON.parse(JSON.stringify(boardState));
+          var stateCopy = JSON.parse(JSON.stringify(this.state));
           // let stateCopy = this.state;
               // reproduce what will be setted in the next setState
               stateCopy.currentStep = nextStep;
@@ -710,10 +707,10 @@ useEffect(() => {
               stateCopy.showRollBackButton = true;
               stateCopy.tiles = n_tiles;
           let backup = JSON.stringify(stateCopy);
-          let n_pastState = boardState.pastStates;
+          let n_pastState = this.state.pastStates;
           let zarma = n_pastState.push(backup);
           console.log('****** state copy Size at Next action ' + backup.length);
-          /*
+          
           this.setState({
             // Would you add something here, add it above
             currentStep : nextStep,
@@ -724,8 +721,8 @@ useEffect(() => {
             showActionableCards : true,
             showRollBackButton : true,
             tiles : n_tiles});
-            */
-
+            
+              /*
            setBoardState({ 
             ...boardState, 
             // Would you add something here, add it above
@@ -738,39 +735,40 @@ useEffect(() => {
             showRollBackButton : true,
             tiles : n_tiles
           });
+          */
 
         }
       }
       // user has to pick two cards from the leap
       else if (input === "PickTwoCardsONE"){
-          let tempState = boardState;
-          tempState = doPickOnePlayerCard(1, tempState);
-          // this.setState(tempState);
-          setBoardState({ 
-            ...tempState, 
-          });
+          let tempState = this.state;
+          tempState = this.doPickOnePlayerCard(1, tempState);
+          this.setState(tempState);
+
+          //setBoardState({ 
+          //  ...tempState, 
+          //});
       } else if (input === "PickTwoCardsTWO"){
-          let tempState = boardState;
-          tempState = doPickOnePlayerCard(2, tempState);
-          // this.setState(tempState);
-          setBoardState({ 
-            ...tempState, 
-          });
+          let tempState = this.state;
+          tempState = this.doPickOnePlayerCard(2, tempState);
+          this.setState(tempState);
+          //setBoardState({ 
+          //  ...tempState, 
+          //});
       }
       else if (input === "PlayerFlood"){
-        doFloodATile(1, howManyCards(boardState.floodMeter.level));
+          this.doFloodATile(1, this.howManyCards(this.state.floodMeter.level));
       }
-  }
-  // end of Controller
+  } // end of Controller
 
-  function doFloodATile(number, outOf){
-    unblinkTheTiles();
-    let lng = boardState.languageDistributor;
+  doFloodATile(number, outOf){
+    this.unblinkTheTiles();
+    let lng = this.state.languageDistributor;
 
-    let n_Tiles = boardState.tiles;
-    let n_FloodCardsLeap = boardState.floodCardsLeap;
-    let n_FloodCardsDiscard = boardState.floodCardsDiscard;
-    let n_FloodCardsOutOfGame = boardState.floodCardsOutOfGame;
+    let n_Tiles = this.state.tiles;
+    let n_FloodCardsLeap = this.state.floodCardsLeap;
+    let n_FloodCardsDiscard = this.state.floodCardsDiscard;
+    let n_FloodCardsOutOfGame = this.state.floodCardsOutOfGame;
     let floodedTileId = "";
     let blinkingTile = -1;
 
@@ -819,7 +817,7 @@ useEffect(() => {
               gameOver = true;
               gameOverMsg = lng.explorersCantLeaveTheIsland;
               gameOverCode = 4; // helipad disapeared
-              doLog("GAME_LOST", "helipadIsDrawned", "", boardState);
+              doLog("GAME_LOST", "helipadIsDrawned", "", this.state);
             }
             // rescue some players ?
             guysToEvacuate = n_Tiles[j].playerOn;
@@ -831,19 +829,19 @@ useEffect(() => {
             // Check if all Temples of an undiscovered Treasure are drawned. If yes : end game
             if (n_Tiles[j].templeFor !== ""){
                 // it's a temple drawning
-                if (boardState.possessedTreasures.indexOf(n_Tiles[j].templeFor) < 0){
+                if (this.state.possessedTreasures.indexOf(n_Tiles[j].templeFor) < 0){
                   // the treasure of this temple isn't discovered yet
                   for (let k = 0; k < 24; k++){
                     if (k != j && n_Tiles[k].templeFor === n_Tiles[j].templeFor){
                       if (n_Tiles[k].isDrawned){
                         //message = message + "<br/>Oh my God ! all the temples for " + getTreasureNameById(n_Tiles[j].templeFor) + " are drawned. You'll never get it. GAME OVER";
-                        message = message + lng.allTheTemplesAreDrawned.format(getTreasureNameById(n_Tiles[j].templeFor));
+                        message = message + lng.allTheTemplesAreDrawned.format(this.getTreasureNameById(n_Tiles[j].templeFor));
                         // gameOver = true;
-                        console.log("Oh my God ! all the temples for " + getTreasureNameById(n_Tiles[j].templeFor) + " are drawned. You'll never get it. GAME OVER" );
+                        console.log("Oh my God ! all the temples for " + this.getTreasureNameById(n_Tiles[j].templeFor) + " are drawned. You'll never get it. GAME OVER" );
                         gameOver = true;
-                        gameOverMsg = lng.allTheTemplesAreDrawned.format(getTreasureNameById(n_Tiles[j].templeFor));
+                        gameOverMsg = lng.allTheTemplesAreDrawned.format(this.getTreasureNameById(n_Tiles[j].templeFor));
                         gameOverCode = 3; // all the temples for one undiscovered treasure disapeared
-                        doLog("GAME_LOST", "twoTemplesAreDrawned", "", boardState);
+                        doLog("GAME_LOST", "twoTemplesAreDrawned", "", this.state);
                       }
                       break;
                     }
@@ -852,7 +850,7 @@ useEffect(() => {
             }
         }
         else if(n_Tiles[j].isDrawned){
-          customAlert("CONCEPTUAL ERROR : " + n_Tiles[j].name + " is already drawned. it shouldn't be in the Leap !");
+            this.customAlert("CONCEPTUAL ERROR : " + n_Tiles[j].name + " is already drawned. it shouldn't be in the Leap !");
         }
         else{
             // message = message + lng.formatTileIsFlooded.format(n_Tiles[j].name, j);
@@ -898,13 +896,14 @@ useEffect(() => {
     }
 
     if (gameOver === true){
-      /*
+      
       this.setState({
           mainUserMessage: n_userMessage,
           gameIsOver: true,
           gameIsLost: true,
           endMessage: gameOverMsg});
-          */
+          
+          /*
          setBoardState({ 
           ...boardState, 
           mainUserMessage: n_userMessage,
@@ -912,9 +911,10 @@ useEffect(() => {
           gameIsLost: true,
           endMessage: gameOverMsg
         });
+        */
     }
     else {
-      /*
+      
       this.setState({
         mainUserMessage: n_userMessage,
         floodCardsLeap: n_FloodCardsLeap,
@@ -926,7 +926,7 @@ useEffect(() => {
         guysToEvacuate: guysToEvacuate,
         floodingSequence: floodingSequence,
         showActionableCards: showActionableCards});
-        */
+        /*
        setBoardState({ 
         ...boardState, 
         mainUserMessage: n_userMessage,
@@ -940,13 +940,14 @@ useEffect(() => {
         floodingSequence: floodingSequence,
         showActionableCards: showActionableCards
       });
+      */
     }
   }
 
-  function doEvacuate(){
-      let lng = boardState.languageDistributor;
-      let n_players = boardState.players;
-      let drawningGuy = n_players[boardState.guysToEvacuate[0]];
+  doEvacuate(){
+      let lng = this.state.languageDistributor;
+      let n_players = this.state.players;
+      let drawningGuy = n_players[this.state.guysToEvacuate[0]];
       let drawningGuyId = drawningGuy.id;
       let tilesToLight = [];
       let gameIsLost = false;
@@ -954,10 +955,10 @@ useEffect(() => {
       let gameOverCode = 0;
 
       if (drawningGuy.role === "Pilot"){
-        tilesToLight = whereCanHeFly(drawningGuy.position);
+        tilesToLight = this.whereCanHeFly(drawningGuy.position);
         n_players[drawningGuyId].whereCanHeFly = tilesToLight;
       } else {
-        tilesToLight = whereCanHeMove(drawningGuy.position, drawningGuy.role)
+        tilesToLight = this.WhereCanHeMove(drawningGuy.position, drawningGuy.role)
         n_players[drawningGuyId].whereCanHeMove = tilesToLight;
       }
 
@@ -969,22 +970,22 @@ useEffect(() => {
         gameIsLost = true;
         gameOverMsg = lng.nowhereHeCanGo.format(drawningGuy.name);
         gameOverCode = 1; // guy drawned
-        doLog("GAME_LOST", "guyIsDrawned", "", boardState);
+        doLog("GAME_LOST", "guyIsDrawned", "", this.state);
       } else {
-        lightTheTiles(tilesToLight, drawningGuy.color);
+        this.lightTheTiles(tilesToLight, drawningGuy.color);
         newMessage = new UserMessage('chooseADestinationToEvacuate', null, false, []);
       }
 
       if (gameIsLost === true)
       {
-        /*
+        
           this.setState({
             mainUserMessage: newMessage,
             gameIsOver: true,
             gameIsLost: true,
             endMessage: gameOverMsg});
-            */
-
+            
+            /*
            setBoardState({ 
             ...boardState, 
             mainUserMessage: newMessage,
@@ -992,14 +993,15 @@ useEffect(() => {
             gameIsLost: true,
             endMessage: gameOverMsg
           });
+          */
       }
       else
-      {/*
+      {
         this.setState({ whatIsExpectedNext: "TileButtonClickForEvacuate" ,
                         players : n_players,
                         gameIsLost : gameIsLost,
                         mainUserMessage: newMessage });
-                        */
+            /*            
         setBoardState({ 
           ...boardState, 
           whatIsExpectedNext: "TileButtonClickForEvacuate" ,
@@ -1007,10 +1009,11 @@ useEffect(() => {
           gameIsLost : gameIsLost,
           mainUserMessage: newMessage
         });
+        */
       }
   }
 
-  function doMoveFloodOmeterCursor(){
+  doMoveFloodOmeterCursor(){
     let cursorImage = document.getElementById("floodOmeterCursorImg");
     cursorImage.classList.add('doMoveFloodCursor');
     cursorImage.addEventListener('webkitAnimationEnd', function (e) {
@@ -1018,8 +1021,8 @@ useEffect(() => {
     });
   }
 
-  function doPickOnePlayerCard(cardNumber, tempState){
-      let lng = boardState.languageDistributor;
+  doPickOnePlayerCard(cardNumber, tempState){
+      let lng = this.state.languageDistributor;
       let newPlayerCardsDiscard = tempState.playerCardsDiscard;
       let newPlayerCardsLeap = tempState.playerCardsLeap;
       let newPlayers = tempState.players;
@@ -1055,9 +1058,9 @@ useEffect(() => {
 
           // upgrade the Flood Level
           newFloodMeter.level = newFloodMeter.level + 1;
-          newFloodMeter.floodFactor = howManyCards(newFloodMeter.level);
+          newFloodMeter.floodFactor = this.howManyCards(newFloodMeter.level);
 
-          doMoveFloodOmeterCursor();
+          this.doMoveFloodOmeterCursor();
 
           // alert("Flood Riiiiise ! New Flood level is " + newFloodMeter.level + "(pick " +  newFloodMeter.floodFactor + " at each flood)");
           if (newFloodMeter.level >= newFloodMeter.topLevel)
@@ -1066,7 +1069,7 @@ useEffect(() => {
             gameIsLost = true;
             gameOverMsg = lng.topLevelReached;
             gameOverCode = 2; // Top level reached. The Island is submerged.
-            doLog("GAME_LOST", "islandIsDrawned", "", boardState);
+            doLog("GAME_LOST", "islandIsDrawned", "", this.state);
           }
 
           // put the flood card in the discards
@@ -1078,11 +1081,11 @@ useEffect(() => {
       }
 
       // has Player too much cards ?
-      let nbrOfCardsInHand = newPlayers[boardState.currentPlayerPlaying].cards.length + 1;
+      let nbrOfCardsInHand = newPlayers[this.state.currentPlayerPlaying].cards.length + 1;
 
       if (cardToPushToPlayer != null)
       {
-              newPlayers[boardState.currentPlayerPlaying].cards.push(cardToPushToPlayer);
+              newPlayers[this.state.currentPlayerPlaying].cards.push(cardToPushToPlayer);
       }
 
       let newMessage = "";
@@ -1091,13 +1094,13 @@ useEffect(() => {
       }
       else if (cardNumber == 1)
       {
-            newMessage = new UserMessage(null, lng.firstCard_msg.format(getStringInTheCatalog(lng, card.loc_key)) + '. <br/><img src='  + card.url + ' width="30px" height="46px"/>', false, [3]);
+            newMessage = new UserMessage(null, lng.firstCard_msg.format(this.getStringInTheCatalog(lng, card.loc_key)) + '. <br/><img src='  + card.url + ' width="30px" height="46px"/>', false, [3]);
             newCurrentStep = 4;
       }
       else
       {
-            let databag = {userId : boardState.currentPlayerPlaying}
-            newMessage = new UserMessage(null, lng.secondCard_msg.format(getStringInTheCatalog(lng, card.loc_key)) + '. <br/><img src=' + card.url  + ' width="30px" height="46px"/>', false, [9], databag);
+            let databag = {userId : this.state.currentPlayerPlaying}
+            newMessage = new UserMessage(null, lng.secondCard_msg.format(this.getStringInTheCatalog(lng, card.loc_key)) + '. <br/><img src=' + card.url  + ' width="30px" height="46px"/>', false, [9], databag);
       }
 
       tempState.mainUserMessage = newMessage;
@@ -1123,42 +1126,43 @@ useEffect(() => {
       return tempState;
   }
 
-  function doShowGameIsLost()
+  doShowGameIsLost()
   {
-    /*
+    
     this.setState({
       showGameIsLost: true
     });
-    */
+    /*
     setBoardState({ 
       ...boardState, 
       showGameIsLost: true
     });
+    */
   }
 
   // MUST BE DONE AT THE END OF AN ACTION -> embraye sur un ActionIsDone
-  function doCheckIfMoreThan5CardsInHand(passages, userId)
+  doCheckIfMoreThan5CardsInHand(passages, userId)
   {
-    let cardsInHand = boardState.players[userId].cards;
+    let cardsInHand = this.state.players[userId].cards;
     if (cardsInHand.length > 5)
     {
       // alert ("Oh no ! Over 5 cards in Hand ! : " + cardsInHand.length);
 
-      let n_whatIsExpectedNext_toRestore = boardState.whatIsExpectedNext;
-      let n_messageBoardState_toRestore = boardState.messageBoardState;
+      let n_whatIsExpectedNext_toRestore = this.state.whatIsExpectedNext;
+      let n_messageBoardState_toRestore = this.state.messageBoardState;
 
       if (passages === 0)
       {
-        /*
+        
         this.setState({ 
           whatIsExpectedNext_toRestore : n_whatIsExpectedNext_toRestore,
                         whatIsExpectedNext: "ResolveOver5Cards" ,
-                        mainUserMessage_toRestore: boardState.mainUserMessage,
+                        mainUserMessage_toRestore: this.state.mainUserMessage,
                         showActionableCards: false,
                         messageBoardState_toRestore: n_messageBoardState_toRestore,
                         messageBoardState: "SolveOver5Cards",
                         cardUser : userId });
-                        */
+                        /*
                        setBoardState({ 
                         ...boardState, 
                         whatIsExpectedNext_toRestore : n_whatIsExpectedNext_toRestore,
@@ -1169,14 +1173,15 @@ useEffect(() => {
                         messageBoardState: "SolveOver5Cards",
                         cardUser : userId
                       });
+                      */
       } else {
-        /*
+        
         this.setState({
                         whatIsExpectedNext: "ResolveOver5Cards" ,
                         messageBoardState: "SolveOver5Cards",
                         showActionableCards: false,
                         cardUser : userId });
-                        */
+                        /*
         setBoardState({ 
           ...boardState, 
           whatIsExpectedNext: "ResolveOver5Cards" ,
@@ -1184,6 +1189,7 @@ useEffect(() => {
           showActionableCards: false,
           cardUser : userId 
         });
+        */
 
       }
       return null;
@@ -1194,14 +1200,14 @@ useEffect(() => {
       if (passages > 0)
       {
         // passages > 0 means a throw or two have been made, let's restore the states
-        /*
-        this.setState({ whatIsExpectedNext: boardState.whatIsExpectedNext_toRestore,
+        
+        this.setState({ whatIsExpectedNext: this.state.whatIsExpectedNext_toRestore,
                         whatIsExpectedNext_toRestore: null,
-                        mainUserMessage: boardState.mainUserMessage_toRestore,
+                        mainUserMessage: this.state.mainUserMessage_toRestore,
                         mainUserMessage_toRestore: null,
                         showActionableCards: true,
                         messageBoardState: "default"});
-                        */
+                        /*
                        setBoardState({ 
                         ...boardState, 
                         whatIsExpectedNext: boardState.whatIsExpectedNext_toRestore,
@@ -1210,18 +1216,18 @@ useEffect(() => {
                         mainUserMessage_toRestore: null,
                         showActionableCards: true,
                         messageBoardState: "default"
-                      });
+                      });*/
       }
 
-      controller("ActionIsDone");
+      this.controller("ActionIsDone");
     }
   }
 
-  function throwCard(cardtype, index, userId)
+  throwCard(cardtype, index, userId)
   {
       // index is wrong. Please trust cardType
-      let n_players = boardState.players;
-      let n_playerCardsDiscard = boardState.playerCardsDiscard;
+      let n_players = this.state.players;
+      let n_playerCardsDiscard = this.state.playerCardsDiscard;
 
       var trueIndex = -1;
       for (var i = n_players[userId].cards.length -1; i >= 0; i--){
@@ -1236,20 +1242,20 @@ useEffect(() => {
         n_players[userId].cards.splice(trueIndex, 1);
       }
 
-      // this.setState({ players: n_players });
+      this.setState({ players: n_players });
       // this.ss_players(n_players);
-      setBoardState({ 
-        ...boardState, 
-        players: n_players
-      });
-      doCheckIfMoreThan5CardsInHand(1, userId); // 1 means : we've been there already, we may want to close the check if more than five cards process.
+      //setBoardState({ 
+      //  ...boardState, 
+      //  players: n_players
+      //});
+      this.doCheckIfMoreThan5CardsInHand(1, userId); // 1 means : we've been there already, we may want to close the check if more than five cards process.
   }
 
-  function useACardToGetRidOfIt(type, index, userId){
-      let lng = boardState.languageDistributor;
+  useACardToGetRidOfIt(type, index, userId){
+      let lng = this.state.languageDistributor;
       let n_message = new UserMessage('okWhatsNext', null, false, [10]);
       // ici set un state to recover à 'Voilà, on a utilisé une carte -> next doCheckIfMoreThan5CardsInHand'
-      /*
+      
       this.setState({mainUserMessage: n_message,
                     messageBoardState: "default",
                     showActionableCards: false }, () => {
@@ -1258,46 +1264,46 @@ useEffect(() => {
                     } else if (type === "SB"){
                         this.clickedOnSandBagCard(userId, true);
                     } else {
-                      customAlert("CONCEPTUAL ERROR : WRONG CARD TYPE");
+                      this.customAlert("CONCEPTUAL ERROR : WRONG CARD TYPE");
                     }
                     
       });
-      */
+      /*
      setBoardState({ 
       ...boardState, 
       mainUserMessage: n_message,
       messageBoardState: "default",
       showActionableCards: false
-    });
+    });*/
 
      if (type === "H"){
-          clickedOnHelicopterCard(userId, true);
+        this.clickedOnHelicopterCard(userId, true);
       } else if (type === "SB"){
-          clickedOnSandBagCard(userId, true);
+         this.clickedOnSandBagCard(userId, true);
       } else {
-        customAlert("CONCEPTUAL ERROR : WRONG CARD TYPE");
-  }
+        this.customAlert("CONCEPTUAL ERROR : WRONG CARD TYPE");
+      }
   }
 
-  function clickedOnHelicopterCard(playerId, inAGetRidOfACardContext) {
-    let lng = boardState.languageDistributor;
-    let whatIsExpectedNext_toRestore = boardState.whatIsExpectedNext;
+  clickedOnHelicopterCard(playerId, inAGetRidOfACardContext) {
+    let lng = this.state.languageDistributor;
+    let whatIsExpectedNext_toRestore = this.state.whatIsExpectedNext;
     let n_Message = new UserMessage('chooseALandingDestination', null, false, [7]);
-    let n_messageBoardState_toRestore = boardState.messageBoardState;
+    let n_messageBoardState_toRestore = this.state.messageBoardState;
 
     // displays the board of co travellers choice
-    /*
+    
     this.setState({ whatIsExpectedNext_toRestore : whatIsExpectedNext_toRestore,
                     whatIsExpectedNext: "ResolveLeftPaneThing" ,
-                    mainUserMessage_toRestore: boardState.mainUserMessage,
+                    mainUserMessage_toRestore: this.state.mainUserMessage,
                     mainUserMessage: n_Message,
                     messageBoardState_toRestore: n_messageBoardState_toRestore,
                     messageBoardState: "ChooseCoTravellers",
                     inAGetRidOfACardContext: inAGetRidOfACardContext,
                     cardUser : playerId,
                     showActionableCards : false });
-                    */
-
+                    
+/*
                    setBoardState({ 
                     ...boardState, 
                     whatIsExpectedNext_toRestore : whatIsExpectedNext_toRestore,
@@ -1309,95 +1315,95 @@ useEffect(() => {
                     inAGetRidOfACardContext: inAGetRidOfACardContext,
                     cardUser : playerId,
                     showActionableCards : false 
-                  });
+                  });*/
   }
 
-  function helicopterCardEnRoute(travellers){
-    let lng = boardState.languageDistributor;
+  helicopterCardEnRoute(travellers){
+    let lng = this.state.languageDistributor;
     let victory = false;
     // Check if there are travellers
     if (travellers.length < 1 )
     {
-      customAlert(lng.thereIsNoOneInThisHelicopter);
+      this.customAlert(lng.thereIsNoOneInThisHelicopter);
       return null;
     }
     // Check if travellers are on the same tile
     if (travellers.length > 1 )
     {
-      var startingTile = boardState.players[travellers[0]].position;
+      var startingTile = this.state.players[travellers[0]].position;
       for (let i = 1; i < travellers.length; i++)
       {
-        if (boardState.players[travellers[i]].position != startingTile){
-          customAlert(lng.helicopterRideShouldStartFromTheSameTile);
+        if (this.state.players[travellers[i]].position != startingTile){
+          this.customAlert(lng.helicopterRideShouldStartFromTheSameTile);
           return null;
         }
       }
     }
     // Check if the game is won :
     // on the helipad, 4 treasures found, all players on the tile
-    if (boardState.possessedTreasures.length === 4 &&
-        boardState.tiles[boardState.players[travellers[0]].position].name === "helipad" &&
-        travellers.length === boardState.nbrOfPlayers ) {
+    if (this.state.possessedTreasures.length === 4 &&
+      this.state.tiles[this.state.players[travellers[0]].position].name === "helipad" &&
+        travellers.length === this.state.nbrOfPlayers ) {
           // YOU WON // VICTORY
           victory = true;
         }
     // displays the possible destinations
-    let tilesToLight = whereCanHeFly(boardState.players[travellers[0]].position);
-    boardState.players[travellers[0]].whereCanHeFly = tilesToLight;
-    boardState.showActionableCards = false;
-    let nada = lightTheTiles(tilesToLight, boardState.players[travellers[0]].color);
+    let tilesToLight = this.whereCanHeFly(this.state.players[travellers[0]].position);
+    this.state.players[travellers[0]].whereCanHeFly = tilesToLight;
+    this.state.showActionableCards = false;
+    let nada = this.lightTheTiles(tilesToLight, this.state.players[travellers[0]].color);
 
     let n_messageBoardState = "default";
 
     if (victory === true){
-        doLog("GAME_WON","","", boardState);
-        /*
+        doLog("GAME_WON","","", this.state);
+        
         this.setState({
-            mainUserMessage: new UserMessage(null, lng.youWonMsg.format(boardState.nbrOfPlayers), false, []),
+            mainUserMessage: new UserMessage(null, lng.youWonMsg.format(this.state.nbrOfPlayers), false, []),
             gameIsOver: true,
             gameIsWon: true,
-            endMessage: lng.youWonMsg.format(boardState.nbrOfPlayers)});
-            */
+            endMessage: lng.youWonMsg.format(this.state.nbrOfPlayers)});
+            /*
 
            setBoardState({ 
             ...boardState, 
-            mainUserMessage: new UserMessage(null, lng.youWonMsg.format(boardState.nbrOfPlayers), false, []),
+            mainUserMessage: new UserMessage(null, lng.youWonMsg.format(this.state.nbrOfPlayers), false, []),
             gameIsOver: true,
             gameIsWon: true,
             endMessage: lng.youWonMsg.format(boardState.nbrOfPlayers)
-          });
+          });*/
 
     }
     else{
-      /*
+      
       this.setState({ whatIsExpectedNext: "TileButtonClickForFlyWithACard",
                       coTravellers: travellers,
                       messageBoardState: n_messageBoardState });
-                      */
+                      /*
                      setBoardState({ 
                       ...boardState, 
                       whatIsExpectedNext: "TileButtonClickForFlyWithACard",
                       coTravellers: travellers,
                       messageBoardState: n_messageBoardState
-                    });
+                    });*/
     }
   };
 
-  function cancelHelicopterCardPick() {
-    unlightTheTiles();
-    showActionButtons();
-    /*
-    this.setState({ whatIsExpectedNext: boardState.whatIsExpectedNext_toRestore,
+  cancelHelicopterCardPick() {
+    this.unlightTheTiles();
+    this.showActionButtons();
+    
+    this.setState({ whatIsExpectedNext: this.state.whatIsExpectedNext_toRestore,
                     whatIsExpectedNext_toRestore : null,
-                    mainUserMessage: boardState.mainUserMessage_toRestore,
+                    mainUserMessage: this.state.mainUserMessage_toRestore,
                     mainUserMessage_toRestore: null,
-                    messageBoardState: boardState.messageBoardState_toRestore,
+                    messageBoardState: this.state.messageBoardState_toRestore,
                     messageBoardState_toRestore: null,
                     inAGetRidOfACardContext: false,
                     coTravellers : null,
                     showActionableCards: true });
-                    */
-
+                    
+/*
                    setBoardState({ 
                     ...boardState, 
                     whatIsExpectedNext: boardState.whatIsExpectedNext_toRestore,
@@ -1409,33 +1415,33 @@ useEffect(() => {
                     inAGetRidOfACardContext: false,
                     coTravellers : null,
                     showActionableCards: true 
-                  });
+                  });*/
   }
 
-  function clickedOnSandBagCard(playerId, inAGetRidOfACardContext)
+  clickedOnSandBagCard(playerId, inAGetRidOfACardContext)
   {
-    let lng = boardState.languageDistributor;
-    let tilesToLight = getImmersedTiles();
+    let lng = this.state.languageDistributor;
+    let tilesToLight = this.getImmersedTiles();
     if (tilesToLight.length === 0)
     {
-      customAlert(lng.noTileToDry);
+      this.customAlert(lng.noTileToDry);
       return null;
     }
 
-    boardState.players[playerId].whereCanHeDry = tilesToLight;
-    lightTheTiles(tilesToLight, boardState.players[playerId].color);
+    this.state.players[playerId].whereCanHeDry = tilesToLight;
+    this.lightTheTiles(tilesToLight, this.state.players[playerId].color);
     let newMessage = new UserMessage('chooseATileToDry', null, false, [6]);
-    /*
-    this.setState({ whatIsExpectedNext_toRestore : boardState.whatIsExpectedNext,
+    
+    this.setState({ whatIsExpectedNext_toRestore : this.state.whatIsExpectedNext,
                     whatIsExpectedNext: "TileButtonClickForDryWithACard" ,
-                    mainUserMessage_toRestore: boardState.mainUserMessage,
+                    mainUserMessage_toRestore: this.state.mainUserMessage,
                     mainUserMessage: newMessage,
-                    messageBoardState_toRestore: boardState.messageBoardState,
+                    messageBoardState_toRestore: this.state.messageBoardState,
                     inAGetRidOfACardContext: inAGetRidOfACardContext,
                     cardUser : playerId,
                     showActionableCards: false });
-                    */
-
+                    
+            /*
                    setBoardState({ 
                     ...boardState, 
                     whatIsExpectedNext_toRestore : boardState.whatIsExpectedNext,
@@ -1446,27 +1452,27 @@ useEffect(() => {
                     inAGetRidOfACardContext: inAGetRidOfACardContext,
                     cardUser : playerId,
                     showActionableCards: false 
-                  });
+                  });*/
       
     return null;
   }
 
-  function cancelSandBagCardPick()
+  cancelSandBagCardPick()
   {
-    unlightTheTiles();
-    showActionButtons();
-    /*
-    this.setState({ whatIsExpectedNext: boardState.whatIsExpectedNext_toRestore,
+    this.unlightTheTiles();
+    this.showActionButtons();
+    
+    this.setState({ whatIsExpectedNext: this.state.whatIsExpectedNext_toRestore,
                     whatIsExpectedNext_toRestore : null,
-                    mainUserMessage: boardState.mainUserMessage_toRestore,
+                    mainUserMessage: this.state.mainUserMessage_toRestore,
                     mainUserMessage_toRestore: null,
-                    messageBoardState: boardState.messageBoardState_toRestore,
+                    messageBoardState: this.state.messageBoardState_toRestore,
                     messageBoardState_toRestore: null,
                     inAGetRidOfACardContext: false,
                     showActionableCards: true
                    });
-                   */
-
+                   
+/*
                   setBoardState({ 
                     ...boardState, 
                     whatIsExpectedNext: boardState.whatIsExpectedNext_toRestore,
@@ -1477,10 +1483,10 @@ useEffect(() => {
                     messageBoardState_toRestore: null,
                     inAGetRidOfACardContext: false,
                     showActionableCards: true
-                  });
+                  });*/
   }
 
-  function howManyCards(level){
+  howManyCards(level){
     // flood scale :  |12|345|67|89|
     //                |2 |3  |4 |5 |
     if (level < 3){
@@ -1494,35 +1500,35 @@ useEffect(() => {
     }
   }
 
-  function checkCardState(){
+  checkCardState(){
     // flood Cards
-    let nbrOfFloodCardsInDiscard = boardState.floodCardsDiscard.length;
-    let nbrOfFloodCardsInLeap = boardState.floodCardsLeap.length;
-    let nbrOfFloodCardsOutOfGame = boardState.floodCardsOutOfGame.length;
+    let nbrOfFloodCardsInDiscard = this.state.floodCardsDiscard.length;
+    let nbrOfFloodCardsInLeap = this.state.floodCardsLeap.length;
+    let nbrOfFloodCardsOutOfGame = this.state.floodCardsOutOfGame.length;
     let nbrOfFloodCards = nbrOfFloodCardsInDiscard + nbrOfFloodCardsInLeap + nbrOfFloodCardsOutOfGame;
 
     console.log("FLOOD CARDS : total = " + nbrOfFloodCards+ " (24 expected), out of game = " + nbrOfFloodCardsOutOfGame + ", in Discard = " + nbrOfFloodCardsInDiscard + ", in Leap = " + nbrOfFloodCardsInLeap);
 
     if (nbrOfFloodCards != 24){
-      customAlert("ALERT : We loose some Flood cards in the process.");
+      this.customAlert("ALERT : We loose some Flood cards in the process.");
     }
 
     // playerCards
     let nbrOfPlayerCardsInPLayersHands = 0;
-    let nbrOfPlayerCardsInDiscard = boardState.playerCardsDiscard.length;
-    let nbrOfPlayerCardsInLeap = boardState.playerCardsLeap.length;
-    for(let i = 0 ; i < boardState.players.length; i++){
-      nbrOfPlayerCardsInPLayersHands = nbrOfPlayerCardsInPLayersHands + boardState.players[i].cards.length;
+    let nbrOfPlayerCardsInDiscard = this.state.playerCardsDiscard.length;
+    let nbrOfPlayerCardsInLeap = this.state.playerCardsLeap.length;
+    for(let i = 0 ; i < this.state.players.length; i++){
+      nbrOfPlayerCardsInPLayersHands = nbrOfPlayerCardsInPLayersHands + this.state.players[i].cards.length;
     }
     let nbrOfPlayerCards = nbrOfPlayerCardsInPLayersHands + nbrOfPlayerCardsInDiscard + nbrOfPlayerCardsInLeap;
     console.log("PLAYER CARDS : total = " + nbrOfPlayerCards+ " (28 expected), in players hands = " + nbrOfPlayerCardsInPLayersHands + ", in Discard = " + nbrOfPlayerCardsInDiscard + ", in Leap = " + nbrOfPlayerCardsInLeap);
 
     if (nbrOfPlayerCards != 28){
-      customAlert("ALERT : We loose some Player cards in the process.");
+      this.customAlert("ALERT : We loose some Player cards in the process.");
     }
   }
 
-  function getPossibleActions(player, hasPilotFlownThisTurn, isInitial) {
+  getPossibleActions(player, hasPilotFlownThisTurn, isInitial) {
       let actions = [];
       for (let i = 0; i < playerDefaultActions.length; i++){
           let action = playerDefaultActions[i];
@@ -1536,20 +1542,20 @@ useEffect(() => {
           if (isInitial && (action.name === "Give" || action.name === "Get a Treasure !")){
             // nothing happens. You can never give or find a treasure on the first action of the game
           } else if (!isInitial && action.name === "Give"){
-            if (boardState.tiles[player.position].playerOn.length > 1 ){
+            if (this.state.tiles[player.position].playerOn.length > 1 ){
               actions.push(action);
             }
           } else if(!isInitial && action.name === "Get a Treasure !"){
-            if (boardState.tiles[player.position].templeFor.length === 2){
+            if (this.state.tiles[player.position].templeFor.length === 2){
               actions.push(action);
             }
           } else if (!isInitial && ( action.name === "Dry" || action.name === "Dry around")){
-            let where = whereCanHeDry(player.position, player.role);
+            let where = this.whereCanHeDry(player.position, player.role);
             if (where.length > 0){
               actions.push(action);
             }
           } else if (!isInitial && ( action.name === "Move" || action.name === "Move around")){
-            let where = whereCanHeMove(player.position, player.role);
+            let where = this.WhereCanHeMove(player.position, player.role);
             if (where.length > 0){
               actions.push(action);
             }
@@ -1586,7 +1592,7 @@ useEffect(() => {
     }
 
   // returns an array of positions
-  function whereCanHeMove(position, role){
+  WhereCanHeMove(position, role){
     let moves = [];
     if (role === "Explorer"){
         moves = orthogonalPaths[position];
@@ -1602,18 +1608,18 @@ useEffect(() => {
         let i = positionsToInvestigate.pop();
         investigatedPositions.push(i);
 
-        if (boardState.tiles[i].isDrawned || boardState.tiles[i].isImmersed){
+        if (this.state.tiles[i].isDrawned || this.state.tiles[i].isImmersed){
 
-          if (boardState.tiles[i].isImmersed){
+          if (this.state.tiles[i].isImmersed){
             groundsHeCanGoTo.push(i);
           }
 
           let candidates = orthogonalPaths[i];
           for(let z = 0; z < candidates.length; z++){
             if (!(investigatedPositions.indexOf(candidates[z]) >= 0)) {
-              if (boardState.tiles[candidates[z]].isDrawned){
+              if (this.state.tiles[candidates[z]].isDrawned){
                 positionsToInvestigate.push(candidates[z]);
-              } else if (boardState.tiles[candidates[z]].isImmersed) {
+              } else if (this.state.tiles[candidates[z]].isImmersed) {
                 positionsToInvestigate.push(candidates[z]);
                 groundsHeCanGoTo.push(candidates[z]);
               } else {
@@ -1627,7 +1633,7 @@ useEffect(() => {
         }
       }
 
-      moves =  groundsHeCanGoTo;
+      moves = groundsHeCanGoTo;
 
     }
     else {
@@ -1636,16 +1642,16 @@ useEffect(() => {
     }
 
     // virer les cases isDrawned et origin
-    return removeDrawnedAndOriginTiles(moves, position);
+    return this.removeDrawnedAndOriginTiles(moves, position);
   }
 
   // remove Drawned And Origin Tiles from a where-can-he-go selection
-  function removeDrawnedAndOriginTiles(moves, position){
+  removeDrawnedAndOriginTiles(moves, position){
     let output = [];
     if (moves.length > 0) {
       for (let k = 0; k < moves.length; k++)
       {
-          if (!boardState.tiles[moves[k]].isDrawned && moves[k] !== position)
+          if (!this.state.tiles[moves[k]].isDrawned && moves[k] !== position)
           {
             output.push(moves[k]);
           }
@@ -1655,7 +1661,7 @@ useEffect(() => {
   }
 
   // returns an array of positions
-  function whereCanHeFly(position){
+  whereCanHeFly(position){
     let moves = [];
     for (let i = 0; i < 24; i ++){
       if (i !== position){
@@ -1663,60 +1669,60 @@ useEffect(() => {
       }
     }
     // virer les cases isDrawned et origin
-    return removeDrawnedAndOriginTiles(moves, position);
+    return this.removeDrawnedAndOriginTiles(moves, position);
   }
 
-  function whereNavigatorCanMoveHim(position){
+  whereNavigatorCanMoveHim(position){
       let moves = [];
       let secondMoves = [];
       moves = orthogonalPaths[position];
 
       for (let i = 0 ; i < moves.length; i++){
-        if (!boardState.tiles[moves[i]].isDrawned){
+        if (!this.state.tiles[moves[i]].isDrawned){
           secondMoves = secondMoves.concat(orthogonalPaths[moves[i]]);
         }
       }
       moves = moves.concat(secondMoves);
 
       // virer les cases isDrawned et origin
-      return removeDrawnedAndOriginTiles(moves, position);
+      return this.removeDrawnedAndOriginTiles(moves, position);
   }
 
   // returns an array of positions
-  function whereCanHeDry(position, role){
+  whereCanHeDry(position, role){
     let cases = [];
     if (role === "Bag"){
       for (let i = 0; i < 24; i ++){
-        if (boardState.tiles[i].isImmersed){
+        if (this.state.tiles[i].isImmersed){
           cases.push(i);
         }
       }
     }
     else if (role === "Explorer"){
       for (let j = 0 ; j < orthogonalPaths[position].length; j++){
-        if (boardState.tiles[orthogonalPaths[position][j]].isImmersed){
+        if (this.state.tiles[orthogonalPaths[position][j]].isImmersed){
           cases.push(orthogonalPaths[position][j]);
         }
       }
       for (let k = 0 ; k < diagonalPaths[position].length; k++){
-        if (boardState.tiles[diagonalPaths[position][k]].isImmersed){
+        if (this.state.tiles[diagonalPaths[position][k]].isImmersed){
           cases.push(diagonalPaths[position][k]);
         }
       }
       // adding the case he's on
-      if (boardState.tiles[position].isImmersed)
+      if (this.state.tiles[position].isImmersed)
       {
         cases.push(position);
       }
     }
     else{
       for (let j = 0 ; j < orthogonalPaths[position].length; j++){
-        if (boardState.tiles[orthogonalPaths[position][j]].isImmersed){
+        if (this.state.tiles[orthogonalPaths[position][j]].isImmersed){
           cases.push(orthogonalPaths[position][j]);
         }
       }
       // adding the case he's on
-      if (boardState.tiles[position].isImmersed)
+      if (this.state.tiles[position].isImmersed)
       {
         cases.push(position);
       }
@@ -1725,217 +1731,217 @@ useEffect(() => {
     return cases;
   }
 
-  function getImmersedTiles(){
-    let cases = [];
+  getImmersedTiles(){
+    let immersedCases = [];
     for (let i = 0; i < 24; i++){
-      if (boardState.tiles[i].isImmersed){
-        cases.push(i);
+      if (this.state.tiles[i].isImmersed){
+        immersedCases.push(i);
       }
     }
 
-    return cases;
+    return immersedCases;
   }
 
   // Handles a click on an action button in the left menu
-  function handleActionClick(action) {
-    let lng = boardState.languageDistributor;
-    hideActionButtons();
+  handleActionClick(action) {
+    let lng = this.state.languageDistributor;
+    this.hideActionButtons();
     console.log("clicked on " + action);
-    if (boardState.whatIsExpectedNext === "CharacterActionButtonClick") {
-      let id = boardState.players[boardState.currentPlayerPlaying].id;
+    if (this.state.whatIsExpectedNext === "CharacterActionButtonClick") {
+      let id = this.state.players[this.state.currentPlayerPlaying].id;
       if (action === "Move" || action === "Dive" || action === "MoveAround"){
-            let tilesToLight = whereCanHeMove(boardState.players[id].position, boardState.players[id].role);
+            let tilesToLight = this.WhereCanHeMove(this.state.players[id].position, this.state.players[id].role);
             if (tilesToLight.length === 0 ){
-              customAlert(lng.nowhereToGo);
-              showActionButtons();
+              this.customAlert(lng.nowhereToGo);
+              this.showActionButtons();
             } else  {
-              boardState.players[id].whereCanHeMove = tilesToLight;
-              let nada = lightTheTiles(tilesToLight, boardState.players[id].color);
+              this.state.players[id].whereCanHeMove = tilesToLight;
+              let nada = this.lightTheTiles(tilesToLight, this.state.players[id].color);
               // set a new Expected PlayerInput
               let newMessage = new UserMessage('chooseADestination', null, false, [1]);
-              /*
+              
               this.setState({ whatIsExpectedNext : "TileButtonClickForMove" ,
                               mainUserMessage : newMessage,
                               showActionableCards : false,
                               showRollBackButton : false});
-                            */
+                            /*
                            setBoardState({ 
                             ...boardState,
                             whatIsExpectedNext : "TileButtonClickForMove" ,
                             mainUserMessage : newMessage,
                             showActionableCards : false,
                             showRollBackButton : false
-                          });
+                          });*/
             }
       } if (action === "Fly"){
-          let tilesToLight = whereCanHeFly(boardState.players[id].position);
-          boardState.players[id].whereCanHeFly = tilesToLight;
-          let nada = lightTheTiles(tilesToLight, boardState.players[id].color);
+          let tilesToLight = this.whereCanHeFly(this.state.players[id].position);
+          this.state.players[id].whereCanHeFly = tilesToLight;
+          let nada = this.lightTheTiles(tilesToLight, this.state.players[id].color);
           let newMessage = new UserMessage('chooseALandingDestination', null, false, [1]);
-          /*
+          
           this.setState({ whatIsExpectedNext: "TileButtonClickForFly" ,
                           mainUserMessage: newMessage ,
                           showActionableCards : false,
                           showRollBackButton : false });
-                          */
+                         /*
                          setBoardState({ 
                           ...boardState,
                           whatIsExpectedNext: "TileButtonClickForFly" ,
                           mainUserMessage: newMessage ,
                           showActionableCards : false,
                           showRollBackButton : false 
-                        });
+                        }); */
       } else if (action === "Dry" || action === "DryAround"){
-            let tilesToLight = whereCanHeDry(boardState.players[id].position, boardState.players[id].role);
+            let tilesToLight = this.whereCanHeDry(this.state.players[id].position, this.state.players[id].role);
             if (tilesToLight.length === 0 ){
-              customAlert(lng.noTilesToDry);
-              showActionButtons();
+              this.customAlert(lng.noTilesToDry);
+              this.showActionButtons();
             } else {
-              boardState.players[id].whereCanHeDry = tilesToLight;
-              let nada = lightTheTiles(tilesToLight, boardState.players[id].color);
+              this.state.players[id].whereCanHeDry = tilesToLight;
+              let nada = this.lightTheTiles(tilesToLight, this.state.players[id].color);
               let newMessage = new UserMessage('nowChooseATileToDry', null, false, [1]);
-              /*
+              
               this.setState({ whatIsExpectedNext: "TileButtonClickForDry",
                               mainUserMessage: newMessage,
                               showActionableCards : false,
                               showRollBackButton : false });
-                              */
+                              /*
                              setBoardState({ 
                               ...boardState,
                               whatIsExpectedNext: "TileButtonClickForDry",
                               mainUserMessage: newMessage,
                               showActionableCards : false,
                               showRollBackButton : false 
-                            });
+                            });*/
             }
       } else if (action === "DryTwoTiles"){
-            let tilesToLight = whereCanHeDry(boardState.players[id].position, boardState.players[id].role);
+            let tilesToLight = this.whereCanHeDry(this.state.players[id].position, this.state.players[id].role);
             if (tilesToLight.length === 0 ){
-              customAlert(lng.noTilesToDry);
-              showActionButtons();
+              this.customAlert(lng.noTilesToDry);
+              this.showActionButtons();
             } else if (tilesToLight.length === 1 ){
-              boardState.players[id].whereCanHeDry = tilesToLight;
-              let nada = lightTheTiles(tilesToLight, boardState.players[id].color);
+              this.state.players[id].whereCanHeDry = tilesToLight;
+              let nada = this.lightTheTiles(tilesToLight, this.state.players[id].color);
               let newMessage = new UserMessage('onlyOneTileToDry', null, false, [1]);
-              /*
+              
               this.setState({ whatIsExpectedNext: "TileButtonClickForDry" ,
                               mainUserMessage: newMessage,
                               showActionableCards : false,
                               showRollBackButton : false });
-                              */
+                              /*
                              setBoardState({ 
                               ...boardState,
                               whatIsExpectedNext: "TileButtonClickForDry" ,
                               mainUserMessage: newMessage,
                               showActionableCards : false,
                               showRollBackButton : false 
-                            });
+                            });*/
             } else {
-              boardState.players[id].whereCanHeDry = tilesToLight;
-              let nada = lightTheTiles(tilesToLight, boardState.players[id].color);
+              this.state.players[id].whereCanHeDry = tilesToLight;
+              let nada = this.lightTheTiles(tilesToLight, this.state.players[id].color);
               let newMessage = new UserMessage('nowChooseTwoTilesToDry', null, false, [1]);
-              /*
+              
               this.setState({ whatIsExpectedNext: "TileButtonClickForDryTwoTimes" ,
                               mainUserMessage: newMessage,
                               showActionableCards : false,
                               showRollBackButton : false });
-                              */
+                              /*
                              setBoardState({ 
                               ...boardState,
                               whatIsExpectedNext: "TileButtonClickForDryTwoTimes" ,
                               mainUserMessage: newMessage,
                               showActionableCards : false,
                               showRollBackButton : false
-                            });
+                            });*/
             }
       } else if (action === "Give") {
-              let playersAround = getPlayersOnTheSameTileExceptMe();
-              if (boardState.players[id].cards.length < 1 ){
-                customAlert(lng.noCardToGive);
-                showActionButtons();
+              let playersAround = this.getPlayersOnTheSameTileExceptMe();
+              if (this.state.players[id].cards.length < 1 ){
+                this.customAlert(lng.noCardToGive);
+                this.showActionButtons();
               } else if ( action === "Give" && playersAround.length < 1) {
-                  customAlert(lng.noOtherPlayerOnYourTile);
-                  showActionButtons();
+                  this.customAlert(lng.noOtherPlayerOnYourTile);
+                  this.showActionButtons();
               } else {
-                /*
+                
                 this.setState({ whatIsExpectedNext: "ResolveUserDialogSequence" ,
                                 messageBoardState: "giveACardSequence",
                                 showActionableCards : false,
                                 showRollBackButton : false });
-                                */
+                                /*
                                setBoardState({ 
                                 ...boardState,
                                 whatIsExpectedNext: "ResolveUserDialogSequence" ,
                                 messageBoardState: "giveACardSequence",
                                 showActionableCards : false,
                                 showRollBackButton : false
-                              });
+                              });*/
               }
       } else if (action === "SendACard") {
-            if (boardState.players[id].cards.length < 1 ){
-              customAlert(lng.noCardToSend);
-              showActionButtons();
+            if (this.state.players[id].cards.length < 1 ){
+              this.customAlert(lng.noCardToSend);
+              this.showActionButtons();
             } else {
-              /*
+              
               this.setState({ whatIsExpectedNext: "ResolveUserDialogSequence" ,
                               messageBoardState: "sendACardSequence",
                               showActionableCards : false,
                               showRollBackButton : false });
-                              */
+                              /*
                              setBoardState({ 
                               ...boardState,
                               whatIsExpectedNext: "ResolveUserDialogSequence" ,
                               messageBoardState: "sendACardSequence",
                               showActionableCards : false,
                               showRollBackButton : false 
-                            });
+                            });*/
             }
       } else if (action === "GetATreasure") {
-              let treasureId = boardState.tiles[boardState.players[id].position].templeFor;
+              let treasureId = this.state.tiles[this.state.players[id].position].templeFor;
               if (treasureId === ""){
-                customAlert(lng.thisTileIsNotATemple);
-                showActionButtons();
+                this.customAlert(lng.thisTileIsNotATemple);
+                this.showActionButtons();
               }
               else {
                   let cardsIndexes = [];
-                  for (let i = 0 ; i < boardState.players[id].cards.length; i++){
-                    if (boardState.players[id].cards[i].type === treasureId){
+                  for (let i = 0 ; i < this.state.players[id].cards.length; i++){
+                    if (this.state.players[id].cards[i].type === treasureId){
                       cardsIndexes.push(i);
                     }
                   }
 
-                  if (boardState.possessedTreasures.includes(treasureId)){
-                    customAlert(lng.thisTreasureHasBeenFoundAlready);
-                    showActionButtons();
+                  if (this.state.possessedTreasures.includes(treasureId)){
+                    this.customAlert(lng.thisTreasureHasBeenFoundAlready);
+                    this.showActionButtons();
                   }
                   else if (cardsIndexes.length < 4){
                     // alert("You do not have enough " + getTreasureNameById(treasureId) + " cards to get the treasure... you need 4 , you have " + cardsIndexes.length);
-                    customAlert(lng.notEnoughCards4Treasure.format(getTreasureNameById(treasureId), cardsIndexes.length));
-                    showActionButtons();
+                    this.customAlert(lng.notEnoughCards4Treasure.format(this.getTreasureNameById(treasureId), cardsIndexes.length));
+                    this.showActionButtons();
                   } else {
-                      if (boardState.possessedTreasures.length === 3 ){
+                      if (this.state.possessedTreasures.length === 3 ){
                         //alert("You found the 4th treasure ! Now, go to the heliport and leave the Island with an Helicopter card !");
-                        customAlert(lng.youFoundThe4th);
-                      } else if (boardState.possessedTreasures.length === 1) {
-                        customAlert(lng.youFoundThe2nd);
-                      } else if (boardState.possessedTreasures.length === 2) {
-                        customAlert(lng.youFoundThe3rd);
+                        this.customAlert(lng.youFoundThe4th);
+                      } else if (this.state.possessedTreasures.length === 1) {
+                        this.customAlert(lng.youFoundThe2nd);
+                      } else if (this.state.possessedTreasures.length === 2) {
+                        this.customAlert(lng.youFoundThe3rd);
                       }else {
-                        customAlert(lng.youFoundThe1st);
+                        this.customAlert(lng.youFoundThe1st);
                       }
                       // PICK A TREASURE
-                      let n_playerCardsDiscard = boardState.playerCardsDiscard;
-                      let n_players = boardState.players;
-                      let n_possessedTreasures = boardState.possessedTreasures;
+                      let n_playerCardsDiscard = this.state.playerCardsDiscard;
+                      let n_players = this.state.players;
+                      let n_possessedTreasures = this.state.possessedTreasures;
                       // drop 4 cards
                       let cardsLeftInHand = [];
                       let count = 0;
-                      for (let j = 0; j < boardState.players[id].cards.length; j++){
-                        if (boardState.players[id].cards[j].type === treasureId && count < 4){
-                            n_playerCardsDiscard.push(boardState.players[id].cards[j]);
+                      for (let j = 0; j < this.state.players[id].cards.length; j++){
+                        if (this.state.players[id].cards[j].type === treasureId && count < 4){
+                            n_playerCardsDiscard.push(this.state.players[id].cards[j]);
                             count = count + 1;
                         } else {
-                            cardsLeftInHand.push(boardState.players[id].cards[j]);
+                            cardsLeftInHand.push(this.state.players[id].cards[j]);
                         }
                       }
 
@@ -1944,8 +1950,8 @@ useEffect(() => {
                       //update possessedTreasures
                       n_possessedTreasures.push(treasureId);
 
-                      let newMessage = new UserMessage(null, lng.youFoundTheTreasureX.format(getTreasureNameById(treasureId)), false, [0]);
-                      /*
+                      let newMessage = new UserMessage(null, lng.youFoundTheTreasureX.format(this.getTreasureNameById(treasureId)), false, [0]);
+                      
                       this.setState({ mainUserMessage: newMessage,
                                       possessedTreasures: n_possessedTreasures,
                                       players: n_players,
@@ -1953,7 +1959,7 @@ useEffect(() => {
                                       showActionableCards : false,
                                       showRollBackButton : false
                                     });
-                                    */
+                                    /*
                                    setBoardState({ 
                                     ...boardState,
                                     mainUserMessage: newMessage,
@@ -1962,235 +1968,237 @@ useEffect(() => {
                                     playerCardsDiscard: n_playerCardsDiscard,
                                     showActionableCards : false,
                                     showRollBackButton : false
-                                  });
+                                  });*/
               }
           }
       } else if (action === "MoveSomeone") {
-        /*
+        
               this.setState({ whatIsExpectedNext: "ResolveUserDialogSequence" ,
                               messageBoardState: "moveSomeOneSequence",
                               showActionableCards : false,
                               showRollBackButton : false });
-                              */
+                 /*             
                              setBoardState({ 
                               ...boardState,
                               whatIsExpectedNext: "ResolveUserDialogSequence" ,
                               messageBoardState: "moveSomeOneSequence",
                               showActionableCards : false,
                               showRollBackButton : false
-                            });
+                            });*/
       } else if (action === "DoNothing"){ // skip one action
               let newMessage = new UserMessage('doingNothing', null, false, [0]);
-              /*
+              
               this.setState({ mainUserMessage: newMessage,
                               showRollBackButton : false});
-                              */
+                              /*
                              setBoardState({ 
                               ...boardState,
                               mainUserMessage: newMessage,
                               showRollBackButton : false
-                            });
+                            });*/
       } else if (action === "SkipTurn"){ // skip the whole player turn, goes to next player
              let newMessage = new UserMessage('skipTurn', null, false, [0]);
-             /*
+             
              this.setState({ mainUserMessage: newMessage,
                               currentStep: 5});
-                              */
+                              /*
                              setBoardState({ 
                               ...boardState,
                               mainUserMessage: newMessage,
                               currentStep: 5
-                            });
+                            });*/
       } else if (action === "DoSleep"){ // finish the actions, go to card picking
              let newMessage = new UserMessage('sleep', null, false, [0]);
-             /*
+             
              this.setState({ mainUserMessage: newMessage,
                               currentStep: 2});
-                              */
+                              /*
                              setBoardState({ 
                               ...boardState,
                               mainUserMessage: newMessage,
                               currentStep: 2
-                            });
+                            });*/
       }
     }
     else{
-      customAlert(lng.unexpectedClickOnActionButton);
+      this.customAlert(lng.unexpectedClickOnActionButton);
     }
     return null;
 }
 
-function handleCardClick(card, playerId, toThrowIt){
-  let lng = boardState.languageDistributor;
-  if (boardState.whatIsExpectedNext !== "TileButtonClickForMove")
+handleCardClick(card, playerId, toThrowIt){
+  let lng = this.state.languageDistributor;
+  if (this.state.whatIsExpectedNext !== "TileButtonClickForMove")
   {
-    hideActionButtons();
+    this.hideActionButtons();
     if (card === "helicopterCard" && toThrowIt === false) {
-          clickedOnHelicopterCard(playerId)
+          this.clickedOnHelicopterCard(playerId)
     } else if (card === "sandBagCard" && toThrowIt === false) {
-          clickedOnSandBagCard(playerId)
+          this.clickedOnSandBagCard(playerId)
     }
   } else {
-    customAlert(lng.pleaseFinishYourActionFirst);
+    this.customAlert(lng.pleaseFinishYourActionFirst);
   }
 }
 
 // Handles a click on a tile
-function handleTileClick(i) {
-    let lng = boardState.languageDistributor;
+handleTileClick(i) {
+    let lng = this.state.languageDistributor;
     // showActionButtons(); Done : dispatched on each succeeded actions
-    if (boardState.whatIsExpectedNext === "TileButtonClickForMove") {
-        let player = boardState.players[boardState.currentPlayerPlaying];
+    if (this.state.whatIsExpectedNext === "TileButtonClickForMove") {
+        let player = this.state.players[this.state.currentPlayerPlaying];
         if (player.whereCanHeMove.indexOf(i) >= 0){
             // Move
-            showActionButtons();
-            let returnPack = moveAPlayer(player, i, boardState.players);
-            let nada = unlightTheTiles();
+            this.showActionButtons();
+            let returnPack = this.moveAPlayer(player, i, this.state.players);
+            let nada = this.unlightTheTiles();
             if (nada){
-              /*
+              
               this.setState({ whatIsExpectedNext: "",
                               tiles: returnPack.tiles,
                               players: returnPack.players});
-                              */
+                             /*
                              setBoardState({ 
                               ...boardState,
                               whatIsExpectedNext: "",
                               tiles: returnPack.tiles,
                               players: returnPack.players
-                            });
-              controller("ActionIsDone");
+                            }); */
+                            this.controller("ActionIsDone");
             }
         }
         else{
-          customAlert(lng.heCantMoveThere);
+          this.customAlert(lng.heCantMoveThere);
         }
       }
-      else if (boardState.whatIsExpectedNext === "TileButtonClickForFly") {
-          let player = boardState.players[boardState.currentPlayerPlaying];
+      else if (this.state.whatIsExpectedNext === "TileButtonClickForFly") {
+          let player = this.state.players[this.state.currentPlayerPlaying];
           if (player.whereCanHeFly.indexOf(i) >= 0){
               // Move
-              showActionButtons();
-              let returnPack = moveAPlayer(player, i, boardState.players);
-              /*
+              this.showActionButtons();
+              let returnPack = this.moveAPlayer(player, i, this.state.players);
+              
               this.setState({ whatIsExpectedNext: "" ,
                               hasPilotFlownThisTurn: true,
                               tiles: returnPack.tiles,
                               players: returnPack.players}, () => {
-                                unlightTheTiles();
-                                controller("ActionIsDone");
+                                this.unlightTheTiles();
+                                this.controller("ActionIsDone");
               });
-              */
+              /*
              setBoardState({ 
               ...boardState,
               whatIsExpectedNext: "" ,
               hasPilotFlownThisTurn: true,
               tiles: returnPack.tiles,
               players: returnPack.players
-            });
+            });*/
             //then
-            unlightTheTiles();
-            controller("ActionIsDone");
+
+            //this.unlightTheTiles();
+            //this.controller("ActionIsDone");
           }
           else{
-            customAlert(lng.heCantMoveThere);
+            this.customAlert(lng.heCantMoveThere);
           }
-      } else if (boardState.whatIsExpectedNext === "TileButtonClickForMoveSomeone") {
+      } else if (this.state.whatIsExpectedNext === "TileButtonClickForMoveSomeone") {
         let puppet = null;
-        for (let i = 0; i < boardState.players.length; i++){
-          if (boardState.players[i].isPuppet === true){
-            puppet = boardState.players[i];
+        for (let i = 0; i < this.state.players.length; i++){
+          if (this.state.players[i].isPuppet === true){
+            puppet = this.state.players[i];
             break;
           }
         }
 
         if (puppet === null) {
-          customAlert("CONCEPTUAL ERROR : CAN't FIND PUPPET !");
+          this.customAlert("CONCEPTUAL ERROR : CAN't FIND PUPPET !");
         }
 
         if (puppet.whereCanHeMove.indexOf(i) >= 0){
-              showActionButtons();
+          this.showActionButtons();
               // Move
-              let returnPack = moveAPlayer(puppet, i, boardState.players);
+              let returnPack = this.moveAPlayer(puppet, i, this.state.players);
               // virer le puppet flag
               for (let j = 0; j < returnPack.players.length; j++){
                 returnPack.players[j].isPuppet = false;
               }
-              /*
+              
               this.setState({ whatIsExpectedNext: "" ,
                               messageBoardState : "default",
                               tiles: returnPack.tiles,
                               players: returnPack.players}, () => {
-                                unlightTheTiles();
-                                controller("ActionIsDone");
+                                this.unlightTheTiles();
+                                this.controller("ActionIsDone");
               });
-              */
+             /*
              setBoardState({ 
               ...boardState,
               whatIsExpectedNext: "" ,
               messageBoardState : "default",
               tiles: returnPack.tiles,
               players: returnPack.players
-            });
+            }); */
             //then
-            unlightTheTiles();
-            controller("ActionIsDone");
+            //unlightTheTiles();
+            //controller("ActionIsDone");
         }
         else{
-          customAlert(lng.heCantMoveThere);
+          this.customAlert(lng.heCantMoveThere);
         }
-      } else if (boardState.whatIsExpectedNext === "TileButtonClickForDry"){
-        let newplayers = boardState.players;
-        let newplayer = boardState.players[boardState.currentPlayerPlaying];
+      } else if (this.state.whatIsExpectedNext === "TileButtonClickForDry"){
+        let newplayers = this.state.players;
+        let newplayer = this.state.players[this.state.currentPlayerPlaying];
         if (newplayer.whereCanHeDry.indexOf(i) >= 0){
             // Dry
-            showActionButtons();
-            dryATile(i);
-            let nada = unlightTheTiles();
+            this.showActionButtons();
+            this.dryATile(i);
+            let nada = this.unlightTheTiles();
             if (nada){
               // let newMessage = new UserMessage(player.name + "dried a tile", false, true, false);
-              newplayers[boardState.currentPlayerPlaying].whereCanHeDry = null;
-              // this.setState({ whatIsExpectedNext: "" , playersnewplayers: newplayers });
+              newplayers[this.state.currentPlayerPlaying].whereCanHeDry = null;
+              this.setState({ whatIsExpectedNext: "" , playersnewplayers: newplayers });
+              /*
               setBoardState({ 
                 ...boardState,
                 whatIsExpectedNext: "" , 
                 playersnewplayers: newplayers // ?????
-              });
-              controller("ActionIsDone");
+              });*/
+              this.controller("ActionIsDone");
             }
         }
         else {
-          customAlert(lng.heCantDryThere);
+          this.customAlert(lng.heCantDryThere);
         }
-      } else if (boardState.whatIsExpectedNext === "TileButtonClickForDryTwoTimes") {
-        let newplayers = boardState.players;
-        let newplayer = boardState.players[boardState.currentPlayerPlaying];
+      } else if (this.state.whatIsExpectedNext === "TileButtonClickForDryTwoTimes") {
+        let newplayers = this.state.players;
+        let newplayer = this.state.players[this.state.currentPlayerPlaying];
         if (newplayer.whereCanHeDry.indexOf(i) >= 0){
             // Dry
-            showActionButtons();
-            dryATile(i);
-            unlightATile(i);
+            this.showActionButtons();
+            this.dryATile(i);
+            this.unlightATile(i);
             let newMessage = new UserMessage('nowChooseASecondOneToDry', null, false, []);
-            hideActionButtons();
-            /*
+            this.hideActionButtons();
+            
             this.setState({ whatIsExpectedNext: "TileButtonClickForDry" ,
                             mainUserMessage: newMessage});
-                            */
+                            /*
                            setBoardState({ 
                             ...boardState,
                             whatIsExpectedNext: "TileButtonClickForDry" ,
                             mainUserMessage: newMessage
-                          });
+                          });*/
         }
         else {
-          customAlert(lng.heCantDryThere);
+          this.customAlert(lng.heCantDryThere);
         }
-      } else if (boardState.whatIsExpectedNext === "TileButtonClickForFlyWithACard") {
+      } else if (this.state.whatIsExpectedNext === "TileButtonClickForFlyWithACard") {
         // let player = boardState.players[boardState.cardUser];
-        let cardUser = boardState.players[boardState.cardUser];
-        let travellers = boardState.coTravellers;
-        let n_Players = boardState.players;
-        let n_PlayerCardsDiscard = boardState.playerCardsDiscard;
-        let whatIsExpectedNext_toRestore = boardState.whatIsExpectedNext_toRestore;
+        let cardUser = this.state.players[this.state.cardUser];
+        let travellers = this.state.coTravellers;
+        let n_Players = this.state.players;
+        let n_PlayerCardsDiscard = this.state.playerCardsDiscard;
+        let whatIsExpectedNext_toRestore = this.state.whatIsExpectedNext_toRestore;
 
         //if (travellers[0].whereCanHeFly.indexOf(i) >= 0){
             // index of the card to remove
@@ -2208,14 +2216,14 @@ function handleTileClick(i) {
             // If the currently active is the flyer or in the flight or if the current player is on the reception ISLAND
             // and destination tile has a guy on it and he's not the messanger,
             // recalculate the current active player possible actions to include the 'give' action unless he is the messenger
-            let n_possibleActions = boardState.possibleActions;
-            if ((boardState.currentPlayerPlaying === boardState.cardUser
-                || boardState.tiles[i].playerOn.indexOf(boardState.currentPlayerPlaying) >= 0
-                || boardState.coTravellers.indexOf(boardState.currentPlayerPlaying) >= 0)
-                && boardState.tiles[i].playerOn.length > 0
-                && boardState.currentStep <= 2)
+            let n_possibleActions = this.state.possibleActions;
+            if ((this.state.currentPlayerPlaying === this.state.cardUser
+                || this.state.tiles[i].playerOn.indexOf(this.state.currentPlayerPlaying) >= 0
+                || this.state.coTravellers.indexOf(this.state.currentPlayerPlaying) >= 0)
+                && this.state.tiles[i].playerOn.length > 0
+                && this.state.currentStep <= 2)
               {
-                if (!actionIsInThePossibleActionsListAlready("Give")){
+                if (!this.actionIsInThePossibleActionsListAlready("Give")){
                   let y = n_possibleActions.length - 1;
                   n_possibleActions.splice(y, 0, playerDefaultActions[2]);
                 }
@@ -2226,11 +2234,11 @@ function handleTileClick(i) {
 
               // Same. if after a fly, one lands on a flooded or surrounded by flooded tiles and is currently playing,
               // Check if it's not in possibleActions already and let's add the DRY action
-              if (boardState.currentStep <= 2)
+              if (this.state.currentStep <= 2)
               {
-                  let dryableTiles = whereCanHeDry(i, boardState.players[boardState.cardUser].role);
+                  let dryableTiles = this.whereCanHeDry(i, this.state.players[this.state.cardUser].role);
                   if (dryableTiles.length > 0
-                  && !actionIsInThePossibleActionsListAlready("Dry") && !actionIsInThePossibleActionsListAlready("Dry two tiles")
+                  && !this.actionIsInThePossibleActionsListAlready("Dry") && !this.actionIsInThePossibleActionsListAlready("Dry two tiles")
                   ){
                         n_possibleActions.splice(1, 0, playerDefaultActions[1]);
                   }
@@ -2241,9 +2249,9 @@ function handleTileClick(i) {
 
               // Same. if after a fly, one lands on a temple and is currently playing,
               // Check if it's not in possibleActions already and let's add the Get A Treasure action
-              if (boardState.tiles[i].templeFor.length > 0 && boardState.currentStep <= 2)
+              if (this.state.tiles[i].templeFor.length > 0 && this.state.currentStep <= 2)
               {
-                  if (!actionIsInThePossibleActionsListAlready("Get a Treasure !")){
+                  if (!this.actionIsInThePossibleActionsListAlready("Get a Treasure !")){
                     let y = n_possibleActions.length - 1;
                     n_possibleActions.splice(y, 0, playerDefaultActions[3]);
                   }
@@ -2252,7 +2260,7 @@ function handleTileClick(i) {
               }
 
             // Move
-            let returnPack = moveAGroupOfPlayers(boardState.coTravellers, i, n_Players, boardState.tiles);
+            let returnPack = this.moveAGroupOfPlayers(this.state.coTravellers, i, n_Players, this.state.tiles);
             //
 /*
             if (boardState.inAGetRidOfACardContext){
@@ -2262,11 +2270,11 @@ function handleTileClick(i) {
                 showActionButtons();
             }
 */
-            boardState.inAGetRidOfACardContext?hideActionButtons():showActionButtons();
-/*
-            this.setState({ whatIsExpectedNext: boardState.whatIsExpectedNext_toRestore,
-                            messageBoardState: boardState.messageBoardState_toRestore,
-                            mainUserMessage: boardState.mainUserMessage_toRestore,
+            this.state.inAGetRidOfACardContext?this.hideActionButtons():this.showActionButtons();
+
+            this.setState({ whatIsExpectedNext: this.state.whatIsExpectedNext_toRestore,
+                            messageBoardState: this.state.messageBoardState_toRestore,
+                            mainUserMessage: this.state.mainUserMessage_toRestore,
                             // cardUser: -1, because it's used by UseACard when getting rid of it
                             coTravellers: [],
                             players: returnPack.players,
@@ -2277,7 +2285,7 @@ function handleTileClick(i) {
                             whatIsExpectedNext_toRestore: null,
                             inAGetRidOfACardContext: false,
                             showActionableCards: true });
-*/
+/*
               setBoardState({ 
                 ...boardState, 
                 whatIsExpectedNext: boardState.whatIsExpectedNext_toRestore,
@@ -2293,18 +2301,18 @@ function handleTileClick(i) {
                 whatIsExpectedNext_toRestore: null,
                 inAGetRidOfACardContext: false,
                 showActionableCards: true 
-              });
+              });*/
 
-            let nada = unlightTheTiles();
+            let nada = this.unlightTheTiles();
         //} else {
-        //  customAlert(lng.cantFlyThereWithHisHCard);
+        //  this.customAlert(lng.cantFlyThereWithHisHCard);
         //}
       }
-      else if (boardState.whatIsExpectedNext === "TileButtonClickForDryWithACard") {
-        let player = boardState.players[boardState.cardUser];
-        let NewPlayers = boardState.players;
-        let NewPlayerCardsDiscard = boardState.playerCardsDiscard;
-        let whatIsExpectedNext_toRestore = boardState.whatIsExpectedNext_toRestore;
+      else if (this.state.whatIsExpectedNext === "TileButtonClickForDryWithACard") {
+        let player = this.state.players[this.state.cardUser];
+        let NewPlayers = this.state.players;
+        let NewPlayerCardsDiscard = this.state.playerCardsDiscard;
+        let whatIsExpectedNext_toRestore = this.state.whatIsExpectedNext_toRestore;
 
         if (player.whereCanHeDry.indexOf(i) >= 0){
           // index of the card to remove from the player's hand
@@ -2319,7 +2327,7 @@ function handleTileClick(i) {
           player.whereCanHeDry = [];
           NewPlayers[player.id] = player;
           // Dry
-          dryATile(i);
+          this.dryATile(i);
 
           /*
                       if (boardState.inAGetRidOfACardContext){
@@ -2329,12 +2337,12 @@ function handleTileClick(i) {
                           showActionButtons();
                       }
           */
-          boardState.inAGetRidOfACardContext?hideActionButtons():showActionButtons();
+          this.state.inAGetRidOfACardContext?this.hideActionButtons():this.showActionButtons();
           
-          /*
-          this.setState({ whatIsExpectedNext: boardState.whatIsExpectedNext_toRestore,
-                          messageBoardState: boardState.messageBoardState_toRestore,
-                          mainUserMessage: boardState.mainUserMessage_toRestore,
+          
+          this.setState({ whatIsExpectedNext: this.state.whatIsExpectedNext_toRestore,
+                          messageBoardState: this.state.messageBoardState_toRestore,
+                          mainUserMessage: this.state.mainUserMessage_toRestore,
                           // cardUser: -1,
                           players: NewPlayers,
                           playerCardsDiscard: NewPlayerCardsDiscard,
@@ -2343,7 +2351,7 @@ function handleTileClick(i) {
                           mainUserMessage_toRestore: null,
                           inAGetRidOfACardContext: false,
                           showActionableCards: true });
-                          */
+                          /*
                          setBoardState({ 
                           ...boardState, 
                           whatIsExpectedNext: boardState.whatIsExpectedNext_toRestore,
@@ -2357,19 +2365,19 @@ function handleTileClick(i) {
                           mainUserMessage_toRestore: null,
                           inAGetRidOfACardContext: false,
                           showActionableCards: true
-                        });
+                        });*/
 
-          let nada = unlightTheTiles();
+          let nada = this.unlightTheTiles();
         }
         else {
-          customAlert(lng.cantDryThereWithHisCard);
+          this.customAlert(lng.cantDryThereWithHisCard);
         }
       }
-      else if (boardState.whatIsExpectedNext === "TileButtonClickForEvacuate") {
+      else if (this.state.whatIsExpectedNext === "TileButtonClickForEvacuate") {
         // get player : first of To Evacuate
-        showActionButtons(); // not sure about this one
-        let n_players = boardState.players;
-        let n_guysToEvacuate = boardState.guysToEvacuate;
+        this.showActionButtons(); // not sure about this one
+        let n_players = this.state.players;
+        let n_guysToEvacuate = this.state.guysToEvacuate;
 
         let rescued = n_players[n_guysToEvacuate[0]];
 
@@ -2378,7 +2386,7 @@ function handleTileClick(i) {
             // Move
             let bozo = n_guysToEvacuate.shift();
 
-            let floodingSequence = boardState.floodingSequence;
+            let floodingSequence = this.state.floodingSequence;
             let floodNumber = floodingSequence[0];
             let floodTotal = floodingSequence[1];
 
@@ -2402,23 +2410,23 @@ function handleTileClick(i) {
               message = message + lng.floodingsGoesOn;
               n_userMessage = new UserMessage(null, message , false, [5], databag);
             }
-            /*
+            
             this.setState({
               whatIsExpectedNext: "",
               guysToEvacuate: n_guysToEvacuate,
               mainUserMessage: n_userMessage
             });
-            */
+            /*
            setBoardState({ 
             ...boardState, 
             whatIsExpectedNext: "",
             guysToEvacuate: n_guysToEvacuate,
             mainUserMessage: n_userMessage
-          });
+          });*/
 
 
 
-            let n_Tiles = boardState.tiles;
+            let n_Tiles = this.state.tiles;
 
             // remove player from current Tile
             /* ON TENTE LE OSEF !
@@ -2432,33 +2440,33 @@ function handleTileClick(i) {
             n_players[rescued.id].whereCanHeMove = null;
             n_players[rescued.id].whereCanHeFly = null;
 
-            /*
+            
             this.setState({
               tiles: n_Tiles,
               players: n_players
             });
-            */
+            /*
            setBoardState({ 
             ...boardState, 
             tiles: n_Tiles,
             players: n_players
-          });
+          });*/
 
-            unlightTheTiles();
+          this.unlightTheTiles();
         }
         else{
-          customAlert(lng.heCantMoveThere);
+          this.customAlert(lng.heCantMoveThere);
         }
       } else {
-        customAlert(lng.unexpectedClickOnATile);
+        this.customAlert(lng.unexpectedClickOnATile);
         // alert (lng.unexpectedClickOnATile);
       }
     }// end of HandleTileClick
 
-    function handleRollBack(curstep){
+    handleRollBack(curstep){
     // TODO refactor avoiding the pop and push
-    if (boardState.pastStates.length >= 1 ){
-      let pastStates = boardState.pastStates;
+    if (this.state.pastStates.length >= 1 ){
+      let pastStates = this.state.pastStates;
       let stateToThrow = null;
       let strStateToRestore = null;
       if (curstep == 3 && pastStates.length === 3){
@@ -2470,14 +2478,14 @@ function handleTileClick(i) {
         pastStates.push(strStateToRestore);
       } else if (curstep == 2){
         if (pastStates.length != 3){
-          customAlert("CONCEPTUAL ERROR, on step 2 , pastStates should be 3 long");
+          this.customAlert("CONCEPTUAL ERROR, on step 2 , pastStates should be 3 long");
         }
         stateToThrow = pastStates.pop();
         strStateToRestore = pastStates.pop();
         pastStates.push(strStateToRestore);
       } else if (curstep == 1) {
         if (pastStates.length != 2){
-          customAlert("CONCEPTUAL ERROR, on step 1 , pastStates should be 2 long");
+          this.customAlert("CONCEPTUAL ERROR, on step 1 , pastStates should be 2 long");
         }
         stateToThrow = pastStates.pop();
         strStateToRestore = pastStates.pop();
@@ -2487,15 +2495,15 @@ function handleTileClick(i) {
       let objStateToRestore = JSON.parse(strStateToRestore);
       objStateToRestore.pastStates = pastStates;
 
-      return doStatePermutation(objStateToRestore);
+      return this.doStatePermutation(objStateToRestore);
     } else {
-      customAlert("CONCEPTUAL ERROR : No state to restore");
+      this.customAlert("CONCEPTUAL ERROR : No state to restore");
       // alert("CONCEPTUAL ERROR : No state to restore");
     }
   }
 
-  function moveAPlayer(player, destination){
-    let n_Tiles = boardState.tiles;
+  moveAPlayer(player, destination){
+    let n_Tiles = this.state.tiles;
     // remove player from current Tile
     let tile = n_Tiles[player.position]
     let index = tile.playerOn.indexOf(player.id);
@@ -2503,7 +2511,7 @@ function handleTileClick(i) {
     // adding player to new tile
     n_Tiles[destination].playerOn.push(player.id);
 
-    let n_players = boardState.players;
+    let n_players = this.state.players;
     n_players[player.id].position = destination;
     n_players[player.id].whereCanHeMove = null;
     n_players[player.id].whereCanHeFly = null;
@@ -2511,10 +2519,10 @@ function handleTileClick(i) {
     return { players: n_players, tiles: n_Tiles};
   }
 
-  function moveAGroupOfPlayers(travellersIds, destination){
-    let n_Tiles = boardState.tiles;
-    let startingFrom = boardState.players[travellersIds[0]].position;
-    let n_Players = boardState.players;
+  moveAGroupOfPlayers(travellersIds, destination){
+    let n_Tiles = this.state.tiles;
+    let startingFrom = this.state.players[travellersIds[0]].position;
+    let n_Players = this.state.players;
 
     for (let i=0; i < travellersIds.length; i++){
           // remove travellers from the current Tile
@@ -2531,38 +2539,40 @@ function handleTileClick(i) {
     return { players: n_Players, tiles: n_Tiles};
   }
 
-  function dryATile(tile){
-        let NewTiles = boardState.tiles;
+  dryATile(tile){
+        let NewTiles = this.state.tiles;
         if (NewTiles[tile].isDrawned){
-          customAlert("CONCEPTUAL ERROR : can't dry a drawned tile");
+          this.customAlert("CONCEPTUAL ERROR : can't dry a drawned tile");
           // alert("CONCEPTUAL ERROR : can't dry a drawned tile");
         }
         NewTiles[tile].isImmersed = false;
-        // this.setState({ tiles: NewTiles});
+        this.setState({ tiles: NewTiles});
         // this.ss_tiles(NewTiles);
+        /*
         setBoardState({ 
           ...boardState, 
           tiles: NewTiles
         });
+        */
   }
 
-  function cancelAnAction(){
-    let lng = boardState.languageDistributor;
-    unlightTheTiles();
+  cancelAnAction(){
+    let lng = this.state.languageDistributor;
+    this.unlightTheTiles();
     let newMessage = new UserMessage('chooseAnAction_msg', null , false, []);
 
-    if (!boardState.inAGetRidOfACardContext && boardState.currentStep < 3){
-      showActionButtons();
+    if (!this.state.inAGetRidOfACardContext && this.state.currentStep < 3){
+      this.showActionButtons();
     }
-    /*
+    
     this.setState({
       // TODO show back handsOver Actionable cards
       showActionableCards : true,
       whatIsExpectedNext: "CharacterActionButtonClick" ,
       messageBoardState: "default",
       mainUserMessage : newMessage});
-      */
-
+      
+/*
      setBoardState({ 
       ...boardState, 
       // TODO show back handsOver Actionable cards
@@ -2570,19 +2580,19 @@ function handleTileClick(i) {
       whatIsExpectedNext: "CharacterActionButtonClick" ,
       messageBoardState: "default",
       mainUserMessage : newMessage
-    });
+    });*/
   }
 
-  function doMoveSomeOne(puppet) {
-    let lng = boardState.languageDistributor;
+  doMoveSomeOne(puppet) {
+    let lng = this.state.languageDistributor;
     if (isNaN(puppet) || puppet == null) {
         // alert(lng.chooseAnExplorerToMove);
-        customAlert(lng.chooseAnExplorerToMove);
+        this.customAlert(lng.chooseAnExplorerToMove);
         return null;
     }
-    let whereCanHeMove = whereNavigatorCanMoveHim(boardState.players[puppet].position);
-    boardState.players[puppet].whereCanHeMove = whereCanHeMove;
-    let n_players = boardState.players;
+    let whereCanHeMove = this.whereNavigatorCanMoveHim(this.state.players[puppet].position);
+    this.state.players[puppet].whereCanHeMove = whereCanHeMove;
+    let n_players = this.state.players;
     for (let i = 0; i < n_players.length; i++){
       if (i == puppet){
         n_players[i].isPuppet = true;
@@ -2592,36 +2602,36 @@ function handleTileClick(i) {
       }
     }
 
-    unlightTheTiles();
-    lightTheTiles(whereCanHeMove, boardState.players[puppet].color);
+    this.unlightTheTiles();
+    this.lightTheTiles(whereCanHeMove, this.state.players[puppet].color);
     let newMessage = new UserMessage('chooseADestination', null, false, []); // TODO : SET a cancel. See bug.
-    /*
+    
     this.setState({ whatIsExpectedNext: "TileButtonClickForMoveSomeone" ,
                     mainUserMessage: newMessage,
                     messageBoardState : "moveSomeOneSequence",
                     players : n_players });
-                    */
+                    /*
                    setBoardState({ 
                     ...boardState, 
                     whatIsExpectedNext: "TileButtonClickForMoveSomeone" ,
                     mainUserMessage: newMessage,
                     messageBoardState : "moveSomeOneSequence",
                     players : n_players
-                  });
+                  });*/
   }
 
-  function doGiveACard(giver, card, receiver){
-    let lng = boardState.languageDistributor;
+  doGiveACard(giver, card, receiver){
+    let lng = this.state.languageDistributor;
     // alert("GIVE A CARD : " + giver + " will give the " + card + " to " + receiver);
     console.log("PRE  Given : " + card + " to " + receiver);
     if (card == null){
-      customAlert(lng.pleaseSelectACardToGive);
+      this.customAlert(lng.pleaseSelectACardToGive);
       // alert(lng.pleaseSelectACardToGive);
     } else if (receiver == null){
-      customAlert(lng.pleaseSelectARecipientForTheCard);
+      this.customAlert(lng.pleaseSelectARecipientForTheCard);
     } else {
       // remove from player
-      let n_players = boardState.players;
+      let n_players = this.state.players;
       let givenCard = null;
       let index = null;
       for (let i = 0; i < n_players[giver].cards.length; i++){
@@ -2633,7 +2643,7 @@ function handleTileClick(i) {
       }
 
       if (index == null){
-        customAlert("CONCEPTUAL ERROR: Couldn't find the card");
+        this.customAlert("CONCEPTUAL ERROR: Couldn't find the card");
       }
       n_players[giver].cards.splice(index, 1);
 
@@ -2641,70 +2651,70 @@ function handleTileClick(i) {
       n_players[receiver].cards.push(givenCard);
       console.log("POST Given : " + givenCard.id + " to " + receiver);
       // alert("GIVE A CARD : " + giver + " will give the " + card + " to " + receiver);
-      /*
+      
       this.setState({whatIsExpectedNext: "" ,
           messageBoardState: "default",
           players: n_players}, () => {
-                  doCheckIfMoreThan5CardsInHand(0, receiver);
+                  this.doCheckIfMoreThan5CardsInHand(0, receiver);
           });
-          */
-
+          
+        /*
           setBoardState({ 
           ...boardState, 
           whatIsExpectedNext: "" ,
           messageBoardState: "default",
           players: n_players
-        });
+        });*/
 
         //then
-        doCheckIfMoreThan5CardsInHand(0, receiver);
+        // doCheckIfMoreThan5CardsInHand(0, receiver);
     }
   }
 
-  function getPlayersOnTheSameTileExceptMe(id){
+  getPlayersOnTheSameTileExceptMe(id){
     let playersOnTheSameTileExceptMe = [];
     if (id === null || id === undefined){
-      id = boardState.currentPlayerPlaying;
+      id = this.state.currentPlayerPlaying;
     }
     // let id = boardState.currentPlayerPlaying;
-    let currentpostion = boardState.players[id].position;
+    let currentpostion = this.state.players[id].position;
 
-    for (let i = 0 ; i < boardState.players.length; i++){
-      if (boardState.players[i].position === currentpostion && boardState.players[i].id !== id){
-        playersOnTheSameTileExceptMe.push(boardState.players[i].id);
+    for (let i = 0 ; i < this.state.players.length; i++){
+      if (this.state.players[i].position === currentpostion && this.state.players[i].id !== id){
+        playersOnTheSameTileExceptMe.push(this.state.players[i].id);
       }
     }
     // alert("players on the same tile than me : Iam " +  id + " and I'm with" + playersOnTheSameTileExceptMe);
     return playersOnTheSameTileExceptMe;
   }
 
-  function getPlayersIdsExceptMe(id){
+  getPlayersIdsExceptMe(id){
     let playersIdsExceptMe = [];
     if (id === null || id === undefined){
-      id = boardState.currentPlayerPlaying;
+      id = this.state.currentPlayerPlaying;
     }
 
-    for (let i = 0 ; i < boardState.players.length; i++){
-      if ( boardState.players[i].id !== id){
-        playersIdsExceptMe.push(boardState.players[i].id);
+    for (let i = 0 ; i < this.state.players.length; i++){
+      if ( this.state.players[i].id !== id){
+        playersIdsExceptMe.push(this.state.players[i].id);
       }
     }
     return playersIdsExceptMe;
   }
 
-  function getPlayersOnATile(position){
+  getPlayersOnATile(position){
     let playersOnTheTile = [];
 
-    for (let i = 0 ; i < boardState.players.length; i++){
-      if (boardState.players[i].position === position ){
-        playersOnTheTile.push(boardState.players[i].id);
+    for (let i = 0 ; i < this.state.players.length; i++){
+      if (this.state.players[i].position === position ){
+        playersOnTheTile.push(this.state.players[i].id);
       }
     }
     return playersOnTheTile;
   }
 
-  function doStatePermutation(newState){
-    /*
+  doStatePermutation(newState){
+    
       this.setState({
         tiles: newState.tiles,
         playerCardsLeap: newState.playerCardsLeap,
@@ -2754,7 +2764,7 @@ function handleTileClick(i) {
         showActionableCards : newState.showActionableCards,
         showRollBackButton : newState.showRollBackButton
       });
-      */
+      /*
      setBoardState({ 
       ...boardState, 
       tiles: newState.tiles,
@@ -2805,35 +2815,35 @@ function handleTileClick(i) {
       showActionableCards : newState.showActionableCards,
       showRollBackButton : newState.showRollBackButton
     });
-
+    */
   }
 
-  function renderSquare(i) {
+  renderSquare(i) {
     return(
       <span>
-        <DrawSquare tile={boardState.tiles[i]} players={boardState.players} index={i} blinkPlayer={boardState.blinkPlayer} doBlink={boardState.blinkingTile == i} onClick={() => handleTileClick(i)}/>
+        <DrawSquare tile={this.state.tiles[i]} players={this.state.players} index={i} blinkPlayer={this.state.blinkPlayer} doBlink={this.state.blinkingTile == i} onClick={() => this.handleTileClick(i)}/>
       </span>
     );
   }
 
-  function renderEmptySquare() {
+  renderEmptySquare() {
     return (
       <DrawEmptySquare /*HACK onClick={() => this.launchGameOver(false, true, "Yolo")} *//>
     );
   }
 
-  function renderTreasureSquare(treasureId) {
+  renderTreasureSquare(treasureId) {
     // if le tresor a été trouvé draw it else Draw empty square
-    let lng = boardState.languageDistributor;
+    let lng = this.state.languageDistributor;
     let trophyPath = "";
     let msg = "";
 
-    if (boardState.possessedTreasures.indexOf(treasureId) >= 0){
+    if (this.state.possessedTreasures.indexOf(treasureId) >= 0){
       for (let i = 0 ; i < treasures.length; i++){
         if (treasures[i].id === treasureId)
         {
           trophyPath = treasures[i].trophyImg;
-          msg = getStringInTheCatalog(lng, treasures[i].loc_found_msg_key);
+          msg = this.getStringInTheCatalog(lng, treasures[i].loc_found_msg_key);
           break;
         }
       }
@@ -2850,13 +2860,13 @@ function handleTileClick(i) {
       </span>)
   }
 
-  function renderPlayerBoard(i) { // passing a player index
-    let isPlaying = boardState.currentPlayerPlaying === i; // bool
+  renderPlayerBoard(i) { // passing a player index
+    let isPlaying = this.state.currentPlayerPlaying === i; // bool
     let boardClass = isPlaying?  ('playerBoard playerBoardPlaying') : ('playerBoard ');
-    let player = boardState.players[i];
-    let str_roleQualifier = getStringInTheCatalog(boardState.languageDistributor, player.roleQualifier);
-    let str_roleAttachedToName = getStringInTheCatalog(boardState.languageDistributor, player.roleAttachedToName);
-    let str_abilityHelp = getStringInTheCatalog(boardState.languageDistributor, player.playersAbility);
+    let player = this.state.players[i];
+    let str_roleQualifier = this.getStringInTheCatalog(this.state.languageDistributor, player.roleQualifier);
+    let str_roleAttachedToName = this.getStringInTheCatalog(this.state.languageDistributor, player.roleAttachedToName);
+    let str_abilityHelp = this.getStringInTheCatalog(this.state.languageDistributor, player.playersAbility);
 
     return (
       <div className={boardClass}>
@@ -2866,16 +2876,16 @@ function handleTileClick(i) {
         <br/>
         <div className="inBoardCards">
           {
-            boardState.players[i].cards.map((card, index) => {
+            this.state.players[i].cards.map((card, index) => {
               if (card){
-                return card.name === "helicopter" && boardState.showActionableCards ?
+                return card.name === "helicopter" && this.state.showActionableCards ?
                     <span key={index} className="activableBoardPlayerCards">
-                      <img src={card.url} width="45px" height="70px" onClick={() => handleCardClick("helicopterCard", boardState.players[i].id, false)}/>
+                      <img src={card.url} width="45px" height="70px" onClick={() => this.handleCardClick("helicopterCard", this.state.players[i].id, false)}/>
                       <span className="spanOverHand"><img id={"actionCard:" + index + "::" + i} className="overHand doRotate" src="img/hand.png"/></span>
                     </span>
-                  : card.name === "sandBag" && boardState.showActionableCards ?
+                  : card.name === "sandBag" && this.state.showActionableCards ?
                       <span key={index} className="activableBoardPlayerCards">
-                        <img src={card.url} width="45px" height="70px" onClick={() => handleCardClick("sandBagCard", boardState.players[i].id, false)}/>
+                        <img src={card.url} width="45px" height="70px" onClick={() => this.handleCardClick("sandBagCard", this.state.players[i].id, false)}/>
                         <span className="spanOverHand"><img id={"actionCard:" + index + "::" + i} className="overHand doRotate" src="img/hand.png"/></span>
                       </span>
                       :
@@ -2890,55 +2900,55 @@ function handleTileClick(i) {
     )
   }
 
-  function renderPlayerMessagePanel() {
-    let foundTreasures = boardState.possessedTreasures.length;
-    let lng = boardState.languageDistributor;
-    let currentPlayer = boardState.players[boardState.currentPlayerPlaying];
-    let str_roleQualifier = getStringInTheCatalog(lng, currentPlayer.roleQualifier);
-    let str_roleAttachedToName = getStringInTheCatalog(lng, currentPlayer.roleAttachedToName);
-    let str_currentStep = getStringInTheCatalog(lng, playerSteps[boardState.currentStep].wording);
-    let langToggleImg = boardState.selectedLanguage === "FR" ? "img/toggle_right.png" : "img/toggle_left.png";
+  renderPlayerMessagePanel() {
+    let foundTreasures = this.state.possessedTreasures.length;
+    let lng = this.state.languageDistributor;
+    let currentPlayer = this.state.players[this.state.currentPlayerPlaying];
+    let str_roleQualifier = this.getStringInTheCatalog(lng, currentPlayer.roleQualifier);
+    let str_roleAttachedToName = this.getStringInTheCatalog(lng, currentPlayer.roleAttachedToName);
+    let str_currentStep = this.getStringInTheCatalog(lng, playerSteps[this.state.currentStep].wording);
+    let langToggleImg = this.state.selectedLanguage === "FR" ? "img/toggle_right.png" : "img/toggle_left.png";
 
     // Either we're in action or before picking the first player card :
-    let showBackButton = boardState.showRollBackButton && ((boardState.currentStep > 0 && boardState.currentStep < 3) || ( boardState.mainUserMessage.buttons.indexOf(2) >= 0));
+    let showBackButton = this.state.showRollBackButton && ((this.state.currentStep > 0 && this.state.currentStep < 3) || ( this.state.mainUserMessage.buttons.indexOf(2) >= 0));
 
     return (
       <span>
         <div className="messagePanel">
           <div className="panelTitle"> {lng.mainTitle01}<br/>{lng.mainTitle02}</div>
-          <div className="panelSubTitle"><b>{boardState.versionNumber}</b></div>
-          <div className="littlePanelInfo">English <img id="langToggle" src={langToggleImg} onClick={() => doChangeLang()} /> Français</div>
-          <div className="littlePanelInfo">{lng.turn} {boardState.turn} | {lng.level} {boardState.difficultyLevelString}</div>
+          <div className="panelSubTitle"><b>{this.state.versionNumber}</b></div>
+          <div className="littlePanelInfo">English <img id="langToggle" src={langToggleImg} onClick={() => this.doChangeLang()} /> Français</div>
+          <div className="littlePanelInfo">{lng.turn} {this.state.turn} | {lng.level} {this.state.difficultyLevelString}</div>
           <div className="littlePanelInfo">{lng.treasuresFound} : {foundTreasures}/4 </div>
-          <div className="littlePanelInfo"> {lng.floodLevel} {boardState.floodMeter.level} {lng.xCardsPerFlood.format(boardState.floodMeter.floodFactor)}</div>
+          <div className="littlePanelInfo"> {lng.floodLevel} {this.state.floodMeter.level} {lng.xCardsPerFlood.format(this.state.floodMeter.floodFactor)}</div>
         </div>
         <div className="messagePanel02">
           <div className="panelInfo"> {currentPlayer.name}&nbsp;{str_roleQualifier}&nbsp;<span style={{color: currentPlayer.color}}>{str_roleAttachedToName}</span>&nbsp;{lng.isPlaying}
             <br/>
             <span className="superLittlePanelInfo"> {str_currentStep} </span>
             <br/>
-            {renderTurnStepsBoard()}
+            {this.renderTurnStepsBoard()}
           </div>
         </div>
         <div className="actionPanel">
           { showBackButton ?
               <span className="rollBackButton">
                 <a className="actionTooltips" href="#">
-                  <img className="rollBackButtonImg" src="img/backButton.png" width="15" height="15" onClick= {() => handleRollBack(boardState.currentStep)}/>
-                  <span className="actionTooltipsForRollback inToolTipsText">{getStringInTheCatalog(lng, 'ah_rollback')}</span>
+                  <img className="rollBackButtonImg" src="img/backButton.png" width="15" height="15" onClick= {() => this.handleRollBack(this.state.currentStep)}/>
+                  <span className="actionTooltipsForRollback inToolTipsText">{this.getStringInTheCatalog(lng, 'ah_rollback')}</span>
                 </a>
               </span>
               : <span></span>
           }
-          {renderMessageBoard()}
+          {this.renderMessageBoard()}
           <div className="panelInfo" id="UserActions">
             
-              {boardState.possibleActions.map((action, index) =>
+              {this.state.possibleActions.map((action, index) =>
                 <>
-                    <button className="actionButton fullButton" onClick={() => handleActionClick(action.triggers)} >
-                      {getStringInTheCatalog(lng, action.locName)}
+                    <button className="actionButton fullButton" onClick={() => this.handleActionClick(action.triggers)} >
+                      {this.getStringInTheCatalog(lng, action.locName)}
                     </button>
-                    <a className="actionTooltips helpCharacterIcon" id={'tooltipAction' + index} href="#">?<span className="inToolTipsText">{getStringInTheCatalog(lng, action.locHelp)}</span></a>
+                    <a className="actionTooltips helpCharacterIcon" id={'tooltipAction' + index} href="#">?<span className="inToolTipsText">{this.getStringInTheCatalog(lng, action.locHelp)}</span></a>
                  </>
               )}
             
@@ -2950,76 +2960,80 @@ function handleTileClick(i) {
       </span>
     )
   }
-
-  function updateRadioButton()
+/*
+  updateRadioButton()
   {
 
   }
 
-  function doChangeCardInFormGiveACard(x){
+  doChangeCardInFormGiveACard(x){
     setBoardState({ 
       ...boardState, 
       chosenCard: x
     });
   }
 
-  function doChangeReceiverInFormGiveACard(x){
+  doChangeReceiverInFormGiveACard(x){
     setBoardState({ 
       ...boardState, 
       chosenReceiver: x
     });
   }
+  */
 
-  function renderMessageBoard() {
-    let lng = boardState.languageDistributor;
-    if (boardState.messageBoardState === "giveACardSequence"){
-      let giverId = boardState.players[boardState.currentPlayerPlaying].id;
-      let playersOnTheSameTileExceptMe = getPlayersOnTheSameTileExceptMe();
+  renderMessageBoard() {
+    let lng = this.state.languageDistributor;
+    if (this.state.messageBoardState === "giveACardSequence"){
+      let giverId = this.state.players[this.state.currentPlayerPlaying].id;
+      let playersOnTheSameTileExceptMe = this.getPlayersOnTheSameTileExceptMe();
       console.log('playersOnTheSameTileExceptMe = ' + playersOnTheSameTileExceptMe);// seems Ok
-      let chosenCard = boardState.players[giverId].cards.length === 1 ? boardState.players[giverId].cards[0].id : null;
+      let chosenCard = this.state.players[giverId].cards.length === 1 ? this.state.players[giverId].cards[0].id : null;
       let receiver = playersOnTheSameTileExceptMe.length === 1 ? playersOnTheSameTileExceptMe[0] : null;
 
       // set default
-      
+      // 2021 : don't know if I must keep this
+      /*
       if (playersOnTheSameTileExceptMe.length === 1)
       {
-        doChangeReceiverInFormGiveACard(playersOnTheSameTileExceptMe[0].id);
+        this.doChangeReceiverInFormGiveACard(playersOnTheSameTileExceptMe[0].id);
       } else {
-        doChangeReceiverInFormGiveACard(undefined);
-      }
-/*
-      if (boardState.players[giverId].cards.length === 1)
-      {
-        doChangeCardInFormGiveACard(boardState.players[giverId].cards[0].id);
-      } else {
-        doChangeCardInFormGiveACard(undefined);
+        this.doChangeReceiverInFormGiveACard(undefined);
       }
       */
-
+      // 2021 : don't know if I must keep this
+      /*
+      if (this.state.players[giverId].cards.length === 1)
+      {
+        this.doChangeCardInFormGiveACard(this.state.players[giverId].cards[0].id);
+      } else {
+        this.doChangeCardInFormGiveACard(undefined);
+      }
+      */
+      
       return (
           <div className="panelInfo" id="UserDialog">
             {lng.whichCardDoYouWantToGive}
                 { playersOnTheSameTileExceptMe.length === 1 ?
-                  (<span> {lng.to} <span style={{color: boardState.players[playersOnTheSameTileExceptMe[0]].color}}>{ boardState.players[playersOnTheSameTileExceptMe[0]].name} </span></span> )
+                  (<span> {lng.to} <span style={{color: this.state.players[playersOnTheSameTileExceptMe[0]].color}}>{ this.state.players[playersOnTheSameTileExceptMe[0]].name} </span></span> )
                   : <span></span>
                 }
             ? <br/>
             <table className="throwTable">
               <tbody>
             {
-              boardState.players[giverId].cards.length === 1 ?
+              this.state.players[giverId].cards.length === 1 ?
               <tr key="card0">
-                <td><input type="radio" name="chosenCard" key="0" checked="checked" value={boardState.players[giverId].cards[0].id} /*onChange={() => chosenCard = boardState.players[giverId].cards[0].id}*/ /></td>
-                <td>{ getStringInTheCatalog(lng, boardState.players[giverId].cards[0].loc_key)} </td>
-                <td><img src= {boardState.players[giverId].cards[0].url}  width="20px" height="32px"/></td>
+                <td><input type="radio" name="chosenCard" key="0" checked="checked" value={this.state.players[giverId].cards[0].id} /*onChange={() => chosenCard = this.state.players[giverId].cards[0].id}*/ /></td>
+                <td>{ this.getStringInTheCatalog(lng, this.state.players[giverId].cards[0].loc_key)} </td>
+                <td><img src= {this.state.players[giverId].cards[0].url}  width="20px" height="32px"/></td>
               </tr>
               :
               // dedoublonner
-              doDedoubleCards(boardState.players[giverId].cards).map((card, index) =>
+              this.doDedoubleCards(this.state.players[giverId].cards).map((card, index) =>
               <tr key={'card' + index}>
-                <td><input type="radio" name="chosenCard" key={index} value={card.id} onChange={() => doChangeCardInFormGiveACard(card.id)} /></td>
+                <td><input type="radio" name="chosenCard" key={index} value={card.id} onChange={() => chosenCard = card.id} /></td>
                 <td><img src= {card.url}  width="20px" height="32px"/></td>
-                <td>{getStringInTheCatalog(lng, card.loc_key)} <span className="superSmall">x{card.howMany}</span></td>
+                <td>{this.getStringInTheCatalog(lng, card.loc_key)} <span className="superSmall">x{card.howMany}</span></td>
               </tr>
               )
             }
@@ -3034,45 +3048,45 @@ function handleTileClick(i) {
             {
               playersOnTheSameTileExceptMe.length > 1 ?
                 playersOnTheSameTileExceptMe.map((player, index) => {
-                  let current_player = boardState.players[player];
-                    return <span key={'char'+index}><input type="radio" name="receiver" key={index} value={current_player.id} onChange={() => doChangeReceiverInFormGiveACard(current_player.id)}/><span style={{color: current_player.color}}>{current_player.name}</span><br/></span>
+                  let current_player = this.state.players[player];
+                    return <span key={'char'+index}><input type="radio" name="receiver" key={index} value={current_player.id} onChange={() => receiver = this.state.players[player].id}/><span style={{color: current_player.color}}>{current_player.name}</span><br/></span>
                   })
                 :
                 <span></span>
             }
-            <button className="actionButton" value="Give" onClick={() => doGiveACard(giverId, boardState.chosenCard, boardState.chosenReceiver)}> {lng.btn_give} </button>
-            <button className="actionButton" value="Cancel" onClick={() => cancelAnAction()}>{lng.btn_cancel}</button>
+            <button className="actionButton" value="Give" onClick={() => this.doGiveACard(giverId, chosenCard, receiver)}> {lng.btn_give} </button>
+            <button className="actionButton" value="Cancel" onClick={() => this.cancelAnAction()}>{lng.btn_cancel}</button>
           </div>
       )
-    } else if (boardState.messageBoardState === "sendACardSequence") {
-      let giverId = boardState.players[boardState.currentPlayerPlaying].id;
-      let otherPlayers = getPlayersIdsExceptMe(giverId);
-      let chosenCard = boardState.players[giverId].cards.length === 1 ? boardState.players[giverId].cards[0].id : null;
-      let receiver = otherPlayers.length === 1 ? otherPlayers[0] : null;
+    } else if (this.state.messageBoardState === "sendACardSequence") {
+      let giverId = this.state.players[this.state.currentPlayerPlaying].id;
+      let otherPlayers = this.getPlayersIdsExceptMe(giverId);
+      let chosenCard = this.state.players[giverId].cards.length === 1 ? this.state.players[giverId].cards[0].id : null;
+      let receiver = this.state.length === 1 ? otherPlayers[0] : null;
 
       return (
           <div className="panelInfo" id="UserDialog">
             {lng.whichCardDoYouWantToSend}
                     { otherPlayers.length === 1 ?
-                      (<span> {lng.to} <span style={{color: boardState.players[otherPlayers[0]].color}}> {boardState.players[otherPlayers[0]].name} </span></span> )
+                      (<span> {lng.to} <span style={{color: this.state.players[otherPlayers[0]].color}}> {this.state.players[otherPlayers[0]].name} </span></span> )
                       : <span></span>
                     }
             ? <br/>
             <table className="throwTable">
               <tbody>
             {
-              boardState.players[giverId].cards.length === 1 ?
+              this.state.players[giverId].cards.length === 1 ?
               <tr key="0">
-                <td><input type="radio" name="chosenCard" key="0" checked="checked" value={boardState.players[giverId].cards[0].id} onChange={() => chosenCard = boardState.players[giverId].cards[0].id} /></td>
-                <td><img src= {boardState.players[giverId].cards[0].url}  width="20px" height="32px"/></td>
-                <td>{ getStringInTheCatalog(lng, boardState.players[giverId].cards[0].loc_key) } </td>
+                <td><input type="radio" name="chosenCard" key="0" checked="checked" value={this.state.players[giverId].cards[0].id} onChange={() => chosenCard = this.state.players[giverId].cards[0].id} /></td>
+                <td><img src= {this.state.players[giverId].cards[0].url}  width="20px" height="32px"/></td>
+                <td>{ this.getStringInTheCatalog(lng, this.state.players[giverId].cards[0].loc_key) } </td>
               </tr>
               :
-              doDedoubleCards(boardState.players[giverId].cards).map((card, index) =>
+              this.doDedoubleCards(this.state.players[giverId].cards).map((card, index) =>
               <tr key={'card' + index}>
                 <td><input type="radio" name="chosenCard" key={index} value={card.id} onChange={() => chosenCard = card.id} /></td>
                 <td><img src= {card.url}  width="20px" height="32px"/></td>
-                <td>{ getStringInTheCatalog(lng, card.loc_key)} <span className="superSmall">x{card.howMany}</span></td>
+                <td>{ this.getStringInTheCatalog(lng, card.loc_key)} <span className="superSmall">x{card.howMany}</span></td>
               </tr>
               )
             }
@@ -3086,7 +3100,7 @@ function handleTileClick(i) {
             }
             {
               otherPlayers.length > 1 ?
-                 boardState.players.map((player, index) => {
+              this.state.players.map((player, index) => {
                   return (player.id != giverId) ?
                     (<span key={'char'+index}><input type="radio" name="receiver" key={index} value={player.id} onChange={() => receiver = player.id}/><span style={{color: player.color}}>{player.name}</span><br/></span>)
                     :
@@ -3095,11 +3109,11 @@ function handleTileClick(i) {
                 :
                 <span></span>
             }
-            <button className="actionButton" value="Give" onClick={() => doGiveACard(giverId, chosenCard, receiver)}> {lng.btn_send} </button>
-            <button className="actionButton" value="Cancel" onClick={() => cancelAnAction()}>{lng.btn_cancel}</button>
+            <button className="actionButton" value="Give" onClick={() => this.doGiveACard(giverId, chosenCard, receiver)}> {lng.btn_send} </button>
+            <button className="actionButton" value="Cancel" onClick={() => this.cancelAnAction()}>{lng.btn_cancel}</button>
           </div>
       )
-    } else if (boardState.messageBoardState === "ChooseCoTravellers") {
+    } else if (this.state.messageBoardState === "ChooseCoTravellers") {
         //let flyerId = boardState.cardUser;
         //let playersOnTheSameTileExceptMe = this.getPlayersOnTheSameTileExceptMe(flyerId);
 
@@ -3116,8 +3130,8 @@ function handleTileClick(i) {
         }
         */
 
-        boardState.players.map(p => {
-          whereAndWho[p.position] = boardState.tiles[p.position].playerOn; // may be redundant but.... who cares. Max of 4 iterations
+        this.state.players.map(p => {
+          whereAndWho[p.position] = this.state.tiles[p.position].playerOn; // may be redundant but.... who cares. Max of 4 iterations
         });
 
         console.log(JSON.stringify(whereAndWho));
@@ -3144,7 +3158,7 @@ function handleTileClick(i) {
                      {
                         playersOnT.map((playerId, indexPlayer) => {
                           return <span key={playerId}>
-                                  <input type="checkBox" name="traveller" id={"checkBoxAmadeusFor"+playerId} key={playerId} value={playerId} onChange={() => Amadeus(playerId, "checkBoxAmadeusFor"+playerId)} /><span style={{color: boardState.players[playerId].color}}>{boardState.players[playerId].name}</span><br/></span>
+                                  <input type="checkBox" name="traveller" id={"checkBoxAmadeusFor"+playerId} key={playerId} value={playerId} onChange={() => Amadeus(playerId, "checkBoxAmadeusFor"+playerId)} /><span style={{color: this.state.players[playerId].color}}>{this.state.players[playerId].name}</span><br/></span>
                         })
                       }
                       </div>)
@@ -3153,33 +3167,33 @@ function handleTileClick(i) {
                     )
                   }))
             }
-            <button className="actionButton" onClick={() => helicopterCardEnRoute(travellers)}>{lng.hopIn}</button>
+            <button className="actionButton" onClick={() => this.helicopterCardEnRoute(travellers)}>{lng.hopIn}</button>
           </div>
         )
-    } else if (boardState.messageBoardState === "moveSomeOneSequence") {
+    } else if (this.state.messageBoardState === "moveSomeOneSequence") {
       let puppet = null;
           return (
             <div className="panelInfo" id="UserDialog">
               {lng.whoDoYouWantToMove} <br/>
               {
-              (boardState.players.map((player, index) => {
+              (this.state.players.map((player, index) => {
                 return (player.role != "Navigator") ?
-                  (<span key={index}><input type="radio" name="puppet" key={index} value={player.id} onChange={() => doMoveSomeOne(player.id)}/><span style={{color: player.color}}>{player.name}</span><br/></span>)
+                  (<span key={index}><input type="radio" name="puppet" key={index} value={player.id} onChange={() => this.doMoveSomeOne(player.id)}/><span style={{color: player.color}}>{player.name}</span><br/></span>)
                   :
                   (<span key={index}></span>)
                 }))
               }
               <div>{lng.andMoveHimUpToTwoTiles}</div>
-              <button className="actionButton" value="Cancel" onClick={() => cancelAnAction()}>{lng.btn_cancel}</button>
+              <button className="actionButton" value="Cancel" onClick={() => this.cancelAnAction()}>{lng.btn_cancel}</button>
             </div>
           )
-    } else if (boardState.messageBoardState === "SolveOver5Cards") {
+    } else if (this.state.messageBoardState === "SolveOver5Cards") {
 
       // TODO set a RED border
-      let userId = boardState.cardUser;
-      let color = boardState.players[userId].color;
-      let name = boardState.players[userId].name;
-      // let cardsInHand = boardState.players[userId].cards;
+      let userId = this.state.cardUser;
+      let color = this.state.players[userId].color;
+      let name = this.state.players[userId].name;
+      // let cardsInHand = this.state.players[userId].cards;
       // console.log("user is : " + user + ". His cards : " + cardsInHand);
 
       return(
@@ -3189,19 +3203,19 @@ function handleTileClick(i) {
           <table className="throwTable">
             <tbody>
           {
-            (doDedoubleCards(boardState.players[userId].cards).map((card, index) => {
+            (this.doDedoubleCards(this.state.players[userId].cards).map((card, index) => {
               return (card.type === "H" || card.type === "SB") ?
                   (<tr>
                     <td><span key={index}/>{card.name} <span className="superSmall">x{card.howMany}</span></td>
                     <td> <img src= {card.url}  width="20px" height="32px"/></td>
-                    <td><button onClick={() => throwCard(card.type, index, userId)}>{lng.btn_throw}</button></td>
-                    <td><button onClick={() => useACardToGetRidOfIt(card.type, index, userId)}>{lng.btn_use}</button></td>
+                    <td><button onClick={() => this.throwCard(card.type, index, userId)}>{lng.btn_throw}</button></td>
+                    <td><button onClick={() => this.useACardToGetRidOfIt(card.type, index, userId)}>{lng.btn_use}</button></td>
                   </tr>)
                   :
                   (<tr>
                     <td><span key={index}/>{card.name} <span className="superSmall">x{card.howMany}</span></td>
                     <td> <img src= {card.url}  width="20px" height="32px"/></td>
-                    <td><button onClick={() => throwCard(card.type, index, userId)}>{lng.btn_throw}</button></td>
+                    <td><button onClick={() => this.throwCard(card.type, index, userId)}>{lng.btn_throw}</button></td>
                     <td></td>
                   </tr>)
             }))
@@ -3210,17 +3224,17 @@ function handleTileClick(i) {
           </table>
         </div>
       )
-    } else if (boardState.messageBoardState === "empty"){
+    } else if (this.state.messageBoardState === "empty"){
           return (
             // shouldn't happened.
             <div>++ empty ++</div>
           )
     } else {
-      let lng = boardState.languageDistributor;
+      let lng = this.state.languageDistributor;
       // classic message  with one button
-      let buttons = boardState.mainUserMessage.buttons;
-      let databag = boardState.mainUserMessage.databag;
-      let gameIsOver = boardState.gameIsOver;
+      let buttons = this.state.mainUserMessage.buttons;
+      let databag = this.state.mainUserMessage.databag;
+      let gameIsOver = this.state.gameIsOver;
 
       let showNextBtnStyle = (buttons.indexOf(0) >= 0)?({display: 'block'}):({display: 'none'});
       let showCancelBtnStyle = (buttons.indexOf(1) >= 0)?({display: 'block'}):({display: 'none'});
@@ -3239,11 +3253,11 @@ function handleTileClick(i) {
       // let msgEts = boardState.mainUserMessage.complexMessage;
 
       let translatedString = "";
-      if (boardState.mainUserMessage.complexMessage && boardState.mainUserMessage.complexMessage.length > 0){
-        translatedString = boardState.mainUserMessage.complexMessage;
+      if (this.state.mainUserMessage.complexMessage && this.state.mainUserMessage.complexMessage.length > 0){
+        translatedString = this.state.mainUserMessage.complexMessage;
       }
       else {
-        translatedString = getStringInTheCatalog(lng, boardState.mainUserMessage.message);
+        translatedString = this.getStringInTheCatalog(lng, this.state.mainUserMessage.message);
       }
 
       return(
@@ -3252,18 +3266,18 @@ function handleTileClick(i) {
           {
             //!gameIsOver ?
               (<div>
-                <button style={showNextBtnStyle} onClick ={() => controller("ActionIsDone")}>{lng.btn_next}</button>
-                <button style={showCancelBtnStyle} onClick ={() => cancelAnAction()}>{lng.btn_cancel}</button>
-                <button style={showPick2CardsBtnStyle01} onClick ={() => controller("PickTwoCardsONE")}>{lng.btn_pickTwoCardsFirst}</button>
-                <button style={showPick2CardsBtnStyle02} onClick ={() => controller("PickTwoCardsTWO")}>{lng.btn_pickTwocardsSec}</button>
-                <button style={showFloodBtnStyle} onClick ={() => controller("PlayerFlood")}>{lng.btn_flood}</button>
-                <button style={showNextFloodingBtnStyle} onClick ={() => doFloodATile(databag.nextFloodingNumber, databag.outOf)}>{lng.btn_nextFlooding}</button>
-                <button style={showCancelSandBagCardStyle} onClick ={() => cancelSandBagCardPick()}>{lng.btn_cancel}</button>
-                <button style={showCancelHelicopterCardStyle} onClick ={() => cancelHelicopterCardPick()}>{lng.btn_cancelTheFlight}</button>
-                <button style={showEvacuateStyle} onClick ={() => doEvacuate()}>{lng.btn_evacuate}</button>
-                <button style={showCheckIfMoreThan5Style} onClick ={() => doCheckIfMoreThan5CardsInHand(0, databag.userId)}>{lng.btn_next}</button>
-                <button style={showCheckIfMoreThan5SecondTimeStyle} onClick ={() => doCheckIfMoreThan5CardsInHand(1, boardState.cardUser)}>{lng.btn_next}</button>
-                <button style={showThisIsTheEndMyFriend} onClick ={() => doShowGameIsLost()}>{lng.btn_fate}</button>
+                <button style={showNextBtnStyle} onClick ={() => this.controller("ActionIsDone")}>{lng.btn_next}</button>
+                <button style={showCancelBtnStyle} onClick ={() => this.cancelAnAction()}>{lng.btn_cancel}</button>
+                <button style={showPick2CardsBtnStyle01} onClick ={() => this.controller("PickTwoCardsONE")}>{lng.btn_pickTwoCardsFirst}</button>
+                <button style={showPick2CardsBtnStyle02} onClick ={() => this.controller("PickTwoCardsTWO")}>{lng.btn_pickTwocardsSec}</button>
+                <button style={showFloodBtnStyle} onClick ={() => this.controller("PlayerFlood")}>{lng.btn_flood}</button>
+                <button style={showNextFloodingBtnStyle} onClick ={() => this.doFloodATile(databag.nextFloodingNumber, databag.outOf)}>{lng.btn_nextFlooding}</button>
+                <button style={showCancelSandBagCardStyle} onClick ={() => this.cancelSandBagCardPick()}>{lng.btn_cancel}</button>
+                <button style={showCancelHelicopterCardStyle} onClick ={() => this.cancelHelicopterCardPick()}>{lng.btn_cancelTheFlight}</button>
+                <button style={showEvacuateStyle} onClick ={() => this.doEvacuate()}>{lng.btn_evacuate}</button>
+                <button style={showCheckIfMoreThan5Style} onClick ={() => this.doCheckIfMoreThan5CardsInHand(0, databag.userId)}>{lng.btn_next}</button>
+                <button style={showCheckIfMoreThan5SecondTimeStyle} onClick ={() => this.doCheckIfMoreThan5CardsInHand(1, this.state.cardUser)}>{lng.btn_next}</button>
+                <button style={showThisIsTheEndMyFriend} onClick ={() => this.doShowGameIsLost()}>{lng.btn_fate}</button>
               </div>)
             //  :
             //  (<div>
@@ -3275,13 +3289,13 @@ function handleTileClick(i) {
     }
   }// end of renderMessageBoard
 
-  function renderTurnStepsBoard(){
-    let curColor = boardState.players[boardState.currentPlayerPlaying].color;
-    if (boardState.players[boardState.currentPlayerPlaying].role === "Messenger"){
+  renderTurnStepsBoard(){
+    let curColor = this.state.players[this.state.currentPlayerPlaying].color;
+    if (this.state.players[this.state.currentPlayerPlaying].role === "Messenger"){
       curColor = "#CCCCCC";
     }
 
-    let step = boardState.currentStep;
+    let step = this.state.currentStep;
 
     return(
       <div>
@@ -3330,16 +3344,16 @@ function handleTileClick(i) {
     )
   }
 
-  function lightTheTiles(t, color){
+  lightTheTiles(t, color){
     for (let i = 0; i < t.length; i++){
       document.getElementById("square" + t[i]).style.border = "3px solid " + color;
     }
     return true;
   }
 
-  function unlightTheTiles() {
+  unlightTheTiles() {
     for (let i = 0; i < 24; i++){
-      if (boardState.tiles[i].isDrawned === false && boardState.tiles[i].isDrawning === false ){
+      if (this.state.tiles[i].isDrawned === false && this.state.tiles[i].isDrawning === false ){
         document.getElementById("square" + i).style.border = "1px solid #222";
       } else {
         document.getElementById("square" + i).style.border = "1px solid transparent";// transparent
@@ -3348,12 +3362,12 @@ function handleTileClick(i) {
     return true;
   }
 
-  function blinkATile(tileId) {// never called
-      customAlert("blikATile is Called for tile " + tileId);
+  blinkATile(tileId) {// never called
+      this.customAlert("blikATile is Called for tile " + tileId);
       document.getElementById("square" + tileId).classList.add('blink');
   }
 
-  function unblinkTheTiles() {
+  unblinkTheTiles() {
       for (let i = 0; i < 24; i++){
         if ( document.getElementById("square" + i).classList.contains('blink') ){
           document.getElementById("square" + i).className =
@@ -3362,24 +3376,24 @@ function handleTileClick(i) {
       }
   }
 
-  function blinkAPlayer(playerId) {
+  blinkAPlayer(playerId) {
       document.getElementById("player" + playerId).classList.add('blink');
   }
 
-  function unblinkAPlayer(playerId) {
+  unblinkAPlayer(playerId) {
       if ( document.getElementById("player" + playerId).classList.contains('blink') ){
           document.getElementById("player" + playerId).className.replace( /(?:^|\s)blink(?!\S)/g , '' )
        }
   }
 
-  function retryANewGame(){
+  retryANewGame(){
     if (!window.location.hash)
     {
-        window.location.search = "?lang=" + boardState.selectedLanguage + "&difficulty=" + boardState.difficultyLevel + "&nbrOfPlayers=" + boardState.nbrOfPlayers;
+        window.location.search = "?lang=" + this.state.selectedLanguage + "&difficulty=" + this.state.difficultyLevel + "&nbrOfPlayers=" + this.state.nbrOfPlayers;
     }
   }
 
-  function getTreasureNameById(id){
+  getTreasureNameById(id){
     console.log("In getTreasureById with : " + id);
     /*
     for (let i = 0; i < treasures.length; i ++){
@@ -3394,10 +3408,10 @@ function handleTileClick(i) {
         return treasure.id === id;
     })
 
-    return getStringInTheCatalog(boardState.languageDistributor, t[0].loc_key);
+    return (this.state.languageDistributor, t[0].loc_key);
   }
 
-  function actionIsInThePossibleActionsListAlready(actionName){
+  actionIsInThePossibleActionsListAlready(actionName){
     /*
     for(let i = 0 ; i < boardState.possibleActions.length; i++){
       if (boardState.possibleActions[i].name === actionName){
@@ -3407,37 +3421,37 @@ function handleTileClick(i) {
     return false;
     */
 
-    let a = boardState.possibleActions.filter( possibleAction => {
+    let a = this.state.possibleActions.filter( possibleAction => {
       return possibleAction.name === actionName ;
     });
 
     return a.length > 0;
   }
 
-  function unlightATile(i) {
+  unlightATile(i) {
       document.getElementById("square" + i).style.border = "1px solid #222";
   }
 
-  function hideActionButtons() {
+  hideActionButtons() {
       document.getElementById("UserActions").style.display = "none";
   }
 
-  function showActionButtons() {
+  showActionButtons() {
       document.getElementById("UserActions").style.display = "block";
   }
 
-  function customAlert(msg) {
+  customAlert(msg) {
     document.getElementById("blockAll").classList.add('blockAll');
     document.getElementById('alertText').innerHTML = msg;
     document.getElementById("customAlert").style.display = "block";
   }
 
-  function clearCustomAlert(){
+  clearCustomAlert(){
     document.getElementById("blockAll").classList.remove('blockAll');
     document.getElementById("customAlert").style.display = "none";
   }
 
-  function doDedoubleCards(arrayOfCards) {
+  doDedoubleCards(arrayOfCards) {
       let output = [];
       let alreadyIn = [];
       if (arrayOfCards.length > 0) {
@@ -3475,45 +3489,51 @@ function handleTileClick(i) {
       return output;
   }
 
-  function doChangeLang(){
-    if (boardState.languageDistributor.currentLanguage === "FR"){
+  doChangeLang(){
+    if (this.state.languageDistributor.currentLanguage === "FR"){
         document.getElementById("langToggle").src = "img/toggle_left.png";
-        // this.setState({languageDistributor: stringsCatalog.en});
+        this.setState({languageDistributor: stringsCatalog.en});
         // this.ss_languageDistributor(stringsCatalog.en);
+        /*
         setBoardState({ 
           ...boardState, 
           languageDistributor: stringsCatalog.en
-        });
+        });*/
     } else {
         document.getElementById("langToggle").src = "img/toggle_right.png";
-        //this.setState({languageDistributor: stringsCatalog.fr});
+        this.setState({languageDistributor: stringsCatalog.fr});
         //this.ss_languageDistributor(stringsCatalog.fr);
+        /*
         setBoardState({ 
           ...boardState, 
           languageDistributor: stringsCatalog.fr
         });
+        */
     }
   }
 
-  function doSetLang(lang){
-    if (lang === "FR" && !boardState.languageDistributor.currentLanguage === "FR"){
-        // this.setState({languageDistributor: stringsCatalog.fr});
+  doSetLang(lang){
+    if (lang === "FR" && !this.state.languageDistributor.currentLanguage === "FR"){
+        this.setState({languageDistributor: stringsCatalog.fr});
         // this.ss_languageDistributor(stringsCatalog.fr);
+        /*
         setBoardState({ 
           ...boardState, 
           languageDistributor: stringsCatalog.fr
-        });
-    } else if (lang === "EN" && !boardState.languageDistributor.currentLanguage === "EN"){
-        //this.setState({languageDistributor: stringsCatalog.en});
+        });*/
+    } else if (lang === "EN" && !this.state.languageDistributor.currentLanguage === "EN"){
+        this.setState({languageDistributor: stringsCatalog.en});
         //this.ss_languageDistributor(stringsCatalog.en);
+        /*
         setBoardState({ 
           ...boardState, 
           languageDistributor: stringsCatalog.en
         });
+        */
     }
   }
 
-  function getStringInTheCatalog(distributor, input){
+  getStringInTheCatalog(distributor, input){
 
       let catalog = Object.entries(distributor); // TODO : Object is created everytime
       let stringInput = input.toString();
@@ -3536,56 +3556,56 @@ function handleTileClick(i) {
       //return "YYYYY FIX ME YYYYY";
   }
 
-  function launchGameOver(gameIsWon, gameIsLost, msg){
-    customAlert("Mow SHOULDN't BE USED ANY MORE");
-    /*
+  launchGameOver(gameIsWon, gameIsLost, msg){
+    this.customAlert("Mow SHOULDN't BE USED ANY MORE");
+    
     this.setState({
       gameIsOver: true,
       gameIsLost: gameIsLost,
       gameIsWon: gameIsWon,
       endMessage: msg,
-      */
-
+    });
+    /*
      setBoardState({ 
       ...boardState, 
       gameIsOver: true,
       gameIsLost: gameIsLost,
       gameIsWon: gameIsWon,
       endMessage: msg,
-    });
+    });*/
   }
 
-  function renderGameOverPanel(msg) {
+  renderGameOverPanel(msg) {
     document.getElementById("blockAll").classList.add('blockAll');
-    let lng = boardState.languageDistributor;
+    let lng = this.state.languageDistributor;
     return (
         <span>
           <div className="game-over-title">[ Gamovah' ]</div>
           <div className="game-over-msg">{msg}</div>
-          <div className="game-over-btn"><button onClick ={() => retryANewGame()}>{lng.btn_retry}</button></div>
+          <div className="game-over-btn"><button onClick ={() => this.retryANewGame()}>{lng.btn_retry}</button></div>
         </span>
     );
   }
 
-  function renderVictoryPanel(i) {
+  renderVictoryPanel(i) {
     document.getElementById("blockAll").classList.add('blockAll');
-    let lng = boardState.languageDistributor;
-    let msg = lng.youWonMsg.format(boardState.nbrOfPlayers);
+    let lng = this.state.languageDistributor;
+    let msg = lng.youWonMsg.format(this.state.nbrOfPlayers);
 
     return (
         <span>
           <div className="game-over-title">[ congratulations ]</div>
           <div className="game-over-msg">{msg}</div>
-          <div className="game-over-btn"><button onClick ={() => retryANewGame()}>{lng.btn_retry}</button></div>
+          <div className="game-over-btn"><button onClick ={() => this.retryANewGame()}>{lng.btn_retry}</button></div>
         </span>
     );
   }
 
   // rendering de Board
-  //render() {
+  render() {
       // Flood-O-meter values for the needle
       let fOm_position_value = "relative";
-      let fOm_left_value = 5 + ((boardState.floodMeter.level - 1) * 33);
+      let fOm_left_value = 5 + ((this.state.floodMeter.level - 1) * 33);
       let fOm_top_value = -70;
 
       // calculate length of the jauges in px
@@ -3593,85 +3613,85 @@ function handleTileClick(i) {
       let nbrOfFloodCards = 24;
       //117 is cellJauge px in css
       let cellJaugepx = 117;
-      let floodCardsJaugeWidth = (boardState.floodCardsLeap.length * (cellJaugepx - 10)) / nbrOfFloodCards;
-      let playerCardsJaugeWidth = (boardState.playerCardsLeap.length * (cellJaugepx - 10)) / nbrOfPlayerCards;
+      let floodCardsJaugeWidth = (this.state.floodCardsLeap.length * (cellJaugepx - 10)) / nbrOfFloodCards;
+      let playerCardsJaugeWidth = (this.state.playerCardsLeap.length * (cellJaugepx - 10)) / nbrOfPlayerCards;
 
-      let floodCardsDiscardJaugeWidth = (boardState.floodCardsDiscard.length * (cellJaugepx - 10)) / nbrOfFloodCards;
-      let playerCardsDiscardJaugeWidth = (boardState.playerCardsDiscard.length * (cellJaugepx - 10)) / nbrOfPlayerCards;
-      let lng = boardState.languageDistributor;
+      let floodCardsDiscardJaugeWidth = (this.state.floodCardsDiscard.length * (cellJaugepx - 10)) / nbrOfFloodCards;
+      let playerCardsDiscardJaugeWidth = (this.state.playerCardsDiscard.length * (cellJaugepx - 10)) / nbrOfPlayerCards;
+      let lng = this.state.languageDistributor;
 
     return (
       <div  className="littleCopyrightLine">
         <div id="customAlert" className="custom-alert-panel">
               <div id="alertText" className="alertText">Ce message ne devrais jamais s'afficher.</div>
-              <div id="alertCloseButton" className="alertCloseButton" onClick={() => clearCustomAlert()}>{lng.btn_understood}</div>
+              <div id="alertCloseButton" className="alertCloseButton" onClick={() => this.clearCustomAlert()}>{lng.btn_understood}</div>
         </div>
 
         <div className="littleCopyrightLine">{lng.copyright}</div>
         <div>
-          {boardState.showGameIsLost ?
+          {this.state.showGameIsLost ?
             <div id="game-over-panel" className="game-lost-panel">
-              {renderGameOverPanel(boardState.endMessage)}
+              {this.renderGameOverPanel(this.state.endMessage)}
             </div> : <div></div>
           }
-          {boardState.gameIsWon ?
+          {this.state.gameIsWon ?
             <div id="game-over-panel" className="game-won-panel">
-              {renderGameOverPanel(boardState.endMessage)}
+              {this.renderGameOverPanel(this.state.endMessage)}
             </div> : <div></div>
           }
           <div id="blockAll">
           <div className="messageBoard-column">
-            {renderPlayerMessagePanel()}
+            {this.renderPlayerMessagePanel()}
           </div>
           <div className="board-column">
             <div className="islandBoard" style={{ backgroundImage: "url('img/sea05.png')"}}>
               <div className="board-row">
-                {renderTreasureSquare("ST")}
-                {renderEmptySquare()}
-                {renderSquare(0)}
-                {renderSquare(1)}
-                {renderEmptySquare()}
-                {renderTreasureSquare("SC")}
+                {this.renderTreasureSquare("ST")}
+                {this.renderEmptySquare()}
+                {this.renderSquare(0)}
+                {this.renderSquare(1)}
+                {this.renderEmptySquare()}
+                {this.renderTreasureSquare("SC")}
               </div>
               <div className="board-row">
-                {renderEmptySquare()}
-                {renderSquare(2)}
-                {renderSquare(3)}
-                {renderSquare(4)}
-                {renderSquare(5)}
-                {renderEmptySquare()}
+                {this.renderEmptySquare()}
+                {this.renderSquare(2)}
+                {this.renderSquare(3)}
+                {this.renderSquare(4)}
+                {this.renderSquare(5)}
+                {this.renderEmptySquare()}
               </div>
               <div className="board-row">
-                {renderSquare(6)}
-                {renderSquare(7)}
-                {renderSquare(8)}
-                {renderSquare(9)}
-                {renderSquare(10)}
-                {renderSquare(11)}
+                {this.renderSquare(6)}
+                {this.renderSquare(7)}
+                {this.renderSquare(8)}
+                {this.renderSquare(9)}
+                {this.renderSquare(10)}
+                {this.renderSquare(11)}
               </div>
               <div className="board-row">
-                {renderSquare(12)}
-                {renderSquare(13)}
-                {renderSquare(14)}
-                {renderSquare(15)}
-                {renderSquare(16)}
-                {renderSquare(17)}
+                {this.renderSquare(12)}
+                {this.renderSquare(13)}
+                {this.renderSquare(14)}
+                {this.renderSquare(15)}
+                {this.renderSquare(16)}
+                {this.renderSquare(17)}
               </div>
               <div className="board-row">
-                {renderEmptySquare()}
-                {renderSquare(18)}
-                {renderSquare(19)}
-                {renderSquare(20)}
-                {renderSquare(21)}
-                {renderEmptySquare()}
+                {this.renderEmptySquare()}
+                {this.renderSquare(18)}
+                {this.renderSquare(19)}
+                {this.renderSquare(20)}
+                {this.renderSquare(21)}
+                {this.renderEmptySquare()}
               </div>
               <div className="board-row">
-                {renderTreasureSquare("CU")}
-                {renderEmptySquare()}
-                {renderSquare(22)}
-                {renderSquare(23)}
-                {renderEmptySquare()}
-                {renderTreasureSquare("CR")}
+                {this.renderTreasureSquare("CU")}
+                {this.renderEmptySquare()}
+                {this.renderSquare(22)}
+                {this.renderSquare(23)}
+                {this.renderEmptySquare()}
+                {this.renderTreasureSquare("CR")}
               </div>
             </div>
             <div className="floodOmeter">
@@ -3680,281 +3700,228 @@ function handleTileClick(i) {
             </div>
             <table className="cardsPilesTable">
               <tbody>
-              <tr><th colSpan="2">{boardState.languageDistributor.playerCards}</th><th colSpan="2">{boardState.languageDistributor.floodCards}</th></tr>
+              <tr><th colSpan="2">{this.state.languageDistributor.playerCards}</th><th colSpan="2">{this.state.languageDistributor.floodCards}</th></tr>
               <tr style={{height: '18px'}}>
-                <td className="cellTitle" >{boardState.languageDistributor.leap}</td><td className="cellJauge" ><table className="invisiTable"><tbody><tr className="invisiTable"><td className="jaugePlayer invisiTable" style={{width: playerCardsJaugeWidth}}></td><td className="superSmall invisiTable">{boardState.playerCardsLeap.length}</td></tr></tbody></table></td>
-                <td className="cellTitle">{boardState.languageDistributor.leap}</td><td className="cellJauge"><table className="invisiTable"><tbody><tr className="invisiTable"><td className="jaugeFlood invisiTable" style={{width: floodCardsJaugeWidth}}></td><td className="superSmall invisiTable">{boardState.floodCardsLeap.length}</td></tr></tbody></table></td>
+                <td className="cellTitle" >{this.state.languageDistributor.leap}</td><td className="cellJauge" ><table className="invisiTable"><tbody><tr className="invisiTable"><td className="jaugePlayer invisiTable" style={{width: playerCardsJaugeWidth}}></td><td className="superSmall invisiTable">{this.state.playerCardsLeap.length}</td></tr></tbody></table></td>
+                <td className="cellTitle">{this.state.languageDistributor.leap}</td><td className="cellJauge"><table className="invisiTable"><tbody><tr className="invisiTable"><td className="jaugeFlood invisiTable" style={{width: floodCardsJaugeWidth}}></td><td className="superSmall invisiTable">{this.state.floodCardsLeap.length}</td></tr></tbody></table></td>
               </tr>
               <tr>
-                <td className="cellTitle">{boardState.languageDistributor.discard}</td><td className="cellJauge"><table className="invisiTable"><tbody><tr className="invisiTable"><td className="jaugePlayer invisiTable" style={{width: playerCardsDiscardJaugeWidth}}></td><td className="superSmall invisiTable">{boardState.playerCardsDiscard.length}</td></tr></tbody></table></td>
-                <td className="cellTitle">{boardState.languageDistributor.discard}</td><td className="cellJauge"><table className="invisiTable"><tbody><tr className="invisiTable"><td className="jaugeFlood invisiTable" style={{width: floodCardsDiscardJaugeWidth}}></td><td className="superSmall invisiTable">{boardState.floodCardsDiscard.length}</td></tr></tbody></table></td>
+                <td className="cellTitle">{this.state.languageDistributor.discard}</td><td className="cellJauge"><table className="invisiTable"><tbody><tr className="invisiTable"><td className="jaugePlayer invisiTable" style={{width: playerCardsDiscardJaugeWidth}}></td><td className="superSmall invisiTable">{this.state.playerCardsDiscard.length}</td></tr></tbody></table></td>
+                <td className="cellTitle">{this.state.languageDistributor.discard}</td><td className="cellJauge"><table className="invisiTable"><tbody><tr className="invisiTable"><td className="jaugeFlood invisiTable" style={{width: floodCardsDiscardJaugeWidth}}></td><td className="superSmall invisiTable">{this.state.floodCardsDiscard.length}</td></tr></tbody></table></td>
               </tr>
             </tbody>
             </table>
           </div>
           <div className="playerBoard-column">
             <div>
-                {renderPlayerBoard(0)}
-                {renderPlayerBoard(1)}
-                {boardState.nbrOfPlayers > 2 ? renderPlayerBoard(2) : <span></span> }
-                {boardState.nbrOfPlayers > 3 ? renderPlayerBoard(3) : <span></span> }
+                {this.renderPlayerBoard(0)}
+                {this.renderPlayerBoard(1)}
+                {this.state.nbrOfPlayers > 2 ? this.renderPlayerBoard(2) : <span></span> }
+                {this.state.nbrOfPlayers > 3 ? this.renderPlayerBoard(3) : <span></span> }
             </div>
           </div>
         </div>
         </div>
     </div>
     );
-  //} of render
-}
+  } // end of render
+} // end of Board Class
 
-/* VOIR DANS LA PLAYER LEAP / DISCARD
 
+////VOIR DANS LA PLAYER LEAP / DISCARD
+/*
 <div className="playerBoard-column">
   <table border="1">
       <tr><th>Leap</th><th>Discard</th></tr>
       <tr><td>{
-        boardState.playerCardsLeap.map((card,index) =>
+        this.state.playerCardsLeap.map((card,index) =>
           <span id={index} class="superSmall">{card.name}<br/></span>
         )
       }</td>
       <td>{
-        boardState.playerCardsDiscard.map((card,index) =>
+        this.state.playerCardsDiscard.map((card,index) =>
           <span id={index} class="superSmall">{card.name}<br/></span>
         )
       }</td></tr>
   </table>
 </div>
 
-VOIR DANS LE Flood Leap
+// VOIR DANS LE Flood Leap
 <div className="playerBoard-column">
   <table border="1">
       <tr><th>Leap</th><th>Discard</th></tr>
       <tr><td>{
-        boardState.floodCardsLeap.map((card,index) =>
+        this.state.floodCardsLeap.map((card,index) =>
           <span id={index} class="superSmall">{card.name}<br/></span>
         )
       }</td>
       <td>
         {
-        boardState.floodCardsDiscard.map((card,index) =>
+        this.state.floodCardsDiscard.map((card,index) =>
           <span id={index} class="superSmall">{card.name}<br/></span>
         )
       }
     </td>
     <td>{
-      boardState.floodCardsOutOfGame.map((card, index) =>
+      this.state.floodCardsOutOfGame.map((card, index) =>
         <span id={index} class="superSmall">{card.name}<br/></span>)
       }
     </td></tr>
   </table>
 </div>
-</span>
 */
+
 ////// END OF Board Class
 
 
-/*
-ReactDOM.render(
-  <>
-    <ColorTool colors={colorList}/>,
-    <CarTool cars={carList}/>
-  </>,
+class Game extends React.Component {
+  constructor(props) {
+   super(props);
 
-  document.querySelector('#root'),
-);
-*/
+   // DEFAULT ENTRIES :::INIT
+   let difficulty = 2;
+   let language = "EN";
+   let nbrOfPlayers = 4;
+   let versionNumber = "v0.8.6 BETA";
 
+   // lets' try to get params from GET
+   let propagatedDifficulty = null;
+   let propagatedLanguage = null;
+   let propagatedNbrOfPlayers = null;
 
+   let current_url = window.location.href;
+   let splittedUrl = current_url.split('?');
 
+   let params = new URLSearchParams(splittedUrl[1]);
 
+   if (params){
+     if (params.has('difficulty')){
+       propagatedDifficulty = parseInt(params.get('difficulty'));
+       if (!propagatedDifficulty.isNan && propagatedDifficulty < 5 && propagatedDifficulty > 0){
+         difficulty = propagatedDifficulty;
+       }
+     }
 
-function launchBoard(){
-  /*
-  this.setState(
-  { difficultyLevel: boardState.difficultyLevel,
-  versionNumber: boardState.versionNumber,
-  nbrOfPlayers: boardState.nbrOfPlayers,
-  showStartPanel: false,
-  showBoardPanel: true });
-  */
-  
-  // ss_difficultyLevel(s_difficultyLevel);
+     if (params.has('nbrOfPlayers')){
+       propagatedNbrOfPlayers = parseInt(params.get('nbrOfPlayers'));
+       if (!propagatedNbrOfPlayers.isNan && propagatedNbrOfPlayers > 0 && propagatedNbrOfPlayers < 5){
+         nbrOfPlayers = propagatedNbrOfPlayers;
+       }
+     }
 
-  // ss_nbrOfPlayers(s_nbrOfPlayers);
+     if (params.has('lang')){
+       propagatedLanguage = params.get('lang');
+       if (propagatedLanguage === 'FR' || propagatedLanguage === 'EN'){
+         language = propagatedLanguage;
+       }
+     }
+   }
 
-  this.setState({ 
-    ...this.state, 
-    showStartPanel: false,
-    showBoardPanel: true
-  });
+   let stringcat = language === "EN" ? stringsCatalog.en : stringsCatalog.fr;
 
-  ReactDOM.render(
-    <Board nbrOfPlayers={this.state.nbrOfPlayers} difficultyLevel={this.state.difficultyLevel} language={this.state.language} versionNumber={this.state.versionNumber}/>,
-  document.getElementById('game-board'));
+   this.state = {
+     showStartPanel: true,
+     showBoardPanel: true,
+     showGameOverPanel: false,
+     languageDistributor: stringcat,
+     difficultyLevel: difficulty,
+     // HACK
+     // difficultyLevel: 9,
+     language: language,
+     nbrOfPlayers: nbrOfPlayers,
+     versionNumber: versionNumber
+   };
   }
 
-export default function Game() {
-
-    let difficulty = 2;
-    let language = "EN";
-    let nbrOfPlayers = 4;
-    let versionNumber = "v0.9.0 BETA";
-  
-    // lets' try to get params from GET
-    let propagatedDifficulty = null;
-    let propagatedLanguage = null;
-    let propagatedNbrOfPlayers = null;
-  
-    let current_url = window.location.href;
-    let splittedUrl = current_url.split('?');
-  
-    let params = new URLSearchParams(splittedUrl[1]);
-  
-    if (params){
-      if (params.has('difficulty')){
-        propagatedDifficulty = parseInt(params.get('difficulty'));
-        if (!propagatedDifficulty.isNan && propagatedDifficulty < 5 && propagatedDifficulty > 0){
-          difficulty = propagatedDifficulty;
-        }
-      }
-  
-      if (params.has('nbrOfPlayers')){
-        propagatedNbrOfPlayers = parseInt(params.get('nbrOfPlayers'));
-        if (!propagatedNbrOfPlayers.isNan && propagatedNbrOfPlayers > 0 && propagatedNbrOfPlayers < 5){
-          nbrOfPlayers = propagatedNbrOfPlayers;
-        }
-      }
-  
-      if (params.has('lang')){
-        propagatedLanguage = params.get('lang');
-        if (propagatedLanguage === 'FR' || propagatedLanguage === 'EN'){
-          language = propagatedLanguage;
-        }
-      }
-    }
-  
-    let stringcat = language === "EN" ? stringsCatalog.en : stringsCatalog.fr;
-
-    const [ state , setState ]  = useState({
-      showStartPanel: true,
-      showBoardPanel: false,
-      showGameOverPanel: false,
-      languageDistributor: stringcat,
-      difficultyLevel: difficulty,
-      language: language,
-      nbrOfPlayers: nbrOfPlayers,
-      versionNumber: versionNumber
-    })
-    
-    let lng = state.languageDistributor;
-
-    const showHideStartPanel = {
-      'display': state.showStartPanel ? 'block' : 'none'
-    };
-
-    const showHideGameOverPanel = {
-      'display': state.showGameOverPanel ? 'block' : 'none'
-    };
-
-    const showHideBoardPanel = {
-      'display': state.showBoardPanel ? 'block' : 'none'
-    };
-
-    let radioHowMany2 = state.nbrOfPlayers === 2 ? "checked" : "";
-    let radioHowMany3 = state.nbrOfPlayers === 3 ? "checked" : "";
-    let radioHowMany4 = state.nbrOfPlayers === 4 ? "checked" : "";
-
-    let radioDifficulty1 = state.difficultyLevel === 1 ? "checked" : "";
-    let radioDifficulty2 = state.difficultyLevel === 2 ? "checked" : "";
-    let radioDifficulty3 = state.difficultyLevel === 3 ? "checked" : "";
-    let radioDifficulty4 = state.difficultyLevel === 4 ? "checked" : "";
-
-    function doChangeDifficulty(x){
-      setState({ 
-        ...state, 
-        difficultyLevel: x
-      });
-    }
-
-    function doChangeNbrOfPlayers(x){
-      setState({ 
-        ...state, 
-        nbrOfPlayers: x
-      });
-    }
-    
-    function doChangeDifficulty(x){
-      setState({ 
-        ...state, 
-        difficultyLevel: x
-      });
-    }
-
-    function doChangeLangSelector() {
-      let l = null;
-      let ld = null;
-
-      if (state.language === "FR"){
+   doChangeLangSelector(){
+      if (this.state.language === "FR"){
           document.getElementById("homeLangToggle").src = "img/toggle_left.png";
-          l = "EN";
-          ld = stringsCatalog.en;
+          this.setState({language: "EN",
+                         languageDistributor: stringsCatalog.en });
       } else {
           document.getElementById("homeLangToggle").src = "img/toggle_right.png";
-          l = "FR";
-          ld = stringsCatalog.fr;
+          this.setState({language: "FR",
+                         languageDistributor: stringsCatalog.fr});
       }
-
-      setState({ 
-        ...state, 
-        language: l,
-        languageDistributor: ld
-      });
-    };
-
-    function launchBoard(){
-
-      setState({ 
-        ...state, 
-        showStartPanel: false,
-        showBoardPanel: true
-      });
-
-      ReactDOM.render(
-        <Board nbrOfPlayers={state.nbrOfPlayers} difficultyLevel={state.difficultyLevel} language={state.language} versionNumber={state.versionNumber}/>,
-      document.getElementById('game-board'));
-    
     }
 
-    return (
-      <div className="game">
-        <div className="game-board" id="game-board" style={showHideBoardPanel}></div>
-        <div id="start-panel" className="game-start-panel" style={showHideStartPanel}>
-          <div className="panelTitle"> {lng.mainTitle01}<br/>::ReactJS::<br/>{lng.mainTitle02}<br/><span className="littlePanelInfo">{state.versionNumber}</span></div>
-          <div className="introChoices">
-            <div>{lng.welcomeIntro}</div>
-            <div>{lng.howManyAdventurers}
-                  | 2 <input type="radio" name="howManyAdventurers" key="howManyAdventurers2" checked={radioHowMany2} value='2' onChange={() => doChangeNbrOfPlayers(2)}/> |
-                    3 <input type="radio" name="howManyAdventurers" key="howManyAdventurers3" checked={radioHowMany3} value='3' onChange={() => doChangeNbrOfPlayers(3)}/> |
-                    4 <input type="radio" name="howManyAdventurers" key="howManyAdventurers4" checked={radioHowMany4} value='4' onChange={() => doChangeNbrOfPlayers(4)}/> |
-            </div>
-            <div>{lng.howDifficult}
-                    | {lng.novice} <input type="radio" name="WhichDifficulty" key="WhichDifficulty1" checked={radioDifficulty1} value='1' onChange={() => doChangeDifficulty(1)}/> |
-                    {lng.normal} <input type="radio" name="WhichDifficulty" key="WhichDifficulty2" checked={radioDifficulty2} value='2' onChange={() => doChangeDifficulty(2)}/> |
-                    {lng.elite} <input type="radio" name="WhichDifficulty" key="WhichDifficulty3" checked={radioDifficulty3} value='3' onChange={() => doChangeDifficulty(3)}/> |
-                    {lng.legendary} <input type="radio" name="WhichDifficulty" key="WhichDifficulty4" checked={radioDifficulty4} value='4' onChange={() => doChangeDifficulty(4)}/> |
-              </div>
-              {lng.language === "FR" ?
-                <div>{lng.language} English <img id="homeLangToggle" src="img/toggle_right.png" onClick={() => doChangeLangSelector()} /> Français</div>
-                :
-                <div>{lng.language} English <img id="homeLangToggle" src="img/toggle_left.png" onClick={() => doChangeLangSelector()} /> Français</div>
-              }
+    doChangeNbrOfPlayers(x){
+      this.setState({ nbrOfPlayers: x});
+    }
 
-            <div><button onClick={() => launchBoard()}>{lng.letsGo}</button></div>
-          </div>
-        </div>
-      </div>
-    );
-} // end of Game function
+    doChangeDifficulty(x){
+      this.setState({ difficultyLevel: x});
+    }
+
+    launchBoard(){
+       this.setState(
+         { difficultyLevel: this.state.difficultyLevel,
+           versionNumber: this.state.versionNumber,
+           nbrOfPlayers: this.state.nbrOfPlayers,
+           showStartPanel: false,
+           showBoardPanel: true });
+
+         ReactDOM.render(
+           <Board nbrOfPlayers={this.state.nbrOfPlayers} difficultyLevel={this.state.difficultyLevel} language={this.state.language} versionNumber={this.state.versionNumber}/>,
+           document.getElementById('game-board'));
+    }
+
+ render() {
+   let lng = this.state.languageDistributor;
+
+   const showHideStartPanel = {
+     'display': this.state.showStartPanel ? 'block' : 'none'
+   };
+
+   const showHideGameOverPanel = {
+     'display': this.state.showGameOverPanel ? 'block' : 'none'
+   };
+
+   const showHideBoardPanel = {
+     'display': this.state.showBoardPanel ? 'block' : 'none'
+   };
+   //
+
+   let radioHowMany2 = this.state.nbrOfPlayers === 2 ? "checked" : "";
+   let radioHowMany3 = this.state.nbrOfPlayers === 3 ? "checked" : "";
+   let radioHowMany4 = this.state.nbrOfPlayers === 4 ? "checked" : "";
+
+   let radioDifficulty1 = this.state.difficultyLevel === 1 ? "checked" : "";
+   let radioDifficulty2 = this.state.difficultyLevel === 2 ? "checked" : "";
+   let radioDifficulty3 = this.state.difficultyLevel === 3 ? "checked" : "";
+   let radioDifficulty4 = this.state.difficultyLevel === 4 ? "checked" : "";
+
+   return (
+     <div className="game">
+       <div className="game-board" id="game-board" style={showHideBoardPanel}></div>
+       <div id="start-panel" className="game-start-panel" style={showHideStartPanel}>
+         <div className="panelTitle"> {lng.mainTitle01}<br/>::ReactJS::<br/>{lng.mainTitle02}<br/><span className="littlePanelInfo">{this.state.versionNumber}</span></div>
+         <div className="introChoices">
+           <div>{lng.welcomeIntro}</div>
+           <div>{lng.howManyAdventurers}
+                 | 2 <input type="radio" name="howManyAdventurers" key="howManyAdventurers2" checked={radioHowMany2} value='2' onChange={() => this.doChangeNbrOfPlayers(2)}/> |
+                   3 <input type="radio" name="howManyAdventurers" key="howManyAdventurers3" checked={radioHowMany3} value='3' onChange={() => this.doChangeNbrOfPlayers(3)}/> |
+                   4 <input type="radio" name="howManyAdventurers" key="howManyAdventurers4" checked={radioHowMany4} value='4' onChange={() => this.doChangeNbrOfPlayers(4)}/> |
+           </div>
+           <div>{lng.howDifficult}
+                   | {lng.novice} <input type="radio" name="WhichDifficulty" key="WhichDifficulty1" checked={radioDifficulty1} value='1' onChange={() => this.doChangeDifficulty(1)}/> |
+                   {lng.normal} <input type="radio" name="WhichDifficulty" key="WhichDifficulty2" checked={radioDifficulty2} value='2' onChange={() => this.doChangeDifficulty(2)}/> |
+                   {lng.elite} <input type="radio" name="WhichDifficulty" key="WhichDifficulty3" checked={radioDifficulty3} value='3' onChange={() => this.doChangeDifficulty(3)}/> |
+                   {lng.legendary} <input type="radio" name="WhichDifficulty" key="WhichDifficulty4" checked={radioDifficulty4} value='4' onChange={() => this.doChangeDifficulty(4)}/> |
+             </div>
+             {this.state.language === "FR" ?
+               <div>{lng.language} English <img id="homeLangToggle" src="img/toggle_right.png" onClick={() => this.doChangeLangSelector()} /> Français</div>
+               :
+               <div>{lng.language} English <img id="homeLangToggle" src="img/toggle_left.png" onClick={() => this.doChangeLangSelector()} /> Français</div>
+             }
+
+           <div><button onClick={() => this.launchBoard()}>{lng.letsGo}</button></div>
+         </div>
+       </div>
+     </div>
+   );
+ }
+}
 
 class FloodMeter {
   constructor(startLevel) {
