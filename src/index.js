@@ -3041,7 +3041,7 @@ class Game extends React.Component {
    let difficulty = 2;
    let language = "EN";
    let nbrOfPlayers = 4;
-   let versionNumber = "v0.8.6 BETA";
+   let versionNumber = "v0.8.7 BETA";
 
    // lets' try to get params from GET
    let propagatedDifficulty = null;
