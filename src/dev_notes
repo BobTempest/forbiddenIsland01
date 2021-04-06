@@ -41,5 +41,39 @@ screen size : 1334 x 750
 ******** BUGS *******
 
 FIXED 001 : line 3032 : doChangeCardInFormGiveACard is not a Function
-002 : line 2118 : this.howActionButtons is not a function
-003 : When only one card -> 'give' -> the preselected card is not recognised as pre selected
+FIXED 002 : line 2118 : this.howActionButtons is not a function
+FIXED 003 : When only one card -> 'give' -> the preselected card is not recognised as pre selected
+FIXED 004 : send a card with one recipient -> he's not auto selected
+FIXED 005 : "Oh my God ! all the temples for tr_sceptre are drawned."
+FIXED 006 Loosing the pace ! Après avoir asséché avec une carte sandBag dans un contexte trop de carte ?, on ne quitte pas le message : choisissez une case et il n'y a plus aucune case allumée. Fucked.
+                2311 -> a tile is clicked
+
+                Pareil après getRid of a H card!
+                Ok après un Throw
+
+
+007 After pilot plays, buttons are shifted
+
+
+ETATS 
+Wait for player input : 
+Choose An action
+Wait for A Tile Click : Dry action
+Wait for A Tile Click : Second Dry
+Wait for A Tile Click : Move / Fly
+Wait for A Tile Click : Helicopter Destination
+Wait for A Tile Click : Dry with a SandBag
+Wait for A Tile Click : Evacuate someone
+Pick a ressource Card 1 
+Pick a ressource Card 2
+Start a Flood 
+Give a Card
+Send a Card
+Helicopter Boarding
+Too Many Cards
+Wait for A Tile Click : Dry action
+Wait for A Tile Click : Second Dry
+Wait for A Tile Click : Move / Fly / Dive
+Wait for A Tile Click : Move Someone
+Wait for A Tile Click : Helicopter Destination
+Wait for A Tile Click : Evacuate someone
