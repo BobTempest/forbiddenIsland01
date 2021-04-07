@@ -298,6 +298,7 @@ class Board extends React.Component {
   componentDidMount() {
       // Perform the initial Flooding of 6 tiles
       let initialFlood = 6;
+      // let initialFlood = 0; HACK NO FLOODED TILE
       let n_FloodCardsLeap = this.state.floodCardsLeap;
       let n_Tiles = this.state.tiles;
       let n_FloodCardsDiscard = this.state.floodCardsDiscard;
@@ -602,7 +603,6 @@ class Board extends React.Component {
             if (n_Tiles[j].playerOn.length > 0 && !gameOver){
                 // message = message + "<br/> There are " + n_Tiles[j].playerOn.length + " explorer(s) on it. Let's evacuate them.";
                 message = message + lng.thereAreXexplorersOnIt.format(n_Tiles[j].playerOn.length);
-                // alert ("There is " + n_Tiles[j].playerOn.length + " explorer(s) on the drawning tile. Let's evacuate them.");
             }
             // Check if all Temples of an undiscovered Treasure are drawned. If yes : end game
             if (n_Tiles[j].templeFor !== ""){
@@ -1049,8 +1049,7 @@ class Board extends React.Component {
                     messageBoardState_toRestore: null,
                     inAGetRidOfACardContext: false,
                     coTravellers : null,
-                    showActionableCards: true });
-                    
+                    showActionableCards: true });       
   }
 
   clickedOnSandBagCard(playerId, inAGetRidOfACardContext)
@@ -1060,6 +1059,7 @@ class Board extends React.Component {
     if (tilesToLight.length === 0)
     {
       this.customAlert(lng.noTileToDry);
+      this.showActionButtons();
       return null;
     }
 
@@ -1094,7 +1094,6 @@ class Board extends React.Component {
                     inAGetRidOfACardContext: false,
                     showActionableCards: true
                    });
-
   }
 
   howManyCards(level){
@@ -2248,8 +2247,7 @@ handleTileClick(i) {
           <div className="panelTitle"> {lng.mainTitle01}<br/>{lng.mainTitle02}</div>
           <div className="panelSubTitle"><b>{this.state.versionNumber}</b></div>
           <div className="littlePanelInfo">English <img id="langToggle" src={langToggleImg} onClick={() => this.doChangeLang()} /> Français</div>
-          <div className="littlePanelInfo">{lng.turn} {this.state.turn} | {lng.level} {this.state.difficultyLevelString}</div>
-          <div className="littlePanelInfo">{lng.treasuresFound} : {foundTreasures}/4 </div>
+          <div className="littlePanelInfo">{lng.turn} {this.state.turn} | {lng.level} {this.state.difficultyLevelString} | {lng.treasuresFound} : {foundTreasures}/4 </div>
           <div className="littlePanelInfo"> {lng.floodLevel} {this.state.floodMeter.level} {lng.xCardsPerFlood.format(this.state.floodMeter.floodFactor)}</div>
         </div>
         <div className="messagePanel02">
@@ -2554,7 +2552,6 @@ handleTileClick(i) {
           <div className="panelInfo" id="UserDialog">
           <span id="mainMessage" dangerouslySetInnerHTML={{__html: translatedString}} />
           {
-            //!gameIsOver ?
               (<div>
                 <button style={showNextBtnStyle} onClick ={() => this.controller("ActionIsDone")}>{lng.btn_next}</button>
                 <button style={showCancelBtnStyle} onClick ={() => this.cancelAnAction()}>{lng.btn_cancel}</button>
@@ -2569,10 +2566,6 @@ handleTileClick(i) {
                 <button style={showCheckIfMoreThan5SecondTimeStyle} onClick ={() => this.doCheckIfMoreThan5CardsInHand(1, this.state.cardUser)}>{lng.btn_next}</button>
                 <button style={showThisIsTheEndMyFriend} onClick ={() => this.doShowGameIsLost()}>{lng.btn_fate}</button>
               </div>)
-            //  :
-            //  (<div>
-            //    <button style={showThisIsTheEndMyFriend} onClick ={() => this.doShowGameIsLost()}>{lng.btn_fate}</button>
-            //  </div>)
         }
       </div>
       )

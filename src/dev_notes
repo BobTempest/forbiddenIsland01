@@ -4,7 +4,6 @@
 css bonhommes trop vers le bas : fixed
 css jauges : fixed
 animation for player gauge : done
-fixed bug : Move someone (yellow) if nowhere to go ? Stuck ! 
 
 **** BUGS *****
 
@@ -51,10 +50,8 @@ FIXED 006 Loosing the pace ! Après avoir asséché avec une carte sandBag dans 
                 Pareil après getRid of a H card!
                 Ok après un Throw
 
-
 FIXED 007 After pilot plays, buttons are shifted
-
-WHAT IF : A tile drawns and there's a last temple (Game Over) AND someone to evacuate ?
+FIXED 008 If use sandBagCard but nothing to dry : actions do not re apear after message
 
 
 ETATS 
