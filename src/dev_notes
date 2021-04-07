@@ -7,13 +7,20 @@ animation for player gauge : done
 
 **** BUGS *****
 
-when cancelling a give action, bad recount des cartes (du giver et/ou du receiver)
-
-If use sandBagCard but nothing to dry : actions do not re apear after message
-
-
+when cancelling a give action, bad recount des cartes (du giver et/ou du receiver) (  ???? )
 
 *********************
+**** JE PUBLIE EN PROD :
+
+npm run build  -> creates a build folder
+
+dans build/index.html : ajouter un point devant les slash de path, renommer <title></title>
+
+ATTENTION DE NE PAS ECRASER LES LOGS lors du transfert FTP :)
+
+????????????????????????????????????????????????????????
+change homepage in your package.json, for example:
+  "homepage": "http://mywebsite.com/relativepath",
 
 
 *********************
@@ -52,6 +59,8 @@ FIXED 006 Loosing the pace ! Après avoir asséché avec une carte sandBag dans 
 
 FIXED 007 After pilot plays, buttons are shifted
 FIXED 008 If use sandBagCard but nothing to dry : actions do not re apear after message
+009 sometimes, retry does not work
+010 Get a treasure emoticon does not display properly
 
 
 ETATS 

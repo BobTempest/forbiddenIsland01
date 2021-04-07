@@ -1155,9 +1155,21 @@ class Board extends React.Component {
             if (this.state.tiles[player.position].playerOn.length > 1 ){
               actions.push(action);
             }
-          } else if(!isInitial && action.name === "Get a Treasure !"){
-            if (this.state.tiles[player.position].templeFor.length === 2){
-              actions.push(action);
+          } else if (!isInitial && action.name === "Get a Treasure !"){
+            let treasureId = this.state.tiles[player.position].templeFor
+            if (treasureId !== ""){
+
+              let cardsForThisTreasure = [];
+              for (let i = 0 ; i < player.cards.length; i++){
+                if (player.cards[i].type === treasureId){
+                  cardsForThisTreasure.push(i);
+                }
+              }
+
+              if (cardsForThisTreasure.length >= 4)
+              {
+                  actions.push(action);
+              }
             }
           } else if (!isInitial && ( action.name === "Dry" || action.name === "Dry around")){
             let where = this.whereCanHeDry(player.position, player.role);

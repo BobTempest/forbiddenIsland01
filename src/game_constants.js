@@ -133,19 +133,6 @@ export const playerSpecialActions = [
    {id : 6, name : "Move/Dive", locName: "ac_MoveDive", forRole: "Diver", replacesAction: "0", locHelp: "ah_MoveDive", enabled : true, triggers : "Dive"  }, // a tile to dive to
  ];
 
-
-
-/*
- const playerCards = [
- "crystal","crystal","crystal","crystal","crystal",
- "cup","cup","cup","cup","cup",
- "statue","statue","statue","statue","statue",
- "sceptre","sceptre","sceptre","sceptre","sceptre",
- "helicopter","helicopter","helicopter",
- "sandBag","sandBag",
- "floodRise","floodRise","floodRise"];
- */
-
 export const floodCards = [
  { name : "helipad" },
  { name : "doorBlack" }, { name : "doorYellow" }, { name : "doorGreen" }, { name : "doorRed" }, { name : "doorWhite" },
