@@ -410,7 +410,6 @@ class Board extends React.Component {
         else if (nextStep === 6){
           // next Turn, new Player 0
           if (this.state.currentPlayerPlaying === this.state.players[this.state.players.length -1].id){
-            // let newMessage = new UserMessage("Next Turn ! Please " + this.state.players[0].name + ", Choose an action " , false, []);
             let newMessage = new UserMessage(null, lng.nextTurn_msg.format(this.state.players[0].name) , false, []);
             let nextTurn = this.state.turn + 1;
             let nextPlayer = this.state.players[0].id;
@@ -1645,7 +1644,6 @@ handleTileClick(i) {
             this.dryATile(i);
             let nada = this.unlightTheTiles();
             if (nada){
-              // let newMessage = new UserMessage(player.name + "dried a tile", false, true, false);
               newplayers[this.state.currentPlayerPlaying].whereCanHeDry = null;
               this.setState({ whatIsExpectedNext: "" , playersnewplayers: newplayers });
 
@@ -1673,7 +1671,6 @@ handleTileClick(i) {
           this.customAlert(lng.heCantDryThere);
         }
       } else if (this.state.whatIsExpectedNext === "TileButtonClickForFlyWithACard") {
-        // let player = boardState.players[boardState.cardUser];
         let cardUser = this.state.players[this.state.cardUser];
         let travellers = this.state.coTravellers;
         let n_Players = this.state.players;

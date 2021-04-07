@@ -524,6 +524,7 @@ list-style:none;
 .fullButton {
   display: block;
   width: 100%;
+  min-width: 100px;
   margin-left: 20px;
 }
 

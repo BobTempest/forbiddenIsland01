@@ -52,7 +52,9 @@ FIXED 006 Loosing the pace ! Après avoir asséché avec une carte sandBag dans 
                 Ok après un Throw
 
 
-007 After pilot plays, buttons are shifted
+FIXED 007 After pilot plays, buttons are shifted
+
+WHAT IF : A tile drawns and there's a last temple (Game Over) AND someone to evacuate ?
 
 
 ETATS 
