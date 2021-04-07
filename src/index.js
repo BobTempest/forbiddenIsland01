@@ -2246,9 +2246,9 @@ handleTileClick(i) {
         <div className="messagePanel">
           <div className="panelTitle"> {lng.mainTitle01}<br/>{lng.mainTitle02}</div>
           <div className="panelSubTitle"><b>{this.state.versionNumber}</b></div>
-          <div className="littlePanelInfo">English <img id="langToggle" src={langToggleImg} onClick={() => this.doChangeLang()} /> Français</div>
-          <div className="littlePanelInfo">{lng.turn} {this.state.turn} | {lng.level} {this.state.difficultyLevelString} | {lng.treasuresFound} : {foundTreasures}/4 </div>
-          <div className="littlePanelInfo"> {lng.floodLevel} {this.state.floodMeter.level} {lng.xCardsPerFlood.format(this.state.floodMeter.floodFactor)}</div>
+          <div className="littlePanelInfo">English <img id="langToggle" src={langToggleImg} onClick={() => this.doChangeLang()} /> Français | {lng.level} {this.state.difficultyLevelString}</div>
+          <div className="littlePanelInfo">{lng.turn} {this.state.turn} | {lng.treasuresFound} : {foundTreasures}/4 </div>
+          <div className="littlePanelInfo"> {lng.floodLevel} : {this.state.floodMeter.level} {lng.xCardsPerFlood.format(this.state.floodMeter.floodFactor)}</div>
         </div>
         <div className="messagePanel02">
           <div className="panelInfo"> {currentPlayer.name}&nbsp;{str_roleQualifier}&nbsp;<span style={{color: currentPlayer.color}}>{str_roleAttachedToName}</span>&nbsp;{lng.isPlaying}
