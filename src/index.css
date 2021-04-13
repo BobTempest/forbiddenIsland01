@@ -323,12 +323,13 @@ list-style:none;
   position: absolute;
   top: 50px;
   left: 232px;
-  background: #fff;
+  background-image: url("./img/IleCoverEN.png");
   border: 1px solid #BBB;
   height: 380px;
   width: 700px;
   z-index: 50;
   box-shadow: 1px 1px 3px #333333;
+
 }
 
 .panelTitle {

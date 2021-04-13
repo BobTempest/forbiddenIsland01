@@ -59,8 +59,8 @@ FIXED 006 Loosing the pace ! Après avoir asséché avec une carte sandBag dans 
 
 FIXED 007 After pilot plays, buttons are shifted
 FIXED 008 If use sandBagCard but nothing to dry : actions do not re apear after message
-009 sometimes, retry does not work
-010 Get a treasure emoticon does not display properly
+009 sometimes, at the end of the game, retry does not work
+FIXED 010 Get a treasure emoticon does not display properly
 
 
 ETATS 

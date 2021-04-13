@@ -3361,12 +3361,20 @@ function generateFloodCardsLeap(){
 
 function generatePlayers(howMany){
     if (howMany > 4 || howMany < 2){
-      alert("CONCEPTUAL ERROR : Too many player requested");
+      alert("CONCEPTUAL ERROR : Wrong number of players requested");
     }
-    let roles = [0,1,2,3,4,5];
-    roles = shuffleArray(roles);
-    // Diver hack off
-    // let roles = [1,5,2,3,4,0];
+    //let roles = [0,1,2,3,4,5];
+    //roles = shuffleArray(roles);
+    // role hack :
+    /*
+        0 engineer
+        1 navigator
+        2 messenger
+        3 diver
+        4 explorer
+        5 pilot
+    */
+    let roles = [4,0,1,5,4,0];
     let players = [];
     for (let i = 0; i < howMany; i++){
       let type = roles[i];
