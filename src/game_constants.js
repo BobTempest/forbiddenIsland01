@@ -152,7 +152,7 @@ export const floodCards = [
  }
 
  export class Tile {
-    constructor(name, position, isImmersed, isDrawning, isDrawned, startBase, templeFor, playerOn, backgroundColor, littleTextToDisplay) {
+    constructor(name, position, isImmersed, isDrawning, isDrawned, startBase, templeFor, playerOn, backgroundColor, littleTextToDisplay, emoticon) {
       this.name = name; // string
       this.position = position; // int
       this.isImmersed = isImmersed; // bool
@@ -163,6 +163,7 @@ export const floodCards = [
       this.playerOn = playerOn; // int[]
       this.backgroundColor = backgroundColor; // string
       this.LittleTextToDisplay = littleTextToDisplay; // string
+      this.Emoticon = emoticon; // string
       this.imgpath = "./img/" + name + "Tile.png"; // string
     }
   }
