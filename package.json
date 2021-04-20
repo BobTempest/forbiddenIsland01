@@ -2,6 +2,7 @@
   "name": "forbidden-island",
   "version": "0.1.0",
   "private": true,
+  "homepage": ".",
   "dependencies": {
     "jshint": "^2.10.1",
     "react": "^16.13.1",

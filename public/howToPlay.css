@@ -1,0 +1,52 @@
+body {
+    font: 14px "Century Gothic", Futura, sans-serif;
+    margin: 20px;
+  }
+
+.plongeuse {
+    color:#000;
+    font-weight: bold;
+}
+
+.ingénieure {
+    color: #CC0000;
+}
+
+.navigateur {
+    color: #FFF200;
+    text-shadow: black 0.1em 0.1em 0.2em;
+}
+
+.pilote {
+    color: #0064b3;
+}
+
+.explorateur {
+    color: #0AB300;
+}
+
+.messager {
+    color: #FFF;
+    text-shadow: black 0.1em 0.1em 0.2em;
+}
+
+.littleCard {
+    width: 25px;
+}
+
+.float {
+    float:left;
+    padding-right: 5px;
+}
+
+.littleEmoticon {
+    font-size: 23px;
+    position: relative;
+    top: -10px;
+}
+
+.arithmetic {
+    position: relative;
+    top: -10px;
+    font-size: 23px;
+}

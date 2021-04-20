@@ -3,6 +3,9 @@ import './index.css';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+import BoiteDeJeu from './img/IleCoverFR.png';
+import GameBox from './img/IleCoverEN.png';
+
 import {
   Player,
   Tile,
@@ -18,6 +21,18 @@ import {
   treasures
 } from './game_constants.js';
 import {stringsCatalog} from './strings.js';
+
+
+export function getStringInTheCatalog(distributor, input){
+  let catalog = Object.entries(distributor);
+  let stringInput = input.toString();
+  // alert ("stringInput is : " + stringInput);
+  let s = catalog.filter( couple => {
+      return couple[0] === stringInput;
+  });
+  return s[0][1];
+}
+
 
 function DrawSquare(props) {
   let squareStyle; // sets the backGround
@@ -76,7 +91,7 @@ function DrawSquare(props) {
         null
       }
       {props.tile.LittleTextToDisplay.length > 0 && (!props.tile.isDrawned) ?
-        <div className="inSquareLittleText">{props.tile.LittleTextToDisplay}</div>
+        <div className="inSquareLittleText">{getStringInTheCatalog(props.lng, props.tile.LittleTextToDisplay)}</div>
         :
         null
       }
@@ -104,7 +119,7 @@ function DrawPlayerPawns(props){
     return (
       <div className="playerPawn singlePP">
       {
-        <DrawOnePlayerPawn className={props.players[props.pawns[0]].id === props.blinkPlayer ? "blink2" : ""} color={props.players[props.pawns[0]].color} />
+        <DrawOnePlayerPawn className={props.players[props.pawns[0]].id === props.blinkPlayer ? "blink2" : ""} color={props.players[props.pawns[0]].color} width="16" height="22" />
       }
       </div>
     );
@@ -113,11 +128,11 @@ function DrawPlayerPawns(props){
     return (
       <div className="playerPawn twoPP">
       {
-        <DrawOnePlayerPawn className={props.players[props.pawns[0]].id === props.blinkPlayer ? "blink2" : ""} color={props.players[props.pawns[0]].color} />
+        <DrawOnePlayerPawn className={props.players[props.pawns[0]].id === props.blinkPlayer ? "blink2" : ""} color={props.players[props.pawns[0]].color} width="16" height="22" />
       }
       &nbsp;
       {
-        <DrawOnePlayerPawn className={props.players[props.pawns[1]].id === props.blinkPlayer ? "blink2" : ""} color={props.players[props.pawns[1]].color} />
+        <DrawOnePlayerPawn className={props.players[props.pawns[1]].id === props.blinkPlayer ? "blink2" : ""} color={props.players[props.pawns[1]].color} width="16" height="22" />
       }
       </div>
     );
@@ -126,15 +141,15 @@ function DrawPlayerPawns(props){
     return (
       <div className="playerPawn multilinePP">
       {
-        <DrawOnePlayerPawn className={props.players[props.pawns[0]].id === props.blinkPlayer ? "blink2" : ""} color={props.players[props.pawns[0]].color} />
+        <DrawOnePlayerPawn className={props.players[props.pawns[0]].id === props.blinkPlayer ? "blink2" : ""} color={props.players[props.pawns[0]].color} width="16" height="22" />
       }
       &nbsp;
       {
-        <DrawOnePlayerPawn className={props.players[props.pawns[1]].id === props.blinkPlayer ? "blink2" : ""} color={props.players[props.pawns[1]].color} />
+        <DrawOnePlayerPawn className={props.players[props.pawns[1]].id === props.blinkPlayer ? "blink2" : ""} color={props.players[props.pawns[1]].color} width="16" height="22" />
       }
       <br/>
       {
-        <DrawOnePlayerPawn className={props.players[props.pawns[2]].id === props.blinkPlayer ? "blink2" : ""} color={props.players[props.pawns[2]].color} />
+        <DrawOnePlayerPawn className={props.players[props.pawns[2]].id === props.blinkPlayer ? "blink2" : ""} color={props.players[props.pawns[2]].color} width="16" height="22" />
       }
       </div>
     );
@@ -143,19 +158,19 @@ function DrawPlayerPawns(props){
     return (
       <div className="playerPawn multilinePP">
       {
-        <DrawOnePlayerPawn className={props.players[props.pawns[0]].id === props.blinkPlayer ? "blink2" : ""} color={props.players[props.pawns[0]].color} />
+        <DrawOnePlayerPawn className={props.players[props.pawns[0]].id === props.blinkPlayer ? "blink2" : ""} color={props.players[props.pawns[0]].color} width="16" height="22" />
       }
       &nbsp;
       {
-        <DrawOnePlayerPawn className={props.players[props.pawns[1]].id === props.blinkPlayer ? "blink2" : ""} color={props.players[props.pawns[1]].color} />
+        <DrawOnePlayerPawn className={props.players[props.pawns[1]].id === props.blinkPlayer ? "blink2" : ""} color={props.players[props.pawns[1]].color} width="16" height="22" />
       }
       <br/>
       {
-        <DrawOnePlayerPawn className={props.players[props.pawns[2]].id === props.blinkPlayer ? "blink2" : ""} color={props.players[props.pawns[2]].color} />
+        <DrawOnePlayerPawn className={props.players[props.pawns[2]].id === props.blinkPlayer ? "blink2" : ""} color={props.players[props.pawns[2]].color} width="16" height="22" />
       }
       &nbsp;
       {
-        <DrawOnePlayerPawn className={props.players[props.pawns[3]].id === props.blinkPlayer ? "blink2" : ""} color={props.players[props.pawns[3]].color} />
+        <DrawOnePlayerPawn className={props.players[props.pawns[3]].id === props.blinkPlayer ? "blink2" : ""} color={props.players[props.pawns[3]].color} width="16" height="22" />
       }
       </div>
     );
@@ -163,30 +178,27 @@ function DrawPlayerPawns(props){
   return null;
 }
 
+/*
 function DrawOnePlayerPawn(props)
 {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="22" viewBox="0 0 384 512">
       <path d="M120 72c0-39.765 32.235-72 72-72s72 32.235 72 72c0 39.764-32.235 72-72 72s-72-32.236-72-72zm254.627 1.373c-12.496-12.497-32.758-12.497-45.254 0L242.745 160H141.254L54.627 73.373c-12.496-12.497-32.758-12.497-45.254 0-12.497 12.497-12.497 32.758 0 45.255L104 213.254V480c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V368h16v112c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V213.254l94.627-94.627c12.497-12.497 12.497-32.757 0-45.254z"
-      style={{stroke: '#000000', strokeWidth: '2px', fill: props.color}}
+      style={{stroke: '#000000', strokeWidth: '5px', fill: props.color}}
       className={props.className}/>
     </svg>
   );
-}
+}*/
 
-function DrawLittleTemple(props){
-  if (props.temple.length > 0){
-    let litTempleImgPath = "";
-    for (let i = 0 ; i < treasures.length; i++){
-      if (treasures[i].id === props.temple)
-      {
-        litTempleImgPath = treasures[i].litTempleImg;
-        break;
-      }
-    }
-    return (<span><img className="littleTemple" src={litTempleImgPath} /></span>)
-  }
-  return null;
+function DrawOnePlayerPawn(props)
+{
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width= {props.width} height={props.height} viewBox="0 0 384 512">
+      <path d="M120 72c0-39.765 32.235-72 72-72s72 32.235 72 72c0 39.764-32.235 72-72 72s-72-32.236-72-72zm254.627 1.373c-12.496-12.497-32.758-12.497-45.254 0L242.745 160H141.254L54.627 73.373c-12.496-12.497-32.758-12.497-45.254 0-12.497 12.497-12.497 32.758 0 45.255L104 213.254V480c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V368h16v112c0 17.673 14.327 32 32 32h16c17.673 0 32-14.327 32-32V213.254l94.627-94.627c12.497-12.497 12.497-32.757 0-45.254z"
+      style={{stroke: '#000000', strokeWidth: '5px', fill: props.color}}
+      className={props.className}/>
+    </svg>
+  );
 }
 
 class Board extends React.Component {
@@ -840,13 +852,13 @@ class Board extends React.Component {
       }
       else if (cardNumber == 1)
       {
-            newMessage = new UserMessage(null, lng.firstCard_msg.format(this.getStringInTheCatalog(lng, card.loc_key)) + '. <br/><img src='  + card.url + ' width="30px" height="46px"/>', false, [3]);
+            newMessage = new UserMessage(null, lng.firstCard_msg.format(getStringInTheCatalog(lng, card.loc_key)) + '. <br/><img src='  + card.url + ' width="30px" height="46px"/>', false, [3]);
             newCurrentStep = 4;
       }
       else
       {
             let databag = {userId : this.state.currentPlayerPlaying}
-            newMessage = new UserMessage(null, lng.secondCard_msg.format(this.getStringInTheCatalog(lng, card.loc_key)) + '. <br/><img src=' + card.url  + ' width="30px" height="46px"/>', false, [9], databag);
+            newMessage = new UserMessage(null, lng.secondCard_msg.format(getStringInTheCatalog(lng, card.loc_key)) + '. <br/><img src=' + card.url  + ' width="30px" height="46px"/>', false, [9], databag);
       }
 
       tempState.mainUserMessage = newMessage;
@@ -2175,7 +2187,7 @@ handleTileClick(i) {
   renderSquare(i) {
     return(
       <span>
-        <DrawSquare tile={this.state.tiles[i]} players={this.state.players} index={i} blinkPlayer={this.state.blinkPlayer} doBlink={this.state.blinkingTile == i} onClick={() => this.handleTileClick(i)}/>
+        <DrawSquare tile={this.state.tiles[i]} players={this.state.players} index={i} blinkPlayer={this.state.blinkPlayer} doBlink={this.state.blinkingTile == i} onClick={() => this.handleTileClick(i)} lng={this.state.languageDistributor}/>
       </span>
     );
   }
@@ -2197,7 +2209,7 @@ handleTileClick(i) {
         if (treasures[i].id === treasureId)
         {
           trophyPath = treasures[i].trophyImg;
-          msg = this.getStringInTheCatalog(lng, treasures[i].loc_found_msg_key);
+          msg = getStringInTheCatalog(lng, treasures[i].loc_found_msg_key);
           break;
         }
       }
@@ -2218,14 +2230,20 @@ handleTileClick(i) {
     let isPlaying = this.state.currentPlayerPlaying === i; // bool
     let boardClass = isPlaying?  ('playerBoard playerBoardPlaying') : ('playerBoard ');
     let player = this.state.players[i];
-    let str_roleQualifier = this.getStringInTheCatalog(this.state.languageDistributor, player.roleQualifier);
-    let str_roleAttachedToName = this.getStringInTheCatalog(this.state.languageDistributor, player.roleAttachedToName);
-    let str_abilityHelp = this.getStringInTheCatalog(this.state.languageDistributor, player.playersAbility);
+    let str_roleQualifier = getStringInTheCatalog(this.state.languageDistributor, player.roleQualifier);
+    let str_roleAttachedToName = getStringInTheCatalog(this.state.languageDistributor, player.roleAttachedToName);
+    let str_abilityHelp = getStringInTheCatalog(this.state.languageDistributor, player.playersAbility);
 
     return (
       <div className={boardClass}>
+        <span className="figurine"> 
+          {
+            <DrawOnePlayerPawn color={player.color} width='50' height='69'/>
+          }
+        </span>
         <span className="inBoardName">{player.name}</span>&nbsp;{str_roleQualifier}&nbsp;
         <span className="inBoardRole" style={{color: player.color}}>{str_roleAttachedToName}</span>
+
         <a className="tooltips helpCharacterIcon" id={'tooltip' + i} href="#">?<span className="inToolTipsText">{str_abilityHelp}</span></a>
         <br/>
         <div className="inBoardCards">
@@ -2254,13 +2272,82 @@ handleTileClick(i) {
     )
   }
 
+  renderShowMeTheRulesButton(){
+    return (
+      <div className="showMeTheRulesButton"><a onClick={() => this.setState({showMeTheRules: true})}>?</a></div>
+    );
+  }
+
+  hideHowToPlayPanel() {
+    document.getElementById("blockAll").classList.remove('blockAll');
+    this.setState({showMeTheRules: false});
+  }
+
+  renderHowToPlayPanel()
+  {
+      document.getElementById("blockAll").classList.add('blockAll');
+      let lng = this.state.languageDistributor;
+
+      return (
+        <div>
+          <div>
+            <span className="howToPlayTitle">{lng.howToPlay}</span>
+            <span className="closeTheRulesButton"><a onClick={() => this.hideHowToPlayPanel() }>x</a></span> 
+          </div>
+          <div>
+            { 
+            this.state.selectedLanguage === "FR" ? 
+              <iframe  className="iFrame" src="/howToPlayFR.html"></iframe>
+              :
+              <iframe  className="iFrame" src="/howToPlayEN.html"></iframe>
+            }
+          </div>
+
+        </div>
+      );
+  }
+
+  renderShowMeTheCreditsButton(){
+    return (
+      <div className="showMeTheRulesButton"><a onClick={() => this.setState({showMeTheCredits: true})}>&#169;</a></div>
+    );
+  }
+
+  hideCreditsPanel() {
+    document.getElementById("blockAll").classList.remove('blockAll');
+    this.setState({showMeTheCredits: false});
+  }
+
+  renderCreditsPanel()
+  {
+      document.getElementById("blockAll").classList.add('blockAll');
+      let lng = this.state.languageDistributor;
+
+      return (
+        <div>
+          <div>
+            <span className="howToPlayTitle">{lng.credits}</span>
+            <span className="closeTheRulesButton"><a onClick={() => this.hideCreditsPanel() }>x</a></span> 
+          </div>
+          <div className="credits">
+            <br/><br/>
+            {lng.copyright}<br/><br/>
+            {lng.forbIslandAt_msg} <a href={lng.link_boardGame} className="write2me" target="_blank">{lng.publisher_site_name}</a><br/>
+            {lng.more_info_at} <a href={lng.link_about} className="write2me" target="_blank">{lng.info_site_name}</a><br/><br/>
+            {lng.about_msg}<br/>
+            {lng.mailMessage} <a href={lng.mailAdress} className="write2me">{lng.mailLink}</a>
+          </div>
+        </div>
+      );
+  }
+
   renderPlayerMessagePanel() {
     let foundTreasures = this.state.possessedTreasures.length;
     let lng = this.state.languageDistributor;
     let currentPlayer = this.state.players[this.state.currentPlayerPlaying];
-    let str_roleQualifier = this.getStringInTheCatalog(lng, currentPlayer.roleQualifier);
-    let str_roleAttachedToName = this.getStringInTheCatalog(lng, currentPlayer.roleAttachedToName);
-    let str_currentStep = this.getStringInTheCatalog(lng, playerSteps[this.state.currentStep].wording);
+    let str_roleQualifier = getStringInTheCatalog(lng, currentPlayer.roleQualifier);
+    let str_roleAttachedToName = getStringInTheCatalog(lng, currentPlayer.roleAttachedToName);
+    let str_currentStep = getStringInTheCatalog(lng, playerSteps[this.state.currentStep].wording);
     let langToggleImg = this.state.selectedLanguage === "FR" ? "img/toggle_right.png" : "img/toggle_left.png";
 
     // Either we're in action or before picking the first player card :
@@ -2288,7 +2375,7 @@ handleTileClick(i) {
               <span className="rollBackButton">
                 <a className="actionTooltips" href="#">
                   <img className="rollBackButtonImg" src="img/backButton.png" width="15" height="15" onClick= {() => this.handleRollBack(this.state.currentStep)}/>
-                  <span className="actionTooltipsForRollback inToolTipsText">{this.getStringInTheCatalog(lng, 'ah_rollback')}</span>
+                  <span className="actionTooltipsForRollback inToolTipsText">{getStringInTheCatalog(lng, 'ah_rollback')}</span>
                 </a>
               </span>
               : <span></span>
@@ -2299,16 +2386,13 @@ handleTileClick(i) {
               {this.state.possibleActions.map((action, index) =>
                 <>
                     <button className="actionButton fullButton" onClick={() => this.handleActionClick(action.triggers)} >
-                      {this.getStringInTheCatalog(lng, action.locName)}
+                      {getStringInTheCatalog(lng, action.locName)}
                     </button>
-                    <a className="actionTooltips helpCharacterIcon" id={'tooltipAction' + index} href="#">?<span className="inToolTipsText">{this.getStringInTheCatalog(lng, action.locHelp)}</span></a>
+                    <a className="actionTooltips helpCharacterIcon" id={'tooltipAction' + index} href="#">?<span className="inToolTipsText">{getStringInTheCatalog(lng, action.locHelp)}</span></a>
                  </>
               )}
             
           </div>
-        </div>
-        <div className="mailMessage">
-          {lng.mailMessage} <a href={lng.mailAdress} className="write2me">{lng.mailLink}</a>
         </div>
       </span>
     )
@@ -2337,7 +2421,7 @@ handleTileClick(i) {
               this.state.players[giverId].cards.length === 1 ?
               <tr key="card0">
                 <td><input type="radio" name="chosenCard" key="0" checked="checked" value={this.state.players[giverId].cards[0].id} /*onChange={() => chosenCard = this.state.players[giverId].cards[0].id}*/ /></td>
-                <td>{ this.getStringInTheCatalog(lng, this.state.players[giverId].cards[0].loc_key)} </td>
+                <td>{ getStringInTheCatalog(lng, this.state.players[giverId].cards[0].loc_key)} </td>
                 <td><img src= {this.state.players[giverId].cards[0].url}  width="20px" height="32px"/></td>
               </tr>
               :
@@ -2346,7 +2430,7 @@ handleTileClick(i) {
               <tr key={'card' + index}>
                 <td><input type="radio" name="chosenCard" key={index} value={card.id} onChange={() => chosenCard = card.id} /></td>
                 <td><img src= {card.url}  width="20px" height="32px"/></td>
-                <td>{this.getStringInTheCatalog(lng, card.loc_key)} <span className="superSmall">x{card.howMany}</span></td>
+                <td>{getStringInTheCatalog(lng, card.loc_key)} <span className="superSmall">x{card.howMany}</span></td>
               </tr>
               )
             }
@@ -2392,14 +2476,14 @@ handleTileClick(i) {
               <tr key="0">
                 <td><input type="radio" name="chosenCard" key="0" checked="checked" value={this.state.players[giverId].cards[0].id} onChange={() => chosenCard = this.state.players[giverId].cards[0].id} /></td>
                 <td><img src= {this.state.players[giverId].cards[0].url}  width="20px" height="32px"/></td>
-                <td>{ this.getStringInTheCatalog(lng, this.state.players[giverId].cards[0].loc_key) } </td>
+                <td>{ getStringInTheCatalog(lng, this.state.players[giverId].cards[0].loc_key) } </td>
               </tr>
               :
               this.doDedoubleCards(this.state.players[giverId].cards).map((card, index) =>
               <tr key={'card' + index}>
                 <td><input type="radio" name="chosenCard" key={index} value={card.id} onChange={() => chosenCard = card.id} /></td>
                 <td><img src= {card.url}  width="20px" height="32px"/></td>
-                <td>{ this.getStringInTheCatalog(lng, card.loc_key)} <span className="superSmall">x{card.howMany}</span></td>
+                <td>{ getStringInTheCatalog(lng, card.loc_key)} <span className="superSmall">x{card.howMany}</span></td>
               </tr>
               )
             }
@@ -2570,7 +2654,7 @@ handleTileClick(i) {
         translatedString = this.state.mainUserMessage.complexMessage;
       }
       else {
-        translatedString = this.getStringInTheCatalog(lng, this.state.mainUserMessage.message);
+        translatedString = getStringInTheCatalog(lng, this.state.mainUserMessage.message);
       }
 
       return(
@@ -2815,29 +2899,6 @@ handleTileClick(i) {
     }
   }
 
-  getStringInTheCatalog(distributor, input){
-
-      let catalog = Object.entries(distributor); // TODO : Object is created everytime
-      let stringInput = input.toString();
-      // alert ("stringInput is : " + stringInput);
-      let s = catalog.filter( couple => {
-          return couple[0] === stringInput;
-      });
-      //alert (typeof s);
-      // alert ("asked for " + stringInput + " creates " + s /*+ " and gives " + s[0][1]*/);
-      return s[0][1];
-      
-      /*
-     for (let i = 0 ; i < catalog.length; i++){
-        if (catalog[i][0] == stringInput){
-          return catalog[i][1];
-        }
-      }
-      */
-
-      //return "YYYYY FIX ME YYYYY";
-  }
-
   launchGameOver(gameIsWon, gameIsLost, msg){
     this.customAlert("Mow SHOULDN't BE USED ANY MORE");
     
@@ -2911,6 +2972,16 @@ handleTileClick(i) {
           {this.state.gameIsWon ?
             <div id="game-over-panel" className="game-won-panel">
               {this.renderGameOverPanel(this.state.endMessage)}
+            </div> : <div></div>
+          }
+          {this.state.showMeTheRules ?
+            <div id="howToPlay-panel" className="howToPlay-panel">
+              {this.renderHowToPlayPanel()}
+            </div> : <div></div>
+          }
+          {this.state.showMeTheCredits ?
+            <div id="credits-panel" className="credits-panel">
+              {this.renderCreditsPanel()}
             </div> : <div></div>
           }
           <div id="blockAll">
@@ -2992,6 +3063,8 @@ handleTileClick(i) {
                 {this.renderPlayerBoard(1)}
                 {this.state.nbrOfPlayers > 2 ? this.renderPlayerBoard(2) : <span></span> }
                 {this.state.nbrOfPlayers > 3 ? this.renderPlayerBoard(3) : <span></span> }
+                {this.renderShowMeTheRulesButton()}
+                {this.renderShowMeTheCreditsButton()}
             </div>
           </div>
         </div>
@@ -3110,12 +3183,10 @@ class Game extends React.Component {
    doChangeLangSelector(){
       if (this.state.language === "FR"){
           document.getElementById("homeLangToggle").src = "img/toggle_left.png";
-          this.setState({language: "EN",
-                         languageDistributor: stringsCatalog.en });
+          this.setState({language: "EN", languageDistributor: stringsCatalog.en });
       } else {
           document.getElementById("homeLangToggle").src = "img/toggle_right.png";
-          this.setState({language: "FR",
-                         languageDistributor: stringsCatalog.fr});
+          this.setState({language: "FR", languageDistributor: stringsCatalog.fr});
       }
     }
 
@@ -3144,7 +3215,8 @@ class Game extends React.Component {
    let lng = this.state.languageDistributor;
 
    const showHideStartPanel = {
-     'display': this.state.showStartPanel ? 'block' : 'none'
+     'display': this.state.showStartPanel ? 'block' : 'none',
+     'backgroundImage':`url(${GameBox})`
    };
 
    const showHideGameOverPanel = {
@@ -3276,20 +3348,20 @@ function riseTheIsland(){
 
 // Regular playground
 function riseTheIsland(){
-    var tile01 = new Tile("helipad", 0, false, false, false, 5, "", [], "#A9D0F5", "\xa0\xa0\xa0HELIPORT", "");
+    var tile01 = new Tile("helipad", 0, false, false, false, 5, "", [], "#A9D0F5", "tpl_heliport", "");
     var tile02 = new Tile("doorBlack", 0, false, false, false, 3, "", [], "#6E6E6E", "", "");
     var tile03 = new Tile("doorRed", 0, false, false, false, 0, "", [], "#F78181", "", "");
     var tile04 = new Tile("doorGreen", 0, false, false, false, 4, "", [], "#9FF781", "", "");
     var tile05 = new Tile("doorWhite", 0, false, false, false, 2, "", [], "#D9D9D9", "", "");
     var tile06 = new Tile("doorYellow", 0, false, false, false, 1, "", [], "#F2F5A9", "", "");
-    var tile07 = new Tile("temple0001", 0, false, false, false, "", "CR", [], "#bdc3c7", "TEMPLE CRYSTAL", "🏯");
-    var tile08 = new Tile("temple0002", 0, false, false, false, "", "CR", [], "#bdc3c7", "TEMPLE CRYSTAL", "🏯");
-    var tile09 = new Tile("temple0101", 0, false, false, false, "", "CU", [], "#bdc3c7", "TEMPLE CUP", "🛕");
-    var tile10 = new Tile("temple0102", 0, false, false, false, "", "CU", [], "#bdc3c7", "TEMPLE CUP", "🛕");
-    var tile11 = new Tile("temple0201", 0, false, false, false, "", "SC", [], "#bdc3c7", "TEMPLE SCEPTRE", "🏰");
-    var tile12 = new Tile("temple0202", 0, false, false, false, "", "SC", [], "#bdc3c7", "TEMPLE SCEPTRE", "🏰");
-    var tile13 = new Tile("temple0301", 0, false, false, false, "", "ST", [], "#bdc3c7", "TEMPLE STATUE", "🕍");
-    var tile14 = new Tile("temple0302", 0, false, false, false, "", "ST", [], "#bdc3c7", "TEMPLE STATUE", "🕍");
+    var tile07 = new Tile("temple0001", 0, false, false, false, "", "CR", [], "#bdc3c7", "tpl_crystal", "🏯");
+    var tile08 = new Tile("temple0002", 0, false, false, false, "", "CR", [], "#bdc3c7", "tpl_crystal", "🏯");
+    var tile09 = new Tile("temple0101", 0, false, false, false, "", "CU", [], "#bdc3c7", "tpl_cup", "🛕");
+    var tile10 = new Tile("temple0102", 0, false, false, false, "", "CU", [], "#bdc3c7", "tpl_cup", "🛕");
+    var tile11 = new Tile("temple0201", 0, false, false, false, "", "SC", [], "#bdc3c7", "tpl_sceptre", "🏰");
+    var tile12 = new Tile("temple0202", 0, false, false, false, "", "SC", [], "#bdc3c7", "tpl_sceptre", "🏰");
+    var tile13 = new Tile("temple0301", 0, false, false, false, "", "ST", [], "#bdc3c7", "tpl_statue", "🕍");
+    var tile14 = new Tile("temple0302", 0, false, false, false, "", "ST", [], "#bdc3c7", "tpl_statue", "🕍");
     var tile15 = new Tile("coast01", 0, false, false, false, "", "", [], "#825a2c", "", "");
     var tile16 = new Tile("coast02", 0, false, false, false, "", "", [], "#825a2c", "", "");
     var tile17 = new Tile("coast03", 0, false, false, false, "", "", [], "#825a2c", "", "");
@@ -3376,8 +3448,8 @@ function generatePlayers(howMany){
     if (howMany > 4 || howMany < 2){
       alert("CONCEPTUAL ERROR : Wrong number of players requested");
     }
-    //let roles = [0,1,2,3,4,5];
-    //roles = shuffleArray(roles);
+    let roles = [0,1,2,3,4,5];
+    roles = shuffleArray(roles);
     // role hack :
     /*
         0 engineer
@@ -3386,8 +3458,9 @@ function generatePlayers(howMany){
         3 diver
         4 explorer
         5 pilot
+    
+    let roles = [4,0,1,5,99,99];
     */
-    let roles = [4,0,1,5,4,0];
     let players = [];
     for (let i = 0; i < howMany; i++){
       let type = roles[i];

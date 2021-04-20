@@ -1,9 +1,6 @@
 // TODO :
 *********************
-07/10/19 : 
-css bonhommes trop vers le bas : fixed
-css jauges : fixed
-animation for player gauge : done
+
 
 **** BUGS *****
 
@@ -14,14 +11,12 @@ when cancelling a give action, bad recount des cartes (du giver et/ou du receive
 
 npm run build  -> creates a build folder
 
-dans build/index.html : ajouter un point devant les slash de path, renommer <title></title>
+// dans build/index.html : 
+//    - ajouter un point devant les slash de path, 
+//    - renommer <title></title>
+Avant de npm run build, dans package.json, ajouter :   "homepage": ".",
 
 ATTENTION DE NE PAS ECRASER LES LOGS lors du transfert FTP :)
-
-????????????????????????????????????????????????????????
-change homepage in your package.json, for example:
-  "homepage": "http://mywebsite.com/relativepath",
-
 
 *********************
 **** NOW *****
