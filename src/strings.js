@@ -119,7 +119,7 @@ export const stringsCatalog = {
     tpl_sceptre: "SCEPTRE TEMPLE",
     tpl_statue: "STATUE TEMPLE",
     tpl_crystal: "CRYSTAL TEMPLE",
-    tpl_heliport: "HELIPAD",
+    tpl_heliport: "\u00a0\u00a0\u00a0\u00a0HELIPAD",
    // opening panel
    welcomeIntro: "Hola Comrade",
    howManyAdventurers: "How many adventurers ?",
@@ -338,7 +338,7 @@ export const stringsCatalog = {
    tpl_sceptre: "TEMPLE SCEPTRE",
    tpl_statue: "TEMPLE STATUE",
    tpl_crystal: "TEMPLE CRYSTAL",
-   tpl_heliport: "HELIPORT",
+   tpl_heliport: "\u00a0\u00a0\u00a0HELIPORT",
    // opening panel
    welcomeIntro: "Hola Camarade.",
    howManyAdventurers: "Combien d'aventuriers ?",

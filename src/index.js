@@ -22,7 +22,6 @@ import {
 } from './game_constants.js';
 import {stringsCatalog} from './strings.js';
 
-
 export function getStringInTheCatalog(distributor, input){
   let catalog = Object.entries(distributor);
   let stringInput = input.toString();
