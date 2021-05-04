@@ -39,6 +39,10 @@ body {
     padding-right: 5px;
 }
 
+.jauges {
+    width: 220px;
+}
+
 .littleEmoticon {
     font-size: 23px;
     position: relative;
