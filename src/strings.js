@@ -133,7 +133,7 @@ export const stringsCatalog = {
    level: "Level :",
    // messages
    credits: "Credits",
-   welcome_msg: "Welcome on the island. Choose a first action for the first character.",
+   welcome_msg: "Welcome on the forbidden island.",
    howToPlay: "HOW TO PLAY ?",
    letsDrawSomePlayerCards_msg:"Let's draw some Player Cards",
    letsFloodSomeTiles_msg: "Let's flood {0} tiles",
@@ -352,7 +352,7 @@ export const stringsCatalog = {
    level: "Niveau :",
    // msgs
    credits: "Crédits",
-   welcome_msg: "Bienvenue sur l'île. Choisissez une première action pour le premier joueur.",
+   welcome_msg: "Bienvenue sur l'île interdite.",
    howToPlay: "COMMENT ON JOUE ?",
    letsDrawSomePlayerCards_msg: "Tirons une carte joueur.",
    letsFloodSomeTiles_msg: "Inondons {0} terrains",

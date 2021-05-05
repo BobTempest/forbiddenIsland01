@@ -198,6 +198,14 @@ ol, ul {
   opacity: 0.3;
 }
 
+.figurineForBoard {
+  position: absolute;
+  top: 10px;
+  left: 245px;
+  z-index: 50;
+  opacity: 0.3;
+}
+
 .singlePP {
   top: 14px;
   left: 16px;
@@ -332,6 +340,8 @@ ol, ul {
   padding: 10;
   height: 85px;
   width: 300px;
+
+  position: relative;
 }
 
 .actionPanel {
@@ -530,7 +540,7 @@ ol, ul {
   margin-right: 2px;
   margin-top: 2px;
   margin-left: 10px;
-  margin-bottom: 2px;
+  margin-bottom: 5px;
   border-radius: 5px;
   padding: 10;
   height: 100px;

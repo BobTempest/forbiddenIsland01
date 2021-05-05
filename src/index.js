@@ -2237,7 +2237,10 @@ handleTileClick(i) {
       <div className={boardClass}>
         <span className="figurine"> 
           {
+            !isPlaying ?
             <DrawOnePlayerPawn color={player.color} width='50' height='69'/>
+            :
+            <></>
           }
         </span>
         <span className="inBoardName">{player.name}</span>&nbsp;{str_roleQualifier}&nbsp;
@@ -2362,6 +2365,11 @@ handleTileClick(i) {
           <div className="littlePanelInfo"> {lng.floodLevel} : {this.state.floodMeter.level} {lng.xCardsPerFlood.format(this.state.floodMeter.floodFactor)}</div>
         </div>
         <div className="messagePanel02">
+        <span className="figurineForBoard"> 
+          {
+            <DrawOnePlayerPawn color={currentPlayer.color} width='50' height='69'/>
+          }
+        </span>
           <div className="panelInfo"> {currentPlayer.name}&nbsp;{str_roleQualifier}&nbsp;<span style={{color: currentPlayer.color}}>{str_roleAttachedToName}</span>&nbsp;{lng.isPlaying}
             <br/>
             <span className="superLittlePanelInfo"> {str_currentStep} </span>
