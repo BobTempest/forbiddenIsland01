@@ -354,9 +354,10 @@ ol, ul {
   margin-left: 10px;
   margin-bottom: 2px;
   border-radius: 5px;
-  padding: 10;
-  height: 218px;
+  min-height: 218px;
   width: 300px;
+  display: flex;
+  flex-direction: column;
 }
 
 .game-start-panel {
@@ -427,10 +428,10 @@ ol, ul {
 }
 
 .rollBackButton {
-  position: relative;
+  position: absolute;
   float: right;
-  top: -11px;
-  left: -19px;
+  top: 298px;
+  left: 408px;
 }
 
 .rollBackButtonImg {
@@ -640,15 +641,16 @@ ol, ul {
   padding: 5px 15px 5px 15px;
   border: solid #cccccc 1px;
   text-decoration: none;
-  margin-top: 3px;
-  margin-left: 10px;
+  margin-bottom: 6px;
+  margin-right: 6px;
+
 }
 
 .fullButton {
   display: block;
-  width: 100%;
+  width: 70%;
   min-width: 100px;
-  margin-left: 20px;
+
 }
 
 .actionButton:hover {
@@ -813,6 +815,7 @@ ol, ul {
 
 .inToolTipsText {
   text-align: left;
+  color: #000000;
   font-size: 12px;
   line-height: 12px;
   padding: 10px 20px 10px 20px;
@@ -834,9 +837,6 @@ a.tooltips span {
   width:140px;
   color: #000000;
   background: #CFCFCF;
-  /*height: 34px;
-  line-height: 34px;
-  text-align: center;*/
   visibility: hidden;
   border-radius: 6px;
 }
@@ -864,20 +864,14 @@ a:hover.tooltips span {
 /* ACTION Tooltips */
 a.actionTooltips {
   position: relative;
-  left: 17px;
-  top: -15px;
-  display: inline;
+  left: -90px;
+  top: -20px;
 }
 
 a.actionTooltips span {
   position: absolute;
   width:140px;
-  color: #000000;
   background: #CFCFCF;
-  /*
-  height: 34px;
-  line-height: 34px;
-  text-align: center;*/
   visibility: hidden;
   border-radius: 6px;
 }

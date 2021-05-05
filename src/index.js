@@ -2354,6 +2354,8 @@ handleTileClick(i) {
 
     // Either we're in action or before picking the first player card :
     let showBackButton = this.state.showRollBackButton && ((this.state.currentStep > 0 && this.state.currentStep < 3) || ( this.state.mainUserMessage.buttons.indexOf(2) >= 0));
+    // HACK Hide back Button
+    // showBackButton = false; 
 
     return (
       <span>
@@ -2381,7 +2383,7 @@ handleTileClick(i) {
           { showBackButton ?
               <span className="rollBackButton">
                 <a className="actionTooltips" href="#">
-                  <img className="rollBackButtonImg" src="img/backButton.png" width="15" height="15" onClick= {() => this.handleRollBack(this.state.currentStep)}/>
+                  <img src="img/backArrowIcon.png" width="20" height="20" onClick= {() => this.handleRollBack(this.state.currentStep)}/>
                   <span className="actionTooltipsForRollback inToolTipsText">{getStringInTheCatalog(lng, 'ah_rollback')}</span>
                 </a>
               </span>
